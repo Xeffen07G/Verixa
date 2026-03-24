@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const pdfParse = require("pdf-parse");
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -17,6 +16,7 @@ router.post("/", upload.single("pdf"), async (req, res) => {
     return res.status(400).json({ error: "No PDF file uploaded." });
   }
   try {
+    const pdfParse = require("pdf-parse");
     const data = await pdfParse(req.file.buffer);
     const text = data.text.replace(/\s+/g, " ").trim().slice(0, 10000);
     if (!text || text.length < 30) {
