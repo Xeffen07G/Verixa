@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+const PDFParser = require("pdf2json");
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -11,51 +12,27 @@ const upload = multer({
   },
 });
 
-async function extractTextFromPdf(buffer) {
-  // Extract raw text from PDF buffer by reading the stream directly
-  const str = buffer.toString("binary");
-  const textBlocks = [];
-
-  // Extract text between BT and ET markers (PDF text blocks)
-  const btEtRegex = /BT([\s\S]*?)ET/g;
-  let match;
-  while ((match = btEtRegex.exec(str)) !== null) {
-    const block = match[1];
-    // Extract text from Tj and TJ operators
-    const tjRegex = /\(((?:[^()\\]|\\[\s\S])*)\)\s*Tj/g;
-    const tjArrRegex = /\[((?:[^\[\]]|\[(?:[^\[\]])*\])*)\]\s*TJ/g;
-    let tjMatch;
-    while ((tjMatch = tjRegex.exec(block)) !== null) {
-      const text = tjMatch[1]
-        .replace(/\\n/g, " ")
-        .replace(/\\r/g, " ")
-        .replace(/\\t/g, " ")
-        .replace(/\\\(/g, "(")
-        .replace(/\\\)/g, ")")
-        .replace(/\\\\/g, "\\")
-        .replace(/[^\x20-\x7E]/g, " ");
-      if (text.trim()) textBlocks.push(text.trim());
-    }
-    while ((tjMatch = tjArrRegex.exec(block)) !== null) {
-      const arrContent = tjMatch[1];
-      const strRegex = /\(((?:[^()\\]|\\[\s\S])*)\)/g;
-      let strMatch;
-      while ((strMatch = strRegex.exec(arrContent)) !== null) {
-        const text = strMatch[1]
-          .replace(/\\n/g, " ")
-          .replace(/\\r/g, " ")
-          .replace(/[^\x20-\x7E]/g, " ");
-        if (text.trim()) textBlocks.push(text.trim());
+function parsePdfBuffer(buffer) {
+  return new Promise((resolve, reject) => {
+    const pdfParser = new PDFParser(null, 1);
+    pdfParser.on("pdfParser_dataError", (err) => reject(new Error(err.parserError)));
+    pdfParser.on("pdfParser_dataReady", (pdfData) => {
+      try {
+        const pages = pdfData.Pages || [];
+        let fullText = "";
+        pages.forEach((page) => {
+          const pageText = (page.Texts || [])
+            .map((t) => decodeURIComponent(t.R.map((r) => r.T).join(" ")))
+            .join(" ");
+          fullText += pageText + "\n";
+        });
+        resolve({ text: fullText.trim(), numpages: pages.length });
+      } catch (e) {
+        reject(e);
       }
-    }
-  }
-
-  // Count pages
-  const pageMatches = str.match(/\/Type\s*\/Page[^s]/g);
-  const numPages = pageMatches ? pageMatches.length : 1;
-
-  const fullText = textBlocks.join(" ").replace(/\s+/g, " ").trim();
-  return { text: fullText, numpages: numPages };
+    });
+    pdfParser.parseBuffer(buffer);
+  });
 }
 
 router.post("/", upload.single("pdf"), async (req, res) => {
@@ -63,15 +40,11 @@ router.post("/", upload.single("pdf"), async (req, res) => {
     return res.status(400).json({ error: "No PDF file uploaded." });
   }
   try {
-    const { text, numpages } = await extractTextFromPdf(req.file.buffer);
-    const cleaned = text.slice(0, 10000);
-
+    const { text, numpages } = await parsePdfBuffer(req.file.buffer);
+    const cleaned = text.replace(/\s+/g, " ").trim().slice(0, 10000);
     if (!cleaned || cleaned.length < 30) {
-      return res.status(400).json({
-        error: "Could not extract text from this PDF. It may be scanned or image-based. Please try a text-based PDF.",
-      });
+      return res.status(400).json({ error: "Could not extract text from this PDF. It may be scanned or image-based." });
     }
-
     res.json({
       text: cleaned,
       pages: numpages,
