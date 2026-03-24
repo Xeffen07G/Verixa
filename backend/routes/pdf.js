@@ -16,7 +16,8 @@ router.post("/", upload.single("pdf"), async (req, res) => {
     return res.status(400).json({ error: "No PDF file uploaded." });
   }
   try {
-    const pdfParse = require("pdf-parse");
+    const pdfParseModule = require("pdf-parse");
+    const pdfParse = pdfParseModule.default || pdfParseModule;
     const data = await pdfParse(req.file.buffer);
     const text = data.text.replace(/\s+/g, " ").trim().slice(0, 10000);
     if (!text || text.length < 30) {
