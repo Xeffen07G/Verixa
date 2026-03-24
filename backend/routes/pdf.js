@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const PDFParser = require("pdf2json");
+const { PdfReader } = require("pdfreader");
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -14,24 +14,35 @@ const upload = multer({
 
 function parsePdfBuffer(buffer) {
   return new Promise((resolve, reject) => {
-    const pdfParser = new PDFParser(null, 1);
-    pdfParser.on("pdfParser_dataError", (err) => reject(new Error(err.parserError)));
-    pdfParser.on("pdfParser_dataReady", (pdfData) => {
-      try {
-        const pages = pdfData.Pages || [];
-        let fullText = "";
-        pages.forEach((page) => {
-          const pageText = (page.Texts || [])
-            .map((t) => decodeURIComponent(t.R.map((r) => r.T).join(" ")))
-            .join(" ");
-          fullText += pageText + "\n";
-        });
-        resolve({ text: fullText.trim(), numpages: pages.length });
-      } catch (e) {
-        reject(e);
+    const rows = {};
+    let currentPage = 0;
+
+    new PdfReader().parseBuffer(buffer, (err, item) => {
+      if (err) {
+        reject(new Error(err.message || "PDF parse error"));
+        return;
+      }
+
+      if (!item) {
+        // End of file — assemble text
+        const text = Object.keys(rows)
+          .sort((a, b) => Number(a) - Number(b))
+          .map((k) => rows[k].join(" "))
+          .join("\n");
+        resolve({ text, numpages: currentPage });
+        return;
+      }
+
+      if (item.page) {
+        currentPage = item.page;
+        rows[currentPage] = rows[currentPage] || [];
+      }
+
+      if (item.text) {
+        if (!rows[currentPage]) rows[currentPage] = [];
+        rows[currentPage].push(item.text);
       }
     });
-    pdfParser.parseBuffer(buffer);
   });
 }
 
@@ -43,7 +54,9 @@ router.post("/", upload.single("pdf"), async (req, res) => {
     const { text, numpages } = await parsePdfBuffer(req.file.buffer);
     const cleaned = text.replace(/\s+/g, " ").trim().slice(0, 10000);
     if (!cleaned || cleaned.length < 30) {
-      return res.status(400).json({ error: "Could not extract text from this PDF. It may be scanned or image-based." });
+      return res.status(400).json({
+        error: "Could not extract text from this PDF. Please use a text-based PDF, not a scanned image.",
+      });
     }
     res.json({
       text: cleaned,
