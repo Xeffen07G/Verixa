@@ -142,11 +142,13 @@ CONFIDENCE RULES:
 - 0-49: Very little relevant evidence
 
 REASONING RULES:
-- Always cite SPECIFIC facts from the evidence
-- If the claim has a specific error (wrong date, wrong name), state the correct information
-- If sources conflict, explicitly mention both sides
-- Be precise and factual — no vague language
-- For conspiracy theories and misinformation, cite scientific consensus
+- Always cite SPECIFIC facts from the evidence (dates, names, specific numbers)
+- For historical "founding" claims: distinguish between original incorporators and later co-founders/investors. 
+- If the claim is "X made Y", check if X was the ORIGINAL creator. If X joined later, even as a co-founder, the verdict should be "Partially True" or "False" depending on wording.
+- If the claim has a specific error (wrong date, wrong name), state the correct information clearly.
+- If sources conflict (e.g., popular narrative vs technical record), explicitly mention both and lean towards the technical record.
+- Be precise and factual — no vague language.
+- For conspiracy theories and misinformation, cite scientific/official consensus.
 
 IMPORTANT: You MUST return a verdict for EVERY claim. Never skip any claim.
 
