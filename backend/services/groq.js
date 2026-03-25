@@ -5,18 +5,16 @@ function getClient() {
   return new Groq({ apiKey: process.env.GROQ_API_KEY });
 }
 
-async function askGroq(prompt, jsonMode = false) {
+async function askGroq(prompt, jsonMode = false, model = "llama-3.1-8b-instant") {
   const groq = getClient();
   const completion = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile", // Valid Groq model ID
+    model: model, // Specific model ID (8b for speed/TPM, 70b for quality)
     messages: [
       {
         role: "system",
         content: `You are VeriXa — the world's most precise AI fact-verification engine.
-You were built by an elite team of AI researchers to combat misinformation.
 You are exceptionally thorough, accurate, and evidence-based.
 You NEVER guess. You ONLY make verdicts based on retrieved evidence.
-You NEVER skip or merge claims. You extract ALL claims as stated.
 You always respond in valid JSON as instructed.`,
       },
       { role: "user", content: prompt },
@@ -90,13 +88,14 @@ Text: "Elon Musk founded Apple."
 Correct: {"claims": ["Elon Musk founded Apple"]}
 Wrong: {"claims": ["Elon Musk founded Apple", "The text is too short", "There are no other claims"]}
 
-Text to extract from:
-"${text}"
+Text to extract from (truncated for performance):
+"${text.slice(0, 8000)}"
 
 Return ONLY this exact JSON format:
 {"claims": ["claim 1", "claim 2"]}`;
 
-  const raw = await askGroq(prompt, true);
+  // Using 8b model for extraction (faster, higher TPM limit)
+  const raw = await askGroq(prompt, true, "llama-3.1-8b-instant");
   const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
   return parsed.claims || parsed;
 }
@@ -110,7 +109,8 @@ Claim: "${claim}"`;
 
   let searchQuery = claim;
   try {
-    searchQuery = await askGroq(queryPrompt);
+    // Using 8b model for search query generation
+    searchQuery = await askGroq(queryPrompt, false, "llama-3.1-8b-instant");
     searchQuery = searchQuery.replace(/"/g, "").trim();
   } catch (e) {
     // fallback to raw claim
@@ -123,7 +123,7 @@ async function verifyClaims(claimsWithEvidence) {
   const formatted = claimsWithEvidence
     .map(
       (item, i) =>
-        `Claim ${i + 1}: "${item.claim}"\n\nEvidence Retrieved:\n${item.evidenceText.slice(0, 1500)}`
+        `Claim ${i + 1}: "${item.claim}"\n\nEvidence Retrieved:\n${item.evidenceText.slice(0, 800)}`
     )
     .join("\n\n═══════════════\n\n");
 
@@ -166,7 +166,8 @@ Return ONLY this JSON format:
 Claims to verify:
 ${formatted}`;
 
-  const raw = await askGroq(prompt, true);
+  // Keeping 70b model for final verification (best results)
+  const raw = await askGroq(prompt, true, "llama-3.3-70b-versatile");
   const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
   const verified = parsed.results || parsed;
 
@@ -204,9 +205,10 @@ Return ONLY this JSON format:
 }
 
 Text to analyze:
-${text.slice(0, 2000)}`;
+${text.slice(0, 3000)}`;
 
-  const raw = await askGroq(prompt, true);
+  // Using 8b for AI detection (fast)
+  const raw = await askGroq(prompt, true, "llama-3.1-8b-instant");
   return JSON.parse(raw.replace(/```json|```/g, "").trim());
 }
 
