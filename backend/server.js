@@ -8,10 +8,18 @@ const rateLimit = require("express-rate-limit");
 const verifyRoutes = require("./routes/verify");
 const urlRoutes = require("./routes/url");
 const healthRoutes = require("./routes/health");
+const connectDB = require("./config/db");
 const { requireApiKey, requestLogger } = require("./middleware/validate");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Connect to Database
+if (process.env.MONGO_URI) {
+  connectDB();
+} else {
+  console.log("⚠️ MONGO_URI not found in .env. Skipping database connection.");
+}
 
 // Security & middleware
 app.use(helmet());
@@ -40,6 +48,7 @@ app.use("/api/verify", requireApiKey, verifyRoutes);
 app.use("/api/url", requireApiKey, urlRoutes);
 app.use("/api/pdf", requireApiKey, require("./routes/pdf"));
 app.use("/api/image", requireApiKey, require("./routes/image"));
+app.use("/api/auth", require("./routes/auth"));
 app.use("/api/health", healthRoutes);
 
 // 404 handler

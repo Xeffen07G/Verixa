@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, logout } = useAuth();
   const location = useLocation();
   const isLanding = location.pathname === '/';
   const isVerify = location.pathname === '/verify';
@@ -27,6 +29,12 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const bgScrolled = darkMode ? 'rgba(10,10,15,0.92)' : 'rgba(245,244,240,0.96)';
   const borderScrolled = darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.1)';
   const mobileBg = darkMode ? 'rgba(10,10,15,0.98)' : 'rgba(245,244,240,0.98)';
+  const T = {
+    text: textColor,
+    text2: textMuted,
+    border: borderScrolled,
+    accent: '#c9a96e'
+  };
 
   return (
     <>
@@ -60,16 +68,13 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
             {/* Custom Buttons from Page */}
             {children}
 
-            {/* Verification Buttons - Ghost style on landing hero, Solid on scroll/other pages */}
+            {/* Verification Buttons */}
             {!isImage && (
               <Link to="/image" style={{ 
                 padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 500, 
-                border: '1px solid rgba(201,169,110,0.3)', 
-                background: 'transparent', 
-                color: '#c9a96e', 
+                border: '1px solid rgba(201,169,110,0.3)', background: 'transparent', color: '#c9a96e', 
                 letterSpacing: 0.3, transition: 'all 0.3s', textDecoration: 'none', 
-                display: 'inline-block',
-                opacity: (isLanding && !scrolled) ? 0.7 : 1,
+                display: 'inline-block', opacity: (isLanding && !scrolled) ? 0.7 : 1,
               }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,169,110,0.08)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -82,9 +87,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
                 background: (!isLanding || scrolled) ? 'linear-gradient(135deg, #c9a96e, #a07b42)' : 'transparent', 
                 border: (!isLanding || scrolled) ? 'none' : '1px solid rgba(201,169,110,0.3)', 
                 color: (!isLanding || scrolled) ? '#0a0a0f' : '#c9a96e', 
-                letterSpacing: 0.3, transition: 'all 0.3s', textDecoration: 'none', 
-                display: 'inline-block',
-                boxShadow: (!isLanding || scrolled) ? `0 4px 12px ${darkMode ? 'rgba(0,0,0,0.3)' : 'rgba(201,169,110,0.2)'}` : 'none'
+                letterSpacing: 0.3, transition: 'all 0.3s', textDecoration: 'none', display: 'inline-block'
               }}
                 onMouseEnter={e => {
                   if (!isLanding || scrolled) e.currentTarget.style.opacity = '0.88';
@@ -97,23 +100,27 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
               >Start Verifying</Link>
             )}
 
-            {/* Theme Toggle in Navbar - Always Visible */}
-            <button
-              onClick={onToggleTheme}
-              style={{
-                background: 'transparent',
-                border: scrolled ? `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` : '1px solid rgba(201,169,110,0.3)',
-                color: '#c9a96e',
-                width: 38,
-                height: 38,
-                borderRadius: 8,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                fontSize: 16,
-                marginLeft: 4,
-                transition: 'all 0.2s'
+            <div style={{ width: 1, height: 20, background: T.border, margin: '0 8px' }} />
+
+            {/* Auth Buttons */}
+            {user ? (
+              <button onClick={logout} style={{ 
+                padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 600, 
+                background: 'transparent', border: `1px solid ${T.border}`, color: T.text,
+                cursor: 'pointer', transition: 'all 0.2s'
+              }}>Logout</button>
+            ) : (
+              <Link to="/login" style={{ 
+                padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 600, 
+                background: 'transparent', border: `1px solid ${T.border}`, color: T.text,
+                textDecoration: 'none', transition: 'all 0.2s'
+              }}>Sign In</Link>
+            )}
+
+            {/* Theme Toggle */}
+            <button onClick={onToggleTheme} style={{
+                background: 'transparent', border: scrolled ? `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` : '1px solid rgba(201,169,110,0.3)',
+                color: '#c9a96e', width: 38, height: 38, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 16, marginLeft: 4, transition: 'all 0.2s'
               }}
               onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,169,110,0.08)'}
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
