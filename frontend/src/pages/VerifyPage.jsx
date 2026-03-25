@@ -355,7 +355,7 @@ export default function VerifyPage() {
   }
 
   function handleRun() {
-    if (!text.trim() || text.trim().length < 30) return;
+    if (!text.trim() || text.trim().length < 5) return;
     setLeftTab('input');
     verify(text.trim(), detectAI);
   }
