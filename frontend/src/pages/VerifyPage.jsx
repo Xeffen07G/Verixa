@@ -22,16 +22,18 @@ const DARK = {
   inputBg: 'rgba(255,255,255,0.04)', inputBorder: 'rgba(255,255,255,0.1)',
   logBg: 'rgba(255,255,255,0.02)', emptyColor: 'rgba(245,243,239,0.2)',
   cardBg: '#13131a', cardBorder: 'rgba(255,255,255,0.06)',
+  accent: '#c9a96e', accentMuted: 'rgba(201,169,110,0.12)',
 };
 
 const LIGHT = {
-  bg: '#f8f7f3', surface: '#ffffff', surface2: '#f0ede6',
-  border: 'rgba(0,0,0,0.08)', border2: 'rgba(0,0,0,0.04)',
-  text: '#111111', text2: '#444444', text3: '#888888',
-  topbar: 'rgba(248,247,243,0.95)', panelFooter: 'rgba(248,247,243,0.9)',
-  inputBg: '#ffffff', inputBorder: 'rgba(0,0,0,0.12)',
-  logBg: 'rgba(0,0,0,0.02)', emptyColor: 'rgba(30,30,30,0.2)',
-  cardBg: '#ffffff', cardBorder: 'rgba(0,0,0,0.06)',
+  bg: '#e8e5de', surface: '#f0ede6', surface2: '#ddd9d0',
+  border: 'rgba(0,0,0,0.12)', border2: 'rgba(0,0,0,0.06)',
+  text: '#0d0d0d', text2: '#2a2a2a', text3: '#555555',
+  topbar: 'rgba(232,229,222,0.95)', panelFooter: 'rgba(232,229,222,0.9)',
+  inputBg: '#f5f3ed', inputBorder: 'rgba(0,0,0,0.14)',
+  logBg: 'rgba(0,0,0,0.03)', emptyColor: 'rgba(30,30,30,0.25)',
+  cardBg: '#f0ede6', cardBorder: 'rgba(0,0,0,0.08)',
+  accent: '#5a421a', accentMuted: 'rgba(90,66,26,0.15)',
 };
 
 function ScoreBanner({ score, claims }) {
@@ -132,7 +134,7 @@ function ClaimCard({ claim, index, theme }) {
                           <span style={{ fontSize: 10, padding: '1px 8px', borderRadius: 999, background: cred.bg, color: cred.color, fontWeight: 700 }}>{cred.label}</span>
                         </div>
                         {src.snippet && <p style={{ fontSize: 12, color: theme.text3, margin: 0, lineHeight: 1.5 }}>{src.snippet}</p>}
-                        {src.url && <a href={src.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c9a96e', marginTop: 4, display: 'inline-block' }}>Read source →</a>}
+                        {src.url && <a href={src.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: theme.accent, marginTop: 4, display: 'inline-block' }}>Read source →</a>}
                       </div>
                     </div>
                   );
@@ -146,23 +148,71 @@ function ClaimCard({ claim, index, theme }) {
   );
 }
 
-function PipelineProgress({ stage, theme }) {
+function AnimatedLoadingBar({ active, color, height = 3, borderRadius = 4, style = {}, indeterminate = false, progress = null }) {
+  const defaultColor = '#c9a96e';
+  const barColor = color || defaultColor;
+  if (!active) return null;
+  return (
+    <div style={{ width: '100%', height, borderRadius, background: `${color}1a` || 'rgba(201,169,110,0.1)', overflow: 'hidden', position: 'relative', ...style }}>
+      {indeterminate ? (
+        <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: '40%', borderRadius, background: `linear-gradient(90deg, transparent, ${color}, transparent)`, animation: 'loading-shimmer 1.5s ease-in-out infinite' }} />
+      ) : (
+        <div style={{
+          height: '100%', borderRadius,
+          background: `linear-gradient(90deg, ${color}, ${color}cc)`,
+          width: progress != null ? `${progress}%` : undefined,
+          animation: progress == null ? 'loading-progress 12s ease-out forwards' : undefined,
+          boxShadow: `0 0 8px ${color}60`,
+          transition: progress != null ? 'width 0.5s ease' : undefined,
+        }} />
+      )}
+    </div>
+  );
+}
+
+function PipelineProgress({ stage, theme, darkMode }) {
   const labels = ['Extracting', 'Searching', 'Verifying', 'Done'];
   const idx = STAGES.indexOf(stage);
+  const progressMap = { extracting: 15, searching: 45, verifying: 75, done: 100 };
+  const progress = progressMap[stage] || (stage === 'done' ? 100 : 0);
+  const currentLabel = labels[idx] || (stage === 'done' ? 'Complete' : 'Processing');
+
   return (
     <div style={{ padding: '20px 0 8px' }}>
+      {/* Animated progress bar */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+          <span style={{ fontSize: 10, color: theme.accent, letterSpacing: 1, textTransform: 'uppercase', fontWeight: 600 }}>
+            {currentLabel}...
+          </span>
+          <span style={{ fontSize: 10, color: theme.text3, fontFamily: 'DM Mono, monospace' }}>{progress}%</span>
+        </div>
+        <div style={{ width: '100%', height: 4, borderRadius: 4, background: theme.accentMuted, overflow: 'hidden', position: 'relative' }}>
+          <div style={{
+            height: '100%', borderRadius: 4,
+            background: `linear-gradient(90deg, ${theme.accent}, #e8d5a3, ${theme.accent})`,
+            backgroundSize: '200% 100%',
+            width: `${progress}%`,
+            transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+            animation: stage !== 'done' ? 'loading-glow 2s ease-in-out infinite, bar-pulse 1.5s ease-in-out infinite' : 'none',
+            boxShadow: `0 0 10px ${theme.accent}66`,
+          }} />
+        </div>
+      </div>
+
+      {/* Step circles */}
       <div style={{ display: 'flex', alignItems: 'center' }}>
         {labels.map((label, i) => {
           const done = i < idx || stage === 'done', active = i === idx && stage !== 'done';
           return (
             <React.Fragment key={i}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: 1 }}>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: done ? '#c9a96e' : active ? 'rgba(201,169,110,0.15)' : theme.surface2, border: `2px solid ${done || active ? '#c9a96e' : theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s' }}>
-                  {done ? <span style={{ fontSize: 12, color: '#0a0a0f', fontWeight: 800 }}>✓</span> : active ? <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#c9a96e', display: 'block', animation: 'pulse-gold 1.2s infinite' }} /> : null}
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: done ? theme.accent : active ? theme.accentMuted : theme.surface2, border: `2px solid ${done || active ? theme.accent : theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s', boxShadow: active ? `0 0 12px ${theme.accent}4d` : 'none' }}>
+                  {done ? <span style={{ fontSize: 12, color: darkMode ? '#0a0a0f' : '#fff', fontWeight: 800 }}>✓</span> : active ? <span style={{ width: 8, height: 8, borderRadius: '50%', background: theme.accent, display: 'block', animation: 'pulse-gold 1.2s infinite' }} /> : null}
                 </div>
-                <span style={{ fontSize: 9, color: done || active ? '#c9a96e' : theme.text3, letterSpacing: 1, textAlign: 'center', textTransform: 'uppercase', fontWeight: done || active ? 600 : 400 }}>{label}</span>
+                <span style={{ fontSize: 9, color: done || active ? theme.accent : theme.text3, letterSpacing: 1, textAlign: 'center', textTransform: 'uppercase', fontWeight: done || active ? 600 : 400 }}>{label}</span>
               </div>
-              {i < labels.length - 1 && <div style={{ flex: 1, height: 2, background: i < idx ? '#c9a96e' : theme.border, marginTop: -16, transition: 'background 0.5s', borderRadius: 1 }} />}
+              {i < labels.length - 1 && <div style={{ flex: 1, height: 2, background: i < idx ? theme.accent : theme.border, marginTop: -16, transition: 'background 0.5s', borderRadius: 1 }} />}
             </React.Fragment>
           );
         })}
@@ -186,7 +236,7 @@ function HistoryPanel({ history, onLoad, onDelete, theme }) {
         const bg = score >= 70 ? '#dcfce7' : score >= 40 ? '#fef3c7' : '#fee2e2';
         return (
           <div key={i} style={{ padding: '14px 16px', borderRadius: 12, border: `1px solid ${theme.cardBorder}`, marginBottom: 10, background: theme.cardBg, transition: 'border-color 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,169,110,0.3)'}
+            onMouseEnter={e => e.currentTarget.style.borderColor = `${theme.accent}4d`}
             onMouseLeave={e => e.currentTarget.style.borderColor = theme.cardBorder}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 11, color: theme.text3 }}>{new Date(item.timestamp).toLocaleString()}</span>
@@ -196,7 +246,7 @@ function HistoryPanel({ history, onLoad, onDelete, theme }) {
               </div>
             </div>
             <p style={{ margin: '0 0 10px', fontSize: 12, color: theme.text2, lineHeight: 1.5 }}>{item.text?.slice(0, 90)}{item.text?.length > 90 ? '...' : ''}</p>
-            <button onClick={() => onLoad(item)} style={{ fontSize: 11, color: '#c9a96e', background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)', borderRadius: 6, padding: '4px 12px', cursor: 'pointer' }}>Load →</button>
+            <button onClick={() => onLoad(item)} style={{ fontSize: 11, color: theme.accent, background: theme.accentMuted, border: `1px solid ${theme.accent}33`, borderRadius: 6, padding: '4px 12px', cursor: 'pointer' }}>Load →</button>
           </div>
         );
       })}
@@ -220,7 +270,16 @@ export default function VerifyPage() {
   const [fetchingUrl, setFetchingUrl] = useState(false);
   const [pdfInfo, setPdfInfo] = useState(null);
   const [uploadingPdf, setUploadingPdf] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('verixa-theme');
+    return saved ? saved === 'dark' : true;
+  });
+
+  const toggleTheme = () => {
+    const newVal = !darkMode;
+    setDarkMode(newVal);
+    localStorage.setItem('verixa-theme', newVal ? 'dark' : 'light');
+  };
   const [leftTab, setLeftTab] = useState('input');
   const [listening, setListening] = useState(false);
   const [history, setHistory] = useState(() => {
@@ -313,8 +372,8 @@ export default function VerifyPage() {
   const tabBtn = (active) => ({
     flex: 1, padding: '7px 0', borderRadius: 8, border: 'none', cursor: 'pointer',
     fontSize: 11, fontWeight: 600, letterSpacing: 0.5,
-    background: active ? 'rgba(201,169,110,0.12)' : 'transparent',
-    color: active ? '#c9a96e' : T.text3, transition: 'all 0.18s',
+    background: active ? T.accentMuted : 'transparent',
+    color: active ? T.accent : T.text3, transition: 'all 0.18s',
   });
 
   return (
@@ -322,10 +381,41 @@ export default function VerifyPage() {
       <style>{`
         @media (max-width: 768px) { .verify-main { grid-template-columns: 1fr !important; } .left-panel { height: auto !important; border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); } }
         textarea:focus { outline: none; }
+        ::selection { background: rgba(140,100,40,0.7); color: #fff; }
+        ::-moz-selection { background: rgba(140,100,40,0.7); color: #fff; }
         @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
         @keyframes pulse-gold { 0%,100%{opacity:1} 50%{opacity:0.3} }
         @keyframes mic-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,0.4)} 70%{box-shadow:0 0 0 8px rgba(248,113,113,0)} }
         @keyframes slideIn { from { opacity:0; transform:translateX(-10px); } to { opacity:1; transform:none; } }
+        @keyframes loading-shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(250%); }
+        }
+        @keyframes loading-progress {
+          0% { width: 0%; }
+          20% { width: 25%; }
+          40% { width: 45%; }
+          60% { width: 65%; }
+          80% { width: 80%; }
+          95% { width: 92%; }
+          100% { width: 92%; }
+        }
+        @keyframes loading-glow {
+          0%, 100% { box-shadow: 0 0 4px ${T.accent}4d; }
+          50% { box-shadow: 0 0 12px ${T.accent}99, 0 0 24px ${T.accent}33; }
+        }
+        @keyframes bar-pulse {
+          0%, 100% { opacity: 0.8; }
+          50% { opacity: 1; }
+        }
+        @keyframes orbit {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes typing-dot {
+          0%, 60%, 100% { opacity: 0.2; transform: translateY(0); }
+          30% { opacity: 1; transform: translateY(-4px); }
+        }
       `}</style>
 
       {/* TOPBAR */}
@@ -334,7 +424,7 @@ export default function VerifyPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {stage === 'done' && claims.length > 0 && (
             <button onClick={() => exportToPDF(claims, overallScore, text)}
-              style={{ padding: '7px 18px', borderRadius: 8, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.3)', color: '#c9a96e', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+              style={{ padding: '7px 18px', borderRadius: 8, background: T.accentMuted, border: `1px solid ${T.accent}4d`, color: T.accent, fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
               Export PDF
             </button>
           )}
@@ -345,7 +435,7 @@ export default function VerifyPage() {
             </button>
           )}
           <Link to="/image"
-            style={{ padding: '7px 18px', borderRadius: 8, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)', color: '#c9a96e', fontSize: 12, textDecoration: 'none', fontWeight: 500 }}>
+            style={{ padding: '7px 18px', borderRadius: 8, background: T.accentMuted, border: `1px solid ${T.accent}33`, color: T.accent, fontSize: 12, textDecoration: 'none', fontWeight: 500 }}>
             Image
           </Link>
           <button onClick={() => setDarkMode(!darkMode)}
@@ -386,13 +476,14 @@ export default function VerifyPage() {
                 {/* PDF */}
                 {inputMode === 'pdf' && (
                   <div style={{ marginBottom: 14 }}>
-                    <div style={{ border: `2px dashed rgba(201,169,110,0.3)`, borderRadius: 12, padding: '28px 20px', textAlign: 'center', cursor: 'pointer', background: 'rgba(201,169,110,0.02)', transition: 'all 0.2s' }}
+                    <div style={{ border: `2px dashed ${uploadingPdf ? 'rgba(201,169,110,0.5)' : 'rgba(201,169,110,0.3)'}`, borderRadius: 12, padding: '28px 20px', textAlign: 'center', cursor: uploadingPdf ? 'wait' : 'pointer', background: uploadingPdf ? 'rgba(201,169,110,0.04)' : 'rgba(201,169,110,0.02)', transition: 'all 0.3s' }}
                       onDragOver={e => e.preventDefault()}
                       onDrop={async e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f?.type === 'application/pdf') await handlePdfUpload(f); }}
-                      onClick={() => document.getElementById('pdf-input').click()}>
-                      <div style={{ fontSize: 24, marginBottom: 8, color: '#c9a96e' }}>⬡</div>
-                      <p style={{ fontSize: 13, color: T.text3, margin: 0 }}>{uploadingPdf ? 'Extracting...' : 'Click or drag PDF here'}</p>
+                      onClick={() => !uploadingPdf && document.getElementById('pdf-input').click()}>
+                      <div style={{ fontSize: 24, marginBottom: 8, color: T.accent }}>{uploadingPdf ? '⟳' : '⬡'}</div>
+                      <p style={{ fontSize: 13, color: uploadingPdf ? T.accent : T.text3, margin: 0, fontWeight: uploadingPdf ? 500 : 400 }}>{uploadingPdf ? 'Extracting text from PDF...' : 'Click or drag PDF here'}</p>
                       <p style={{ fontSize: 11, color: T.text3, marginTop: 4, opacity: 0.6 }}>Max 10MB</p>
+                      <AnimatedLoadingBar active={uploadingPdf} indeterminate height={3} style={{ marginTop: 14, borderRadius: 6 }} />
                     </div>
                     <input id="pdf-input" type="file" accept="application/pdf" style={{ display: 'none' }} onChange={e => { const f = e.target.files[0]; if (f) handlePdfUpload(f); }} />
                     {pdfInfo && <div style={{ marginTop: 8, padding: '8px 12px', background: 'rgba(74,222,128,0.06)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: 8, fontSize: 12, color: '#4ade80' }}>Loaded: {pdfInfo.filename}</div>}
@@ -406,11 +497,12 @@ export default function VerifyPage() {
                       <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://example.com/article..."
                         style={{ flex: 1, padding: '10px 14px', background: T.inputBg, border: `1px solid ${T.inputBorder}`, borderRadius: 10, color: T.text, fontSize: 13, outline: 'none' }} />
                       <button onClick={handleFetchUrl} disabled={fetchingUrl}
-                        style={{ padding: '10px 16px', borderRadius: 10, border: '1px solid rgba(201,169,110,0.3)', background: 'rgba(201,169,110,0.06)', color: '#c9a96e', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                        {fetchingUrl ? '...' : 'Fetch'}
+                        style={{ padding: '10px 16px', borderRadius: 10, border: `1px solid ${T.accent}4d`, background: fetchingUrl ? `${T.accent}26` : T.accentMuted, color: T.accent, fontSize: 12, fontWeight: 600, cursor: fetchingUrl ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
+                        {fetchingUrl ? 'Fetching...' : 'Fetch'}
                       </button>
                     </div>
-                    {text && <p style={{ fontSize: 11, color: '#4ade80', marginTop: 6 }}>Content loaded</p>}
+                    <AnimatedLoadingBar active={fetchingUrl} indeterminate height={3} style={{ marginTop: 8, borderRadius: 6 }} />
+                    {!fetchingUrl && text && <p style={{ fontSize: 11, color: '#4ade80', marginTop: 6 }}>Content loaded</p>}
                   </div>
                 )}
 
@@ -420,10 +512,10 @@ export default function VerifyPage() {
                     placeholder="Paste your article, essay, or any text with facts..."
                     style={{ width: '100%', minHeight: 200, padding: '14px 14px 44px', background: T.inputBg, border: `1.5px solid ${T.inputBorder}`, borderRadius: 12, color: T.text, fontSize: 13, lineHeight: 1.7, resize: 'vertical', outline: 'none', fontFamily: 'DM Sans, sans-serif', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                     disabled={isLoading}
-                    onFocus={e => e.target.style.borderColor = 'rgba(201,169,110,0.4)'}
+                    onFocus={e => e.target.style.borderColor = `${T.accent}66`}
                     onBlur={e => e.target.style.borderColor = T.inputBorder} />
                   <button onClick={listening ? stopListening : startListening}
-                    style={{ position: 'absolute', bottom: 10, right: 10, padding: '5px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, background: listening ? '#f87171' : 'rgba(201,169,110,0.12)', color: listening ? '#fff' : '#c9a96e', animation: listening ? 'mic-pulse 1.5s infinite' : 'none', transition: 'all 0.2s', letterSpacing: 0.5 }}>
+                    style={{ position: 'absolute', bottom: 10, right: 10, padding: '5px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, background: listening ? '#f87171' : T.accentMuted, color: listening ? '#fff' : T.accent, animation: listening ? 'mic-pulse 1.5s infinite' : 'none', transition: 'all 0.2s', letterSpacing: 0.5 }}>
                     {listening ? 'Stop' : 'Go Voice'}
                   </button>
                 </div>
@@ -434,7 +526,7 @@ export default function VerifyPage() {
 
                 {/* AI Detection Toggle */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12, padding: '10px 14px', background: T.surface2, borderRadius: 10 }}>
-                  <button style={{ width: 36, height: 20, borderRadius: 10, cursor: 'pointer', background: detectAI ? '#c9a96e' : T.inputBorder, position: 'relative', border: 'none', transition: 'background 0.2s', flexShrink: 0 }} onClick={() => setDetectAI(!detectAI)}>
+                  <button style={{ width: 36, height: 20, borderRadius: 10, cursor: 'pointer', background: detectAI ? T.accent : T.inputBorder, position: 'relative', border: 'none', transition: 'background 0.2s', flexShrink: 0 }} onClick={() => setDetectAI(!detectAI)}>
                     <div style={{ position: 'absolute', top: 3, left: detectAI ? 18 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
                   </button>
                   <div>
@@ -443,7 +535,7 @@ export default function VerifyPage() {
                   </div>
                 </div>
 
-                {stage && stage !== 'done' && <PipelineProgress stage={stage} theme={T} />}
+                {stage && stage !== 'done' && <PipelineProgress stage={stage} theme={T} darkMode={darkMode} />}
 
                 {/* Live logs */}
                 {logs.length > 0 && stage !== 'done' && (
@@ -455,8 +547,17 @@ export default function VerifyPage() {
 
               {/* Run button */}
               <div style={{ padding: '16px 20px', borderTop: `1px solid ${T.border}`, background: T.panelFooter }}>
+                <AnimatedLoadingBar active={isLoading} indeterminate color={T.accent} height={3} style={{ marginBottom: 12, borderRadius: 6 }} />
                 <button
-                  style={{ width: '100%', padding: '14px', borderRadius: 12, background: isLoading ? 'rgba(201,169,110,0.15)' : 'linear-gradient(135deg, #c9a96e, #a07b42)', border: 'none', color: isLoading ? '#c9a96e' : '#0a0a0f', fontSize: 14, fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', letterSpacing: 0.8, transition: 'all 0.22s', boxShadow: isLoading ? 'none' : '0 4px 16px rgba(201,169,110,0.3)' }}
+                  style={{ 
+                    width: '100%', padding: '14px', borderRadius: 12, 
+                    background: isLoading ? T.accentMuted : `linear-gradient(135deg, ${T.accent}, #a07b42)`, 
+                    border: 'none', color: isLoading ? T.accent : (darkMode ? '#0a0a0f' : '#fff'), 
+                    fontSize: 14, fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', 
+                    letterSpacing: 0.8, transition: 'all 0.22s', 
+                    boxShadow: isLoading ? 'none' : `0 4px 16px ${T.accent}4d`, 
+                    position: 'relative', overflow: 'hidden' 
+                  }}
                   onClick={handleRun} disabled={isLoading || !text.trim()}>
                   {isLoading ? 'Verifying...' : 'Verify Now'}
                 </button>
@@ -471,12 +572,95 @@ export default function VerifyPage() {
           {/* Empty state */}
           {!stage && claims.length === 0 && !error && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', gap: 20 }}>
-              <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, color: 'rgba(201,169,110,0.3)' }}>◉</div>
+              <div style={{ width: 80, height: 80, borderRadius: '50%', background: T.accentMuted, border: `1px solid ${T.accent}1a`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, color: `${T.accent}4d` }}>◉</div>
               <div style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 32, color: T.emptyColor, lineHeight: 1.2 }}>Ready to verify</div>
               <div style={{ fontSize: 14, color: T.text3, maxWidth: 340, lineHeight: 1.7 }}>Paste any text, URL, or PDF on the left. VeriXa will extract every claim and check it against real evidence.</div>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center', marginTop: 8 }}>
                 {['Text', 'URL', 'PDF', 'Voice', 'Image'].map(f => (
-                  <span key={f} style={{ padding: '4px 14px', borderRadius: 999, background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.12)', fontSize: 12, color: '#c9a96e' }}>{f}</span>
+                  <span key={f} style={{ padding: '4px 14px', borderRadius: 999, background: T.accentMuted, border: `1px solid ${T.accent}1f`, fontSize: 12, color: T.accent }}>{f}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ════ ANIMATED PIPELINE LOADING STATE ════ */}
+          {stage && stage !== 'done' && claims.length === 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', gap: 32 }}>
+              {/* Orbiting ring animation */}
+              <div style={{ position: 'relative', width: 120, height: 120 }}>
+                <div style={{
+                  position: 'absolute', inset: 0, borderRadius: '50%',
+                  border: `2px solid ${T.accent}14`,
+                }} />
+                <div style={{
+                  position: 'absolute', inset: 0, borderRadius: '50%',
+                  border: '2px solid transparent', borderTopColor: T.accent,
+                  animation: 'orbit 1.5s linear infinite',
+                }} />
+                <div style={{
+                  position: 'absolute', inset: 8, borderRadius: '50%',
+                  border: '2px solid transparent', borderTopColor: `${T.accent}66`,
+                  animation: 'orbit 2.5s linear infinite reverse',
+                }} />
+                <div style={{
+                  position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 28, color: T.accent,
+                }}>
+                  {stage === 'extracting' ? '🔍' : stage === 'searching' ? '🌐' : '✓'}
+                </div>
+              </div>
+
+              {/* Stage label */}
+              <div>
+                <div style={{
+                  fontFamily: 'Cormorant Garamond, serif', fontWeight: 400, fontSize: 28,
+                  color: T.text, lineHeight: 1.2, marginBottom: 8,
+                }}>
+                  {stage === 'extracting' ? 'Extracting Claims' : stage === 'searching' ? 'Searching Evidence' : 'Verifying Claims'}...
+                </div>
+                <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.6, maxWidth: 380, margin: '0 auto' }}>
+                  {stage === 'extracting'
+                    ? 'Decomposing your text into discrete, verifiable factual claims using chain-of-thought reasoning.'
+                    : stage === 'searching'
+                    ? 'Querying authoritative sources across the web. Cross-referencing evidence for each claim.'
+                    : 'Analyzing evidence against each claim. Generating verdicts with confidence scores.'}
+                </div>
+              </div>
+
+              {/* Mini progress bar */}
+              <div style={{ width: '100%', maxWidth: 320 }}>
+                <AnimatedLoadingBar active indeterminate height={3} style={{ borderRadius: 6 }} />
+              </div>
+
+              {/* Live stage pills */}
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+                {['Extracting', 'Searching', 'Verifying'].map((s, i) => {
+                  const stageMap = ['extracting', 'searching', 'verifying'];
+                  const currentIdx = stageMap.indexOf(stage);
+                  const isDone = i < currentIdx;
+                  const isActive = i === currentIdx;
+                  return (
+                    <span key={s} style={{
+                      padding: '5px 14px', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: 0.5,
+                      background: isDone ? 'rgba(74,222,128,0.08)' : isActive ? T.accentMuted : `${T.accent}0a`,
+                      color: isDone ? '#4ade80' : isActive ? T.accent : T.text3,
+                      border: `1px solid ${isDone ? 'rgba(74,222,128,0.2)' : isActive ? `${T.accent}40` : T.border}`,
+                      transition: 'all 0.3s',
+                    }}>
+                      {isDone ? '✓ ' : isActive ? '● ' : ''}{s}
+                    </span>
+                  );
+                })}
+              </div>
+
+              {/* Typing dots */}
+              <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+                {[0, 1, 2].map(i => (
+                  <div key={i} style={{
+                    width: 6, height: 6, borderRadius: '50%', background: T.accent,
+                    animation: `typing-dot 1.4s ease-in-out infinite`,
+                    animationDelay: `${i * 0.2}s`,
+                  }} />
                 ))}
               </div>
             </div>
