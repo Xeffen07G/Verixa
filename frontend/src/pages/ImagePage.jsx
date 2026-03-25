@@ -98,7 +98,7 @@ export default function ImagePage() {
   const riskCfg = result ? (RISK_CONFIG[result.risk_level] || RISK_CONFIG['Medium']) : null;
 
   return (
-    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, transition: 'background 0.3s, color 0.3s', fontFamily: 'DM Sans, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, paddingTop: 60, transition: 'background 0.3s, color 0.3s', fontFamily: 'DM Sans, sans-serif' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }

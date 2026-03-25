@@ -378,7 +378,7 @@ export default function VerifyPage() {
   });
 
   return (
-    <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', flexDirection: 'column', transition: 'background 0.3s', fontFamily: 'DM Sans, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', flexDirection: 'column', paddingTop: 60, transition: 'background 0.3s', fontFamily: 'DM Sans, sans-serif' }}>
       <style>{`
         @media (max-width: 768px) { .verify-main { grid-template-columns: 1fr !important; } .left-panel { height: auto !important; border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); } }
         textarea:focus { outline: none; }

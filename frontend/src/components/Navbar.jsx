@@ -30,7 +30,14 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
 
   return (
     <>
-      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, padding: scrolled ? '14px 0' : '22px 0', background: scrolled ? bgScrolled : 'transparent', backdropFilter: scrolled ? 'blur(20px)' : 'none', borderBottom: scrolled ? `1px solid ${borderScrolled}` : '1px solid transparent', transition: 'all 0.3s ease' }}>
+      <nav style={{ 
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, 
+        padding: (scrolled || !isLanding) ? '14px 0' : '22px 0', 
+        background: (scrolled || !isLanding) ? bgScrolled : 'transparent', 
+        backdropFilter: (scrolled || !isLanding) ? 'blur(20px)' : 'none', 
+        borderBottom: (scrolled || !isLanding) ? `1px solid ${borderScrolled}` : '1px solid transparent', 
+        transition: 'all 0.3s ease' 
+      }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 
           <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
