@@ -8,7 +8,7 @@ function getClient() {
 async function askGroq(prompt, jsonMode = false) {
   const groq = getClient();
   const completion = await groq.chat.completions.create({
-    model: "llama-3.1-8b-instant",
+    model: "llama-3.3-70b-versatile", // Valid Groq model ID
     messages: [
       {
         role: "system",
@@ -23,7 +23,7 @@ You always respond in valid JSON as instructed.`,
     ],
     temperature: jsonMode ? 0.1 : 0.2,
     response_format: jsonMode ? { type: "json_object" } : undefined,
-    max_tokens: 4096,
+    max_completion_tokens: 4096,
   });
   return completion.choices[0].message.content.trim();
 }
@@ -69,24 +69,32 @@ async function extractClaims(text) {
   const prompt = `Extract EVERY factual claim from this text. You must extract ALL of them including false ones and conspiracy theories.
 
 CRITICAL RULES:
+- Extract ONLY factual claims that are ACTUALLY STATED in the text
 - Extract EVERY single claim no matter how obviously false it seems
 - Do NOT skip claims that seem wrong, controversial or like misinformation
 - Do NOT merge multiple claims into one
 - Keep the EXACT wording from the original text as much as possible
 - Each claim must be one sentence only
-- You MUST extract ALL claims — minimum 3, maximum 8
-- If there are 4 sentences with claims, return 4 claims
+- Extract between 1 and 8 claims — extract however many exist in the text
+- If there is only 1 claim in the text, return exactly 1 claim
+- NEVER invent claims that are not in the text
+- NEVER add meta-commentary like "the text is too short" or "there are no claims"
+- NEVER add observations ABOUT the text itself — only extract claims FROM the text
 
-EXAMPLE:
+EXAMPLE 1:
 Text: "Vaccines cause autism. The earth is flat. COVID started in 2019. 5G causes cancer."
 Correct: {"claims": ["Vaccines cause autism", "The earth is flat", "COVID started in 2019", "5G causes cancer"]}
-Wrong: {"claims": ["Vaccines cause autism", "COVID started in 2019"]} — you skipped claims!
+
+EXAMPLE 2:
+Text: "Elon Musk founded Apple."
+Correct: {"claims": ["Elon Musk founded Apple"]}
+Wrong: {"claims": ["Elon Musk founded Apple", "The text is too short", "There are no other claims"]}
 
 Text to extract from:
 "${text}"
 
 Return ONLY this exact JSON format:
-{"claims": ["claim 1", "claim 2", "claim 3", "claim 4"]}`;
+{"claims": ["claim 1", "claim 2"]}`;
 
   const raw = await askGroq(prompt, true);
   const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
