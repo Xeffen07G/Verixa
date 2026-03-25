@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 import { useVerify } from '../hooks/useVerify';
 import axios from 'axios';
 
@@ -418,32 +419,20 @@ export default function VerifyPage() {
         }
       `}</style>
 
-      {/* TOPBAR */}
-      <div style={{ borderBottom: `1px solid ${T.border}`, padding: '0 28px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: T.topbar, backdropFilter: 'blur(16px)', position: 'sticky', top: 0, zIndex: 50, transition: 'all 0.3s' }}>
-        <Link to="/" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700, fontSize: 22, color: T.text, letterSpacing: 1, textDecoration: 'none' }}>VeriXa</Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {stage === 'done' && claims.length > 0 && (
-            <button onClick={() => exportToPDF(claims, overallScore, text)}
-              style={{ padding: '7px 18px', borderRadius: 8, background: T.accentMuted, border: `1px solid ${T.accent}4d`, color: T.accent, fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
-              Export PDF
-            </button>
-          )}
-          {stage === 'done' && (
-            <button onClick={reset}
-              style={{ padding: '7px 18px', borderRadius: 8, background: 'transparent', border: `1px solid ${T.border}`, color: T.text3, fontSize: 12, cursor: 'pointer' }}>
-              New
-            </button>
-          )}
-          <Link to="/image"
-            style={{ padding: '7px 18px', borderRadius: 8, background: T.accentMuted, border: `1px solid ${T.accent}33`, color: T.accent, fontSize: 12, textDecoration: 'none', fontWeight: 500 }}>
-            Image
-          </Link>
-          <button onClick={() => setDarkMode(!darkMode)}
-            style={{ width: 36, height: 36, borderRadius: 8, background: T.surface2, border: `1px solid ${T.border}`, color: T.text2, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {darkMode ? '☀️' : '🌙'}
+      <Navbar darkMode={darkMode} onToggleTheme={toggleTheme}>
+        {stage === 'done' && claims.length > 0 && (
+          <button onClick={() => exportToPDF(claims, overallScore, text)}
+            style={{ padding: '7px 18px', borderRadius: 8, background: T.accentMuted, border: `1px solid ${T.accent}4d`, color: T.accent, fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+            Export PDF
           </button>
-        </div>
-      </div>
+        )}
+        {stage === 'done' && (
+          <button onClick={reset}
+            style={{ padding: '7px 18px', borderRadius: 8, background: 'transparent', border: `1px solid ${T.border}`, color: T.text3, fontSize: 12, cursor: 'pointer' }}>
+            New
+          </button>
+        )}
+      </Navbar>
 
       <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '380px 1fr', minHeight: 0 }} className="verify-main">
 

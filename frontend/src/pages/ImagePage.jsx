@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -103,13 +104,7 @@ export default function ImagePage() {
         @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
       `}</style>
 
-      <div style={{ borderBottom: `1px solid ${T.border}`, padding: '0 24px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: T.bg2, backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 50 }}>
-        <Link to="/" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700, fontSize: 20, color: T.text, letterSpacing: 1, textDecoration: 'none' }}>VeriXa</Link>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <Link to="/verify" style={{ padding: '6px 16px', borderRadius: 6, background: 'transparent', border: `1px solid ${T.border}`, color: T.text2, fontSize: 12, textDecoration: 'none' }}>Text Verify</Link>
-          <span style={{ fontSize: 11, color: T.text3, letterSpacing: 1.5 }}>BETA</span>
-        </div>
-      </div>
+      <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '48px 24px' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -253,19 +248,6 @@ export default function ImagePage() {
             ))}
           </div>
         )}
-        
-        {/* Theme Toggle Button */}
-        <button
-          onClick={toggleTheme}
-          style={{
-            position: 'fixed', bottom: 20, right: 20, width: 44, height: 44,
-            borderRadius: '50%', background: T.cardBg, border: `1px solid ${T.border}`,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', fontSize: 20, cursor: 'pointer', zIndex: 100,
-          }}
-        >
-          {darkMode ? '☀️' : '🌙'}
-        </button>
       </div>
     </div>
   );

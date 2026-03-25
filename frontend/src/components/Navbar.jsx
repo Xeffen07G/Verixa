@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-export default function Navbar({ darkMode = true, onToggleTheme }) {
+export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const isLanding = location.pathname === '/';
+  const isVerify = location.pathname === '/verify';
+  const isImage = location.pathname === '/image';
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -47,21 +49,53 @@ export default function Navbar({ darkMode = true, onToggleTheme }) {
             </div>
           )}
 
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 12,
-            opacity: (!isLanding || scrolled) ? 1 : 0,
-            pointerEvents: (!isLanding || scrolled) ? 'auto' : 'none',
-            transform: (!isLanding || scrolled) ? 'translateY(0)' : 'translateY(-10px)',
-            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-          }} className="nav-cta-desktop">
-            {/* Theme Toggle in Navbar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }} className="nav-cta-desktop">
+            {/* Custom Buttons from Page */}
+            {children}
+
+            {/* Verification Buttons - Ghost style on landing hero, Solid on scroll/other pages */}
+            {!isImage && (
+              <Link to="/image" style={{ 
+                padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 500, 
+                border: '1px solid rgba(201,169,110,0.3)', 
+                background: 'transparent', 
+                color: '#c9a96e', 
+                letterSpacing: 0.3, transition: 'all 0.3s', textDecoration: 'none', 
+                display: 'inline-block',
+                opacity: (isLanding && !scrolled) ? 0.7 : 1,
+              }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,169,110,0.08)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              >Image Verify</Link>
+            )}
+
+            {!isVerify && (
+              <Link to="/verify" style={{ 
+                padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 500, 
+                background: (!isLanding || scrolled) ? 'linear-gradient(135deg, #c9a96e, #a07b42)' : 'transparent', 
+                border: (!isLanding || scrolled) ? 'none' : '1px solid rgba(201,169,110,0.3)', 
+                color: (!isLanding || scrolled) ? '#0a0a0f' : '#c9a96e', 
+                letterSpacing: 0.3, transition: 'all 0.3s', textDecoration: 'none', 
+                display: 'inline-block',
+                boxShadow: (!isLanding || scrolled) ? `0 4px 12px ${darkMode ? 'rgba(0,0,0,0.3)' : 'rgba(201,169,110,0.2)'}` : 'none'
+              }}
+                onMouseEnter={e => {
+                  if (!isLanding || scrolled) e.currentTarget.style.opacity = '0.88';
+                  else e.currentTarget.style.background = 'rgba(201,169,110,0.08)';
+                }}
+                onMouseLeave={e => {
+                  if (!isLanding || scrolled) e.currentTarget.style.opacity = '1';
+                  else e.currentTarget.style.background = 'transparent';
+                }}
+              >Start Verifying</Link>
+            )}
+
+            {/* Theme Toggle in Navbar - Always Visible */}
             <button
               onClick={onToggleTheme}
               style={{
                 background: 'transparent',
-                border: '1px solid rgba(201,169,110,0.3)',
+                border: scrolled ? `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` : '1px solid rgba(201,169,110,0.3)',
                 color: '#c9a96e',
                 width: 38,
                 height: 38,
@@ -71,7 +105,7 @@ export default function Navbar({ darkMode = true, onToggleTheme }) {
                 justifyContent: 'center',
                 cursor: 'pointer',
                 fontSize: 16,
-                marginRight: 8,
+                marginLeft: 4,
                 transition: 'all 0.2s'
               }}
               onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,169,110,0.08)'}
@@ -79,14 +113,6 @@ export default function Navbar({ darkMode = true, onToggleTheme }) {
             >
               {darkMode ? '☀️' : '🌙'}
             </button>
-            <Link to="/image" style={{ padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 500, border: '1px solid rgba(201,169,110,0.3)', background: 'transparent', color: '#c9a96e', letterSpacing: 0.3, transition: 'all 0.2s', textDecoration: 'none', display: 'inline-block' }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,169,110,0.08)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-            >Image Verify</Link>
-            <Link to="/verify" style={{ padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 500, background: 'linear-gradient(135deg, #c9a96e, #a07b42)', border: 'none', color: '#0a0a0f', letterSpacing: 0.3, transition: 'all 0.2s', textDecoration: 'none', display: 'inline-block' }}
-              onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
-              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-            >Start Verifying</Link>
           </div>
 
           <button className="hamburger-btn" onClick={() => setMobileOpen(true)}
