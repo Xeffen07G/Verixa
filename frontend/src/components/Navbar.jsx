@@ -47,7 +47,15 @@ export default function Navbar({ darkMode = true, onToggleTheme }) {
             </div>
           )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }} className="nav-cta-desktop">
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 12,
+            opacity: (!isLanding || scrolled) ? 1 : 0,
+            pointerEvents: (!isLanding || scrolled) ? 'auto' : 'none',
+            transform: (!isLanding || scrolled) ? 'translateY(0)' : 'translateY(-10px)',
+            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+          }} className="nav-cta-desktop">
             {/* Theme Toggle in Navbar */}
             <button
               onClick={onToggleTheme}

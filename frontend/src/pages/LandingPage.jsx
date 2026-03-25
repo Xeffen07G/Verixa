@@ -267,7 +267,7 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 0.4 }}
             style={{
               fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
-              fontSize: 'clamp(48px, 7vw, 88px)', lineHeight: 1.08,
+              fontSize: 'clamp(48px, 7vw, 88px)', lineHeight: 1.2,
               color: T.text, letterSpacing: -1, marginBottom: 24,
             }}
           >
@@ -283,6 +283,9 @@ export default function LandingPage() {
               WebkitTextFillColor: 'transparent',
               color: 'transparent',
               animation: 'shimmer 4s linear infinite',
+              padding: '0 10px 10px 0',
+              display: 'inline-block',
+              verticalAlign: 'bottom'
             }}>negotiable.</span>          </motion.h1>
 
           <motion.p
