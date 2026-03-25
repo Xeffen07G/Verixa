@@ -53,7 +53,7 @@ router.post("/", upload.single("pdf"), async (req, res) => {
   try {
     const { text, numpages } = await parsePdfBuffer(req.file.buffer);
     const cleaned = text.replace(/\s+/g, " ").trim().slice(0, 10000);
-    if (!cleaned || cleaned.length < 30) {
+    if (!cleaned || cleaned.length < 5) {
       return res.status(400).json({
         error: "Could not extract text from this PDF. Please use a text-based PDF, not a scanned image.",
       });

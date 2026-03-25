@@ -5,8 +5,8 @@ const { extractClaims, searchEvidence, verifyClaims, detectAIText } = require(".
 router.post("/", async (req, res) => {
   const { text, detectAI = false } = req.body;
 
-  if (!text || text.trim().length < 30) {
-    return res.status(400).json({ error: "Please provide at least 30 characters of text." });
+  if (!text || text.trim().length < 5) {
+    return res.status(400).json({ error: "Please provide at least 5 characters of text." });
   }
 
   res.setHeader("Content-Type", "text/event-stream");
