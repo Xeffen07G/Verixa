@@ -227,24 +227,8 @@ export default function LandingPage() {
   return (
     <div style={{ background: T.bg, minHeight: '100vh', transition: 'background 0.3s' }}>
 
-      <Navbar darkMode={darkMode} />
+      <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
-      {/* Theme Toggle */}
-      <motion.button
-        onClick={() => setDarkMode(!darkMode)}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        style={{
-          position: 'fixed', bottom: 24, right: 24, zIndex: 999, width: 48, height: 48,
-          borderRadius: '50%', background: T.accentMuted,
-          border: `1px solid ${T.accent}59`, display: 'flex', alignItems: 'center',
-          justifyContent: 'center', cursor: 'pointer', fontSize: 20, transition: 'all 0.3s',
-          boxShadow: `0 4px 20px ${T.accent}26`, backdropFilter: 'blur(10px)',
-          color: T.accent,
-        }}
-      >
-        {darkMode ? '☀️' : '🌙'}
-      </motion.button>
 
       {/* ══════════ HERO ══════════ */}
       <section style={{

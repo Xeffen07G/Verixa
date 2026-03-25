@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-export default function Navbar({ darkMode = true }) {
+export default function Navbar({ darkMode = true, onToggleTheme }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
@@ -48,6 +48,29 @@ export default function Navbar({ darkMode = true }) {
           )}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }} className="nav-cta-desktop">
+            {/* Theme Toggle in Navbar */}
+            <button
+              onClick={onToggleTheme}
+              style={{
+                background: 'transparent',
+                border: '1px solid rgba(201,169,110,0.3)',
+                color: '#c9a96e',
+                width: 38,
+                height: 38,
+                borderRadius: 8,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: 16,
+                marginRight: 8,
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,169,110,0.08)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              {darkMode ? '☀️' : '🌙'}
+            </button>
             <Link to="/image" style={{ padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 500, border: '1px solid rgba(201,169,110,0.3)', background: 'transparent', color: '#c9a96e', letterSpacing: 0.3, transition: 'all 0.2s', textDecoration: 'none', display: 'inline-block' }}
               onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,169,110,0.08)'}
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -73,6 +96,9 @@ export default function Navbar({ darkMode = true }) {
           {isLanding && navLinks.map(l => (
             <a key={l.label} href={l.href} style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 36, color: textColor, letterSpacing: 2, textDecoration: 'none' }} onClick={() => setMobileOpen(false)}>{l.label}</a>
           ))}
+          <button onClick={() => { onToggleTheme(); setMobileOpen(false); }} style={{ background: 'none', border: 'none', color: '#c9a96e', fontSize: 32, cursor: 'pointer', fontFamily: 'Cormorant Garamond, serif' }}>
+            {darkMode ? '☀️ Light' : '🌙 Dark'}
+          </button>
           <Link to="/image" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 24, color: '#c9a96e', letterSpacing: 2, textDecoration: 'none' }} onClick={() => setMobileOpen(false)}>Image Verify</Link>
           <Link to="/verify" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 36, color: '#c9a96e', letterSpacing: 2, textDecoration: 'none' }} onClick={() => setMobileOpen(false)}>Start Verifying</Link>
         </div>

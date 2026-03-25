@@ -385,7 +385,7 @@ export default function VerifyPage() {
         ::-moz-selection { background: rgba(140,100,40,0.7); color: #fff; }
         @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
         @keyframes pulse-gold { 0%,100%{opacity:1} 50%{opacity:0.3} }
-        @keyframes mic-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,0.4)} 70%{box-shadow:0 0 0 8px rgba(248,113,113,0)} }
+        @keyframes mic-pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.4); transform: scale(1); } 50% { box-shadow: 0 0 0 10px rgba(255, 77, 77, 0); transform: scale(1.05); } 100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); transform: scale(1); } }
         @keyframes slideIn { from { opacity:0; transform:translateX(-10px); } to { opacity:1; transform:none; } }
         @keyframes loading-shimmer {
           0% { transform: translateX(-100%); }
@@ -515,7 +515,33 @@ export default function VerifyPage() {
                     onFocus={e => e.target.style.borderColor = `${T.accent}66`}
                     onBlur={e => e.target.style.borderColor = T.inputBorder} />
                   <button onClick={listening ? stopListening : startListening}
-                    style={{ position: 'absolute', bottom: 10, right: 10, padding: '5px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, background: listening ? '#f87171' : T.accentMuted, color: listening ? '#fff' : T.accent, animation: listening ? 'mic-pulse 1.5s infinite' : 'none', transition: 'all 0.2s', letterSpacing: 0.5 }}>
+                    style={{ 
+                      position: 'absolute', bottom: 12, right: 12, 
+                      padding: '8px 20px', borderRadius: 10, 
+                      border: listening ? '1.5px solid #ff4d4d' : '1.5px solid rgba(201, 169, 110, 0.3)', 
+                      background: listening ? 'rgba(255, 77, 77, 0.15)' : 'rgba(201, 169, 110, 0.08)', 
+                      color: listening ? '#ff4d4d' : '#c9a96e', 
+                      cursor: 'pointer', fontSize: 11, fontWeight: 700, 
+                      backdropFilter: 'blur(8px)',
+                      animation: listening ? 'mic-pulse 2s infinite' : 'none', 
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
+                      letterSpacing: 0.5,
+                      display: 'flex', alignItems: 'center', gap: 6
+                    }}
+                    onMouseEnter={e => {
+                      if (!listening) {
+                        e.currentTarget.style.background = 'rgba(201, 169, 110, 0.15)';
+                        e.currentTarget.style.borderColor = 'rgba(201, 169, 110, 0.6)';
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!listening) {
+                        e.currentTarget.style.background = 'rgba(201, 169, 110, 0.08)';
+                        e.currentTarget.style.borderColor = 'rgba(201, 169, 110, 0.3)';
+                      }
+                    }}
+                  >
+                    {listening ? <span style={{display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#ff4d4d', marginRight: 4}} /> : <span style={{ fontSize: 14 }}>🎙️</span>}
                     {listening ? 'Stop' : 'Go Voice'}
                   </button>
                 </div>
