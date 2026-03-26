@@ -1,26 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
 
-const DARK = {
-  bg: '#0a0a0f',
-  card: 'rgba(255, 255, 255, 0.03)',
-  border: 'rgba(255, 255, 255, 0.06)',
-  text: '#f5f3ef',
-  text2: 'rgba(245, 243, 239, 0.7)',
-  accent: '#c9a96e',
-  error: '#f87171'
-};
-
-const LIGHT = {
-  bg: '#fcfbf9',
-  card: '#ffffff',
-  border: '#e5e1d8',
-  text: '#1a1a1a',
-  text2: '#555555',
-  accent: '#a68a56',
-  error: '#dc2626'
+const T = {
+  bg: '#0a0a0f', card: 'rgba(22,22,31,0.95)', border: 'rgba(255,255,255,0.07)',
+  text: '#f5f3ef', text2: 'rgba(245,243,239,0.55)', accent: '#c9a96e',
+  inputBg: 'rgba(255,255,255,0.04)', inputBorder: 'rgba(255,255,255,0.1)',
 };
 
 export default function LoginPage() {
@@ -31,17 +16,9 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem('verixa-theme');
-    return saved ? saved === 'dark' : true;
-  });
-
-  const T = darkMode ? DARK : LIGHT;
-
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-    setErr('');
-    setIsLoading(true);
+    setErr(''); setIsLoading(true);
     const result = await login(email, password);
     if (result.success) {
       navigate('/verify');
@@ -49,60 +26,66 @@ export default function LoginPage() {
       setErr(result.error);
     }
     setIsLoading(false);
-  };
+  }
 
   return (
-    <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', flexDirection: 'column', transition: 'all 0.3s' }}>
-      <Navbar darkMode={darkMode} onToggleTheme={() => {
-        const newVal = !darkMode;
-        setDarkMode(newVal);
-        localStorage.setItem('verixa-theme', newVal ? 'dark' : 'light');
-      }} />
+    <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: 'DM Sans, sans-serif' }}>
+      <style>{`
+        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+        input:focus { outline: none !important; border-color: rgba(201,169,110,0.4) !important; box-shadow: 0 0 0 3px rgba(201,169,110,0.08) !important; }
+      `}</style>
 
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}>
-        <div style={{ 
-          maxWidth: 400, width: '100%', padding: '48px 40px', 
-          background: T.card, border: `1px solid ${T.border}`, 
-          borderRadius: 24, backdropFilter: 'blur(12px)',
-          boxShadow: '0 24px 48px rgba(0,0,0,0.1)',
-          animation: 'fadeUp 0.6s ease-out'
-        }}>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 40, fontWeight: 300, color: T.text, margin: '0 0 8px', textAlign: 'center' }}>Welcome Back</h1>
-          <p style={{ fontSize: 14, color: T.text2, textAlign: 'center', marginBottom: 32 }}>Enter your credentials to continue</p>
+      {/* Logo */}
+      <Link to="/" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700, fontSize: 28, color: T.text, letterSpacing: 1, textDecoration: 'none', marginBottom: 32 }}>VeriXa</Link>
 
-          {err && <div style={{ padding: '12px', background: `${T.error}15`, border: `1px solid ${T.error}33`, color: T.error, borderRadius: 12, fontSize: 13, marginBottom: 24, textAlign: 'center' }}>{err}</div>}
+      <div style={{ maxWidth: 420, width: '100%', padding: '44px 40px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 20, boxShadow: '0 24px 64px rgba(0,0,0,0.3)', animation: 'fadeUp 0.5s ease' }}>
 
-          <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 12, color: T.text2, marginBottom: 8, fontWeight: 600, letterSpacing: 1 }}>EMAIL ADDRESS</label>
-              <input type="email" required value={email} onChange={e => setEmail(e.target.value)} 
-                style={{ width: '100%', background: 'rgba(255,255,255,0.02)', border: `1px solid ${T.border}`, borderRadius: 12, padding: '14px 16px', color: T.text, fontSize: 14, outline: 'none' }} />
-            </div>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 22, color: T.accent }}>◉</div>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 34, fontWeight: 300, color: T.text, margin: '0 0 6px' }}>Welcome Back</h1>
+          <p style={{ fontSize: 14, color: T.text2, margin: 0 }}>Sign in to continue to VeriXa</p>
+        </div>
 
-            <div style={{ marginBottom: 32 }}>
-              <label style={{ display: 'block', fontSize: 12, color: T.text2, marginBottom: 8, fontWeight: 600, letterSpacing: 1 }}>PASSWORD</label>
-              <input type="password" required value={password} onChange={e => setPassword(e.target.value)} 
-                style={{ width: '100%', background: 'rgba(255,255,255,0.02)', border: `1px solid ${T.border}`, borderRadius: 12, padding: '14px 16px', color: T.text, fontSize: 14, outline: 'none' }} />
-            </div>
+        {err && (
+          <div style={{ padding: '10px 14px', background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)', color: '#f87171', borderRadius: 10, fontSize: 13, marginBottom: 20, textAlign: 'center' }}>
+            {err}
+          </div>
+        )}
 
-            <button type="submit" disabled={isLoading} style={{ 
-              width: '100%', padding: '16px', borderRadius: 12, background: T.accent, 
-              border: 'none', color: '#fff', fontSize: 14, fontWeight: 700, 
-              cursor: 'pointer', transition: 'all 0.2s', opacity: isLoading ? 0.7 : 1
-            }}>
-              {isLoading ? 'Verifying...' : 'Sign In'}
-            </button>
-          </form>
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 11, color: T.text2, marginBottom: 7, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase' }}>Email Address</label>
+            <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              style={{ width: '100%', background: T.inputBg, border: `1px solid ${T.inputBorder}`, borderRadius: 10, padding: '13px 16px', color: T.text, fontSize: 14, boxSizing: 'border-box', transition: 'all 0.2s' }} />
+          </div>
 
-          <p style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: T.text2 }}>
-            Don't have an account? <Link to="/signup" style={{ color: T.accent, textDecoration: 'none', fontWeight: 600 }}>Create one</Link>
+          <div style={{ marginBottom: 28 }}>
+            <label style={{ display: 'block', fontSize: 11, color: T.text2, marginBottom: 7, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase' }}>Password</label>
+            <input type="password" required value={password} onChange={e => setPassword(e.target.value)}
+              placeholder="Your password"
+              style={{ width: '100%', background: T.inputBg, border: `1px solid ${T.inputBorder}`, borderRadius: 10, padding: '13px 16px', color: T.text, fontSize: 14, boxSizing: 'border-box', transition: 'all 0.2s' }} />
+          </div>
+
+          <button type="submit" disabled={isLoading}
+            style={{ width: '100%', padding: '14px', borderRadius: 10, background: isLoading ? 'rgba(201,169,110,0.2)' : 'linear-gradient(135deg, #c9a96e, #a07b42)', border: 'none', color: isLoading ? '#c9a96e' : '#0a0a0f', fontSize: 14, fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', transition: 'all 0.2s', letterSpacing: 0.5, boxShadow: isLoading ? 'none' : '0 4px 16px rgba(201,169,110,0.25)' }}>
+            {isLoading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </form>
+
+        <div style={{ textAlign: 'center', marginTop: 24 }}>
+          <p style={{ fontSize: 13, color: T.text2, margin: 0 }}>
+            No account?{' '}
+            <Link to="/signup" style={{ color: T.accent, textDecoration: 'none', fontWeight: 600 }}>
+              Create one free
+            </Link>
           </p>
         </div>
       </div>
 
-      <style>{`
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-      `}</style>
+      <p style={{ marginTop: 24, fontSize: 12, color: 'rgba(245,243,239,0.2)' }}>
+        Protected by Supabase Auth
+      </p>
     </div>
   );
 }

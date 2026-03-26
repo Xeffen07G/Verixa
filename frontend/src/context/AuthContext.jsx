@@ -1,63 +1,44 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import { supabase } from '../supabaseClient';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem('verixa_token'));
     const [loading, setLoading] = useState(true);
 
-    const API_URL = process.env.REACT_APP_API_URL || '/api';
-
     useEffect(() => {
-        if (token) {
-            // Restore user from token/localStorage
-            const savedUser = localStorage.getItem('verixa_user');
-            if (savedUser) {
-                setUser(JSON.parse(savedUser));
-            }
-        }
-        setLoading(false);
-    }, [token]);
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user ?? null);
+            setLoading(false);
+        });
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     const login = async (email, password) => {
-        try {
-            const res = await axios.post(`${API_URL}/auth/login`, { email, password });
-            const data = res.data;
-            setToken(data.token);
-            setUser(data);
-            localStorage.setItem('verixa_token', data.token);
-            localStorage.setItem('verixa_user', JSON.stringify(data));
-            return { success: true };
-        } catch (error) {
-            return { success: false, error: error.response?.data?.error || 'Login failed' };
-        }
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) return { success: false, error: error.message };
+        return { success: true, user: data.user };
     };
 
     const register = async (email, password) => {
-        try {
-            const res = await axios.post(`${API_URL}/auth/register`, { email, password });
-            const data = res.data;
-            setToken(data.token);
-            setUser(data);
-            localStorage.setItem('verixa_token', data.token);
-            localStorage.setItem('verixa_user', JSON.stringify(data));
-            return { success: true };
-        } catch (error) {
-            return { success: false, error: error.response?.data?.error || 'Registration failed' };
-        }
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        if (error) return { success: false, error: error.message };
+        return { success: true, user: data.user };
     };
 
-    const logout = () => {
-        setToken(null);
+    const logout = async () => {
+        await supabase.auth.signOut();
         setUser(null);
-        localStorage.removeItem('verixa_token');
-        localStorage.removeItem('verixa_user');
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     );
