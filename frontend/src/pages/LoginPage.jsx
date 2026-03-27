@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 const T = {
   bg: '#0a0a0f', card: 'rgba(22,22,31,0.95)', border: 'rgba(255,255,255,0.07)',
@@ -16,17 +17,31 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setErr(''); setIsLoading(true);
-    const result = await login(email, password);
-    if (result.success) {
-      navigate('/verify');
-    } else {
-      setErr(result.error);
+    setErr('');
+    setIsLoading(true);
+
+    try {
+      const result = await login(email, password);
+      if (result.success) {
+        navigate('/verify');
+      } else {
+        // Map common Firebase auth errors to readable messages
+        let message = result.error;
+        if (result.error.includes('auth/invalid-credential')) {
+          message = 'Invalid email or password.';
+        } else if (result.error.includes('auth/too-many-requests')) {
+          message = 'Too many failed attempts. Please try again later.';
+        }
+        setErr(message);
+      }
+    } catch (error) {
+      setErr('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: 'DM Sans, sans-serif' }}>
@@ -84,8 +99,10 @@ export default function LoginPage() {
       </div>
 
       <p style={{ marginTop: 24, fontSize: 12, color: 'rgba(245,243,239,0.2)' }}>
-        Protected by Supabase Auth
+        Protected by Firebase Auth
       </p>
     </div>
   );
+}
+
 }

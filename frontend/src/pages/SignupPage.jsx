@@ -13,26 +13,47 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [err, setErr] = useState('');
-  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setErr(''); setSuccess('');
-    if (password !== confirm) { setErr('Passwords do not match'); return; }
-    if (password.length < 6) { setErr('Password must be at least 6 characters'); return; }
-    setIsLoading(true);
-    const result = await register(email, password);
-    if (result.success) {
-      // Auto navigate to verify after signup
-      navigate('/verify');
-    } else {
-      setErr(result.error);
+    setErr('');
+    
+    if (password !== confirm) {
+      setErr('Passwords do not match');
+      return;
     }
-    setIsLoading(false);
-  }
+    
+    if (password.length < 6) {
+      setErr('Password must be at least 6 characters');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await register(email, password);
+      if (result.success) {
+        navigate('/verify');
+      } else {
+        // Map common Firebase signup errors
+        let message = result.error;
+        if (result.error.includes('auth/email-already-in-use')) {
+          message = 'Email is already in use.';
+        } else if (result.error.includes('auth/weak-password')) {
+          message = 'Password is too weak.';
+        } else if (result.error.includes('auth/invalid-email')) {
+          message = 'Invalid email address.';
+        }
+        setErr(message);
+      }
+    } catch (error) {
+      setErr('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: 'DM Sans, sans-serif' }}>
@@ -54,12 +75,6 @@ export default function SignupPage() {
         {err && (
           <div style={{ padding: '10px 14px', background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)', color: '#f87171', borderRadius: 10, fontSize: 13, marginBottom: 20, textAlign: 'center' }}>
             {err}
-          </div>
-        )}
-
-        {success && (
-          <div style={{ padding: '10px 14px', background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.2)', color: '#4ade80', borderRadius: 10, fontSize: 13, marginBottom: 20, textAlign: 'center' }}>
-            {success}
           </div>
         )}
 
@@ -102,8 +117,10 @@ export default function SignupPage() {
       </div>
 
       <p style={{ marginTop: 24, fontSize: 12, color: 'rgba(245,243,239,0.2)' }}>
-        Protected by Supabase Auth
+        Protected by Firebase Auth
       </p>
     </div>
   );
+}
+
 }
