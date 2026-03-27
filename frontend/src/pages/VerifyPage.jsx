@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import { useVerify } from '../hooks/useVerify';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || '/api';
+const API_URL = process.env.REACT_APP_API_URL || '';
 
 const VERDICT_CONFIG = {
   'True':           { color: '#166534', bg: '#dcfce7', border: '#bbf7d0', icon: '✓', label: 'Verified True',   short: 'TRUE'    },

@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 
-const API_URL = process.env.REACT_APP_API_URL || '/api';
+const API_URL = process.env.REACT_APP_API_URL || '';
 
 export function useVerify() {
   const [stage, setStage] = useState(null);

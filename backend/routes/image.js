@@ -3,8 +3,12 @@ const router = express.Router();
 const Groq = require("groq-sdk");
 const fetch = require("node-fetch");
 
-function getClient() {
-  return new Groq({ apiKey: process.env.GROQ_API_KEY });
+let _groq;
+function getGroq() {
+  if (!_groq) {
+    _groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  }
+  return _groq;
 }
 
 const SYSTEM_PROMPT = `You are VeriXa's image authenticity analysis engine.
@@ -42,8 +46,36 @@ router.post("/url", async (req, res) => {
   }
 
     try {
-      const completion = await groq.chat.completions.create({
-        model: "llama-3.2-11b-vision-preview",
+      // Fetch the image server-side and convert to base64
+      // (Llama 4 Scout cannot fetch external URLs directly)
+      const imgResponse = await fetch(imageUrl, {
+        headers: { 'User-Agent': 'VeriXa-ImageAnalyzer/1.0' },
+        timeout: 15000,
+      });
+
+      if (!imgResponse.ok) {
+        return res.status(400).json({
+          error: `Could not fetch image from URL (HTTP ${imgResponse.status}). Please check the URL is accessible.`,
+        });
+      }
+
+      const contentType = imgResponse.headers.get("content-type") || "image/jpeg";
+      if (!contentType.startsWith("image/")) {
+        return res.status(400).json({
+          error: "URL does not point to an image. Please provide a direct image URL.",
+        });
+      }
+
+      const buffer = await imgResponse.buffer();
+      if (buffer.length > 10 * 1024 * 1024) {
+        return res.status(400).json({ error: "Image too large. Max 10MB." });
+      }
+
+      const base64 = buffer.toString("base64");
+      const dataUrl = `data:${contentType};base64,${base64}`;
+
+      const completion = await getGroq().chat.completions.create({
+        model: "meta-llama/llama-4-scout-17b-16e-instruct",
         messages: [
           {
             role: "user",
@@ -54,7 +86,7 @@ router.post("/url", async (req, res) => {
               },
               {
                 type: "image_url",
-                image_url: { url: imageUrl },
+                image_url: { url: dataUrl },
               },
             ],
           },
@@ -81,7 +113,6 @@ router.post("/url", async (req, res) => {
   } catch (err) {
     console.error("Image URL analysis error:", err.message);
 
-    // If vision model fails, fall back to a text-based analysis
     if (err.message?.includes("Could not process image") || err.message?.includes("400")) {
       return res.status(400).json({
         error: "Could not process this image. The URL may be inaccessible or the image format is unsupported.",
@@ -116,7 +147,7 @@ router.post("/upload", async (req, res) => {
     const dataUrl = `data:${contentType};base64,${base64}`;
 
     const completion = await groq.chat.completions.create({
-      model: "llama-3.2-11b-vision-preview",
+      model: "meta-llama/llama-4-scout-17b-16e-instruct",
       messages: [
         {
           role: "user",
