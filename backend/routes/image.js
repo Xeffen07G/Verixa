@@ -146,7 +146,7 @@ router.post("/upload", async (req, res) => {
     const base64 = buffer.toString("base64");
     const dataUrl = `data:${contentType};base64,${base64}`;
 
-    const completion = await groq.chat.completions.create({
+    const completion = await getGroq().chat.completions.create({
       model: "meta-llama/llama-4-scout-17b-16e-instruct",
       messages: [
         {
