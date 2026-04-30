@@ -8,6 +8,7 @@ import SignupPage from './pages/SignupPage';
 import TrendingPage from './pages/TrendingPage';
 import DashboardPage from './pages/DashboardPage';
 import ExtensionPage from './pages/ExtensionPage';
+import AccountPage from './pages/AccountPage';
 import { AuthProvider } from './context/AuthContext';
 import DragDropOverlay from './components/DragDropOverlay';
 import CustomCursor from './components/CustomCursor';
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="/trending" element={<TrendingPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/extension" element={<ExtensionPage />} />
+            <Route path="/account" element={<AccountPage />} />
           </Routes>
         </DragDropOverlay>
       </Router>

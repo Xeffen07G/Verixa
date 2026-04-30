@@ -155,6 +155,10 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
                 <Layout size={20} />
                 <span style={{ fontSize: 18, fontWeight: 700 }}>Dashboard</span>
               </Link>
+              <Link to="/account" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
+                <User size={20} />
+                <span style={{ fontSize: 18, fontWeight: 700 }}>My Account</span>
+              </Link>
               <button onClick={() => { logout(); setMobileOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', textAlign: 'left' }}>
                 <LogOut size={20} />
                 <span style={{ fontSize: 18, fontWeight: 700 }}>Logout</span>
