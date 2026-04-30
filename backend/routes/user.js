@@ -6,13 +6,14 @@ const User = process.env.MONGO_URI ? require('../models/User') : require('../uti
 router.put('/profile', async (req, res) => {
     try {
         const { userId, name, organization, profilePic } = req.body;
+        const idToUpdate = userId || req.body.id;
         
-        if (!userId) {
+        if (!idToUpdate) {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
         const updatedUser = await User.findByIdAndUpdate(
-            userId,
+            idToUpdate,
             { name, organization, profilePic },
             { new: true }
         ).select('-password');
