@@ -183,8 +183,8 @@ Return ONLY this JSON format:
 Claims to verify:
 ${formatted}`;
 
-  // Keeping 70b model for final verification (best results)
-  const raw = await askGroq(prompt, true, "llama-3.3-70b-versatile");
+  // Using 8b model for final verification (faster, higher limits)
+  const raw = await askGroq(prompt, true, "llama-3.1-8b-instant");
   const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
   const verified = parsed.results || parsed;
 
