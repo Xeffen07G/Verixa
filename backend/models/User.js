@@ -28,7 +28,10 @@ const userSchema = mongoose.Schema({
     profilePic: {
         type: String,
         default: ''
-    }
+    },
+    title: { type: String, default: 'Analysis Expert' },
+    bio: { type: String, default: '' },
+    location: { type: String, default: 'Global Network' }
 }, {
     timestamps: true
 });

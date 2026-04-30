@@ -5,7 +5,7 @@ const User = process.env.MONGO_URI ? require('../models/User') : require('../uti
 // Update profile
 router.put('/profile', async (req, res) => {
     try {
-        const { userId, name, organization, profilePic } = req.body;
+        const { userId, name, organization, profilePic, title, bio, location } = req.body;
         const idToUpdate = userId || req.body.id;
         
         if (!idToUpdate) {
@@ -14,7 +14,7 @@ router.put('/profile', async (req, res) => {
 
         const updatedUser = await User.findByIdAndUpdate(
             idToUpdate,
-            { name, organization, profilePic },
+            { name, organization, profilePic, title, bio, location },
             { new: true }
         ).select('-password');
 
