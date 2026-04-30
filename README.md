@@ -1,51 +1,84 @@
 # 🌐 VeriXa: The Global Enterprise Identity & Truth Engine
 
-![VeriXa Header](https://raw.githubusercontent.com/Xeffen07G/verixa/main/frontend/public/logo192.png)
+![VeriXa Banner](https://raw.githubusercontent.com/Xeffen07G/verixa/main/frontend/public/logo192.png)
 
-> **"Trust is not negotiable."**
-VeriXa is a high-fidelity, enterprise-grade verification platform designed to combat misinformation and establish organizational integrity through AI-powered deep-trace intelligence.
+> **"Trust is not negotiable. VeriXa is the infrastructure of digital integrity."**
+
+VeriXa is a high-fidelity, enterprise-grade verification platform designed to combat misinformation and establish organizational integrity through AI-powered deep-trace intelligence. It transforms raw data into verified intelligence with surgical precision.
+
+---
+
+## 📐 System Architecture & Logic Flow
+
+The following diagram illustrates the high-velocity verification pipeline:
+
+```mermaid
+graph TD
+    A[User Input: Text/URL/PDF] --> B{Verification Engine}
+    B --> C[Claim Extraction: Llama-3.1-8B]
+    C --> D[Parallel Evidence Retrieval]
+    D --> E[Google Search API]
+    D --> F[Global News Database]
+    E --> G[Context Aggregation]
+    F --> G
+    G --> H[Final Fact-Check Audit]
+    H --> I{Result Output}
+    I --> J[Professional PDF Report]
+    I --> K[Truth Certificate]
+    I --> L[Enterprise Dashboard Sync]
+```
 
 ---
 
 ## 💎 The Enterprise Edge
 
-VeriXa is not just a fact-checker; it is a **Role-Based Intelligence Ecosystem** designed for modern corporate environments.
+VeriXa is engineered as a **Role-Based Intelligence Ecosystem** for modern corporate environments.
 
 ### 🛡️ Role-Based Access Control (RBAC)
-*   **Command Center (Admins):** Organization heads gain a master-view of all team activity, global accuracy audits, and individual employee performance tracking.
-*   **Identity Hub (Employees):** Every team member receives a private, professional terminal to verify content while maintaining complete data isolation and personal privacy.
+| Feature | Admin (Head of Org) | Employee |
+| :--- | :--- | :--- |
+| **Data Visibility** | Global (All members) | Private (Self only) |
+| **Team Analytics** | Active tracking & Leaderboards | N/A |
+| **Audit Logs** | Global Master Feed | Personal History |
+| **System Exports** | Global Company Reports | Personal Certificates |
 
 ### 🚀 High-Velocity Verification
-Powered by **Groq's Llama-3.1-8B-Instant** model and parallelized search algorithms, VeriXa delivers comprehensive fact-check reports in under 5 seconds—500% faster than traditional sequential analysis.
-
-### 📸 Multimodal Intelligence
-*   **Text Audit:** Deep-trace analysis of claims, articles, and long-form documents.
-*   **Image Forensics:** Advanced metadata and content analysis to detect manipulated imagery.
-*   **AI Detection:** Built-in engine to identify AI-generated text (LLM Hallucinations).
-*   **Voice Integration:** Real-time voice-to-text verification for live speeches and meetings.
+Powered by **Groq's Llama-3.1-8B-Instant** model and parallelized search algorithms, VeriXa delivers comprehensive fact-check reports in **under 5 seconds**—a 500% increase in throughput compared to traditional sequential analysis.
 
 ---
 
-## 🛠️ Technical Architecture
+## 🛠️ Technical Stack
 
-VeriXa is built on a hardened **MERN** stack optimized for scalability:
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend** | React.js, Tailwind CSS, Lucide, Framer Motion |
+| **Backend** | Node.js, Express.js |
+| **Database** | MongoDB Atlas (Cloud Synchronized) |
+| **AI Engine** | Groq Cloud (Llama-3.1-8B-Instant) |
+| **Search Intelligence** | Google Custom Search JSON API |
+| **Security** | Helmet.js, JWT, Bcrypt, CORS Hardening |
 
-- **Frontend:** React.js, Tailwind CSS (Custom Premium Styles), Lucide Icons, Framer Motion.
-- **Backend:** Node.js, Express, MongoDB Atlas (Cloud Data Sync).
-- **AI Intelligence:** Groq Cloud (Llama-3.1-8B), Google Search API.
-- **Security:** Helmet.js, JWT, Bcrypt, CORS hardening.
+---
+
+## 📡 API Reference
+
+### Profile Management
+`PUT /api/user/profile`
+- Updates user metadata (Bio, Title, Location, Profile Pic).
+- Payload: `{ userId, name, organization, bio, title, location, profilePic }`
+
+### Organization Intelligence
+`GET /api/organization/:orgName/history`
+- **Admin Only**: Retrieves all verification logs for the entire organization.
+
+`POST /api/organization/sync`
+- Synchronizes local verification results with the corporate cloud database.
 
 ---
 
 ## 🚀 Quick Start Guide
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/Xeffen07G/verixa.git
-cd verixa
-```
-
-### 2. Environment Configuration
+### 1. Configure Environment
 Create a `.env` file in the `backend/` directory:
 ```env
 PORT=5000
@@ -56,39 +89,24 @@ GOOGLE_SEARCH_CX=your_search_engine_id
 JWT_SECRET=your_secret_key
 ```
 
-### 3. Installation
+### 2. Deployment & Installation
 ```bash
-# Install Backend Dependencies
-cd backend
-npm install
+# Clone & Install
+git clone https://github.com/Xeffen07G/verixa.git
+cd verixa && npm install-all # Custom script
 
-# Install Frontend Dependencies
-cd ../frontend
-npm install
-```
-
-### 4. Launch the Engine
-```bash
-# In Backend Directory
-npm start
-
-# In Frontend Directory
-npm start
+# Launch Development Environment
+npm run dev
 ```
 
 ---
 
-## 📈 Roadmap & Scalability
+## 📈 Roadmap
 - [x] **Phase 1:** Core AI Verification Engine
 - [x] **Phase 2:** Enterprise RBAC & Organizational Dashboard
 - [x] **Phase 3:** Professional Identity Hub (Account Management)
-- [ ] **Phase 4:** Browser Extension & Real-time Social Media Monitoring
-- [ ] **Phase 5:** White-label Enterprise API for Corporate CMS Integration
-
----
-
-## 📄 License & Integrity
-VeriXa is released under the **MIT License**. We believe that truth should be accessible, verifiable, and permanent.
+- [ ] **Phase 4:** Real-time Browser Extension (Social Verification)
+- [ ] **Phase 5:** White-label Enterprise API (CMS Integration)
 
 ---
 
