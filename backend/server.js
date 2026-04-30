@@ -36,7 +36,11 @@ app.use(
         process.env.FRONTEND_URL,
       ].filter(Boolean);
       // Allow Chrome extensions (chrome-extension://...)
-      if (allowed.includes(origin) || origin.startsWith('chrome-extension://')) {
+      if (
+        allowed.includes(origin) || 
+        origin.startsWith('chrome-extension://') ||
+        origin.endsWith('.vercel.app') // Allow all Vercel deployments
+      ) {
         return callback(null, true);
       }
       // In development, allow all origins
