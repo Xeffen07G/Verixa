@@ -1,10 +1,10 @@
 # 🌐 VeriXa: The Global Enterprise Identity & Truth Engine
 
-![VeriXa Banner](https://raw.githubusercontent.com/Xeffen07G/verixa/main/frontend/public/logo192.png)
+![VeriXa Header](https://raw.githubusercontent.com/Xeffen07G/verixa/main/frontend/public/logo192.png)
 
 > **"Trust is not negotiable. VeriXa is the infrastructure of digital integrity."**
 
-VeriXa is a high-fidelity, enterprise-grade verification platform designed to combat misinformation and establish organizational integrity through AI-powered deep-trace intelligence. It transforms raw data into verified intelligence with surgical precision.
+VeriXa is a high-fidelity, enterprise-grade verification platform designed to combat misinformation and establish organizational integrity through AI-powered deep-trace intelligence.
 
 ---
 
@@ -26,6 +26,33 @@ graph TD
     I --> J[Professional PDF Report]
     I --> K[Truth Certificate]
     I --> L[Enterprise Dashboard Sync]
+```
+
+---
+
+## 📂 Project Structure
+
+A comprehensive map of the VeriXa ecosystem:
+
+```text
+verixa/
+├── backend/                # Server-side Logic & AI Integration
+│   ├── config/             # Database & Service Configurations
+│   ├── middleware/         # Security, Rate Limiting & Auth Validation
+│   ├── models/             # Mongoose Schemas (User, History, Org)
+│   ├── routes/             # API Endpoints (Auth, Verify, User, Org)
+│   ├── services/           # AI Logic (Groq, LLM Prompting)
+│   ├── utils/              # Helper functions (PDF Parsing, Web Scraping)
+│   └── server.js           # Main Entry Point
+├── frontend/               # Client-side Application (React)
+│   ├── public/             # Static Assets & Global Styles
+│   └── src/
+│       ├── components/     # Reusable UI (Navbar, Cards, Loaders)
+│       ├── context/        # Global State (Auth, Identity)
+│       ├── hooks/          # Custom Logic (useVerify)
+│       ├── pages/          # Application Views (Dashboard, Account, Verify)
+│       └── utils/          # Frontend Helpers (Formatting, i18n)
+└── README.md               # Elite Technical Documentation
 ```
 
 ---
