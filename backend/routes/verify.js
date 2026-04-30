@@ -66,6 +66,24 @@ router.post("/", async (req, res) => {
       timestamp: new Date().toISOString(),
     });
 
+    // Report false/partial claims to trending leaderboard
+    try {
+      const trendingRouter = require("./trending");
+      // Direct in-process report (avoid HTTP roundtrip)
+      const falseOrPartial = verified.filter(c => c.verdict === "False" || c.verdict === "Partially True");
+      if (falseOrPartial.length > 0) {
+        // Use the trending module's internal store via a lightweight approach
+        const trendingModule = require("./trending");
+        // We'll use a simple fetch to our own endpoint
+        const port = process.env.PORT || 5000;
+        fetch(`http://localhost:${port}/api/trending/report`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ claims: falseOrPartial }),
+        }).catch(() => {}); // fire-and-forget
+      }
+    } catch (e) { /* ignore trending errors */ }
+
   } catch (err) {
     console.error("Pipeline error:", err);
     send("error", { message: err.message || "Verification pipeline failed" });

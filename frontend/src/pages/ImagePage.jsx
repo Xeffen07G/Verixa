@@ -206,9 +206,18 @@ export default function ImagePage() {
               ))}
             </div>
 
+            {result.extracted_text && (
+              <div style={{ background: T.cardBg, border: `1px solid ${T.accent}4d`, borderRadius: 12, padding: 20, marginBottom: 16, animation: 'fadeUp 0.4s ease' }}>
+                <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.accent, marginBottom: 12, fontWeight: 700 }}>Original Sentence (Extracted Text)</p>
+                <div style={{ padding: '14px', background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', borderRadius: 8, border: `1px solid ${T.border}` }}>
+                  <p style={{ fontSize: 15, color: T.text, lineHeight: 1.6, margin: 0, fontWeight: 500 }}>"{result.extracted_text}"</p>
+                </div>
+              </div>
+            )}
+
             <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
               <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12 }}>Analysis</p>
-              <p style={{ fontSize: 14, color: T.text, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 0.85 }}>{result.assessment}</p>
+              <p style={{ fontSize: 14, color: T.text, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 1, fontWeight: 500 }}>{result.assessment}</p>
             </div>
 
             {result.indicators?.length > 0 && (

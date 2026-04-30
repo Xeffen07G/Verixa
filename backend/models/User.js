@@ -10,6 +10,15 @@ const userSchema = mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    organization: {
+        type: String,
+        required: true,
+        index: true
     }
 }, {
     timestamps: true

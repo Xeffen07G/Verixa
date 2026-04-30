@@ -8,7 +8,14 @@ const rateLimit = require("express-rate-limit");
 const verifyRoutes = require("./routes/verify");
 const urlRoutes = require("./routes/url");
 const healthRoutes = require("./routes/health");
+const trendingRoutes = require("./routes/trending");
 const { requireApiKey, requestLogger } = require("./middleware/validate");
+const connectDB = require("./config/db");
+
+// Connect to Database
+if (process.env.MONGO_URI) {
+  connectDB();
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -20,7 +27,24 @@ app.use(morgan("dev"));
 app.use(express.json({ limit: "10mb" }));
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, extensions background)
+      if (!origin) return callback(null, true);
+      const allowed = [
+        'http://localhost:3000',
+        'http://localhost:5000',
+        process.env.FRONTEND_URL,
+      ].filter(Boolean);
+      // Allow Chrome extensions (chrome-extension://...)
+      if (allowed.includes(origin) || origin.startsWith('chrome-extension://')) {
+        return callback(null, true);
+      }
+      // In development, allow all origins
+      if (process.env.NODE_ENV !== 'production') {
+        return callback(null, true);
+      }
+      callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   })
 );
@@ -42,6 +66,9 @@ app.use("/api/url", requireApiKey, urlRoutes);
 app.use("/api/pdf", requireApiKey, require("./routes/pdf"));
 app.use("/api/image", requireApiKey, require("./routes/image"));
 app.use("/api/health", healthRoutes);
+app.use("/api/trending", trendingRoutes);
+app.use("/api/organization", require("./routes/organization"));
+app.use("/api/auth", require("./routes/auth"));
 
 // 404 handler
 app.use((req, res) => {

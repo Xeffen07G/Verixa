@@ -1,47 +1,50 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { 
-    onAuthStateChanged, 
-    signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword, 
-    signOut 
-} from 'firebase/auth';
-import { auth } from '../firebase';
+import axios from 'axios';
 
 const AuthContext = createContext();
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Initial load from localStorage
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
-            setLoading(false);
-        });
-
-        return unsubscribe;
+        const savedUser = localStorage.getItem('verixa_user');
+        if (savedUser) {
+            setUser(JSON.parse(savedUser));
+        }
+        setLoading(false);
     }, []);
 
     const login = async (email, password) => {
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            return { success: true, user: userCredential.user };
+            const res = await axios.post(`${API_URL}/api/auth/login`, { email, password });
+            const data = res.data;
+            setUser(data);
+            localStorage.setItem('verixa_user', JSON.stringify(data));
+            return { success: true, user: data };
         } catch (error) {
-            return { success: false, error: error.message };
+            return { success: false, error: error.response?.data?.error || error.message };
         }
     };
 
-    const register = async (email, password) => {
+    const register = async (email, password, name, organization) => {
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            return { success: true, user: userCredential.user };
+            const res = await axios.post(`${API_URL}/api/auth/register`, { 
+              email, password, name, organization 
+            });
+            const data = res.data;
+            setUser(data);
+            localStorage.setItem('verixa_user', JSON.stringify(data));
+            return { success: true, user: data };
         } catch (error) {
-            return { success: false, error: error.message };
+            return { success: false, error: error.response?.data?.error || error.message };
         }
     };
 
     const logout = async () => {
-        await signOut(auth);
+        localStorage.removeItem('verixa_user');
         setUser(null);
     };
 

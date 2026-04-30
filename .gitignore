@@ -29,3 +29,5 @@ Thumbs.db
 # Misc
 .cache/
 coverage/
+data/
+backend/data/

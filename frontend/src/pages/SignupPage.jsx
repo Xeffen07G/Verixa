@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { User, Building, Mail, Lock } from 'lucide-react';
 
 const T = {
   bg: '#0a0a0f', card: 'rgba(22,22,31,0.95)', border: 'rgba(255,255,255,0.07)',
@@ -9,6 +10,8 @@ const T = {
 };
 
 export default function SignupPage() {
+  const [name, setName] = useState('');
+  const [organization, setOrganization] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -33,20 +36,11 @@ export default function SignupPage() {
 
     setIsLoading(true);
     try {
-      const result = await register(email, password);
+      const result = await register(email, password, name, organization);
       if (result.success) {
         navigate('/verify');
       } else {
-        // Map common Firebase signup errors
-        let message = result.error;
-        if (result.error.includes('auth/email-already-in-use')) {
-          message = 'Email is already in use.';
-        } else if (result.error.includes('auth/weak-password')) {
-          message = 'Password is too weak.';
-        } else if (result.error.includes('auth/invalid-email')) {
-          message = 'Invalid email address.';
-        }
-        setErr(message);
+        setErr(result.error || 'Signup failed');
       }
     } catch (error) {
       setErr('An unexpected error occurred. Please try again.');
@@ -55,70 +49,76 @@ export default function SignupPage() {
     }
   };
 
+  const inputStyle = {
+    width: '100%', background: T.inputBg, border: `1px solid ${T.inputBorder}`,
+    borderRadius: 12, padding: '12px 16px 12px 44px', color: T.text, fontSize: 14,
+    boxSizing: 'border-box', transition: 'all 0.2s', outline: 'none'
+  };
+
+  const iconStyle = { position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: T.text2 };
+
   return (
     <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: 'DM Sans, sans-serif' }}>
       <style>{`
         @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
-        input:focus { outline: none !important; border-color: rgba(201,169,110,0.4) !important; box-shadow: 0 0 0 3px rgba(201,169,110,0.08) !important; }
+        .form-input:focus { border-color: ${T.accent}66 !important; background: rgba(255,255,255,0.06) !important; }
       `}</style>
 
-      <Link to="/" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700, fontSize: 28, color: T.text, letterSpacing: 1, textDecoration: 'none', marginBottom: 32 }}>VeriXa</Link>
+      <Link to="/" style={{ fontFamily: 'serif', fontWeight: 700, fontSize: 28, color: T.text, letterSpacing: 1, textDecoration: 'none', marginBottom: 32 }}>VeriXa</Link>
 
-      <div style={{ maxWidth: 420, width: '100%', padding: '44px 40px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 20, boxShadow: '0 24px 64px rgba(0,0,0,0.3)', animation: 'fadeUp 0.5s ease' }}>
+      <div style={{ maxWidth: 460, width: '100%', padding: '48px 40px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 24, boxShadow: '0 24px 64px rgba(0,0,0,0.4)', animation: 'fadeUp 0.5s ease' }}>
 
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 22, color: T.accent }}>◈</div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 34, fontWeight: 300, color: T.text, margin: '0 0 6px' }}>Create Account</h1>
-          <p style={{ fontSize: 14, color: T.text2, margin: 0 }}>Join VeriXa and start verifying facts</p>
+          <h1 style={{ fontFamily: 'serif', fontSize: 34, fontWeight: 300, color: T.text, margin: '0 0 8px' }}>Join the Network.</h1>
+          <p style={{ fontSize: 14, color: T.text2, margin: 0 }}>Establish your enterprise identity for shared integrity.</p>
         </div>
 
         {err && (
-          <div style={{ padding: '10px 14px', background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)', color: '#f87171', borderRadius: 10, fontSize: 13, marginBottom: 20, textAlign: 'center' }}>
+          <div style={{ padding: '12px', background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', color: '#f87171', borderRadius: 12, fontSize: 13, marginBottom: 24, textAlign: 'center' }}>
             {err}
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', fontSize: 11, color: T.text2, marginBottom: 7, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase' }}>Email Address</label>
-            <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              style={{ width: '100%', background: T.inputBg, border: `1px solid ${T.inputBorder}`, borderRadius: 10, padding: '13px 16px', color: T.text, fontSize: 14, boxSizing: 'border-box', transition: 'all 0.2s' }} />
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ position: 'relative' }}>
+              <User size={16} style={iconStyle} />
+              <input required placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} className="form-input" style={inputStyle} />
+            </div>
+            <div style={{ position: 'relative' }}>
+              <Building size={16} style={iconStyle} />
+              <input required placeholder="Organization" value={organization} onChange={e => setOrganization(e.target.value)} className="form-input" style={inputStyle} />
+            </div>
           </div>
 
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', fontSize: 11, color: T.text2, marginBottom: 7, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase' }}>Password</label>
-            <input type="password" required value={password} onChange={e => setPassword(e.target.value)}
-              placeholder="Minimum 6 characters"
-              style={{ width: '100%', background: T.inputBg, border: `1px solid ${T.inputBorder}`, borderRadius: 10, padding: '13px 16px', color: T.text, fontSize: 14, boxSizing: 'border-box', transition: 'all 0.2s' }} />
+          <div style={{ position: 'relative' }}>
+            <Mail size={16} style={iconStyle} />
+            <input type="email" required placeholder="Work Email" value={email} onChange={e => setEmail(e.target.value)} className="form-input" style={inputStyle} />
           </div>
 
-          <div style={{ marginBottom: 28 }}>
-            <label style={{ display: 'block', fontSize: 11, color: T.text2, marginBottom: 7, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase' }}>Confirm Password</label>
-            <input type="password" required value={confirm} onChange={e => setConfirm(e.target.value)}
-              placeholder="Repeat your password"
-              style={{ width: '100%', background: T.inputBg, border: `1px solid ${T.inputBorder}`, borderRadius: 10, padding: '13px 16px', color: T.text, fontSize: 14, boxSizing: 'border-box', transition: 'all 0.2s' }} />
+          <div style={{ position: 'relative' }}>
+            <Lock size={16} style={iconStyle} />
+            <input type="password" required placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="form-input" style={inputStyle} />
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <Lock size={16} style={iconStyle} />
+            <input type="password" required placeholder="Confirm Password" value={confirm} onChange={e => setConfirm(e.target.value)} className="form-input" style={inputStyle} />
           </div>
 
           <button type="submit" disabled={isLoading}
-            style={{ width: '100%', padding: '14px', borderRadius: 10, background: isLoading ? 'rgba(201,169,110,0.2)' : 'linear-gradient(135deg, #c9a96e, #a07b42)', border: 'none', color: isLoading ? '#c9a96e' : '#0a0a0f', fontSize: 14, fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', transition: 'all 0.2s', letterSpacing: 0.5, boxShadow: isLoading ? 'none' : '0 4px 16px rgba(201,169,110,0.25)' }}>
-            {isLoading ? 'Creating account...' : 'Create Account'}
+            style={{ width: '100%', padding: '14px', marginTop: 12, borderRadius: 12, background: isLoading ? 'rgba(201,169,110,0.2)' : T.accent, border: 'none', color: '#0a0a0f', fontSize: 14, fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
+            {isLoading ? 'Establishing Identity...' : 'Join VeriXa'}
           </button>
         </form>
 
         <div style={{ textAlign: 'center', marginTop: 24 }}>
           <p style={{ fontSize: 13, color: T.text2, margin: 0 }}>
-            Already have an account?{' '}
-            <Link to="/login" style={{ color: T.accent, textDecoration: 'none', fontWeight: 600 }}>
-              Sign in
-            </Link>
+            Already registered? <Link to="/login" style={{ color: T.accent, textDecoration: 'none', fontWeight: 600 }}>Sign in</Link>
           </p>
         </div>
       </div>
-
-      <p style={{ marginTop: 24, fontSize: 12, color: 'rgba(245,243,239,0.2)' }}>
-        Protected by Firebase Auth
-      </p>
     </div>
   );
 }

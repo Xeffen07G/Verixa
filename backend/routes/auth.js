@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = process.env.MONGO_URI ? require('../models/User') : require('../utils/store').User;
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET || 'secret', {
@@ -12,7 +12,7 @@ const generateToken = (id) => {
 // @desc Register a new user
 // @route POST /api/auth/register
 router.post('/register', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, name, organization } = req.body;
 
     try {
         const userExists = await User.findOne({ email });
@@ -21,12 +21,14 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: 'User already exists' });
         }
 
-        const user = await User.create({ email, password });
+        const user = await User.create({ email, password, name, organization });
 
         if (user) {
             res.status(201).json({
                 _id: user._id,
+                name: user.name,
                 email: user.email,
+                organization: user.organization,
                 token: generateToken(user._id)
             });
         } else {
@@ -45,7 +47,9 @@ router.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ email });
 
-        if (user && (await user.matchPassword(password))) {
+        const isMatch = user && (user.matchPassword ? await user.matchPassword(password) : user.password === password);
+
+        if (isMatch) {
             res.json({
                 _id: user._id,
                 email: user.email,

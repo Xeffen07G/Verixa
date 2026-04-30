@@ -22,7 +22,8 @@ You MUST respond with ONLY valid JSON in this exact format:
   "confidence": integer 0-100,
   "risk_level": "High" | "Medium" | "Low",
   "assessment": "1-2 sentence assessment of the image",
-  "indicators": ["list", "of", "specific", "indicators", "found"]
+  "indicators": ["list", "of", "specific", "indicators", "found"],
+  "extracted_text": "string containing any text found in the image, or empty string if none"
 }
 
 Analyze carefully for:
@@ -45,56 +46,56 @@ router.post("/url", async (req, res) => {
     return res.status(400).json({ error: "imageUrl is required" });
   }
 
-    try {
-      // Fetch the image server-side and convert to base64
-      // (Llama 4 Scout cannot fetch external URLs directly)
-      const imgResponse = await fetch(imageUrl, {
-        headers: { 'User-Agent': 'VeriXa-ImageAnalyzer/1.0' },
-        timeout: 15000,
+  try {
+    // Fetch the image server-side and convert to base64
+    // (Llama 4 Scout cannot fetch external URLs directly)
+    const imgResponse = await fetch(imageUrl, {
+      headers: { 'User-Agent': 'VeriXa-ImageAnalyzer/1.0' },
+      timeout: 15000,
+    });
+
+    if (!imgResponse.ok) {
+      return res.status(400).json({
+        error: `Could not fetch image from URL (HTTP ${imgResponse.status}). Please check the URL is accessible.`,
       });
+    }
 
-      if (!imgResponse.ok) {
-        return res.status(400).json({
-          error: `Could not fetch image from URL (HTTP ${imgResponse.status}). Please check the URL is accessible.`,
-        });
-      }
-
-      const contentType = imgResponse.headers.get("content-type") || "image/jpeg";
-      if (!contentType.startsWith("image/")) {
-        return res.status(400).json({
-          error: "URL does not point to an image. Please provide a direct image URL.",
-        });
-      }
-
-      const buffer = await imgResponse.buffer();
-      if (buffer.length > 10 * 1024 * 1024) {
-        return res.status(400).json({ error: "Image too large. Max 10MB." });
-      }
-
-      const base64 = buffer.toString("base64");
-      const dataUrl = `data:${contentType};base64,${base64}`;
-
-      const completion = await getGroq().chat.completions.create({
-        model: "meta-llama/llama-4-scout-17b-16e-instruct",
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: `${SYSTEM_PROMPT}\n\nAnalyze this image for authenticity. Is it AI-generated, manipulated, or real? Respond with ONLY the JSON format specified.`,
-              },
-              {
-                type: "image_url",
-                image_url: { url: dataUrl },
-              },
-            ],
-          },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.1,
-        max_tokens: 1024,
+    const contentType = imgResponse.headers.get("content-type") || "image/jpeg";
+    if (!contentType.startsWith("image/")) {
+      return res.status(400).json({
+        error: "URL does not point to an image. Please provide a direct image URL.",
       });
+    }
+
+    const buffer = await imgResponse.buffer();
+    if (buffer.length > 10 * 1024 * 1024) {
+      return res.status(400).json({ error: "Image too large. Max 10MB." });
+    }
+
+    const base64 = buffer.toString("base64");
+    const dataUrl = `data:${contentType};base64,${base64}`;
+
+    const completion = await getGroq().chat.completions.create({
+      model: "meta-llama/llama-4-scout-17b-16e-instruct",
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `${SYSTEM_PROMPT}\n\nAnalyze this image for authenticity. Is it AI-generated, manipulated, or real? Respond with ONLY the JSON format specified.`,
+            },
+            {
+              type: "image_url",
+              image_url: { url: dataUrl },
+            },
+          ],
+        },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.1,
+      max_tokens: 1024,
+    });
 
     const raw = completion.choices[0].message.content.trim();
     const cleaned = raw.replace(/```json|```/g, "").trim();
@@ -108,6 +109,7 @@ router.post("/url", async (req, res) => {
     result.verdict = result.verdict ?? "Uncertain";
     result.assessment = result.assessment ?? "Analysis completed.";
     result.indicators = result.indicators ?? [];
+    result.extracted_text = result.extracted_text ?? "";
 
     res.json(result);
   } catch (err) {

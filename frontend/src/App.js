@@ -5,19 +5,30 @@ import VerifyPage from './pages/VerifyPage';
 import ImagePage from './pages/ImagePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import TrendingPage from './pages/TrendingPage';
+import DashboardPage from './pages/DashboardPage';
+import ExtensionPage from './pages/ExtensionPage';
 import { AuthProvider } from './context/AuthContext';
+import DragDropOverlay from './components/DragDropOverlay';
+import CustomCursor from './components/CustomCursor';
 
 export default function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/verify" element={<VerifyPage />} />
-          <Route path="/image" element={<ImagePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-        </Routes>
+        <CustomCursor />
+        <DragDropOverlay>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/verify" element={<VerifyPage />} />
+            <Route path="/image" element={<ImagePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/trending" element={<TrendingPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/extension" element={<ExtensionPage />} />
+          </Routes>
+        </DragDropOverlay>
       </Router>
     </AuthProvider>
   );

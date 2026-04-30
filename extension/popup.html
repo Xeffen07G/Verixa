@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>VeriXa</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 340px;
+      min-height: 200px;
+      background: #0a0a0f;
+      color: #f5f3ef;
+      font-family: 'Segoe UI', -apple-system, sans-serif;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(16,16,23,0.8);
+    }
+    .logo-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: linear-gradient(135deg, rgba(201,169,110,0.2), rgba(201,169,110,0.05));
+      border: 1px solid rgba(201,169,110,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: #c9a96e; font-weight: 700;
+    }
+    .logo-text { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+    .version {
+      margin-left: auto; font-size: 10px;
+      color: rgba(245,243,239,0.3); letter-spacing: 0.5px;
+    }
+    .body { padding: 18px; }
+    .status {
+      text-align: center; padding: 24px 0;
+      font-size: 13px; color: rgba(245,243,239,0.5);
+      line-height: 1.7;
+    }
+    .status-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.4; }
+    .result-card {
+      padding: 14px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+      margin-bottom: 10px;
+    }
+    .score { font-size: 36px; font-weight: 300; line-height: 1; margin-bottom: 4px; }
+    .label { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
+    .claim-row {
+      display: flex; gap: 8px; align-items: flex-start;
+      padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 12px; color: rgba(245,243,239,0.6); line-height: 1.5;
+    }
+    .verdict-icon { flex-shrink: 0; font-weight: 700; font-size: 13px; }
+    .actions {
+      display: flex; gap: 8px; margin-top: 16px;
+    }
+    .btn {
+      flex: 1; padding: 10px; border-radius: 8px; border: none;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #c9a96e, #a07b42);
+      color: #0a0a0f;
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(245,243,239,0.5);
+    }
+    .btn:hover { opacity: 0.85; }
+    .tip {
+      margin-top: 16px; padding: 10px 14px; border-radius: 8px;
+      background: rgba(201,169,110,0.06);
+      border: 1px solid rgba(201,169,110,0.15);
+      font-size: 11px; color: rgba(201,169,110,0.7); line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-icon">V</div>
+    <span class="logo-text">VeriXa</span>
+    <span class="version">v1.0</span>
+  </div>
+  <div class="body" id="body">
+    <div class="status">
+      <div class="status-icon">🔍</div>
+      <p>Select any text on a webpage,<br>right-click, and choose</p>
+      <p style="color:#c9a96e;font-weight:600;margin-top:4px;">"Verify with VeriXa"</p>
+    </div>
+    <div class="tip">
+      💡 Tip: Select a claim or paragraph, right-click, and VeriXa will fact-check it instantly using AI.
+    </div>
+  </div>
+  <div style="padding:0 18px 14px;">
+    <div class="actions">
+      <button class="btn btn-primary" onclick="window.open('http://localhost:3000/verify')">Open VeriXa</button>
+      <button class="btn btn-secondary" id="historyBtn">History</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

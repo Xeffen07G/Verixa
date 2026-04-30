@@ -1,0 +1,226 @@
+/* VeriXa Chrome Extension Styles */
+
+#verixa-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 20px;
+  animation: verixa-fadeIn 0.2s ease;
+  font-family: 'Segoe UI', -apple-system, sans-serif;
+}
+
+@keyframes verixa-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes verixa-slideIn {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes verixa-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes verixa-shimmer {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+.verixa-panel {
+  width: 380px;
+  max-height: 85vh;
+  background: #0a0a0f;
+  border: 1px solid rgba(201, 169, 110, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(201, 169, 110, 0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: verixa-slideIn 0.3s ease;
+}
+
+.verixa-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(16, 16, 23, 0.8);
+}
+
+.verixa-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.verixa-logo-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, rgba(201, 169, 110, 0.2), rgba(201, 169, 110, 0.05));
+  border: 1px solid rgba(201, 169, 110, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #c9a96e;
+  font-weight: 700;
+}
+
+.verixa-logo-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #f5f3ef;
+  letter-spacing: 0.5px;
+}
+
+.verixa-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  color: rgba(245, 243, 239, 0.4);
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.verixa-close:hover {
+  background: rgba(248, 113, 113, 0.1);
+  border-color: rgba(248, 113, 113, 0.3);
+  color: #f87171;
+}
+
+.verixa-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(85vh - 60px);
+}
+
+.verixa-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+  gap: 12px;
+}
+
+.verixa-spinner {
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(201, 169, 110, 0.15);
+  border-top-color: #c9a96e;
+  border-radius: 50%;
+  animation: verixa-spin 0.8s linear infinite;
+}
+
+.verixa-loading-text {
+  font-size: 14px;
+  color: #f5f3ef;
+  margin: 0;
+  font-weight: 500;
+  animation: verixa-shimmer 1.5s ease-in-out infinite;
+}
+
+.verixa-loading-sub {
+  font-size: 11px;
+  color: rgba(245, 243, 239, 0.35);
+  margin: 0;
+}
+
+.verixa-open-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(201, 169, 110, 0.3);
+  background: rgba(201, 169, 110, 0.08);
+  color: #c9a96e;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.verixa-open-btn:hover {
+  background: rgba(201, 169, 110, 0.15);
+}
+
+/* Input preview */
+.verixa-input-preview {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 16px;
+}
+
+.verixa-preview-label {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: rgba(201, 169, 110, 0.6);
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+
+.verixa-preview-text {
+  font-size: 12px;
+  color: rgba(245, 243, 239, 0.6);
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Stage pills */
+.verixa-stage-pills {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.verixa-pill {
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(245, 243, 239, 0.3);
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.verixa-pill-active {
+  background: rgba(201, 169, 110, 0.1);
+  border-color: rgba(201, 169, 110, 0.3);
+  color: #c9a96e;
+  font-weight: 600;
+}
+
+.verixa-pill-done {
+  background: rgba(74, 222, 128, 0.08);
+  border-color: rgba(74, 222, 128, 0.2);
+  color: #4ade80;
+}
+
+/* Scrollbar for overlay */
+.verixa-body::-webkit-scrollbar { width: 4px; }
+.verixa-body::-webkit-scrollbar-track { background: transparent; }
+.verixa-body::-webkit-scrollbar-thumb { background: rgba(201, 169, 110, 0.2); border-radius: 4px; }

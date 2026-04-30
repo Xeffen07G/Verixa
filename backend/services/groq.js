@@ -5,17 +5,20 @@ function getClient() {
   return new Groq({ apiKey: process.env.GROQ_API_KEY });
 }
 
-async function askGroq(prompt, jsonMode = false, model = "llama-3.1-8b-instant") {
+async function askGroq(prompt, jsonMode = false, model = "llama-3.1-8b-instant", retries = 3) {
   const groq = getClient();
-  const completion = await groq.chat.completions.create({
-    model: model, // Specific model ID (8b for speed/TPM, 70b for quality)
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const completion = await groq.chat.completions.create({
+        model: model,
     messages: [
       {
         role: "system",
         content: `You are VeriXa — the world's most precise AI fact-verification engine.
 You are exceptionally thorough, accurate, and evidence-based.
 You NEVER guess. You ONLY make verdicts based on retrieved evidence.
-You always respond in valid JSON as instructed.`,
+You always respond in valid JSON as instructed.
+MULTILINGUAL SUPPORT: You can understand and process text in ANY language including Hindi (हिन्दी), Bengali (বাংলা), Tamil (தமிழ்), Telugu (తెలుగు), and all other Indian languages. When the user's input text is in a non-English language, keep the claim text in its original language but provide reasoning and verdicts in English for consistency. Extract claims faithfully preserving the original language.`,
       },
       { role: "user", content: prompt },
     ],
@@ -23,7 +26,19 @@ You always respond in valid JSON as instructed.`,
     response_format: jsonMode ? { type: "json_object" } : undefined,
     max_completion_tokens: 4096,
   });
-  return completion.choices[0].message.content.trim();
+      return completion.choices[0].message.content.trim();
+    } catch (err) {
+      if (err.status === 429 && attempt < retries) {
+        let waitMs = (attempt + 1) * 4000;
+        const match = err.message?.match(/try again in (\d+\.?\d*)s/i);
+        if (match) waitMs = Math.ceil(parseFloat(match[1]) * 1000) + 500;
+        console.log(`⏳ Rate limited. Waiting ${(waitMs / 1000).toFixed(1)}s before retry ${attempt + 1}/${retries}...`);
+        await new Promise(resolve => setTimeout(resolve, waitMs));
+        continue;
+      }
+      throw err;
+    }
+  }
 }
 
 async function tavilySearch(query) {

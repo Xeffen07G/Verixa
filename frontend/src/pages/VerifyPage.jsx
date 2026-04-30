@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useVerify } from '../hooks/useVerify';
+import SkeletonLoading from '../components/SkeletonCard';
+import Confetti from '../components/Confetti';
+import { t, getStoredLanguage } from '../utils/i18n';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
@@ -106,8 +109,8 @@ function ClaimCard({ claim, index, theme }) {
         </div>
 
         <div style={{ flex: 1 }}>
-          <p style={{ margin: '0 0 6px', fontSize: 15, color: theme.text, lineHeight: 1.55, fontWeight: 500, fontFamily: 'Cormorant Garamond, serif' }}>{claim.claim}</p>
-          <span style={{ fontSize: 12, color: cfg.color, fontWeight: 600, background: cfg.bg, padding: '2px 10px', borderRadius: 999, border: `1px solid ${cfg.border}` }}>{cfg.label}</span>
+          <p style={{ margin: '0 0 6px', fontSize: 15, color: open ? cfg.color : theme.text, lineHeight: 1.55, fontWeight: 700, fontFamily: 'Inter, sans-serif' }}>{claim.claim}</p>
+          <span style={{ fontSize: 12, color: cfg.color, fontWeight: 700, background: cfg.bg, padding: '2px 10px', borderRadius: 999, border: `1px solid ${cfg.border}` }}>{cfg.label}</span>
         </div>
 
         <span style={{ color: theme.text3, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'none', fontSize: 12, marginTop: 14, flexShrink: 0 }}>▼</span>
@@ -118,7 +121,7 @@ function ClaimCard({ claim, index, theme }) {
           <div style={{ height: 1, background: cfg.border, marginBottom: 16 }} />
 
           {/* Reasoning */}
-          <p style={{ fontSize: 14, color: theme.text, lineHeight: 1.75, margin: '0 0 20px', fontStyle: 'italic' }}>{claim.reasoning}</p>
+          <p style={{ fontSize: 14, color: open ? cfg.color : theme.text, lineHeight: 1.75, margin: '0 0 20px', fontStyle: 'italic', fontWeight: 500 }}>{claim.reasoning}</p>
 
           {/* Sources */}
           {claim.sources?.length > 0 && (
@@ -256,11 +259,128 @@ function HistoryPanel({ history, onLoad, onDelete, theme }) {
 }
 
 function exportToPDF(claims, overallScore, text) {
-  const html = `<html><head><style>body{font-family:Georgia,serif;max-width:800px;margin:40px auto;color:#1a1a1a;line-height:1.6;}h1{font-size:28px;font-weight:300;border-bottom:2px solid #c9a96e;padding-bottom:12px;color:#0a0a0f}.score{font-size:56px;font-weight:300;color:${overallScore>=70?'#166534':overallScore>=40?'#92400e':'#991b1b'}}.claim{border:1px solid #e5e7eb;border-radius:10px;padding:18px;margin-bottom:14px;}.badge{display:inline-block;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:8px}.reasoning{color:#555;font-size:13px;margin-top:8px;line-height:1.6}.source{font-size:11px;color:#888;margin-top:6px}</style></head><body><h1>VeriXa Accuracy Report</h1><p style="color:#666;margin-bottom:4px">Generated ${new Date().toLocaleString()} · ${claims.length} claims</p><div class="score">${overallScore}%</div><p style="color:#666;margin:4px 0 28px">${overallScore>=70?'Mostly Accurate':overallScore>=40?'Mixed Accuracy':'Mostly Inaccurate'}</p>${claims.map((c,i)=>`<div class="claim"><div class="badge" style="background:${VERDICT_CONFIG[c.verdict]?.bg};color:${VERDICT_CONFIG[c.verdict]?.color}">${VERDICT_CONFIG[c.verdict]?.icon} ${c.verdict}</div><strong style="font-size:15px;display:block;margin-bottom:6px">${i+1}. ${c.claim}</strong><div class="reasoning">${c.reasoning}</div>${c.sources?.length?`<div class="source">Sources: ${c.sources.map(s=>s.title).join(' · ')}</div>`:''}</div>`).join('')}</body></html>`;
+  const html = `<html><head><style>body{font-family:'Segoe UI',system-ui,sans-serif;max-width:800px;margin:40px auto;color:#1a1a1a;line-height:1.6;}h1{font-size:28px;font-weight:300;border-bottom:2px solid #c9a96e;padding-bottom:12px;color:#0a0a0f}.score{font-size:56px;font-weight:300;color:${overallScore>=70?'#166534':overallScore>=40?'#92400e':'#991b1b'}}.claim{border:1px solid #e5e7eb;border-radius:10px;padding:18px;margin-bottom:14px;}.badge{display:inline-block;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:8px}.reasoning{color:#555;font-size:13px;margin-top:8px;line-height:1.6}.source{font-size:11px;color:#888;margin-top:6px}</style></head><body><h1>VeriXa Accuracy Report</h1><p style="color:#666;margin-bottom:4px">Generated ${new Date().toLocaleString()} · ${claims.length} claims</p><div class="score">${overallScore}%</div><p style="color:#666;margin:4px 0 28px">${overallScore>=70?'Mostly Accurate':overallScore>=40?'Mixed Accuracy':'Mostly Inaccurate'}</p>${claims.map((c,i)=>`<div class="claim"><div class="badge" style="background:${VERDICT_CONFIG[c.verdict]?.bg};color:${VERDICT_CONFIG[c.verdict]?.color}">${VERDICT_CONFIG[c.verdict]?.icon} ${c.verdict}</div><strong style="font-size:15px;display:block;margin-bottom:6px">${i+1}. ${c.claim}</strong><div class="reasoning">${c.reasoning}</div>${c.sources?.length?`<div class="source">Sources: ${c.sources.map(s=>s.title).join(' · ')}</div>`:''}</div>`).join('')}</body></html>`;
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const win = window.open(url, '_blank');
   if (win) setTimeout(() => { win.print(); URL.revokeObjectURL(url); }, 800);
+}
+
+function generateCertificate(claims, overallScore, text) {
+  const scoreColor = overallScore >= 70 ? '#4ade80' : overallScore >= 40 ? '#fbbf24' : '#f87171';
+  const label = overallScore >= 90 ? 'HIGHLY ACCURATE' : overallScore >= 70 ? 'MOSTLY ACCURATE' : overallScore >= 40 ? 'MIXED ACCURACY' : 'LOW ACCURACY';
+  const html = `<html><head><style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600;700&family=Inter:wght@400;700&display=swap');
+    
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-sizing: border-box; }
+    body { background: #000; color: #fff; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Inter', sans-serif; }
+    
+    .cert-wrapper { 
+      width: 95vw; max-width: 1000px; height: 95vh; max-height: 700px;
+      background: #0a0a0f; 
+      border: 2px solid #c9a96e; 
+      position: relative; 
+      padding: 50px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      margin: auto;
+    }
+    
+    .ornament-outer { position: absolute; inset: 10px; border: 1px solid rgba(201,169,110,0.2); pointer-events: none; }
+    .ornament-inner { position: absolute; inset: 18px; border: 1px solid rgba(201,169,110,0.3); pointer-events: none; }
+    
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(201,169,110,0.2); padding-bottom: 15px; }
+    .brand { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; color: #c9a96e; letter-spacing: 2px; }
+    .header-right { font-size: 9px; color: rgba(201,169,110,0.5); letter-spacing: 2px; text-transform: uppercase; }
+    
+    .content { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px 0; }
+    .sub-title { font-size: 11px; color: #c9a96e; letter-spacing: 3px; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; }
+    .main-title { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 600; margin: 0 0 25px; line-height: 1; color: #f5f3ef; }
+    .divider { width: 100px; height: 1px; background: linear-gradient(90deg, transparent, #c9a96e, transparent); margin-bottom: 30px; }
+    
+    .score-box { display: flex; align-items: center; gap: 25px; margin-bottom: 30px; }
+    .score-circle { 
+      width: 130px; height: 130px; border-radius: 50%; 
+      border: 4px double ${scoreColor}; 
+      display: flex; align-items: center; justify-content: center; 
+      font-size: 40px; font-weight: 800; color: ${scoreColor};
+      background: rgba(255,255,255,0.02);
+    }
+    .score-info { text-align: left; }
+    .verdict-label { font-size: 24px; font-weight: 800; color: ${scoreColor}; margin: 0 0 3px; letter-spacing: 1px; }
+    .verdict-desc { font-size: 12px; color: rgba(245,243,239,0.4); margin: 0; }
+    
+    .excerpt-box { 
+      width: 100%; max-width: 700px; 
+      padding: 20px; 
+      background: rgba(255,255,255,0.03); 
+      border: 1px solid rgba(255,255,255,0.06); 
+      border-radius: 10px;
+      text-align: left;
+    }
+    .excerpt-lbl { font-size: 8px; color: #c9a96e; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; display: block; }
+    .excerpt-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px; color: rgba(245,243,239,0.7); line-height: 1.5; margin: 0; }
+    
+    .footer { 
+      display: flex; justify-content: space-between; align-items: flex-end; 
+      border-top: 1px solid rgba(201,169,110,0.15); padding-top: 20px; 
+      font-size: 11px; color: rgba(245,243,239,0.3); 
+    }
+    .footer-left b { color: #c9a96e; }
+    .seal { 
+      width: 60px; height: 60px; border-radius: 50%; 
+      border: 2px solid #c9a96e; 
+      display: flex; flex-direction: column; align-items: center; justify-content: center; 
+      color: #c9a96e; font-size: 7px; font-weight: 700;
+      background: rgba(201,169,110,0.03);
+    }
+    
+    @page { size: landscape; margin: 0; }
+  </style></head><body>
+    <div class="cert-wrapper">
+      <div class="ornament-outer"></div>
+      <div class="ornament-inner"></div>
+      
+      <div class="header">
+        <div class="brand">VeriXa</div>
+        <div class="header-right">Truth is not negotiable</div>
+      </div>
+      
+      <div class="content">
+        <div class="sub-title">Fact-Check Authenticity</div>
+        <h1 class="main-title">Certificate of Verification</h1>
+        <div class="divider"></div>
+        
+        <div class="score-box">
+          <div class="score-circle">${overallScore}%</div>
+          <div class="score-info">
+            <h2 class="verdict-label">${label}</h2>
+            <p class="verdict-desc">Verified by AI-Powered Evidence Analysis</p>
+          </div>
+        </div>
+        
+        <div class="excerpt-box">
+          <span class="excerpt-lbl">Verified Content Excerpt</span>
+          <p class="excerpt-text">"${text.slice(0, 300)}${text.length > 300 ? '...' : ''}"</p>
+        </div>
+      </div>
+      
+      <div class="footer">
+        <div class="footer-left">
+          <div><b>Issued:</b> ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+          <div style="margin-top:4px;"><b>Report ID:</b> VX${Math.random().toString(36).substr(2, 9).toUpperCase()}</div>
+        </div>
+        <div class="seal">
+          <span>VERIFIED</span>
+          <span style="font-size:18px; margin-top:2px;">✓</span>
+        </div>
+      </div>
+    </div>
+    <script>setTimeout(() => window.print(), 500);</script>
+  </body></html>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (win) setTimeout(() => { URL.revokeObjectURL(url); }, 5000);
 }
 
 export default function VerifyPage() {
@@ -271,6 +391,9 @@ export default function VerifyPage() {
   const [fetchingUrl, setFetchingUrl] = useState(false);
   const [pdfInfo, setPdfInfo] = useState(null);
   const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [lang, setLang] = useState(getStoredLanguage());
+  const [searchParams] = useSearchParams();
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('verixa-theme');
     return saved ? saved === 'dark' : true;
@@ -293,9 +416,74 @@ export default function VerifyPage() {
 
   const { stage, logs, claims, overallScore, aiDetection, error, isLoading, verify, reset } = useVerify();
 
+  // Listen for language changes from Navbar
+  useEffect(() => {
+    const handler = (e) => setLang(e.detail);
+    window.addEventListener('verixa-lang-change', handler);
+    return () => window.removeEventListener('verixa-lang-change', handler);
+  }, []);
+
+  // Load text from drag-drop via sessionStorage
+  useEffect(() => {
+    if (searchParams.get('source') === 'dragdrop') {
+      const dragText = sessionStorage.getItem('verixa-dragdrop-text');
+      if (dragText) {
+        setText(dragText);
+        sessionStorage.removeItem('verixa-dragdrop-text');
+      }
+    }
+  }, [searchParams]);
+
+  // Load text from Chrome extension via sessionStorage and auto-verify
+  useEffect(() => {
+    if (searchParams.get('source') !== 'extension') return;
+
+    const loadExtensionText = () => {
+      const extText = sessionStorage.getItem('verixa-extension-text');
+      if (extText) {
+        setText(extText);
+        sessionStorage.removeItem('verixa-extension-text');
+        // Auto-trigger verification after a short delay
+        setTimeout(() => {
+          verify(extText, false);
+        }, 500);
+      }
+    };
+
+    // Try immediately (content script may have already written it)
+    loadExtensionText();
+
+    // Also listen for the custom event from the content script
+    const handler = () => loadExtensionText();
+    window.addEventListener('verixa-extension-ready', handler);
+
+    // Fallback: poll briefly in case of timing issues
+    const poll = setInterval(() => {
+      const extText = sessionStorage.getItem('verixa-extension-text');
+      if (extText) {
+        loadExtensionText();
+        clearInterval(poll);
+      }
+    }, 200);
+    setTimeout(() => clearInterval(poll), 3000);
+
+    return () => {
+      window.removeEventListener('verixa-extension-ready', handler);
+      clearInterval(poll);
+    };
+  }, [searchParams]);
+
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
   }, [logs]);
+
+  // Celebration confetti for 90%+ scores
+  useEffect(() => {
+    if (stage === 'done' && overallScore >= 90) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 4000);
+    }
+  }, [stage, overallScore]);
 
   useEffect(() => {
     if (stage === 'done' && claims.length > 0) {
@@ -378,7 +566,10 @@ export default function VerifyPage() {
   });
 
   return (
-    <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', flexDirection: 'column', paddingTop: 60, transition: 'background 0.3s', fontFamily: 'DM Sans, sans-serif' }}>
+    <div className="page-wrapper" style={{ minHeight: '100vh', background: T.bg, display: 'flex', flexDirection: 'column', transition: 'background 0.3s', fontFamily: 'DM Sans, sans-serif' }}>
+      {/* Confetti celebration for 90%+ scores */}
+      <Confetti trigger={showConfetti} />
+
       <style>{`
         @media (max-width: 768px) { .verify-main { grid-template-columns: 1fr !important; } .left-panel { height: auto !important; border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); } }
         textarea:focus { outline: none; }
@@ -422,14 +613,31 @@ export default function VerifyPage() {
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme}>
         {stage === 'done' && claims.length > 0 && (
           <button onClick={() => exportToPDF(claims, overallScore, text)}
-            style={{ padding: '7px 18px', borderRadius: 8, background: T.accentMuted, border: `1px solid ${T.accent}4d`, color: T.accent, fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
-            Export PDF
+            style={{ padding: '7px 14px', borderRadius: 7, background: T.accentMuted, border: `1px solid ${T.accent}4d`, color: T.accent, fontSize: 11, cursor: 'pointer', fontWeight: 600 }}>
+            {t('exportPDF', lang)}
+          </button>
+        )}
+        {stage === 'done' && claims.length > 0 && (
+          <button onClick={() => generateCertificate(claims, overallScore, text)}
+            style={{ 
+              padding: '8px 18px', borderRadius: 8, 
+              background: 'linear-gradient(135deg, #c9a96e, #a07b42)', 
+              border: 'none', color: '#0a0a0f', fontSize: 12, 
+              cursor: 'pointer', fontWeight: 700, 
+              boxShadow: '0 4px 12px rgba(201,169,110,0.3)',
+              display: 'flex', alignItems: 'center', gap: 6,
+              transition: 'transform 0.2s'
+            }}
+            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            🏆 {t('generateCertificate', lang)}
           </button>
         )}
         {stage === 'done' && (
-          <button onClick={reset}
-            style={{ padding: '7px 18px', borderRadius: 8, background: 'transparent', border: `1px solid ${T.border}`, color: T.text3, fontSize: 12, cursor: 'pointer' }}>
-            New
+          <button onClick={() => { reset(); setShowConfetti(false); }}
+            style={{ padding: '7px 14px', borderRadius: 7, background: 'transparent', border: `1px solid ${T.border}`, color: T.text3, fontSize: 11, cursor: 'pointer' }}>
+            {t('newVerification', lang)}
           </button>
         )}
       </Navbar>
@@ -498,7 +706,7 @@ export default function VerifyPage() {
                 {/* Textarea */}
                 <div style={{ position: 'relative' }}>
                   <textarea value={text} onChange={e => setText(e.target.value)}
-                    placeholder="Paste your article, essay, or any text with facts..."
+                    placeholder={t('pasteText', lang)}
                     style={{ width: '100%', minHeight: 200, padding: '14px 14px 44px', background: T.inputBg, border: `1.5px solid ${T.inputBorder}`, borderRadius: 12, color: T.text, fontSize: 13, lineHeight: 1.7, resize: 'vertical', outline: 'none', fontFamily: 'DM Sans, sans-serif', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                     disabled={isLoading}
                     onFocus={e => e.target.style.borderColor = `${T.accent}66`}
@@ -574,7 +782,7 @@ export default function VerifyPage() {
                     position: 'relative', overflow: 'hidden' 
                   }}
                   onClick={handleRun} disabled={isLoading || !text.trim()}>
-                  {isLoading ? 'Verifying...' : 'Verify Now'}
+                  {isLoading ? t('verifying', lang) : t('verifyNow', lang)}
                 </button>
               </div>
             </>
@@ -588,95 +796,67 @@ export default function VerifyPage() {
           {!stage && claims.length === 0 && !error && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', gap: 20 }}>
               <div style={{ width: 80, height: 80, borderRadius: '50%', background: T.accentMuted, border: `1px solid ${T.accent}1a`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, color: `${T.accent}4d` }}>◉</div>
-              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 32, color: T.emptyColor, lineHeight: 1.2 }}>Ready to verify</div>
-              <div style={{ fontSize: 14, color: T.text3, maxWidth: 340, lineHeight: 1.7 }}>Paste any text, URL, or PDF on the left. VeriXa will extract every claim and check it against real evidence.</div>
+              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 32, color: T.emptyColor, lineHeight: 1.2 }}>{t('readyToVerify', lang)}</div>
+              <div style={{ fontSize: 14, color: T.text3, maxWidth: 340, lineHeight: 1.7 }}>{t('readyDesc', lang)}</div>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center', marginTop: 8 }}>
-                {['Text', 'URL', 'PDF', 'Voice', 'Image'].map(f => (
+                {['Text', 'URL', 'PDF', 'Voice', 'Drag & Drop'].map(f => (
                   <span key={f} style={{ padding: '4px 14px', borderRadius: 999, background: T.accentMuted, border: `1px solid ${T.accent}1f`, fontSize: 12, color: T.accent }}>{f}</span>
                 ))}
               </div>
             </div>
           )}
 
-          {/* ════ ANIMATED PIPELINE LOADING STATE ════ */}
+          {/* ════ SKELETON LOADING STATE ════ */}
           {stage && stage !== 'done' && claims.length === 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', gap: 32 }}>
-              {/* Orbiting ring animation */}
-              <div style={{ position: 'relative', width: 120, height: 120 }}>
-                <div style={{
-                  position: 'absolute', inset: 0, borderRadius: '50%',
-                  border: `2px solid ${T.accent}14`,
-                }} />
-                <div style={{
-                  position: 'absolute', inset: 0, borderRadius: '50%',
-                  border: '2px solid transparent', borderTopColor: T.accent,
-                  animation: 'orbit 1.5s linear infinite',
-                }} />
-                <div style={{
-                  position: 'absolute', inset: 8, borderRadius: '50%',
-                  border: '2px solid transparent', borderTopColor: `${T.accent}66`,
-                  animation: 'orbit 2.5s linear infinite reverse',
-                }} />
-                <div style={{
-                  position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 28, color: T.accent,
-                }}>
-                  {stage === 'extracting' ? '🔍' : stage === 'searching' ? '🌐' : '✓'}
-                </div>
-              </div>
-
-              {/* Stage label */}
-              <div>
-                <div style={{
-                  fontFamily: 'Cormorant Garamond, serif', fontWeight: 400, fontSize: 28,
-                  color: T.text, lineHeight: 1.2, marginBottom: 8,
-                }}>
-                  {stage === 'extracting' ? 'Extracting Claims' : stage === 'searching' ? 'Searching Evidence' : 'Verifying Claims'}...
-                </div>
-                <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.6, maxWidth: 380, margin: '0 auto' }}>
-                  {stage === 'extracting'
-                    ? 'Decomposing your text into discrete, verifiable factual claims using chain-of-thought reasoning.'
-                    : stage === 'searching'
-                    ? 'Querying authoritative sources across the web. Cross-referencing evidence for each claim.'
-                    : 'Analyzing evidence against each claim. Generating verdicts with confidence scores.'}
-                </div>
-              </div>
-
-              {/* Mini progress bar */}
-              <div style={{ width: '100%', maxWidth: 320 }}>
-                <AnimatedLoadingBar active indeterminate height={3} style={{ borderRadius: 6 }} />
-              </div>
-
-              {/* Live stage pills */}
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
-                {['Extracting', 'Searching', 'Verifying'].map((s, i) => {
-                  const stageMap = ['extracting', 'searching', 'verifying'];
-                  const currentIdx = stageMap.indexOf(stage);
-                  const isDone = i < currentIdx;
-                  const isActive = i === currentIdx;
-                  return (
-                    <span key={s} style={{
-                      padding: '5px 14px', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: 0.5,
-                      background: isDone ? 'rgba(74,222,128,0.08)' : isActive ? T.accentMuted : `${T.accent}0a`,
-                      color: isDone ? '#4ade80' : isActive ? T.accent : T.text3,
-                      border: `1px solid ${isDone ? 'rgba(74,222,128,0.2)' : isActive ? `${T.accent}40` : T.border}`,
-                      transition: 'all 0.3s',
-                    }}>
-                      {isDone ? '✓ ' : isActive ? '● ' : ''}{s}
-                    </span>
-                  );
-                })}
-              </div>
-
-              {/* Typing dots */}
-              <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-                {[0, 1, 2].map(i => (
-                  <div key={i} style={{
-                    width: 6, height: 6, borderRadius: '50%', background: T.accent,
-                    animation: `typing-dot 1.4s ease-in-out infinite`,
-                    animationDelay: `${i * 0.2}s`,
+            <div style={{ padding: '0' }}>
+              {/* Stage header */}
+              <div style={{ textAlign: 'center', marginBottom: 32, animation: 'fadeUp 0.4s ease forwards' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 16 }}>
+                  <div style={{
+                    width: 40, height: 40, borderRadius: '50%',
+                    border: '2px solid transparent', borderTopColor: T.accent,
+                    animation: 'orbit 1.2s linear infinite',
                   }} />
-                ))}
+                  <div style={{
+                    fontFamily: 'Cormorant Garamond, serif', fontWeight: 400, fontSize: 24,
+                    color: T.text, lineHeight: 1.2,
+                  }}>
+                    {stage === 'extracting' ? t('extractingClaims', lang) : stage === 'searching' ? t('searchingEvidence', lang) : t('verifyingClaims', lang)}...
+                  </div>
+                </div>
+                <div style={{ fontSize: 13, color: T.text3, lineHeight: 1.6, maxWidth: 420, margin: '0 auto' }}>
+                  {stage === 'extracting' ? t('extractingDesc', lang)
+                    : stage === 'searching' ? t('searchingDesc', lang)
+                    : t('verifyingDesc', lang)}
+                </div>
+
+                {/* Live stage pills */}
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginTop: 16 }}>
+                  {[t('extractingClaims', lang), t('searchingEvidence', lang), t('verifyingClaims', lang)].map((s, i) => {
+                    const stageMap = ['extracting', 'searching', 'verifying'];
+                    const currentIdx = stageMap.indexOf(stage);
+                    const isDone = i < currentIdx;
+                    const isActive = i === currentIdx;
+                    return (
+                      <span key={i} style={{
+                        padding: '5px 14px', borderRadius: 999, fontSize: 10, fontWeight: 600, letterSpacing: 0.5,
+                        background: isDone ? 'rgba(74,222,128,0.08)' : isActive ? T.accentMuted : `${T.accent}0a`,
+                        color: isDone ? '#4ade80' : isActive ? T.accent : T.text3,
+                        border: `1px solid ${isDone ? 'rgba(74,222,128,0.2)' : isActive ? `${T.accent}40` : T.border}`,
+                        transition: 'all 0.3s',
+                      }}>
+                        {isDone ? '✓ ' : isActive ? '● ' : ''}{s}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Simple Processing Card */}
+              <div style={{ background: T.surface, border: `1.5px solid ${T.accent}33`, borderRadius: 16, padding: 32, textAlign: 'center', animation: 'fadeUp 0.4s ease' }}>
+                <div style={{ width: 48, height: 48, border: `3px solid ${T.accent}22`, borderTopColor: T.accent, borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
+                <p style={{ margin: 0, fontSize: 16, color: T.text, fontWeight: 500 }}>{t('processingRequest', lang)}...</p>
+                <p style={{ margin: '8px 0 0', fontSize: 13, color: T.text3 }}>{t('pleaseWait', lang)}</p>
               </div>
             </div>
           )}
