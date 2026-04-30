@@ -627,33 +627,10 @@ export default function VerifyPage() {
       `}</style>
 
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme}>
-        {stage === 'done' && claims.length > 0 && (
-          <button onClick={() => exportToPDF(claims, overallScore, text)}
-            style={{ padding: '7px 14px', borderRadius: 7, background: T.accentMuted, border: `1px solid ${T.accent}4d`, color: T.accent, fontSize: 11, cursor: 'pointer', fontWeight: 600 }}>
-            {t('exportPDF', lang)}
-          </button>
-        )}
-        {stage === 'done' && claims.length > 0 && (
-          <button onClick={() => generateCertificate(claims, overallScore, text)}
-            style={{ 
-              padding: '8px 18px', borderRadius: 8, 
-              background: 'linear-gradient(135deg, #c9a96e, #a07b42)', 
-              border: 'none', color: '#0a0a0f', fontSize: 12, 
-              cursor: 'pointer', fontWeight: 700, 
-              boxShadow: '0 4px 12px rgba(201,169,110,0.3)',
-              display: 'flex', alignItems: 'center', gap: 6,
-              transition: 'transform 0.2s'
-            }}
-            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-          >
-            🏆 {t('generateCertificate', lang)}
-          </button>
-        )}
         {stage === 'done' && (
           <button onClick={() => { reset(); setShowConfetti(false); }}
-            style={{ padding: '7px 14px', borderRadius: 7, background: 'transparent', border: `1px solid ${T.border}`, color: T.text3, fontSize: 11, cursor: 'pointer' }}>
-            {t('newVerification', lang)}
+            style={{ padding: '7px 18px', borderRadius: 8, background: T.accent, border: 'none', color: '#0a0a0f', fontSize: 12, fontWeight: 700, cursor: 'pointer', boxShadow: `0 4px 12px ${T.accent}33` }}>
+            + New Audit
           </button>
         )}
       </Navbar>
@@ -882,6 +859,30 @@ export default function VerifyPage() {
 
               {/* Color coded score banner */}
               <ScoreBanner score={overallScore} claims={claims} />
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
+                <button onClick={() => exportToPDF(claims, overallScore, text)}
+                  style={{ flex: 1, minWidth: 160, padding: '14px', borderRadius: 12, background: T.accentMuted, border: `1.5px solid ${T.accent}33`, color: T.accent, fontSize: 13, cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s' }}
+                  onMouseEnter={e => e.currentTarget.style.background = `${T.accent}1a`}
+                  onMouseLeave={e => e.currentTarget.style.background = T.accentMuted}>
+                  <Download size={18} /> Export Full Report
+                </button>
+                <button onClick={() => generateCertificate(claims, overallScore, text)}
+                  style={{ 
+                    flex: 1.5, minWidth: 200, padding: '14px', borderRadius: 12, 
+                    background: 'linear-gradient(135deg, #c9a96e, #a07b42)', 
+                    border: 'none', color: '#0a0a0f', fontSize: 13, 
+                    cursor: 'pointer', fontWeight: 800, 
+                    boxShadow: '0 8px 24px rgba(201,169,110,0.3)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(201,169,110,0.4)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(201,169,110,0.3)'; }}>
+                  🏆 Get Truth Certificate
+                </button>
+              </div>
 
               {/* AI Detection */}
               {aiDetection && (
