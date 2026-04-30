@@ -822,57 +822,29 @@ export default function VerifyPage() {
             </div>
           )}
 
-          {/* ════ SKELETON LOADING STATE ════ */}
-          {stage && stage !== 'done' && claims.length === 0 && (
-            <div style={{ padding: '0' }}>
-              {/* Stage header */}
-              <div style={{ textAlign: 'center', marginBottom: 32, animation: 'fadeUp 0.4s ease forwards' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 16 }}>
-                  <div style={{
-                    width: 40, height: 40, borderRadius: '50%',
-                    border: '2px solid transparent', borderTopColor: T.accent,
-                    animation: 'orbit 1.2s linear infinite',
-                  }} />
-                  <div style={{
-                    fontFamily: 'Cormorant Garamond, serif', fontWeight: 400, fontSize: 24,
-                    color: T.text, lineHeight: 1.2,
-                  }}>
-                    {stage === 'extracting' ? t('extractingClaims', lang) : stage === 'searching' ? t('searchingEvidence', lang) : t('verifyingClaims', lang)}...
-                  </div>
-                </div>
-                <div style={{ fontSize: 13, color: T.text3, lineHeight: 1.6, maxWidth: 420, margin: '0 auto' }}>
-                  {stage === 'extracting' ? t('extractingDesc', lang)
-                    : stage === 'searching' ? t('searchingDesc', lang)
-                    : t('verifyingDesc', lang)}
-                </div>
-
-                {/* Live stage pills */}
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginTop: 16 }}>
-                  {[t('extractingClaims', lang), t('searchingEvidence', lang), t('verifyingClaims', lang)].map((s, i) => {
-                    const stageMap = ['extracting', 'searching', 'verifying'];
-                    const currentIdx = stageMap.indexOf(stage);
-                    const isDone = i < currentIdx;
-                    const isActive = i === currentIdx;
-                    return (
-                      <span key={i} style={{
-                        padding: '5px 14px', borderRadius: 999, fontSize: 10, fontWeight: 600, letterSpacing: 0.5,
-                        background: isDone ? 'rgba(74,222,128,0.08)' : isActive ? T.accentMuted : `${T.accent}0a`,
-                        color: isDone ? '#4ade80' : isActive ? T.accent : T.text3,
-                        border: `1px solid ${isDone ? 'rgba(74,222,128,0.2)' : isActive ? `${T.accent}40` : T.border}`,
-                        transition: 'all 0.3s',
-                      }}>
-                        {isDone ? '✓ ' : isActive ? '● ' : ''}{s}
-                      </span>
-                    );
-                  })}
+          {/* ════ CLASSIC PULSING HUB LOADING ════ */}
+          {stage && stage !== 'done' && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 32, animation: 'fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+              <div style={{ position: 'relative', width: 200, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `2px solid ${T.accent}33`, animation: 'classic-pulse 2s infinite' }} />
+                <div style={{ position: 'absolute', inset: 20, borderRadius: '50%', border: `1px solid ${T.accent}4d`, animation: 'classic-pulse 2s infinite 0.5s' }} />
+                <div style={{ position: 'absolute', inset: 40, borderRadius: '50%', border: `1px solid ${T.accent}66`, animation: 'classic-pulse 2s infinite 1s' }} />
+                <div style={{ position: 'absolute', inset: -10, borderRadius: '50%', border: `1px dashed ${T.accent}1a`, animation: 'spin 12s linear infinite' }} />
+                <div style={{ position: 'absolute', width: 8, height: 8, borderRadius: '50%', background: T.accent, top: '50%', left: -4, marginTop: -4, boxShadow: `0 0 15px ${T.accent}`, animation: 'spin 3s linear infinite' }} />
+                <div style={{ width: 100, height: 100, borderRadius: '50%', background: `radial-gradient(circle, ${T.accent}33, transparent)`, border: `2px solid ${T.accent}`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 40px ${T.accent}33`, zIndex: 2 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid ${T.accent}`, borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />
                 </div>
               </div>
-
-              {/* Simple Processing Card */}
-              <div style={{ background: T.surface, border: `1.5px solid ${T.accent}33`, borderRadius: 16, padding: 32, textAlign: 'center', animation: 'fadeUp 0.4s ease' }}>
-                <div style={{ width: 48, height: 48, border: `3px solid ${T.accent}22`, borderTopColor: T.accent, borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
-                <p style={{ margin: 0, fontSize: 16, color: T.text, fontWeight: 500 }}>{t('processingRequest', lang)}...</p>
-                <p style={{ margin: '8px 0 0', fontSize: 13, color: T.text3 }}>{t('pleaseWait', lang)}</p>
+              <div style={{ textAlign: 'center', zIndex: 3 }}>
+                <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 300, color: T.text, margin: '0 0 12px' }}>
+                  {stage === 'extracting' ? 'Extracting Claims' : stage === 'searching' ? 'Retrieving Evidence' : 'Verifying Truth'}...
+                </h2>
+                <p style={{ fontSize: 14, color: T.text3, letterSpacing: 1, textTransform: 'uppercase', fontWeight: 600 }}>Live Intelligence Sync Active</p>
+                <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 24 }}>
+                  {['extracting', 'searching', 'verifying'].map((s, i) => (
+                    <div key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: i < ['extracting', 'searching', 'verifying'].indexOf(stage) ? '#4ade80' : i === ['extracting', 'searching', 'verifying'].indexOf(stage) ? T.accent : T.border, transition: '0.3s', boxShadow: i === ['extracting', 'searching', 'verifying'].indexOf(stage) ? `0 0 10px ${T.accent}` : 'none' }} />
+                  ))}
+                </div>
               </div>
             </div>
           )}

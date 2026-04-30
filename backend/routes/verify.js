@@ -37,17 +37,14 @@ router.post("/", async (req, res) => {
     }
 
     send("stage", { stage: "searching", message: "Retrieving evidence from the web..." });
-    const claimsWithEvidence = [];
-
-    for (let i = 0; i < claims.length; i++) {
-      send("log", { message: `Searching evidence for claim ${i + 1} of ${claims.length}...` });
+    const claimsWithEvidence = await Promise.all(claims.map(async (claim) => {
       try {
-        const result = await searchEvidence(claims[i]);
-        claimsWithEvidence.push({ claim: claims[i], evidenceText: result.text, sources: result.sources });
+        const result = await searchEvidence(claim);
+        return { claim, evidenceText: result.text, sources: result.sources };
       } catch (e) {
-        claimsWithEvidence.push({ claim: claims[i], evidenceText: "Search failed.", sources: [] });
+        return { claim, evidenceText: "Search failed.", sources: [] };
       }
-    }
+    }));
 
     send("stage", { stage: "verifying", message: "Running verification logic..." });
     const verified = await verifyClaims(claimsWithEvidence);
