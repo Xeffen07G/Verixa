@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useVerify } from '../hooks/useVerify';
+import { useAuth } from '../context/AuthContext';
 import SkeletonLoading from '../components/SkeletonCard';
 import Confetti from '../components/Confetti';
 import { t, getStoredLanguage } from '../utils/i18n';
@@ -394,6 +395,7 @@ export default function VerifyPage() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [lang, setLang] = useState(getStoredLanguage());
   const [searchParams] = useSearchParams();
+  const { user } = useAuth();
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('verixa-theme');
     return saved ? saved === 'dark' : true;
@@ -492,11 +494,25 @@ export default function VerifyPage() {
         timestamp: new Date().toISOString(),
         verdictCounts: claims.reduce((acc, c) => { acc[c.verdict] = (acc[c.verdict] || 0) + 1; return acc; }, {}),
       };
+      
+      // Update local history
       const updated = [entry, ...history].slice(0, 10);
       setHistory(updated);
       try { localStorage.setItem('verixa_history', JSON.stringify(updated)); } catch {}
+
+      // Sync to Organization Cloud (for Head of Company)
+      if (user && user.organization) {
+        axios.post(`${API_URL}/api/organization/sync`, {
+          userId: user._id,
+          userName: user.name,
+          organization: user.organization,
+          text: entry.text,
+          overallScore: entry.overallScore,
+          claims: entry.claims
+        }).catch(err => console.error('Cloud sync failed:', err));
+      }
     }
-  }, [stage]);
+  }, [stage, user]);
 
   const startListening = useCallback(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
