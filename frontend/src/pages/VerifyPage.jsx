@@ -822,28 +822,48 @@ export default function VerifyPage() {
             </div>
           )}
 
-          {/* ════ CLASSIC PULSING HUB LOADING ════ */}
+          {/* ════ ORIGINAL PIPELINE LOADING ════ */}
           {stage && stage !== 'done' && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 32, animation: 'fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-              <div style={{ position: 'relative', width: 200, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `2px solid ${T.accent}33`, animation: 'classic-pulse 2s infinite' }} />
-                <div style={{ position: 'absolute', inset: 20, borderRadius: '50%', border: `1px solid ${T.accent}4d`, animation: 'classic-pulse 2s infinite 0.5s' }} />
-                <div style={{ position: 'absolute', inset: 40, borderRadius: '50%', border: `1px solid ${T.accent}66`, animation: 'classic-pulse 2s infinite 1s' }} />
-                <div style={{ position: 'absolute', inset: -10, borderRadius: '50%', border: `1px dashed ${T.accent}1a`, animation: 'spin 12s linear infinite' }} />
-                <div style={{ position: 'absolute', width: 8, height: 8, borderRadius: '50%', background: T.accent, top: '50%', left: -4, marginTop: -4, boxShadow: `0 0 15px ${T.accent}`, animation: 'spin 3s linear infinite' }} />
-                <div style={{ width: 100, height: 100, borderRadius: '50%', background: `radial-gradient(circle, ${T.accent}33, transparent)`, border: `2px solid ${T.accent}`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 40px ${T.accent}33`, zIndex: 2 }}>
-                  <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid ${T.accent}`, borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />
-                </div>
-              </div>
-              <div style={{ textAlign: 'center', zIndex: 3 }}>
-                <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 300, color: T.text, margin: '0 0 12px' }}>
+            <div style={{ padding: '60px 20px', textAlign: 'center', animation: 'fadeUp 0.4s ease' }}>
+              <div style={{ maxWidth: 500, margin: '0 auto' }}>
+                <div style={{ width: 64, height: 64, borderRadius: '50%', border: `3px solid ${T.accent}22`, borderTopColor: T.accent, margin: '0 auto 24px', animation: 'spin 1s linear infinite' }} />
+                
+                <h2 style={{ fontFamily: 'serif', fontSize: 28, fontWeight: 300, color: T.text, margin: '0 0 8px' }}>
                   {stage === 'extracting' ? 'Extracting Claims' : stage === 'searching' ? 'Retrieving Evidence' : 'Verifying Truth'}...
                 </h2>
-                <p style={{ fontSize: 14, color: T.text3, letterSpacing: 1, textTransform: 'uppercase', fontWeight: 600 }}>Live Intelligence Sync Active</p>
-                <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 24 }}>
-                  {['extracting', 'searching', 'verifying'].map((s, i) => (
-                    <div key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: i < ['extracting', 'searching', 'verifying'].indexOf(stage) ? '#4ade80' : i === ['extracting', 'searching', 'verifying'].indexOf(stage) ? T.accent : T.border, transition: '0.3s', boxShadow: i === ['extracting', 'searching', 'verifying'].indexOf(stage) ? `0 0 10px ${T.accent}` : 'none' }} />
-                  ))}
+                <p style={{ color: T.text3, fontSize: 13, marginBottom: 40 }}>Running deep-trace intelligence audit across global sources.</p>
+
+                {/* Progress Steps */}
+                <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  {['Extracting', 'Searching', 'Verifying'].map((s, i) => {
+                    const stageMap = ['extracting', 'searching', 'verifying'];
+                    const currentIdx = stageMap.indexOf(stage);
+                    const isDone = i < currentIdx;
+                    const isActive = i === currentIdx;
+                    
+                    return (
+                      <div key={i} style={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                        {/* Connecting Line */}
+                        {i < 2 && (
+                          <div style={{ position: 'absolute', top: 12, left: '50%', width: '100%', height: 2, background: isDone ? T.accent : T.border, zIndex: 0 }} />
+                        )}
+                        
+                        {/* Dot */}
+                        <div style={{ 
+                          width: 24, height: 24, borderRadius: '50%', 
+                          background: isDone ? T.accent : (isActive ? T.bg : T.border),
+                          border: `2px solid ${isDone || isActive ? T.accent : T.border}`,
+                          zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          transition: '0.3s',
+                          boxShadow: isActive ? `0 0 15px ${T.accent}4d` : 'none'
+                        }}>
+                          {isDone ? <span style={{ color: '#0a0a0f', fontSize: 10, fontWeight: 900 }}>✓</span> : isActive ? <div style={{ width: 6, height: 6, borderRadius: '50%', background: T.accent, animation: 'pulse-gold 1.5s infinite' }} /> : null}
+                        </div>
+                        
+                        <span style={{ fontSize: 10, fontWeight: 700, color: isDone || isActive ? T.text : T.text3, textTransform: 'uppercase', letterSpacing: 1 }}>{s}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

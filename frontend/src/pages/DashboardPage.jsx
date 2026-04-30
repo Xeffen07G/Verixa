@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import { TrendingUp, ShieldCheck, AlertCircle, Clock, Download, ChevronRight, Users, Activity, BarChart3 } from 'lucide-react';
+import { TrendingUp, ShieldCheck, AlertCircle, Clock, Download, ChevronRight, Users, Activity, BarChart3, User, History } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
@@ -32,35 +32,47 @@ export default function DashboardPage() {
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('verixa-theme') === 'dark');
   const [orgHistory, setOrgHistory] = useState([]);
   const [members, setMembers] = useState([]);
+  const [personalHistory, setPersonalHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch all Organization data (Members + Global History)
+  // Check if current user is Admin (Head of Company)
+  const isAdmin = user?.role === 'admin' || user?.email?.includes('admin'); // Fallback for now
+
   useEffect(() => {
+    // Load local history for everyone
+    const saved = localStorage.getItem('verixa_history');
+    if (saved) setPersonalHistory(JSON.parse(saved));
+
     if (user?.organization) {
       setLoading(true);
       const orgName = user.organization;
       
-      Promise.all([
-        axios.get(`${API_URL}/api/organization/${orgName}/members`),
-        axios.get(`${API_URL}/api/organization/${orgName}/history`)
-      ]).then(([membersRes, historyRes]) => {
+      // Fetch Org Data if Admin
+      const requests = [
+        axios.get(`${API_URL}/api/organization/${orgName}/members`)
+      ];
+      if (isAdmin) {
+        requests.push(axios.get(`${API_URL}/api/organization/${orgName}/history`));
+      }
+
+      Promise.all(requests).then(([membersRes, historyRes]) => {
         setMembers(membersRes.data);
-        setOrgHistory(historyRes.data);
+        if (historyRes) setOrgHistory(historyRes.data);
       }).catch(err => {
         console.error('Failed to sync organization data', err);
       }).finally(() => setLoading(false));
     }
-  }, [user]);
+  }, [user, isAdmin]);
 
-  // Aggregated Stats for the "Head of Company"
   const stats = useMemo(() => {
-    const total = orgHistory.length;
-    const avg = total ? Math.round(orgHistory.reduce((a, b) => a + b.overallScore, 0) / total) : 0;
-    const falseClaims = orgHistory.reduce((count, h) => {
+    const data = isAdmin ? orgHistory : personalHistory;
+    const total = data.length;
+    const avg = total ? Math.round(data.reduce((a, b) => a + (b.overallScore || 0), 0) / total) : 0;
+    const falseClaims = data.reduce((count, h) => {
       return count + (h.claims || []).filter(c => c.verdict === 'False').length;
     }, 0);
     return { total, avg, falseClaims };
-  }, [orgHistory]);
+  }, [orgHistory, personalHistory, isAdmin]);
 
   const T = darkMode ? {
     bg: '#0a0a0f', text: '#f5f3ef',
@@ -87,99 +99,101 @@ export default function DashboardPage() {
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 24px' }}>
         
-        {/* Master Header */}
+        {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 48, flexWrap: 'wrap', gap: 24 }}>
           <div>
-            <div style={{ fontSize: 10, letterSpacing: 4, color: T.accent, fontWeight: 900, marginBottom: 12 }}>HEAD_OF_OPERATIONS_MODE</div>
-            <h1 style={{ fontFamily: 'serif', fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 300, color: T.text, margin: 0, lineHeight: 1 }}>{user?.organization || 'Enterprise'} <span style={{ color: T.accent }}>Intelligence v2.0.</span></h1>
-            <p style={{ color: T.text2, marginTop: 12, fontSize: 14 }}>Monitoring all team activity across the global network.</p>
+            <div style={{ fontSize: 10, letterSpacing: 4, color: T.accent, fontWeight: 900, marginBottom: 12 }}>
+              {isAdmin ? 'ORGANIZATION_INTELLIGENCE' : 'PERSONAL_AUDIT_TERMINAL'}
+            </div>
+            <h1 style={{ fontFamily: 'serif', fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 300, color: T.text, margin: 0, lineHeight: 1 }}>
+              {isAdmin ? `${user?.organization} Network` : 'Your Activity'}<span style={{ color: T.accent }}>.</span>
+            </h1>
+            <p style={{ color: T.text2, marginTop: 12, fontSize: 14 }}>
+              {isAdmin ? 'Monitoring all team activity across the global network.' : 'Track your personal verifications and accuracy scores.'}
+            </p>
           </div>
-          <button style={{ padding: '12px 24px', borderRadius: 10, background: T.accent, border: 'none', color: '#0a0a0f', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Download size={16} /> Export Global Audit
-          </button>
+          {isAdmin && (
+            <button style={{ padding: '12px 24px', borderRadius: 10, background: T.accent, border: 'none', color: '#0a0a0f', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Download size={16} /> Export Global Audit
+            </button>
+          )}
         </div>
 
-        {/* Global Stats Grid */}
+        {/* Stats Grid */}
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginBottom: 64 }}>
-          <StatCard icon={BarChart3} value={stats.total} label="Total Org Verifications" theme={T} />
-          <StatCard icon={Activity} value={`${stats.avg}%`} label="Team Avg Accuracy" theme={T} color="#4ade80" />
-          <StatCard icon={Users} value={members.length} label="Active Employees" theme={T} color="#60a5fa" />
-          <StatCard icon={AlertCircle} value={stats.falseClaims} label="Global False Claims" theme={T} color="#f87171" />
+          <StatCard icon={isAdmin ? BarChart3 : History} value={stats.total} label={isAdmin ? "Total Org Scans" : "Your Scans"} theme={T} />
+          <StatCard icon={Activity} value={`${stats.avg}%`} label={isAdmin ? "Team Accuracy" : "Your Accuracy"} theme={T} color="#4ade80" />
+          {isAdmin ? (
+             <StatCard icon={Users} value={members.length} label="Active Employees" theme={T} color="#60a5fa" />
+          ) : (
+            <StatCard icon={ShieldCheck} value={personalHistory.length > 0 ? "Secure" : "Inactive"} label="Status" theme={T} color="#60a5fa" />
+          )}
+          <StatCard icon={AlertCircle} value={stats.falseClaims} label={isAdmin ? "Global Falsehoods" : "False Claims Detected"} theme={T} color="#f87171" />
         </div>
 
-        {/* Master Control Area */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 40 }}>
+        {/* Main Feed Area */}
+        <div style={{ display: 'grid', gridTemplateColumns: isAdmin ? '1.6fr 1fr' : '1fr', gap: 40 }}>
           
-          {/* Left Column: MASTER FEED */}
+          {/* Activity Feed */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-              <h2 style={{ fontSize: 18, color: T.text, fontWeight: 600, margin: 0 }}>Master Activity Feed</h2>
-              <span style={{ fontSize: 12, color: T.text3 }}>{orgHistory.length} company operations logged</span>
+              <h2 style={{ fontSize: 18, color: T.text, fontWeight: 600, margin: 0 }}>
+                {isAdmin ? 'Master Activity Feed' : 'Recent Verifications'}
+              </h2>
+              <span style={{ fontSize: 12, color: T.text3 }}>{isAdmin ? orgHistory.length : personalHistory.length} operations logged</span>
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {orgHistory.length > 0 ? orgHistory.map((h, i) => (
-                <div key={i} style={{ padding: '16px 20px', borderRadius: 14, background: T.cardBg, border: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: '0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'} onMouseLeave={e => e.currentTarget.style.background = T.cardBg}>
+              {(isAdmin ? orgHistory : personalHistory).length > 0 ? (isAdmin ? orgHistory : personalHistory).map((h, i) => (
+                <div key={i} style={{ padding: '16px 20px', borderRadius: 14, background: T.cardBg, border: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', gap: 16, alignItems: 'center', flex: 1, minWidth: 0 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 8, background: h.overallScore >= 70 ? '#4ade8014' : '#f8717114', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: h.overallScore >= 70 ? '#4ade80' : '#f87171', flexShrink: 0 }}>
-                      {h.overallScore}%
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: (h.overallScore || 0) >= 70 ? '#4ade8014' : '#f8717114', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: (h.overallScore || 0) >= 70 ? '#4ade80' : '#f87171', flexShrink: 0 }}>
+                      {h.overallScore || 0}%
                     </div>
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: T.text, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.text}</div>
-                      <div style={{ fontSize: 11, color: T.text3, display: 'flex', gap: 8 }}>
-                        <span style={{ color: T.accent }}>Verified by {h.userName || 'Unknown'}</span>
-                        <span>•</span>
-                        <span>{new Date(h.timestamp).toLocaleString()}</span>
+                      <div style={{ fontSize: 11, color: T.text3 }}>
+                        {isAdmin ? `Verified by ${h.userName || 'Unknown'}` : 'Verified locally'} • {new Date(h.timestamp).toLocaleString()}
                       </div>
                     </div>
                   </div>
-                  <ChevronRight size={16} color={T.text3} style={{ marginLeft: 16 }} />
+                  <ChevronRight size={16} color={T.text3} />
                 </div>
               )) : (
                 <div style={{ padding: '60px', textAlign: 'center', border: `1px dashed ${T.border}`, borderRadius: 16 }}>
-                  <p style={{ color: T.text3, fontSize: 14 }}>No company-wide verifications yet.<br/>Your employees' work will appear here live.</p>
+                  <p style={{ color: T.text3, fontSize: 14 }}>No activity logged yet.</p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Right Column: TEAM PERFORMANCE */}
-          <div>
-            <h2 style={{ fontSize: 18, color: T.text, fontWeight: 600, marginBottom: 24 }}>Employee Performance</h2>
-            <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderRadius: 16, padding: '24px' }}>
-              {loading ? (
-                <div style={{ color: T.text3, fontSize: 13 }}>Synchronizing organization data...</div>
-              ) : members.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  {members.map((m, i) => {
-                    const userWork = orgHistory.filter(h => h.userId === m._id || h.userName === m.name);
-                    const userScore = userWork.length ? Math.round(userWork.reduce((a, b) => a + b.overallScore, 0) / userWork.length) : 0;
-                    
-                    return (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: T.accentMuted, border: `1px solid ${T.accent}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: T.accent, fontWeight: 700 }}>
-                          {(m.name || 'U').charAt(0).toUpperCase()}
+          {/* Right Column: Only for Admins */}
+          {isAdmin && (
+            <div>
+              <h2 style={{ fontSize: 18, color: T.text, fontWeight: 600, marginBottom: 24 }}>Employee Performance</h2>
+              <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderRadius: 16, padding: '24px' }}>
+                {members.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    {members.map((m, i) => {
+                      const userWork = orgHistory.filter(h => h.userId === m._id || h.userName === m.name);
+                      const userScore = userWork.length ? Math.round(userWork.reduce((a, b) => a + b.overallScore, 0) / userWork.length) : 0;
+                      return (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div style={{ width: 36, height: 36, borderRadius: '50%', background: T.accentMuted, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: T.accent, fontWeight: 700 }}>
+                            {(m.name || 'U').charAt(0).toUpperCase()}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{m.name || 'Team Member'}</div>
+                            <div style={{ fontSize: 11, color: T.text3 }}>{userWork.length} verifications • {userScore}% Accuracy</div>
+                          </div>
                         </div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{m.name || 'Team Member'}</div>
-                          <div style={{ fontSize: 11, color: T.text3 }}>{userWork.length} verifications • {userScore}% Accuracy</div>
-                        </div>
-                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 10px #4ade804d' }} title="Online" />
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div style={{ color: T.text3, fontSize: 13, textAlign: 'center', padding: '20px 0' }}>
-                  No employees found.
-                </div>
-              )}
-              <div style={{ height: 1, background: T.border, margin: '24px 0' }} />
-              <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.6 }}>
-                You are in <b>Admin Control Mode</b>. This dashboard aggregates data from all connected accounts in the <b>{user?.organization}</b> network.
+                      );
+                    })}
+                  </div>
+                ) : <p style={{ color: T.text3, fontSize: 13 }}>No other team members found.</p>}
               </div>
             </div>
-          </div>
+          )}
 
         </div>
       </div>
