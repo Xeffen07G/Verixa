@@ -8,9 +8,11 @@ const Verification = process.env.MONGO_URI ? require('../models/Verification') :
 router.get('/:orgName/members', async (req, res) => {
   try {
     const { orgName } = req.params;
+    console.log(`🔍 Searching members for Organization: "${orgName}"`);
     const members = await User.find({ 
       organization: { $regex: new RegExp(`^${orgName}$`, 'i') } 
     }).select('name email createdAt');
+    console.log(`✅ Found ${members.length} members`);
     res.json(members);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch team members' });
