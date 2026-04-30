@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = process.env.MONGO_URI ? require('../models/User') : require('../utils/store').User;
+const User = require('../models/User'); // Force use of real Mongoose model
 
 // Update profile
 router.put('/profile', async (req, res) => {
