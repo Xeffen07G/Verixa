@@ -57,6 +57,10 @@ export default function ExtensionPage() {
         @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-12px); } }
         @keyframes glow-pulse { 0%,100% { box-shadow: 0 0 20px rgba(201,169,110,0.1); } 50% { box-shadow: 0 0 40px rgba(201,169,110,0.2); } }
         .ext-feature:hover { border-color: rgba(201,169,110,0.3) !important; transform: translateY(-4px); }
+        @media (max-width: 768px) {
+          .install-grid { grid-template-columns: 1fr !important; }
+          .mockup-container { display: none !important; }
+        }
       `}</style>
 
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
@@ -115,6 +119,7 @@ export default function ExtensionPage() {
           <motion.div
             initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
+            className="mockup-container"
             style={{
               maxWidth: 600, margin: '0 auto', borderRadius: 16,
               background: T.cardBg, border: `1px solid ${T.border}`,
@@ -241,7 +246,7 @@ export default function ExtensionPage() {
             }}>Install in 60 seconds.</h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
+          <div className="install-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
             {INSTALL_STEPS.map((step, i) => (
               <div key={i} style={{
                 padding: '28px 24px', borderRadius: 14,

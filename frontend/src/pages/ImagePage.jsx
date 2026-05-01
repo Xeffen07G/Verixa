@@ -102,6 +102,10 @@ export default function ImagePage() {
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+        @media (max-width: 600px) {
+          .analysis-grid { grid-template-columns: 1fr !important; }
+          .analysis-grid img { height: 200px !important; }
+        }
       `}</style>
 
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
@@ -171,7 +175,7 @@ export default function ImagePage() {
 
         {result && cfg && (
           <div style={{ animation: 'fadeUp 0.4s ease forwards' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: preview ? '1fr 1fr' : '1fr', gap: 20, marginBottom: 20 }}>
+            <div className="analysis-grid" style={{ display: 'grid', gridTemplateColumns: preview ? '1fr 1fr' : '1fr', gap: 20, marginBottom: 20 }}>
               {preview && (
                 <div style={{ borderRadius: 12, overflow: 'hidden', border: `2px solid ${cfg.border}` }}>
                   <img src={preview} alt="analyzed" style={{ width: '100%', height: 240, objectFit: 'cover', display: 'block' }} onError={e => e.target.style.display = 'none'} />

@@ -132,7 +132,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Feed Area */}
-        <div style={{ display: 'grid', gridTemplateColumns: isAdmin ? '1.6fr 1fr' : '1fr', gap: 40 }}>
+        <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: isAdmin ? '1.6fr 1fr' : '1fr', gap: 40 }}>
           
           {/* Activity Feed */}
           <div>
@@ -145,7 +145,7 @@ export default function DashboardPage() {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {(isAdmin ? orgHistory : personalHistory).length > 0 ? (isAdmin ? orgHistory : personalHistory).map((h, i) => (
-                <div key={i} style={{ padding: '16px 20px', borderRadius: 14, background: T.cardBg, border: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div key={i} className="activity-item" style={{ padding: '16px 20px', borderRadius: 14, background: T.cardBg, border: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
                   <div style={{ display: 'flex', gap: 16, alignItems: 'center', flex: 1, minWidth: 0 }}>
                     <div style={{ width: 40, height: 40, borderRadius: 8, background: (h.overallScore || 0) >= 70 ? '#4ade8014' : '#f8717114', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: (h.overallScore || 0) >= 70 ? '#4ade80' : '#f87171', flexShrink: 0 }}>
                       {h.overallScore || 0}%
@@ -199,6 +199,16 @@ export default function DashboardPage() {
       </div>
 
       <Footer darkMode={darkMode} />
+      <style>{`
+        @media (max-width: 900px) {
+          .dashboard-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 600px) {
+          .activity-item { flex-direction: column !important; align-items: flex-start !important; }
+          .activity-item > div { width: 100% !important; }
+          .activity-item > svg { display: none !important; }
+        }
+      `}</style>
     </div>
   );
 }

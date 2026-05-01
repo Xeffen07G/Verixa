@@ -62,6 +62,9 @@ export default function SignupPage() {
       <style>{`
         @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
         .form-input:focus { border-color: ${T.accent}66 !important; background: rgba(255,255,255,0.06) !important; }
+        @media (max-width: 480px) {
+          .signup-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <Link to="/" style={{ fontFamily: 'serif', fontWeight: 700, fontSize: 28, color: T.text, letterSpacing: 1, textDecoration: 'none', marginBottom: 32 }}>VeriXa</Link>
@@ -81,7 +84,7 @@ export default function SignupPage() {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="signup-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div style={{ position: 'relative' }}>
               <User size={16} style={iconStyle} />
               <input required placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} className="form-input" style={inputStyle} />

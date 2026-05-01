@@ -65,7 +65,7 @@ function ScoreBanner({ score, claims }) {
             </div>
             <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.85)', margin: '4px 0 0', fontWeight: 500 }}>{label}</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <div className="report-stats-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {[
               { count: trueCount, label: 'True', color: '#4ade80' },
               { count: falseCount, label: 'False', color: '#f87171' },
@@ -588,7 +588,7 @@ export default function VerifyPage() {
       <Confetti trigger={showConfetti} />
 
       <style>{`
-        @media (max-width: 768px) { .verify-main { grid-template-columns: 1fr !important; } .left-panel { height: auto !important; border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); } }
+        @media (max-width: 768px) { }
         textarea:focus { outline: none; }
         ::selection { background: rgba(140,100,40,0.7); color: #fff; }
         ::-moz-selection { background: rgba(140,100,40,0.7); color: #fff; }
@@ -624,6 +624,15 @@ export default function VerifyPage() {
         @keyframes typing-dot {
           0%, 60%, 100% { opacity: 0.2; transform: translateY(0); }
           30% { opacity: 1; transform: translateY(-4px); }
+        }
+        @media (max-width: 768px) {
+          .verify-main { grid-template-columns: 1fr !important; }
+          .left-panel { height: auto !important; border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); }
+          .results-panel { height: auto !important; padding: 24px 16px !important; }
+          .report-stats-grid { grid-template-columns: repeat(4, 1fr) !important; }
+        }
+        @media (max-width: 480px) {
+          .report-stats-grid { grid-template-columns: 1fr 1fr !important; }
         }
       `}</style>
 
@@ -784,7 +793,7 @@ export default function VerifyPage() {
         </div>
 
         {/* RIGHT RESULTS PANEL */}
-        <div style={{ flex: 1, height: 'calc(100vh - 60px)', overflowY: 'auto', padding: '32px 36px', background: T.bg, transition: 'all 0.3s' }}>
+        <div className="results-panel" style={{ flex: 1, height: 'calc(100vh - 60px)', overflowY: 'auto', padding: '32px 36px', background: T.bg, transition: 'all 0.3s' }}>
 
           {/* Empty state */}
           {!stage && claims.length === 0 && !error && (
