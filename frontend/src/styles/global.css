@@ -535,5 +535,6 @@ input:focus, textarea:focus, select:focus {
   .report-stats-grid { gap: 6px !important; }
   .claim-card-header { padding: 12px 14px !important; gap: 10px !important; }
   .tab-btn { padding: 5px 0 !important; font-size: 10px !important; }
+  .input-tab-btn { padding: 5px 0 !important; font-size: 11px !important; }
 }
 

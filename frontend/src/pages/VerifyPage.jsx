@@ -653,6 +653,13 @@ export default function VerifyPage() {
           .report-stats-grid { grid-template-columns: 1fr 1fr !important; }
           .score-banner { border-radius: 12px !important; }
         }
+        
+        /* Base Desktop Styles */
+        .run-btn { padding: 18px; font-size: 15px; }
+        .voice-btn { padding: 10px 24px; font-size: 12px; }
+        .action-btn { padding: 16px; font-size: 14px; }
+        .tab-btn { padding: 10px 0; font-size: 12px; }
+        .input-tab-btn { padding: 8px 0; font-size: 13px; }
       `}</style>
 
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme}>
@@ -687,7 +694,7 @@ export default function VerifyPage() {
                 {/* Input mode tabs */}
                 <div style={{ display: 'flex', gap: 4, marginBottom: 14, background: T.surface2, borderRadius: 10, padding: 4 }}>
                   {[{ id: 'text', label: 'Text' }, { id: 'url', label: 'URL' }, { id: 'pdf', label: 'PDF' }].map(m => (
-                    <button key={m.id} style={{ flex: 1, padding: '7px 0', borderRadius: 7, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: inputMode === m.id ? T.surface : 'transparent', color: inputMode === m.id ? T.text : T.text3, transition: 'all 0.18s', boxShadow: inputMode === m.id ? `0 1px 4px rgba(0,0,0,0.1)` : 'none' }}
+                    <button key={m.id} className="input-tab-btn" style={{ flex: 1, borderRadius: 7, border: 'none', cursor: 'pointer', fontWeight: 600, background: inputMode === m.id ? T.surface : 'transparent', color: inputMode === m.id ? T.text : T.text3, transition: 'all 0.18s', boxShadow: inputMode === m.id ? `0 1px 4px rgba(0,0,0,0.1)` : 'none' }}
                       onClick={() => setInputMode(m.id)}>{m.label}</button>
                   ))}
                 </div>
@@ -797,7 +804,7 @@ export default function VerifyPage() {
                   {isLoading ? t('verifying', lang) : t('verifyNow', lang)}
                 </button>
                 <div style={{ textAlign: 'center', marginTop: 12, opacity: 0.3, fontSize: 8, letterSpacing: 1 }}>
-                  BUILD 2.0.7 — LATEST
+                  BUILD 2.0.8 — LATEST
                 </div>
               </div>
             </>
