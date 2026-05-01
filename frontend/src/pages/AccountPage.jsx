@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Shield, Building, Calendar, Settings, LogOut, Camera, Save, X, Briefcase, MapPin, Quote, TrendingUp, Award, Zap } from 'lucide-react';
+import axios from 'axios';
+import { Mail, Shield, Building, Calendar, Settings, Camera, Save, X, MapPin, Quote, TrendingUp, Award, Zap } from 'lucide-react';
 
 export default function AccountPage() {
   const { user, logout, setUser } = useAuth();
@@ -51,7 +52,6 @@ export default function AccountPage() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Resize image to prevent localStorage quota issues
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
@@ -69,20 +69,30 @@ export default function AccountPage() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    
-    // Save directly to localStorage — instant, reliable, no network needed
     const updatedUser = { ...user, ...editData };
+
+    // Step 1: Always save to localStorage (instant, always works)
     if (typeof setUser === 'function') setUser(updatedUser);
     localStorage.setItem('verixa_user', JSON.stringify(updatedUser));
-    
-    setTimeout(() => {
-      setIsSaving(false);
-      setIsEditing(false);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    }, 600);
+
+    // Step 2: Try to sync to server (for global visibility)
+    try {
+      const API = process.env.REACT_APP_API_URL || '';
+      await axios.post(`${API}/api/user/profile`, {
+        email: user?.email,
+        ...editData
+      });
+      console.log('Profile synced to cloud successfully');
+    } catch (err) {
+      console.log('Cloud sync skipped (local save succeeded):', err.message);
+    }
+
+    setIsSaving(false);
+    setIsEditing(false);
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
   };
 
   const isAdmin = user?.role === 'admin' || user?.email?.includes('admin');
@@ -93,7 +103,6 @@ export default function AccountPage() {
 
       <main style={{ flex: 1, maxWidth: 900, width: '100%', margin: '60px auto', padding: '0 24px', animation: 'fadeUp 0.6s ease' }}>
         
-        {/* Save Success Toast */}
         {saveSuccess && (
           <div style={{ position: 'fixed', top: 100, right: 30, zIndex: 9999, padding: '16px 24px', borderRadius: 14, background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10, animation: 'fadeUp 0.4s ease', backdropFilter: 'blur(12px)' }}>
             ✅ Profile updated successfully!
@@ -104,11 +113,7 @@ export default function AccountPage() {
           
           {/* LEFT: Identity Card */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div style={{ 
-              padding: '40px 32px', borderRadius: 24, 
-              background: T.card, border: `1px solid ${T.border}`,
-              backdropFilter: 'blur(12px)', textAlign: 'center', position: 'relative'
-            }}>
+            <div style={{ padding: '40px 32px', borderRadius: 24, background: T.card, border: `1px solid ${T.border}`, backdropFilter: 'blur(12px)', textAlign: 'center', position: 'relative' }}>
               <div style={{ position: 'relative', width: 140, height: 140, margin: '0 auto 24px' }}>
                 <div onClick={() => isEditing && fileInputRef.current?.click()} style={{ width: 140, height: 140, borderRadius: '50%', background: editData.profilePic ? `url(${editData.profilePic}) center/cover` : `linear-gradient(135deg, ${T.accent}, #a07b42)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 56, fontWeight: 300, color: '#0a0a0f', border: `4px solid ${isEditing ? T.accent : T.border}`, transition: 'all 0.3s', overflow: 'hidden', cursor: isEditing ? 'pointer' : 'default' }}>
                   {!editData.profilePic && (user?.name || 'U').charAt(0).toUpperCase()}
@@ -134,7 +139,6 @@ export default function AccountPage() {
               </div>
             </div>
 
-            {/* Quick Stats Ribbon */}
             <div style={{ display: 'flex', gap: 12 }}>
               <div style={{ flex: 1, padding: '16px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, textAlign: 'center' }}>
                 <TrendingUp size={16} color={T.accent} style={{ marginBottom: 4 }} />
@@ -152,7 +156,6 @@ export default function AccountPage() {
           {/* RIGHT: Professional Details */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             
-            {/* Bio Section */}
             <div style={{ padding: '28px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 24 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: T.accent, marginBottom: 16 }}>
                 <Quote size={16} />
@@ -167,7 +170,6 @@ export default function AccountPage() {
               )}
             </div>
 
-            {/* Information Grid */}
             <div style={{ padding: '28px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
               {[
                 { icon: Mail, label: 'Email', value: user?.email, locked: true },
@@ -194,7 +196,6 @@ export default function AccountPage() {
               ))}
             </div>
 
-            {/* Control Strip */}
             <div style={{ display: 'flex', gap: 12 }}>
               {isEditing ? (
                 <>
@@ -211,11 +212,8 @@ export default function AccountPage() {
                 </button>
               )}
             </div>
-
           </div>
-
         </div>
-
       </main>
 
       <Footer darkMode={darkMode} />

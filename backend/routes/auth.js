@@ -29,6 +29,12 @@ router.post('/register', async (req, res) => {
                 name: user.name,
                 email: user.email,
                 organization: user.organization,
+                role: user.role,
+                title: user.title,
+                bio: user.bio,
+                location: user.location,
+                profilePic: user.profilePic,
+                createdAt: user.createdAt,
                 token: generateToken(user._id)
             });
         } else {
@@ -52,7 +58,15 @@ router.post('/login', async (req, res) => {
         if (isMatch) {
             res.json({
                 _id: user._id,
+                name: user.name,
                 email: user.email,
+                organization: user.organization,
+                role: user.role,
+                title: user.title,
+                bio: user.bio,
+                location: user.location,
+                profilePic: user.profilePic,
+                createdAt: user.createdAt,
                 token: generateToken(user._id)
             });
         } else {
