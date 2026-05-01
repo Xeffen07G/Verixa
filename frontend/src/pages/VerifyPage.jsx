@@ -52,15 +52,15 @@ function ScoreBanner({ score, claims }) {
   const unclearCount = claims.filter(c => c.verdict === 'Unverifiable').length;
 
   return (
-    <div style={{ background: bg, borderRadius: 16, padding: '28px 32px', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
+    <div className="score-banner" style={{ background: bg, borderRadius: 16, padding: '28px 32px', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', top: -20, right: -20, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
       <div style={{ position: 'absolute', bottom: -30, right: 40, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-          <div>
+          <div style={{ flex: 1, minWidth: 140 }}>
             <p style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', margin: '0 0 6px', fontFamily: 'DM Sans, sans-serif' }}>Accuracy Report</p>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-              <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 64, fontWeight: 300, color: '#fff', lineHeight: 1 }}>{score}</span>
+              <span className="score-text" style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 64, fontWeight: 300, color: '#fff', lineHeight: 1 }}>{score}</span>
               <span style={{ fontSize: 24, color: 'rgba(255,255,255,0.6)', fontFamily: 'Cormorant Garamond, serif' }}>%</span>
             </div>
             <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.85)', margin: '4px 0 0', fontWeight: 500 }}>{label}</p>
@@ -101,8 +101,8 @@ function ClaimCard({ claim, index, theme }) {
   }
 
   return (
-    <div style={{ borderRadius: 14, marginBottom: 12, overflow: 'hidden', border: `1.5px solid ${open ? cfg.border : theme.cardBorder}`, background: theme.cardBg, transition: 'all 0.22s', boxShadow: open ? `0 4px 24px rgba(0,0,0,0.1)` : 'none' }}>
-      <div onClick={() => setOpen(!open)} style={{ padding: '20px 24px', cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: 16, background: open ? cfg.bg : 'transparent', transition: 'background 0.22s' }}>
+    <div className="claim-card" style={{ borderRadius: 14, marginBottom: 12, overflow: 'hidden', border: `1.5px solid ${open ? cfg.border : theme.cardBorder}`, background: theme.cardBg, transition: 'all 0.22s', boxShadow: open ? `0 4px 24px rgba(0,0,0,0.1)` : 'none' }}>
+      <div className="claim-card-header" onClick={() => setOpen(!open)} style={{ padding: '20px 24px', cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: 16, background: open ? cfg.bg : 'transparent', transition: 'background 0.22s' }}>
 
         {/* Verdict badge */}
         <div style={{ width: 44, height: 44, borderRadius: 12, background: cfg.bg, border: `1.5px solid ${cfg.border}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0, gap: 1 }}>
@@ -650,9 +650,14 @@ export default function VerifyPage() {
           .action-btn svg { width: 14px !important; height: 14px !important; }
           .run-btn { padding: 10px !important; font-size: 12px !important; }
           .voice-btn { padding: 6px 12px !important; font-size: 10px !important; bottom: 8px !important; right: 8px !important; }
+          .score-banner { padding: 20px !important; }
+          .score-text { font-size: 44px !important; }
+          .report-stats-grid { gap: 6px !important; }
+          .claim-card-header { padding: 14px 16px !important; gap: 12px !important; }
         }
         @media (max-width: 480px) {
           .report-stats-grid { grid-template-columns: 1fr 1fr !important; }
+          .score-banner { border-radius: 12px !important; }
         }
       `}</style>
 

@@ -215,7 +215,7 @@ export default function LandingPage() {
 
   const sectionHeadingStyle = {
     fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
-    fontSize: 'clamp(34px, 5vw, 54px)', lineHeight: 1.1, color: T.text, letterSpacing: -0.5,
+    fontSize: 'clamp(28px, 5vw, 54px)', lineHeight: 1.1, color: T.text, letterSpacing: -0.5,
   };
   const sectionLabelStyle = {
     fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
@@ -257,7 +257,7 @@ export default function LandingPage() {
 
             <h1 style={{
               fontFamily: 'Cormorant Garamond, serif',
-              fontSize: 'clamp(52px, 9vw, 90px)',
+              fontSize: 'clamp(38px, 9vw, 90px)',
               fontWeight: 300, color: T.text, lineHeight: 1.1,
               marginBottom: 32, letterSpacing: -1,
             }}>
