@@ -62,11 +62,10 @@ export default function AccountPage() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    // Determine the correct API base URL
-    const baseUrl = process.env.REACT_APP_API_URL || window.location.origin;
     
     try {
-      const res = await axios.put(`${baseUrl}/api/user/profile`, {
+      // Use pure relative path for absolute compatibility in Vercel monorepo
+      const res = await axios.put('/api/user/profile', {
         userId: user?._id || user?.id,
         ...editData
       }, {
