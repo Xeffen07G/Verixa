@@ -55,7 +55,7 @@ app.use("/api/image", requireApiKey, require("./routes/image"));
 app.use("/api/health", healthRoutes);
 app.use("/api/trending", trendingRoutes);
 app.use('/api/organization', require('./routes/organization'));
-app.use('/api/user', require('./routes/user'));
+app.use('/v1/identity', require('./routes/user'));
 app.use("/api/auth", require("./routes/auth"));
 
 // 404 handler

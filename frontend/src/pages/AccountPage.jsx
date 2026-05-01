@@ -64,8 +64,8 @@ export default function AccountPage() {
     setIsSaving(true);
     
     try {
-      // Use POST for maximum compatibility with Vercel routing
-      const res = await axios.post('/api/user/profile', {
+      // Using v1 path to avoid Vercel API routing conflicts
+      const res = await axios.post('/v1/identity/profile', {
         userId: user?._id || user?.id,
         ...editData
       }, {
