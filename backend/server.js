@@ -31,28 +31,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (mobile apps, curl, extensions background)
-      if (!origin) return callback(null, true);
-      const allowed = [
-        'http://localhost:3000',
-        'http://localhost:5000',
-        process.env.FRONTEND_URL,
-      ].filter(Boolean);
-      // Allow Chrome extensions (chrome-extension://...)
-      if (
-        allowed.includes(origin) || 
-        origin.startsWith('chrome-extension://') ||
-        origin.endsWith('.vercel.app') // Allow all Vercel deployments
-      ) {
-        return callback(null, true);
-      }
-      // In development, allow all origins
-      if (process.env.NODE_ENV !== 'production') {
-        return callback(null, true);
-      }
-      callback(new Error('Not allowed by CORS'));
-    },
+    origin: true, // Allow all origins for the enterprise demo to ensure connectivity
     credentials: true,
   })
 );
