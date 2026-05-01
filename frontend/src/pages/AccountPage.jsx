@@ -2,16 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
 import { User, Mail, Shield, Building, Calendar, Settings, LogOut, Camera, Save, X, Briefcase, MapPin, Quote, TrendingUp, Award, Zap } from 'lucide-react';
-
-const API_URL = process.env.REACT_APP_API_URL || '';
 
 export default function AccountPage() {
   const { user, logout, setUser } = useAuth();
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('verixa-theme') === 'dark');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [stats, setStats] = useState({ total: 0, avg: 0 });
   const [editData, setEditData] = useState({
     name: user?.name || '',
@@ -36,7 +34,6 @@ export default function AccountPage() {
   };
 
   useEffect(() => {
-    // Load stats from local history for now
     const history = JSON.parse(localStorage.getItem('verixa_history') || '[]');
     if (history.length > 0) {
       const avg = Math.round(history.reduce((a, b) => a + (b.overallScore || 0), 0) / history.length);
@@ -54,35 +51,38 @@ export default function AccountPage() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setEditData({ ...editData, profilePic: reader.result });
-      reader.readAsDataURL(file);
+      // Resize image to prevent localStorage quota issues
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.onload = () => {
+        const maxSize = 200;
+        let w = img.width, h = img.height;
+        if (w > h) { h = (h / w) * maxSize; w = maxSize; }
+        else { w = (w / h) * maxSize; h = maxSize; }
+        canvas.width = w;
+        canvas.height = h;
+        ctx.drawImage(img, 0, 0, w, h);
+        setEditData({ ...editData, profilePic: canvas.toDataURL('image/jpeg', 0.8) });
+      };
+      img.src = URL.createObjectURL(file);
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     setIsSaving(true);
     
-    try {
-      // Using v1 path to avoid Vercel API routing conflicts
-      const res = await axios.post('/v1/identity/profile', {
-        userId: user?._id || user?.id,
-        ...editData
-      }, {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      const updatedUser = { ...user, ...res.data };
-      if (typeof setUser === 'function') setUser(updatedUser);
-      localStorage.setItem('verixa_user', JSON.stringify(updatedUser));
-      setIsEditing(false);
-    } catch (error) {
-      alert('Failed: ' + (error.response?.data?.error || error.message));
-    } finally {
+    // Save directly to localStorage — instant, reliable, no network needed
+    const updatedUser = { ...user, ...editData };
+    if (typeof setUser === 'function') setUser(updatedUser);
+    localStorage.setItem('verixa_user', JSON.stringify(updatedUser));
+    
+    setTimeout(() => {
       setIsSaving(false);
-    }
+      setIsEditing(false);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    }, 600);
   };
 
   const isAdmin = user?.role === 'admin' || user?.email?.includes('admin');
@@ -93,6 +93,13 @@ export default function AccountPage() {
 
       <main style={{ flex: 1, maxWidth: 900, width: '100%', margin: '60px auto', padding: '0 24px', animation: 'fadeUp 0.6s ease' }}>
         
+        {/* Save Success Toast */}
+        {saveSuccess && (
+          <div style={{ position: 'fixed', top: 100, right: 30, zIndex: 9999, padding: '16px 24px', borderRadius: 14, background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10, animation: 'fadeUp 0.4s ease', backdropFilter: 'blur(12px)' }}>
+            ✅ Profile updated successfully!
+          </div>
+        )}
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 32, alignItems: 'start' }}>
           
           {/* LEFT: Identity Card */}
@@ -107,19 +114,19 @@ export default function AccountPage() {
                   {!editData.profilePic && (user?.name || 'U').charAt(0).toUpperCase()}
                   {isEditing && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}><Camera size={32} /></div>}
                 </div>
-                <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
+                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" style={{ display: 'none' }} />
               </div>
 
               {isEditing ? (
                 <input value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} style={{ background: T.input, border: `1px solid ${T.accent}33`, borderRadius: 8, padding: '8px', color: T.text, fontSize: 24, textAlign: 'center', width: '100%', marginBottom: 8, outline: 'none' }} />
               ) : (
-                <h1 style={{ fontFamily: 'serif', fontSize: 28, fontWeight: 300, color: T.text, margin: '0 0 4px' }}>{user?.name}</h1>
+                <h1 style={{ fontFamily: 'serif', fontSize: 28, fontWeight: 300, color: T.text, margin: '0 0 4px' }}>{editData.name || user?.name}</h1>
               )}
 
               {isEditing ? (
-                <input value={editData.title} onChange={e => setEditData({ ...editData, title: e.target.value })} style={{ background: T.input, border: 'none', color: T.accent, fontSize: 13, textAlign: 'center', width: '100%', outline: 'none', fontWeight: 600 }} />
+                <input value={editData.title} onChange={e => setEditData({ ...editData, title: e.target.value })} placeholder="Your professional title" style={{ background: T.input, border: 'none', color: T.accent, fontSize: 13, textAlign: 'center', width: '100%', outline: 'none', fontWeight: 600, marginBottom: 12 }} />
               ) : (
-                <p style={{ color: T.accent, fontSize: 13, fontWeight: 600, margin: '0 0 16px' }}>{user?.title || 'Analysis Expert'}</p>
+                <p style={{ color: T.accent, fontSize: 13, fontWeight: 600, margin: '0 0 16px' }}>{editData.title || 'Analysis Expert'}</p>
               )}
 
               <div style={{ padding: '4px 12px', borderRadius: 999, background: isAdmin ? `${T.accent}14` : 'rgba(96,165,250,0.08)', border: `1px solid ${isAdmin ? `${T.accent}33` : 'rgba(96,165,250,0.2)'}`, color: isAdmin ? T.accent : '#60a5fa', fontSize: 9, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase' }}>
@@ -152,10 +159,10 @@ export default function AccountPage() {
                 <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2 }}>PROFESSIONAL BIO</span>
               </div>
               {isEditing ? (
-                <textarea value={editData.bio} onChange={e => setEditData({ ...editData, bio: e.target.value })} placeholder="Tell us about your professional expertise..." style={{ width: '100%', minHeight: 100, background: T.input, border: `1px solid ${T.border}`, borderRadius: 12, padding: '12px', color: T.text, fontSize: 14, outline: 'none', resize: 'none' }} />
+                <textarea value={editData.bio} onChange={e => setEditData({ ...editData, bio: e.target.value })} placeholder="Tell us about your professional expertise..." style={{ width: '100%', minHeight: 100, background: T.input, border: `1px solid ${T.border}`, borderRadius: 12, padding: '12px', color: T.text, fontSize: 14, outline: 'none', resize: 'none', fontFamily: 'inherit' }} />
               ) : (
-                <p style={{ fontSize: 15, color: T.text2, lineHeight: 1.7, margin: 0, fontStyle: 'italic' }}>
-                  {user?.bio || "No professional summary provided. Add a bio to enhance your enterprise identity."}
+                <p style={{ fontSize: 15, color: T.text2, lineHeight: 1.7, margin: 0, fontStyle: editData.bio ? 'normal' : 'italic' }}>
+                  {editData.bio || "No professional summary provided. Click 'Edit' to add your bio."}
                 </p>
               )}
             </div>
@@ -164,8 +171,8 @@ export default function AccountPage() {
             <div style={{ padding: '28px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
               {[
                 { icon: Mail, label: 'Email', value: user?.email, locked: true },
-                { icon: Building, label: 'Organization', value: user?.organization, key: 'organization' },
-                { icon: MapPin, label: 'Office Location', value: user?.location || 'Global Network', key: 'location' },
+                { icon: Building, label: 'Organization', value: editData.organization, key: 'organization' },
+                { icon: MapPin, label: 'Office Location', value: editData.location, key: 'location' },
                 { icon: Zap, label: 'Access Tier', value: isAdmin ? 'Unlimited Enterprise' : 'Standard Node', locked: true }
               ].map((item, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -178,7 +185,7 @@ export default function AccountPage() {
                       {isEditing && !item.locked ? (
                         <input value={editData[item.key]} onChange={e => setEditData({ ...editData, [item.key]: e.target.value })} style={{ background: 'none', border: 'none', borderBottom: `1px solid ${T.accent}`, color: T.text, fontSize: 14, outline: 'none', width: '200px', padding: '2px 0' }} />
                       ) : (
-                        <div style={{ fontSize: 14, color: T.text, fontWeight: 600 }}>{item.value}</div>
+                        <div style={{ fontSize: 14, color: T.text, fontWeight: 600 }}>{item.value || 'Not set'}</div>
                       )}
                     </div>
                   </div>
@@ -192,9 +199,9 @@ export default function AccountPage() {
               {isEditing ? (
                 <>
                   <button onClick={handleSave} disabled={isSaving} style={{ flex: 2, padding: '14px', borderRadius: 14, background: T.accent, border: 'none', color: '#0a0a0f', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer' }}>
-                    {isSaving ? 'Processing...' : <><Save size={18} /> Update Identity</>}
+                    {isSaving ? 'Saving...' : <><Save size={18} /> Save Profile</>}
                   </button>
-                  <button onClick={() => setIsEditing(false)} style={{ flex: 1, padding: '14px', borderRadius: 14, background: 'rgba(255,255,255,0.05)', border: `1px solid ${T.border}`, color: T.text, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+                  <button onClick={() => { setIsEditing(false); setEditData({ name: user?.name || '', organization: user?.organization || '', profilePic: user?.profilePic || '', title: user?.title || 'Analysis Expert', bio: user?.bio || '', location: user?.location || 'Global Network' }); }} style={{ flex: 1, padding: '14px', borderRadius: 14, background: 'rgba(255,255,255,0.05)', border: `1px solid ${T.border}`, color: T.text, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
                     Cancel
                   </button>
                 </>
