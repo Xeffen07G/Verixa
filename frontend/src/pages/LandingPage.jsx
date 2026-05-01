@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { Shield, Search, BarChart3, Brain, Link2, AlertTriangle, Zap, Clock, CheckCircle2, XCircle, MinusCircle, ShieldCheck } from 'lucide-react';
+import { Shield, Search, BarChart3, Brain, Link2, AlertTriangle, Zap, Clock, CheckCircle2, XCircle, MinusCircle, ShieldCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -708,17 +708,17 @@ export default function LandingPage() {
 
             {/* Navigation: Arrows + Dots */}
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16, marginTop: 28 }}>
-                <button
+              <button
                 onClick={() => setActiveTestimonial(p => (p - 1 + testimonials.length) % testimonials.length)}
                 style={{
-                  width: 36, height: 36, borderRadius: '50%', border: `1px solid ${T.border}`,
+                  width: 44, height: 44, borderRadius: '50%', border: `1px solid ${T.border}`,
                   background: `${T.accent}14`, color: T.accent, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'all 0.2s',
                 }}
                 onMouseEnter={e => e.currentTarget.style.background = `${T.accent}33`}
                 onMouseLeave={e => e.currentTarget.style.background = `${T.accent}14`}
-              >←</button>
+              ><ChevronLeft size={20} /></button>
               <div style={{ display: 'flex', gap: 8 }}>
                 {testimonials.map((_, i) => (
                   <button
@@ -734,14 +734,14 @@ export default function LandingPage() {
               <button
                 onClick={() => setActiveTestimonial(p => (p + 1) % testimonials.length)}
                 style={{
-                  width: 36, height: 36, borderRadius: '50%', border: `1px solid ${T.border}`,
+                  width: 44, height: 44, borderRadius: '50%', border: `1px solid ${T.border}`,
                   background: `${T.accent}14`, color: T.accent, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'all 0.2s',
                 }}
                 onMouseEnter={e => e.currentTarget.style.background = `${T.accent}33`}
                 onMouseLeave={e => e.currentTarget.style.background = `${T.accent}14`}
-              >→</button>
+              ><ChevronRight size={20} /></button>
             </div>
           </div>
         </div>

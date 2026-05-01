@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Download } from 'lucide-react';
+import { Download, Mic } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useVerify } from '../hooks/useVerify';
@@ -642,6 +642,7 @@ export default function VerifyPage() {
           .action-btn { padding: 10px !important; font-size: 11px !important; min-width: 0 !important; }
           .action-btn svg { width: 14px !important; height: 14px !important; }
           .run-btn { padding: 10px !important; font-size: 12px !important; }
+          .voice-btn { padding: 6px 12px !important; font-size: 10px !important; bottom: 8px !important; right: 8px !important; }
         }
         @media (max-width: 480px) {
           .report-stats-grid { grid-template-columns: 1fr 1fr !important; }
@@ -740,20 +741,9 @@ export default function VerifyPage() {
                       letterSpacing: 0.5,
                       display: 'flex', alignItems: 'center', gap: 6
                     }}
-                    onMouseEnter={e => {
-                      if (!listening) {
-                        e.currentTarget.style.background = 'rgba(201, 169, 110, 0.15)';
-                        e.currentTarget.style.borderColor = 'rgba(201, 169, 110, 0.6)';
-                      }
-                    }}
-                    onMouseLeave={e => {
-                      if (!listening) {
-                        e.currentTarget.style.background = 'rgba(201, 169, 110, 0.08)';
-                        e.currentTarget.style.borderColor = 'rgba(201, 169, 110, 0.3)';
-                      }
-                    }}
+                    className="voice-btn"
                   >
-                    {listening ? <span style={{display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#ff4d4d', marginRight: 4}} /> : <span style={{ fontSize: 14 }}>🎙️</span>}
+                    {listening ? <span style={{display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#ff4d4d', marginRight: 4}} /> : <Mic size={14} />}
                     {listening ? 'Stop' : 'Go Voice'}
                   </button>
                 </div>
