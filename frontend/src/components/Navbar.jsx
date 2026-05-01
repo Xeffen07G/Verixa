@@ -79,7 +79,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
             {/* Tool Group (Always Visible) */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               {/* Language Switcher */}
-              <div style={{ position: 'relative' }}>
+              <div style={{ position: 'relative' }} className="hide-mobile">
                 <button onClick={() => setLangOpen(!langOpen)} style={{ background: 'none', border: 'none', color: textMuted, cursor: 'pointer', padding: 8, borderRadius: 8, display: 'flex', alignItems: 'center', gap: 4 }} onMouseEnter={e => e.currentTarget.style.color = textColor} onMouseLeave={e => e.currentTarget.style.color = textMuted}>
                   <Globe size={18} />
                   <span style={{ fontSize: 11, fontWeight: 700 }}>{currentLang?.code.toUpperCase()}</span>
@@ -141,6 +141,18 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
           </div>
         </div>
 
+        {/* Language Selection (Mobile Only) */}
+        <div className="mobile-only" style={{ marginBottom: 40, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ fontSize: 11, color: textMuted, fontWeight: 700, marginBottom: 16, letterSpacing: 1 }}>LANGUAGE</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            {LANGUAGES.map(l => (
+              <button key={l.code} onClick={() => { handleLangChange(l.code); setMobileOpen(false); }} style={{ padding: '12px', borderRadius: 10, background: lang === l.code ? `${T.accent}1a` : 'rgba(255,255,255,0.03)', border: lang === l.code ? `1px solid ${T.accent}` : `1px solid transparent`, color: lang === l.code ? T.accent : textColor, fontSize: 13, fontWeight: 600, cursor: 'pointer', textAlign: 'center' }}>
+                {l.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Navigation & Auth */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ fontSize: 11, color: textMuted, fontWeight: 700, marginBottom: 8, letterSpacing: 1 }}>ACCOUNT</div>
@@ -180,6 +192,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
         @media (max-width: 1024px) {
           .hide-tablet { display: none !important; }
           .mobile-only { display: flex !important; }
+          .hide-mobile { display: none !important; }
         }
         @media (min-width: 1025px) {
           .mobile-only { display: none !important; }
