@@ -274,69 +274,70 @@ function generateCertificate(claims, overallScore, text) {
   const html = `<html><head><style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600;700&family=Inter:wght@400;700&display=swap');
     
-    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-sizing: border-box; }
-    body { background: #000; color: #fff; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Inter', sans-serif; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+    @page { size: A4 landscape; margin: 0; }
+    body { background: #000; color: #fff; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Inter', sans-serif; overflow: hidden; }
     
     .cert-wrapper { 
-      width: 95vw; max-width: 1000px; height: 95vh; max-height: 700px;
-      background: #0a0a0f; 
-      border: 2px solid #c9a96e; 
+      width: 297mm; height: 210mm;
+      background: #000; 
+      border: 4px solid #c9a96e; 
       position: relative; 
-      padding: 50px;
+      padding: 60px 80px;
       display: flex; flex-direction: column; justify-content: space-between;
-      margin: auto;
+      box-shadow: 0 0 100px rgba(0,0,0,0.5);
     }
     
-    .ornament-outer { position: absolute; inset: 10px; border: 1px solid rgba(201,169,110,0.2); pointer-events: none; }
-    .ornament-inner { position: absolute; inset: 18px; border: 1px solid rgba(201,169,110,0.3); pointer-events: none; }
+    .ornament-outer { position: absolute; inset: 15px; border: 1px solid rgba(201,169,110,0.15); pointer-events: none; }
+    .ornament-inner { position: absolute; inset: 25px; border: 1.5px solid rgba(201,169,110,0.25); pointer-events: none; }
     
-    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(201,169,110,0.2); padding-bottom: 15px; }
-    .brand { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; color: #c9a96e; letter-spacing: 2px; }
-    .header-right { font-size: 9px; color: rgba(201,169,110,0.5); letter-spacing: 2px; text-transform: uppercase; }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(201,169,110,0.15); padding-bottom: 20px; }
+    .brand { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: #c9a96e; letter-spacing: 3px; }
+    .header-right { font-size: 10px; color: rgba(201,169,110,0.4); letter-spacing: 3px; text-transform: uppercase; }
     
-    .content { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px 0; }
-    .sub-title { font-size: 11px; color: #c9a96e; letter-spacing: 3px; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; }
-    .main-title { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 600; margin: 0 0 25px; line-height: 1; color: #f5f3ef; }
-    .divider { width: 100px; height: 1px; background: linear-gradient(90deg, transparent, #c9a96e, transparent); margin-bottom: 30px; }
+    .content { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px 0; }
+    .sub-title { font-size: 12px; color: #c9a96e; letter-spacing: 4px; margin-bottom: 12px; font-weight: 700; text-transform: uppercase; }
+    .main-title { font-family: 'Cormorant Garamond', serif; font-size: 64px; font-weight: 600; margin: 0 0 30px; line-height: 1; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+    .divider { width: 140px; height: 1.5px; background: linear-gradient(90deg, transparent, #c9a96e, transparent); margin-bottom: 40px; }
     
-    .score-box { display: flex; align-items: center; gap: 25px; margin-bottom: 30px; }
+    .score-box { display: flex; align-items: center; gap: 40px; margin-bottom: 40px; }
     .score-circle { 
-      width: 130px; height: 130px; border-radius: 50%; 
-      border: 4px double ${scoreColor}; 
+      width: 150px; height: 150px; border-radius: 50%; 
+      border: 5px double ${scoreColor}; 
       display: flex; align-items: center; justify-content: center; 
-      font-size: 40px; font-weight: 800; color: ${scoreColor};
-      background: rgba(255,255,255,0.02);
+      font-size: 48px; font-weight: 800; color: ${scoreColor};
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
     }
     .score-info { text-align: left; }
-    .verdict-label { font-size: 24px; font-weight: 800; color: ${scoreColor}; margin: 0 0 3px; letter-spacing: 1px; }
-    .verdict-desc { font-size: 12px; color: rgba(245,243,239,0.4); margin: 0; }
+    .verdict-label { font-size: 28px; font-weight: 800; color: ${scoreColor}; margin: 0 0 5px; letter-spacing: 1.5px; }
+    .verdict-desc { font-size: 14px; color: rgba(255,255,255,0.4); margin: 0; font-weight: 400; }
     
     .excerpt-box { 
-      width: 100%; max-width: 700px; 
-      padding: 20px; 
-      background: rgba(255,255,255,0.03); 
-      border: 1px solid rgba(255,255,255,0.06); 
-      border-radius: 10px;
-      text-align: left;
+      width: 100%; max-width: 800px; 
+      padding: 24px; 
+      background: rgba(255,255,255,0.02); 
+      border: 1px solid rgba(201,169,110,0.1); 
+      border-radius: 12px;
+      text-align: center;
     }
-    .excerpt-lbl { font-size: 8px; color: #c9a96e; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; display: block; }
-    .excerpt-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px; color: rgba(245,243,239,0.7); line-height: 1.5; margin: 0; }
+    .excerpt-lbl { font-size: 9px; color: #c9a96e; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; display: block; }
+    .excerpt-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px; color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0; }
     
     .footer { 
       display: flex; justify-content: space-between; align-items: flex-end; 
-      border-top: 1px solid rgba(201,169,110,0.15); padding-top: 20px; 
-      font-size: 11px; color: rgba(245,243,239,0.3); 
+      border-top: 1.5px solid rgba(201,169,110,0.15); padding-top: 25px; 
+      font-size: 12px; color: rgba(255,255,255,0.3); 
     }
     .footer-left b { color: #c9a96e; }
     .seal { 
-      width: 60px; height: 60px; border-radius: 50%; 
-      border: 2px solid #c9a96e; 
+      width: 80px; height: 80px; border-radius: 50%; 
+      border: 3px solid #c9a96e; 
       display: flex; flex-direction: column; align-items: center; justify-content: center; 
-      color: #c9a96e; font-size: 7px; font-weight: 700;
-      background: rgba(201,169,110,0.03);
+      color: #c9a96e; font-size: 9px; font-weight: 700;
+      background: rgba(201,169,110,0.05);
+      transform: rotate(-15deg);
     }
-    
-    @page { size: landscape; margin: 0; }
   </style></head><body>
     <div class="cert-wrapper">
       <div class="ornament-outer"></div>
@@ -344,40 +345,48 @@ function generateCertificate(claims, overallScore, text) {
       
       <div class="header">
         <div class="brand">VeriXa</div>
-        <div class="header-right">Truth is not negotiable</div>
+        <div class="header-right">TRUTH IS NOT NEGOTIABLE</div>
       </div>
       
       <div class="content">
-        <div class="sub-title">Fact-Check Authenticity</div>
-        <h1 class="main-title">Certificate of Verification</h1>
+        <div class="sub-title">VERIFICATION OF AUTHENTICITY</div>
+        <h1 class="main-title">Certificate of Truth</h1>
         <div class="divider"></div>
         
         <div class="score-box">
           <div class="score-circle">${overallScore}%</div>
           <div class="score-info">
             <h2 class="verdict-label">${label}</h2>
-            <p class="verdict-desc">Verified by AI-Powered Evidence Analysis</p>
+            <p class="verdict-desc">Verified by VeriXa AI Evidence Pipeline</p>
           </div>
         </div>
         
         <div class="excerpt-box">
-          <span class="excerpt-lbl">Verified Content Excerpt</span>
-          <p class="excerpt-text">"${text.slice(0, 300)}${text.length > 300 ? '...' : ''}"</p>
+          <span class="excerpt-lbl">Subject Content Excerpt</span>
+          <p class="excerpt-text">"${text.slice(0, 260)}${text.length > 260 ? '...' : ''}"</p>
         </div>
       </div>
       
       <div class="footer">
         <div class="footer-left">
-          <div><b>Issued:</b> ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
-          <div style="margin-top:4px;"><b>Report ID:</b> VX${Math.random().toString(36).substr(2, 9).toUpperCase()}</div>
+          <div><b>ISSUED:</b> ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase()}</div>
+          <div style="margin-top:6px;"><b>REPORT ID:</b> VX-${Math.random().toString(36).substr(2, 9).toUpperCase()}</div>
         </div>
         <div class="seal">
-          <span>VERIFIED</span>
-          <span style="font-size:18px; margin-top:2px;">✓</span>
+          <span style="letter-spacing:1px;">VERIFIED</span>
+          <span style="font-size:24px; margin-top:2px;">✓</span>
+          <span style="font-size:6px; opacity:0.6;">PLATFORM-GEN</span>
         </div>
       </div>
     </div>
-    <script>setTimeout(() => window.print(), 500);</script>
+    <script>
+      window.onload = () => {
+        setTimeout(() => {
+          window.print();
+          window.close();
+        }, 1000);
+      };
+    </script>
   </body></html>`;
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
@@ -628,8 +637,11 @@ export default function VerifyPage() {
         @media (max-width: 768px) {
           .verify-main { grid-template-columns: 1fr !important; }
           .left-panel { height: auto !important; border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); }
-          .results-panel { height: auto !important; padding: 24px 16px !important; }
+          .results-panel { height: auto !important; padding: 20px 16px !important; }
           .report-stats-grid { grid-template-columns: repeat(4, 1fr) !important; }
+          .action-btn { padding: 10px !important; font-size: 11px !important; min-width: 0 !important; }
+          .action-btn svg { width: 14px !important; height: 14px !important; }
+          .run-btn { padding: 10px !important; font-size: 12px !important; }
         }
         @media (max-width: 480px) {
           .report-stats-grid { grid-template-columns: 1fr 1fr !important; }
@@ -775,6 +787,7 @@ export default function VerifyPage() {
               <div style={{ padding: '16px 20px', borderTop: `1px solid ${T.border}`, background: T.panelFooter }}>
                 <AnimatedLoadingBar active={isLoading} indeterminate color={T.accent} height={3} style={{ marginBottom: 12, borderRadius: 6 }} />
                 <button
+                  className="run-btn"
                   style={{ 
                     width: '100%', padding: '14px', borderRadius: 12, 
                     background: isLoading ? T.accentMuted : `linear-gradient(135deg, ${T.accent}, #a07b42)`, 
@@ -873,12 +886,14 @@ export default function VerifyPage() {
               {/* Action Buttons */}
               <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
                 <button onClick={() => exportToPDF(claims, overallScore, text)}
+                  className="action-btn"
                   style={{ flex: 1, minWidth: 160, padding: '14px', borderRadius: 12, background: T.accentMuted, border: `1.5px solid ${T.accent}33`, color: T.accent, fontSize: 13, cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s' }}
                   onMouseEnter={e => e.currentTarget.style.background = `${T.accent}1a`}
                   onMouseLeave={e => e.currentTarget.style.background = T.accentMuted}>
                   <Download size={18} /> Export Full Report
                 </button>
                 <button onClick={() => generateCertificate(claims, overallScore, text)}
+                  className="action-btn"
                   style={{ 
                     flex: 1.5, minWidth: 200, padding: '14px', borderRadius: 12, 
                     background: 'linear-gradient(135deg, #c9a96e, #a07b42)', 

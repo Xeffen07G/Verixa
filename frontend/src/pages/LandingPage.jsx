@@ -756,7 +756,7 @@ export default function LandingPage() {
             <div style={{ ...dividerStyle, margin: '20px auto' }} />
           </div>
 
-          <div style={{
+          <div className="pricing-grid" style={{
             display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: 24, alignItems: 'stretch',
           }}>
@@ -861,6 +861,8 @@ export default function LandingPage() {
           .feature-card { flex-direction: column !important; padding: 24px !important; }
           .demo-card { padding: 16px !important; }
           .journey-step { max-width: 100% !important; }
+          .pricing-grid { grid-template-columns: 1fr !important; }
+          .pricing-grid > div { padding: 40px 24px !important; }
         }
         
         @media (max-width: 480px) {
