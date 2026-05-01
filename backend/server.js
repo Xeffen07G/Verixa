@@ -14,7 +14,10 @@ const connectDB = require("./config/db");
 
 // Connect to Database
 if (process.env.MONGO_URI) {
+  console.log('MONGO_URI found. Initializing connection...');
   connectDB();
+} else {
+  console.error('CRITICAL: MONGO_URI is missing from environment variables!');
 }
 
 const app = express();
