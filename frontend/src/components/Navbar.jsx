@@ -47,7 +47,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   return (
     <>
       <nav style={{ 
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 2000,
         background: bg, backdropFilter: (!isLanding || scrolled) ? 'blur(24px)' : 'none',
         borderBottom: (!isLanding || scrolled) ? `1px solid ${border}` : '1px solid transparent',
         transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -79,13 +79,13 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
             {/* Tool Group (Always Visible) */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               {/* Language Switcher */}
-              <div style={{ position: 'relative' }} className="hide-mobile">
-                <button onClick={() => setLangOpen(!langOpen)} style={{ background: 'none', border: 'none', color: textMuted, cursor: 'pointer', padding: 8, borderRadius: 8, display: 'flex', alignItems: 'center', gap: 4 }} onMouseEnter={e => e.currentTarget.style.color = textColor} onMouseLeave={e => e.currentTarget.style.color = textMuted}>
+              <div style={{ position: 'relative' }}>
+                <button onClick={() => setLangOpen(!langOpen)} style={{ background: 'none', border: 'none', color: textMuted, cursor: 'pointer', padding: 8, minHeight: 44, borderRadius: 8, display: 'flex', alignItems: 'center', gap: 4 }} onMouseEnter={e => e.currentTarget.style.color = textColor} onMouseLeave={e => e.currentTarget.style.color = textMuted}>
                   <Globe size={18} />
                   <span style={{ fontSize: 11, fontWeight: 700 }}>{currentLang?.code.toUpperCase()}</span>
                 </button>
                 {langOpen && (
-                  <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 12, background: darkMode ? '#15151a' : '#fff', border: `1px solid ${border}`, borderRadius: 12, padding: '8px', minWidth: 140, boxShadow: '0 10px 30px rgba(0,0,0,0.3)', animation: 'fadeIn 0.2s ease', zIndex: 1002 }}>
+                  <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 12, background: darkMode ? '#15151a' : '#fff', border: `1px solid ${border}`, borderRadius: 12, padding: '8px', minWidth: 160, boxShadow: '0 10px 40px rgba(0,0,0,0.4)', animation: 'fadeIn 0.2s ease', zIndex: 2001 }}>
                     {LANGUAGES.map(l => (
                       <button key={l.code} onClick={() => handleLangChange(l.code)} style={{ width: '100%', padding: '10px 12px', background: lang === l.code ? `${T.accent}1a` : 'none', border: 'none', color: lang === l.code ? T.accent : textColor, textAlign: 'left', cursor: 'pointer', borderRadius: 8, fontSize: 13, fontWeight: 500 }} onMouseEnter={e => e.target.style.background = `${T.accent}0d`}>
                         {l.label}
@@ -138,18 +138,6 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
               <TrendingUp size={20} />
               <span style={{ fontSize: 18, fontWeight: 700 }}>Trending</span>
             </Link>
-          </div>
-        </div>
-
-        {/* Language Selection (Mobile Only) */}
-        <div className="mobile-only" style={{ marginBottom: 40, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ fontSize: 11, color: textMuted, fontWeight: 700, marginBottom: 16, letterSpacing: 1 }}>LANGUAGE</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            {LANGUAGES.map(l => (
-              <button key={l.code} onClick={() => { handleLangChange(l.code); setMobileOpen(false); }} style={{ padding: '12px', borderRadius: 10, background: lang === l.code ? `${T.accent}1a` : 'rgba(255,255,255,0.03)', border: lang === l.code ? `1px solid ${T.accent}` : `1px solid transparent`, color: lang === l.code ? T.accent : textColor, fontSize: 13, fontWeight: 600, cursor: 'pointer', textAlign: 'center' }}>
-                {l.label}
-              </button>
-            ))}
           </div>
         </div>
 
