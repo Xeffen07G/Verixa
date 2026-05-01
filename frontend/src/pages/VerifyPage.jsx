@@ -641,27 +641,6 @@ export default function VerifyPage() {
           0%, 60%, 100% { opacity: 0.2; transform: translateY(0); }
           30% { opacity: 1; transform: translateY(-4px); }
         }
-        @media (max-width: 768px) {
-          .verify-main { grid-template-columns: 1fr !important; }
-          .left-panel { height: auto !important; border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); }
-          .results-panel { height: auto !important; padding: 20px 16px !important; }
-          .report-stats-grid { grid-template-columns: repeat(4, 1fr) !important; }
-          .action-btn { padding: 10px !important; font-size: 11px !important; min-width: 0 !important; flex: 1 !important; }
-          .action-btn svg { width: 14px !important; height: 14px !important; }
-          .run-btn { padding: 10px !important; font-size: 12px !important; }
-          .voice-btn { padding: 6px 12px !important; font-size: 10px !important; bottom: 8px !important; right: 8px !important; }
-          .score-banner { padding: 20px !important; }
-          .score-text { font-size: 44px !important; }
-          .report-stats-grid { gap: 6px !important; }
-          .claim-card-header { padding: 14px 16px !important; gap: 12px !important; }
-          .tab-btn { padding: 6px 0 !important; font-size: 10px !important; }
-        }
-        
-        .run-btn { padding: 14px; font-size: 14px; }
-        .voice-btn { padding: 8px 20px; font-size: 11px; }
-        .action-btn { padding: 14px; font-size: 13px; }
-        .tab-btn { padding: 7px 0; font-size: 11px; }
-
         @media (max-width: 480px) {
           .report-stats-grid { grid-template-columns: 1fr 1fr !important; }
           .score-banner { border-radius: 12px !important; }
@@ -809,6 +788,9 @@ export default function VerifyPage() {
                   onClick={handleRun} disabled={isLoading || !text.trim()}>
                   {isLoading ? t('verifying', lang) : t('verifyNow', lang)}
                 </button>
+                <div style={{ textAlign: 'center', marginTop: 12, opacity: 0.3, fontSize: 8, letterSpacing: 1 }}>
+                  BUILD 2.0.5 — LATEST
+                </div>
               </div>
             </>
           )}
