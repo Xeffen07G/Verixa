@@ -474,3 +474,51 @@ input:focus, textarea:focus, select:focus {
   70% { box-shadow: 0 0 0 10px rgba(201,169,110,0); }
   100% { box-shadow: 0 0 0 0 rgba(201,169,110,0); }
 }
+
+/* ======================================== */
+/* ===== MOBILE RESPONSIVE SYSTEM ========= */
+/* ======================================== */
+
+@media (max-width: 768px) {
+  :root { --nav-h: 60px; }
+  body { font-size: 14px; }
+
+  nav > div { padding: 0 16px !important; }
+
+  main, section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .glassmorphism, .glassmorphism-light, .trending-card, .ext-feature {
+    padding: 16px !important;
+    border-radius: 14px !important;
+  }
+
+  button, a[role="button"] { min-height: 44px; }
+  input, textarea, select { font-size: 16px !important; max-width: 100% !important; }
+  img { max-width: 100% !important; height: auto !important; }
+
+  h1 { font-size: 28px !important; line-height: 1.2 !important; }
+  h2 { font-size: 22px !important; }
+  h3 { font-size: 18px !important; }
+
+  .particles-container, .scan-line-effect { display: none !important; }
+
+  .account-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+  .account-main { padding: 0 16px !important; margin: 40px auto !important; }
+  .avatar-wrap { width: 110px !important; height: 110px !important; }
+  .avatar-wrap > div:first-child { width: 110px !important; height: 110px !important; font-size: 40px !important; }
+}
+
+@media (max-width: 480px) {
+  :root { --nav-h: 56px; }
+  h1 { font-size: 24px !important; }
+  h2 { font-size: 20px !important; }
+  main, section { padding-left: 12px !important; padding-right: 12px !important; }
+  nav > div { padding: 0 12px !important; }
+  .glassmorphism, .glassmorphism-light { padding: 12px !important; border-radius: 12px !important; }
+}
+
