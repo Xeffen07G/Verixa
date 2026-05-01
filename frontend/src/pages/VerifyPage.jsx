@@ -388,17 +388,25 @@ function generateCertificate(claims, overallScore, text) {
     </div>
     <script>
       window.onload = () => {
+        // Wait longer for assets/fonts to settle
         setTimeout(() => {
-          window.print();
-          window.close();
-        }, 1000);
+          try {
+            window.print();
+          } catch (e) {
+            console.error("Print failed", e);
+          }
+        }, 2000);
       };
     </script>
   </body></html>`;
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const win = window.open(url, '_blank');
-  if (win) setTimeout(() => { URL.revokeObjectURL(url); }, 5000);
+  // Don't revoke immediately as it might break the print engine on mobile
+  if (win) {
+    // Optional: focus the window
+    win.focus();
+  }
 }
 
 export default function VerifyPage() {
@@ -789,7 +797,7 @@ export default function VerifyPage() {
                   {isLoading ? t('verifying', lang) : t('verifyNow', lang)}
                 </button>
                 <div style={{ textAlign: 'center', marginTop: 12, opacity: 0.3, fontSize: 8, letterSpacing: 1 }}>
-                  BUILD 2.0.6 — LATEST
+                  BUILD 2.0.7 — LATEST
                 </div>
               </div>
             </>
