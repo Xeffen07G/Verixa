@@ -328,6 +328,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            className="stats-grid"
             style={{
               display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1,
               background: T.border, borderRadius: 16, overflow: 'hidden',
@@ -425,7 +426,7 @@ export default function LandingPage() {
                     <span style={{
                       fontSize: 11, fontWeight: 600, color: claim.color, letterSpacing: 0.5,
                       padding: '4px 10px', borderRadius: 6,
-                      background: `${claim.color}15`, whiteSpace: 'nowrap',
+                      background: `${claim.color}15`, whiteSpace: 'normal', textAlign: 'right'
                     }}>{claim.verdict} · {claim.confidence}%</span>
                   </motion.div>
                 ))}
@@ -454,7 +455,7 @@ export default function LandingPage() {
       {/* ══════════ CAPABILITIES (RE-ENGINEERED) ══════════ */}
       <Section id="features" style={{ padding: '120px 0', position: 'relative', overflow: 'hidden' }}>
         <div style={{ padding: '0 24px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 60, alignItems: 'center' }}>
+          <div className="capabilities-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 60, alignItems: 'center' }}>
             
             {/* Left Column: Vision & Identity */}
             <div>
@@ -503,7 +504,7 @@ export default function LandingPage() {
             </div>
 
             {/* Right Column: Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="capabilities-sub-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               {features.slice(0, 4).map((f, i) => (
                 <motion.div
                   key={i}
@@ -535,7 +536,7 @@ export default function LandingPage() {
           </div>
 
           {/* Full Width Extended Features */}
-          <div style={{ 
+          <div className="extended-features-grid" style={{ 
             display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', 
             gap: 20, marginTop: 40 
           }}>
@@ -614,6 +615,7 @@ export default function LandingPage() {
                   alignSelf: step.side === 'left' ? 'flex-start' : 'flex-end',
                   width: '100%', maxWidth: 380, position: 'relative', zIndex: 2
                 }}
+                className="journey-step"
               >
                 <div style={{
                   padding: '32px', borderRadius: 24,
@@ -646,7 +648,7 @@ export default function LandingPage() {
         <style>{`
           @media (max-width: 1024px) {
             .desktop-wave { display: none !important; }
-            div { align-self: center !important; margin: 0 auto !important; }
+            .journey-step { align-self: center !important; margin: 0 auto !important; width: 100% !important; }
           }
         `}</style>
       </Section>
@@ -848,13 +850,22 @@ export default function LandingPage() {
 
       <Footer darkMode={darkMode} toggleTheme={toggleTheme} />
 
-        <style>{`
-          .feature-card:hover .hover-desc { height: auto !important; opacity: 1 !important; margin-top: 8px !important; }
-          @media (max-width: 768px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-          }
+      <style>{`
+        .feature-card:hover .hover-desc { height: auto !important; opacity: 1 !important; margin-top: 8px !important; }
+        
+        @media (max-width: 768px) {
+          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .capabilities-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+          .capabilities-sub-grid { grid-template-columns: 1fr !important; }
+          .extended-features-grid { grid-template-columns: 1fr !important; }
+          .feature-card { flex-direction: column !important; padding: 24px !important; }
+          .demo-card { padding: 16px !important; }
+          .journey-step { max-width: 100% !important; }
+        }
+        
         @media (max-width: 480px) {
           .stats-grid { grid-template-columns: 1fr !important; }
+          .capabilities-grid h2 { font-size: 32px !important; }
         }
       `}</style>
     </div>
