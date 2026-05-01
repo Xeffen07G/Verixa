@@ -101,7 +101,7 @@ export default function AccountPage() {
     <div style={{ background: T.bg, minHeight: '100vh', transition: 'background 0.3s', display: 'flex', flexDirection: 'column' }}>
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
-      <main style={{ flex: 1, maxWidth: 900, width: '100%', margin: '60px auto', padding: '0 24px', animation: 'fadeUp 0.6s ease' }}>
+      <main className="account-main" style={{ flex: 1, maxWidth: 900, width: '100%', margin: '60px auto', padding: '0 24px', animation: 'fadeUp 0.6s ease' }}>
         
         {saveSuccess && (
           <div style={{ position: 'fixed', top: 100, right: 30, zIndex: 9999, padding: '16px 24px', borderRadius: 14, background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10, animation: 'fadeUp 0.4s ease', backdropFilter: 'blur(12px)' }}>
@@ -109,12 +109,12 @@ export default function AccountPage() {
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 32, alignItems: 'start' }}>
+        <div className="account-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 32, alignItems: 'start' }}>
           
           {/* LEFT: Identity Card */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ padding: '40px 32px', borderRadius: 24, background: T.card, border: `1px solid ${T.border}`, backdropFilter: 'blur(12px)', textAlign: 'center', position: 'relative' }}>
-              <div style={{ position: 'relative', width: 140, height: 140, margin: '0 auto 24px' }}>
+              <div className="avatar-wrap" style={{ position: 'relative', width: 140, height: 140, margin: '0 auto 24px' }}>
                 <div onClick={() => isEditing && fileInputRef.current?.click()} style={{ width: 140, height: 140, borderRadius: '50%', background: editData.profilePic ? `url(${editData.profilePic}) center/cover` : `linear-gradient(135deg, ${T.accent}, #a07b42)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 56, fontWeight: 300, color: '#0a0a0f', border: `4px solid ${isEditing ? T.accent : T.border}`, transition: 'all 0.3s', overflow: 'hidden', cursor: isEditing ? 'pointer' : 'default' }}>
                   {!editData.profilePic && (user?.name || 'U').charAt(0).toUpperCase()}
                   {isEditing && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}><Camera size={32} /></div>}
@@ -185,7 +185,7 @@ export default function AccountPage() {
                     <div>
                       <div style={{ fontSize: 10, color: T.text3, fontWeight: 700, letterSpacing: 1 }}>{item.label}</div>
                       {isEditing && !item.locked ? (
-                        <input value={editData[item.key]} onChange={e => setEditData({ ...editData, [item.key]: e.target.value })} style={{ background: 'none', border: 'none', borderBottom: `1px solid ${T.accent}`, color: T.text, fontSize: 14, outline: 'none', width: '200px', padding: '2px 0' }} />
+                        <input value={editData[item.key]} onChange={e => setEditData({ ...editData, [item.key]: e.target.value })} style={{ background: 'none', border: 'none', borderBottom: `1px solid ${T.accent}`, color: T.text, fontSize: 14, outline: 'none', width: '100%', maxWidth: '200px', padding: '2px 0' }} />
                       ) : (
                         <div style={{ fontSize: 14, color: T.text, fontWeight: 600 }}>{item.value || 'Not set'}</div>
                       )}
@@ -219,6 +219,12 @@ export default function AccountPage() {
       <Footer darkMode={darkMode} />
       <style>{`
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) {
+          .account-main { padding: 0 16px !important; margin: 40px auto !important; }
+          .account-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+          .avatar-wrap { width: 110px !important; height: 110px !important; }
+          .avatar-wrap > div:first-child { width: 110px !important; height: 110px !important; font-size: 40px !important; }
+        }
       `}</style>
     </div>
   );
