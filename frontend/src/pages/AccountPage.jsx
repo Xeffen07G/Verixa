@@ -62,10 +62,18 @@ export default function AccountPage() {
 
   const handleSave = async () => {
     setIsSaving(true);
+    // Determine the correct API base URL
+    const baseUrl = process.env.REACT_APP_API_URL || window.location.origin;
+    
     try {
-      const res = await axios.put(`${API_URL}/api/user/profile`, {
+      const res = await axios.put(`${baseUrl}/api/user/profile`, {
         userId: user?._id || user?.id,
         ...editData
+      }, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       const updatedUser = { ...user, ...res.data };
       if (typeof setUser === 'function') setUser(updatedUser);
