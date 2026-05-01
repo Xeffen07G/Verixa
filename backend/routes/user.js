@@ -15,22 +15,26 @@ router.put('/profile', async (req, res) => {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
-        console.log('Attempting to update user:', idToUpdate);
+        console.log('Attempting to update user with RAW bypass:', idToUpdate);
 
-        // Use findOne instead of findById to avoid strict ObjectId casting errors for legacy timestamp IDs
-        const updatedUser = await User.findOneAndUpdate(
-            { _id: idToUpdate }, 
-            { name, organization, profilePic, title, bio, location },
-            { new: true, runValidators: true }
-        ).select('-password');
+        // Using User.collection.findOneAndUpdate to bypass Mongoose's strict ObjectId casting
+        // This is necessary to support legacy string/timestamp IDs
+        const result = await User.collection.findOneAndUpdate(
+            { _id: idToUpdate },
+            { $set: { name, organization, profilePic, title, bio, location, updatedAt: new Date() } },
+            { returnDocument: 'after' }
+        );
+
+        const updatedUser = result.value || result; // Handle different driver version response formats
 
         if (!updatedUser) {
-            // Fallback for some older mock implementations that might use 'id' field instead of '_id'
-            const fallbackUser = await User.findOneAndUpdate(
+            // Fallback for very old mock implementations
+            const fallbackResult = await User.collection.findOneAndUpdate(
                 { id: idToUpdate },
-                { name, organization, profilePic, title, bio, location },
-                { new: true, runValidators: true }
-            ).select('-password');
+                { $set: { name, organization, profilePic, title, bio, location, updatedAt: new Date() } },
+                { returnDocument: 'after' }
+            );
+            const fallbackUser = fallbackResult.value || fallbackResult;
 
             if (!fallbackUser) {
                 console.error('Update failed: User not found in database for ID:', idToUpdate);
@@ -39,7 +43,7 @@ router.put('/profile', async (req, res) => {
             return res.json(fallbackUser);
         }
 
-        console.log('Profile updated successfully for:', updatedUser.email);
+        console.log('Profile updated successfully (Bypass Mode)');
         res.json(updatedUser);
     } catch (error) {
         console.error('SERVER ERROR IN /api/user/profile:', error);
