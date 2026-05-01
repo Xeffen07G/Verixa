@@ -1,10 +1,16 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
-const User = require('../models/User'); // Force use of real Mongoose model
+const User = require('../models/User');
 
 // Update profile
 router.put('/profile', async (req, res) => {
     try {
+        // Check database connection state
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database connection not ready. State:', mongoose.connection.readyState);
+            return res.status(503).json({ error: 'Database connection is initializing. Please try again in a moment.' });
+        }
         console.log('Profile update request received:', { ...req.body, profilePic: req.body.profilePic ? '[BASE64_IMAGE]' : 'none' });
         
         const { userId, id, _id, name, organization, profilePic, title, bio, location } = req.body;
