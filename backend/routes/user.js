@@ -6,7 +6,7 @@ const User = require('../models/User');
 const connectDB = require('../config/db');
 
 // Update profile
-router.put('/profile', async (req, res) => {
+router.post('/profile', async (req, res) => {
     try {
         // Active Reconnection Logic
         if (mongoose.connection.readyState !== 1) {

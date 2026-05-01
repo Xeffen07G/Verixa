@@ -64,8 +64,8 @@ export default function AccountPage() {
     setIsSaving(true);
     
     try {
-      // Use pure relative path for absolute compatibility in Vercel monorepo
-      const res = await axios.put('/api/user/profile', {
+      // Use POST for maximum compatibility with Vercel routing
+      const res = await axios.post('/api/user/profile', {
         userId: user?._id || user?.id,
         ...editData
       }, {
