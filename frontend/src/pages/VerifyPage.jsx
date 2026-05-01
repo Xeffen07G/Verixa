@@ -271,13 +271,20 @@ function exportToPDF(claims, overallScore, text) {
 function generateCertificate(claims, overallScore, text) {
   const scoreColor = overallScore >= 70 ? '#4ade80' : overallScore >= 40 ? '#fbbf24' : '#f87171';
   const label = overallScore >= 90 ? 'HIGHLY ACCURATE' : overallScore >= 70 ? 'MOSTLY ACCURATE' : overallScore >= 40 ? 'MIXED ACCURACY' : 'LOW ACCURACY';
-  const html = `<html><head><style>
+  const html = `<html><head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600;700&family=Inter:wght@400;700&display=swap');
     
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
     @page { size: A4 landscape; margin: 0; }
-    body { background: #000; color: #fff; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Inter', sans-serif; overflow: hidden; }
+    body { background: #000; color: #fff; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Inter', sans-serif; overflow-x: hidden; }
     
+    @media print {
+      body { background: #000 !important; color: #fff !important; }
+      .cert-wrapper { box-shadow: none !important; border: 4px solid #c9a96e !important; }
+    }
+
     .cert-wrapper { 
       width: 297mm; height: 210mm;
       background: #000; 
@@ -639,7 +646,7 @@ export default function VerifyPage() {
           .left-panel { height: auto !important; border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); }
           .results-panel { height: auto !important; padding: 20px 16px !important; }
           .report-stats-grid { grid-template-columns: repeat(4, 1fr) !important; }
-          .action-btn { padding: 10px !important; font-size: 11px !important; min-width: 0 !important; }
+          .action-btn { padding: 10px !important; font-size: 11px !important; min-width: 0 !important; flex: 1 !important; }
           .action-btn svg { width: 14px !important; height: 14px !important; }
           .run-btn { padding: 10px !important; font-size: 12px !important; }
           .voice-btn { padding: 6px 12px !important; font-size: 10px !important; bottom: 8px !important; right: 8px !important; }

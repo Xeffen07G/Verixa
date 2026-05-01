@@ -659,12 +659,12 @@ export default function LandingPage() {
         <div style={{ padding: '0 24px', maxWidth: 800, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
             <p style={sectionLabelStyle}>Testimonials</p>
-            <h2 style={sectionHeadingStyle}>Trusted by those who<br />demand accuracy.</h2>
+            <h2 style={sectionHeadingStyle}>Trusted by those who <br className="desktop-br" />demand accuracy.</h2>
             <div style={{ ...dividerStyle, margin: '20px auto' }} />
           </div>
 
           {/* Carousel */}
-          <div style={{
+          <div className="testimonial-card" style={{
             position: 'relative', minHeight: 220,
             background: T.testimonialBg, borderRadius: 20,
             border: `1px solid ${T.border}`, padding: '44px 40px',
@@ -863,6 +863,8 @@ export default function LandingPage() {
           .journey-step { max-width: 100% !important; }
           .pricing-grid { grid-template-columns: 1fr !important; }
           .pricing-grid > div { padding: 40px 24px !important; }
+          .testimonial-card { padding: 32px 20px !important; }
+          .desktop-br { display: none !important; }
         }
         
         @media (max-width: 480px) {
