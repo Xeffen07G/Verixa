@@ -3,13 +3,21 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const User = require('../models/User');
 
+const connectDB = require('../config/db');
+
 // Update profile
 router.put('/profile', async (req, res) => {
     try {
-        // Check database connection state
+        // Active Reconnection Logic
         if (mongoose.connection.readyState !== 1) {
-            console.error('Database connection not ready. State:', mongoose.connection.readyState);
-            return res.status(503).json({ error: 'Database connection is initializing. Please try again in a moment.' });
+            console.log('Database connection inactive (State: ' + mongoose.connection.readyState + '). Attempting emergency reconnection...');
+            try {
+                await connectDB();
+                console.log('Emergency reconnection successful.');
+            } catch (connErr) {
+                console.error('Emergency reconnection failed:', connErr);
+                return res.status(503).json({ error: 'Database is currently unreachable. Please check your Atlas IP Whitelist (Allow Access From Anywhere).' });
+            }
         }
         console.log('Profile update request received:', { ...req.body, profilePic: req.body.profilePic ? '[BASE64_IMAGE]' : 'none' });
         
