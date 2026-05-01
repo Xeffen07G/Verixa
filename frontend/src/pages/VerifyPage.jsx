@@ -752,7 +752,7 @@ export default function VerifyPage() {
 
                 {/* AI Detection Toggle */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12, padding: '10px 14px', background: T.surface2, borderRadius: 12, border: `1px solid ${T.border2}` }}>
-                  <button style={{ width: 36, height: 20, borderRadius: 10, cursor: 'pointer', background: detectAI ? T.accent : T.inputBorder, position: 'relative', border: 'none', transition: 'background 0.2s', flexShrink: 0 }} onClick={() => setDetectAI(!detectAI)}>
+                  <button style={{ width: 36, height: 20, minHeight: 0, borderRadius: 10, cursor: 'pointer', background: detectAI ? T.accent : T.inputBorder, position: 'relative', border: 'none', transition: 'background 0.2s', flexShrink: 0 }} onClick={() => setDetectAI(!detectAI)}>
                     <div style={{ position: 'absolute', top: 3, left: detectAI ? 18 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
                   </button>
                   <div style={{ flex: 1 }}>
@@ -789,7 +789,7 @@ export default function VerifyPage() {
                   {isLoading ? t('verifying', lang) : t('verifyNow', lang)}
                 </button>
                 <div style={{ textAlign: 'center', marginTop: 12, opacity: 0.3, fontSize: 8, letterSpacing: 1 }}>
-                  BUILD 2.0.5 — LATEST
+                  BUILD 2.0.6 — LATEST
                 </div>
               </div>
             </>

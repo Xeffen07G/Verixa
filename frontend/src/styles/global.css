@@ -497,7 +497,7 @@ input:focus, textarea:focus, select:focus {
     border-radius: 14px !important;
   }
 
-  button, a[role="button"] { min-height: 44px; }
+  .btn, .action-btn, .run-btn { min-height: 44px; }
   input, textarea, select { font-size: 16px !important; max-width: 100% !important; }
   img { max-width: 100% !important; height: auto !important; }
 
