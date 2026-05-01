@@ -17,15 +17,26 @@ router.put('/profile', async (req, res) => {
 
         console.log('Attempting to update user:', idToUpdate);
 
-        const updatedUser = await User.findByIdAndUpdate(
-            idToUpdate,
+        // Use findOne instead of findById to avoid strict ObjectId casting errors for legacy timestamp IDs
+        const updatedUser = await User.findOneAndUpdate(
+            { _id: idToUpdate }, 
             { name, organization, profilePic, title, bio, location },
             { new: true, runValidators: true }
         ).select('-password');
 
         if (!updatedUser) {
-            console.error('Update failed: User not found in database for ID:', idToUpdate);
-            return res.status(404).json({ error: 'User not found' });
+            // Fallback for some older mock implementations that might use 'id' field instead of '_id'
+            const fallbackUser = await User.findOneAndUpdate(
+                { id: idToUpdate },
+                { name, organization, profilePic, title, bio, location },
+                { new: true, runValidators: true }
+            ).select('-password');
+
+            if (!fallbackUser) {
+                console.error('Update failed: User not found in database for ID:', idToUpdate);
+                return res.status(404).json({ error: 'User not found' });
+            }
+            return res.json(fallbackUser);
         }
 
         console.log('Profile updated successfully for:', updatedUser.email);
