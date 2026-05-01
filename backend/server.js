@@ -69,11 +69,9 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message || "Internal server error" });
 });
 
-if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`\n🔍 VeriXa Backend running on http://localhost:${PORT}`);
-    console.log(`📡 Environment: ${process.env.NODE_ENV || "development"}\n`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`\n🔍 VeriXa Backend running on http://localhost:${PORT}`);
+  console.log(`📡 Environment: ${process.env.NODE_ENV || "development"}\n`);
+});
 
 module.exports = app;
