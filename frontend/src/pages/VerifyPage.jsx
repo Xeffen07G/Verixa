@@ -592,8 +592,8 @@ export default function VerifyPage() {
   }
 
   const tabBtn = (active) => ({
-    flex: 1, padding: '7px 0', borderRadius: 8, border: 'none', cursor: 'pointer',
-    fontSize: 11, fontWeight: 600, letterSpacing: 0.5,
+    flex: 1, borderRadius: 8, border: 'none', cursor: 'pointer',
+    fontWeight: 600, letterSpacing: 0.5,
     background: active ? T.accentMuted : 'transparent',
     color: active ? T.accent : T.text3, transition: 'all 0.18s',
   });
@@ -654,7 +654,14 @@ export default function VerifyPage() {
           .score-text { font-size: 44px !important; }
           .report-stats-grid { gap: 6px !important; }
           .claim-card-header { padding: 14px 16px !important; gap: 12px !important; }
+          .tab-btn { padding: 6px 0 !important; font-size: 10px !important; }
         }
+        
+        .run-btn { padding: 14px; font-size: 14px; }
+        .voice-btn { padding: 8px 20px; font-size: 11px; }
+        .action-btn { padding: 14px; font-size: 13px; }
+        .tab-btn { padding: 7px 0; font-size: 11px; }
+
         @media (max-width: 480px) {
           .report-stats-grid { grid-template-columns: 1fr 1fr !important; }
           .score-banner { border-radius: 12px !important; }
@@ -678,7 +685,7 @@ export default function VerifyPage() {
           {/* Tabs */}
           <div style={{ padding: '12px 20px', borderBottom: `1px solid ${T.border}`, display: 'flex', gap: 4 }}>
             {[{ id: 'input', label: 'Input' }, { id: 'history', label: `History${history.length > 0 ? ` (${history.length})` : ''}` }].map(t => (
-              <button key={t.id} onClick={() => setLeftTab(t.id)} style={tabBtn(leftTab === t.id)}>{t.label}</button>
+              <button key={t.id} onClick={() => setLeftTab(t.id)} className="tab-btn" style={tabBtn(leftTab === t.id)}>{t.label}</button>
             ))}
           </div>
 
@@ -742,11 +749,11 @@ export default function VerifyPage() {
                   <button onClick={listening ? stopListening : startListening}
                     style={{ 
                       position: 'absolute', bottom: 12, right: 12, 
-                      padding: '8px 20px', borderRadius: 10, 
+                      borderRadius: 10, 
                       border: listening ? '1.5px solid #ff4d4d' : '1.5px solid rgba(201, 169, 110, 0.3)', 
                       background: listening ? 'rgba(255, 77, 77, 0.15)' : 'rgba(201, 169, 110, 0.08)', 
                       color: listening ? '#ff4d4d' : '#c9a96e', 
-                      cursor: 'pointer', fontSize: 11, fontWeight: 700, 
+                      cursor: 'pointer', fontWeight: 700, 
                       backdropFilter: 'blur(8px)',
                       animation: listening ? 'mic-pulse 2s infinite' : 'none', 
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
@@ -765,13 +772,13 @@ export default function VerifyPage() {
                 </div>
 
                 {/* AI Detection Toggle */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12, padding: '10px 14px', background: T.surface2, borderRadius: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12, padding: '10px 14px', background: T.surface2, borderRadius: 12, border: `1px solid ${T.border2}` }}>
                   <button style={{ width: 36, height: 20, borderRadius: 10, cursor: 'pointer', background: detectAI ? T.accent : T.inputBorder, position: 'relative', border: 'none', transition: 'background 0.2s', flexShrink: 0 }} onClick={() => setDetectAI(!detectAI)}>
                     <div style={{ position: 'absolute', top: 3, left: detectAI ? 18 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
                   </button>
-                  <div>
-                    <p style={{ margin: 0, fontSize: 12, color: T.text, fontWeight: 500 }}>AI Text Detection</p>
-                    <p style={{ margin: 0, fontSize: 10, color: T.text3 }}>Detect if text was AI generated</p>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ margin: 0, fontSize: 12, color: T.text, fontWeight: 600 }}>AI Text Detection</p>
+                    <p style={{ margin: '1px 0 0', fontSize: 10, color: T.text3 }}>Identify machine-generated text</p>
                   </div>
                 </div>
 
@@ -791,10 +798,10 @@ export default function VerifyPage() {
                 <button
                   className="run-btn"
                   style={{ 
-                    width: '100%', padding: '14px', borderRadius: 12, 
+                    width: '100%', borderRadius: 12, 
                     background: isLoading ? T.accentMuted : `linear-gradient(135deg, ${T.accent}, #a07b42)`, 
                     border: 'none', color: isLoading ? T.accent : (darkMode ? '#0a0a0f' : '#fff'), 
-                    fontSize: 14, fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', 
+                    fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', 
                     letterSpacing: 0.8, transition: 'all 0.22s', 
                     boxShadow: isLoading ? 'none' : `0 4px 16px ${T.accent}4d`, 
                     position: 'relative', overflow: 'hidden' 
@@ -889,7 +896,7 @@ export default function VerifyPage() {
               <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
                 <button onClick={() => exportToPDF(claims, overallScore, text)}
                   className="action-btn"
-                  style={{ flex: 1, minWidth: 160, padding: '14px', borderRadius: 12, background: T.accentMuted, border: `1.5px solid ${T.accent}33`, color: T.accent, fontSize: 13, cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s' }}
+                  style={{ flex: 1, minWidth: 160, borderRadius: 12, background: T.accentMuted, border: `1.5px solid ${T.accent}33`, color: T.accent, cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s' }}
                   onMouseEnter={e => e.currentTarget.style.background = `${T.accent}1a`}
                   onMouseLeave={e => e.currentTarget.style.background = T.accentMuted}>
                   <Download size={18} /> Export Full Report
@@ -897,9 +904,9 @@ export default function VerifyPage() {
                 <button onClick={() => generateCertificate(claims, overallScore, text)}
                   className="action-btn"
                   style={{ 
-                    flex: 1.5, minWidth: 200, padding: '14px', borderRadius: 12, 
+                    flex: 1.5, minWidth: 200, borderRadius: 12, 
                     background: 'linear-gradient(135deg, #c9a96e, #a07b42)', 
-                    border: 'none', color: '#0a0a0f', fontSize: 13, 
+                    border: 'none', color: '#0a0a0f', 
                     cursor: 'pointer', fontWeight: 800, 
                     boxShadow: '0 8px 24px rgba(201,169,110,0.3)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
