@@ -417,6 +417,7 @@ export default function VerifyPage() {
   const [fetchingUrl, setFetchingUrl] = useState(false);
   const [pdfInfo, setPdfInfo] = useState(null);
   const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [isScannedPdf, setIsScannedPdf] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [lang, setLang] = useState(getStoredLanguage());
   const [searchParams] = useSearchParams();
@@ -572,15 +573,55 @@ export default function VerifyPage() {
   }
 
   async function handlePdfUpload(file) {
-    setUploadingPdf(true); setPdfInfo(null);
+    setUploadingPdf(true); setPdfInfo(null); setIsScannedPdf(false);
     try {
       const formData = new FormData(); formData.append('pdf', file);
       const res = await fetch(`${API_URL}/api/pdf`, { method: 'POST', body: formData });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'PDF upload failed');
+      if (!res.ok) {
+        if (data.error?.includes('scanned image')) {
+          setIsScannedPdf(true);
+          setPdfInfo({ file }); // Store file for deep scan
+        }
+        throw new Error(data.error || 'PDF upload failed');
+      }
       setText(data.text); setPdfInfo(data); setInputMode('text');
-    } catch (e) { alert('PDF Error: ' + e.message); }
+    } catch (e) { 
+      if (!isScannedPdf) alert('PDF Error: ' + e.message); 
+    }
     finally { setUploadingPdf(false); }
+  }
+
+  async function handleDeepScan() {
+    if (!pdfInfo?.file) return;
+    setUploadingPdf(true);
+    try {
+      const file = pdfInfo.file;
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfjsLib = window['pdfjs-dist/build/pdf'];
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+      
+      const loadingTask = pdfjsLib.getDocument(arrayBuffer);
+      const pdf = await loadingTask.promise;
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 2.0 });
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      await page.render({ canvasContext: context, viewport }).promise;
+      const base64Image = canvas.toDataURL('image/jpeg', 0.85);
+
+      const res = await axios.post(`${API_URL}/api/pdf/ocr`, { image: base64Image });
+      setText(res.data.text);
+      setPdfInfo({ filename: file.name });
+      setIsScannedPdf(false);
+    } catch (e) {
+      alert('Deep Scan failed: ' + e.message);
+    } finally {
+      setUploadingPdf(false);
+    }
   }
 
   function handleRun() {
@@ -712,7 +753,16 @@ export default function VerifyPage() {
                       <AnimatedLoadingBar active={uploadingPdf} indeterminate height={3} style={{ marginTop: 14, borderRadius: 6 }} />
                     </div>
                     <input id="pdf-input" type="file" accept="application/pdf" style={{ display: 'none' }} onChange={e => { const f = e.target.files[0]; if (f) handlePdfUpload(f); }} />
-                    {pdfInfo && <div style={{ marginTop: 8, padding: '8px 12px', background: 'rgba(74,222,128,0.06)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: 8, fontSize: 12, color: '#4ade80' }}>Loaded: {pdfInfo.filename}</div>}
+                    {pdfInfo?.filename && !isScannedPdf && <div style={{ marginTop: 8, padding: '8px 12px', background: 'rgba(74,222,128,0.06)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: 8, fontSize: 12, color: '#4ade80' }}>Loaded: {pdfInfo.filename}</div>}
+                    {isScannedPdf && (
+                      <div style={{ marginTop: 12, padding: '14px', background: 'rgba(201,169,110,0.05)', border: `1px solid ${T.accent}33`, borderRadius: 12, textAlign: 'center' }}>
+                        <p style={{ fontSize: 12, color: T.accent, marginBottom: 10, fontWeight: 500 }}>Scanned PDF detected. Traditional text extraction failed.</p>
+                        <button onClick={handleDeepScan} disabled={uploadingPdf}
+                          style={{ padding: '8px 16px', borderRadius: 8, background: T.accent, color: '#0a0a0f', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer', boxShadow: `0 4px 12px ${T.accent}4d` }}>
+                          {uploadingPdf ? 'Scanning...' : '🚀 Perform AI Deep Scan'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -804,7 +854,7 @@ export default function VerifyPage() {
                   {isLoading ? t('verifying', lang) : t('verifyNow', lang)}
                 </button>
                 <div style={{ textAlign: 'center', marginTop: 12, opacity: 0.3, fontSize: 8, letterSpacing: 1 }}>
-                  BUILD 2.0.8 — LATEST
+                  BUILD 2.1.0 — LATEST
                 </div>
               </div>
             </>

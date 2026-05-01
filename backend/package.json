@@ -22,7 +22,8 @@
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^2.7.0",
     "pdf-parse": "^2.4.5",
-    "pdfreader": "^3.0.8"
+    "pdfreader": "^3.0.8",
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.3"

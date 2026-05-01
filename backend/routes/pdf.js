@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const { PdfReader } = require("pdfreader");
+const Groq = require("groq-sdk");
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -67,6 +68,40 @@ router.post("/", upload.single("pdf"), async (req, res) => {
   } catch (err) {
     console.error("PDF error:", err.message);
     res.status(500).json({ error: "Failed to parse PDF: " + err.message });
+  }
+});
+
+router.post("/ocr", async (req, res) => {
+  const { image } = req.body;
+  if (!image) return res.status(400).json({ error: "Image data required" });
+
+  try {
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.2-11b-vision-preview",
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: "You are an expert OCR engine. Extract EVERY word and sentence from this document image. Return ONLY the raw text found. Do not add any commentary or labels.",
+            },
+            {
+              type: "image_url",
+              image_url: { url: image },
+            },
+          ],
+        },
+      ],
+      temperature: 0.1,
+    });
+
+    const text = completion.choices[0].message.content.trim();
+    res.json({ text });
+  } catch (err) {
+    console.error("Deep Scan OCR error:", err.message);
+    res.status(500).json({ error: "Deep Scan failed: " + err.message });
   }
 });
 
