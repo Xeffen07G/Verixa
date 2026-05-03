@@ -99,9 +99,9 @@ const demoClaims = [
 
 /* ─────────── Static Data ─────────── */
 const testimonials = [
-  { name: 'Aditya Seth', role: 'Software, Strategy and AI Initiative', textKey: 'test1Text', avatar: 'AS' },
-  { name: 'Arnab Basu', role: 'Academic Coordinator at Techno India University', textKey: 'test2Text', avatar: 'AB' },
-  { name: 'Arnab Saha', role: 'Senior Programme Coordinator at Techno India University', textKey: 'test3Text', avatar: 'AS' },
+  { name: 'Aditya Seth', role: 'Software, Strategy and AI Initiative', text: 'VeriXa has become indispensable to our compliance workflow. It catches misinformation before it reaches our clients with a precision I have never seen in any other tool.', avatar: 'AS' },
+  { name: 'Arnab Basu', role: 'Academic Coordinator at Techno India University', text: 'The claim extraction is extraordinary. What used to take my team three hours of manual fact-checking now takes VeriXa under two minutes. The source citations are impeccable.', avatar: 'AB' },
+  { name: 'Arnab Saha', role: 'Senior Programme Coordinator at Techno India University', text: 'We integrated VeriXa into our research pipeline. The confidence scoring system has become the gold standard for how we evaluate information quality across the firm.', avatar: 'AS' },
 ];
 
 const featuresList = [
@@ -674,7 +674,7 @@ export default function LandingPage() {
                   transition={{ duration: 0.5 }}
                 >
                   <p style={{ fontSize: 16, color: T.text2, lineHeight: 1.8, fontWeight: 300, fontStyle: 'italic', marginBottom: 28 }}>
-                    "{t(tItem.textKey, lang)}"
+                    "{tItem.text}"
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                     <div style={{
@@ -812,9 +812,9 @@ export default function LandingPage() {
             fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
             fontSize: 'clamp(38px, 5vw, 64px)', lineHeight: 1.1,
             color: T.text, maxWidth: 700, margin: '0 auto 20px',
-          }}>Start verifying facts<br />with confidence today.</h2>
+          }}>{t('ctaTitle', lang)}</h2>
           <p style={{ fontSize: 16, color: T.text2, maxWidth: 480, margin: '0 auto 40px', lineHeight: 1.7 }}>
-            Join thousands of journalists, researchers, and enterprises who trust VeriXa to surface truth from noise.
+            {t('ctaSubtitle', lang)}
           </p>
           <Link to="/verify">
             <motion.button
@@ -825,7 +825,7 @@ export default function LandingPage() {
                 background: `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none',
                 color: darkMode ? '#0a0a0f' : '#fff', letterSpacing: 0.5, cursor: 'pointer',
               }}
-            >Launch VeriXa Free</motion.button>
+            > {t('ctaBtn', lang)} </motion.button>
           </Link>
         </div>
       </Section>

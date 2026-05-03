@@ -12,7 +12,8 @@ const translations = {
     testimonialsLabel: 'Testimonials', trustedAccuracy: 'Trusted by those who demand accuracy.', pricingLabel: 'Tiered Access', scaleTruth: 'Scale with absolute truth.', starterPlan: 'Starter', proPlan: 'Professional', enterprisePlan: 'Enterprise', startFreeCTA: 'Start Free', soonCTA: 'Payments Beginning Soon',
     demo1: 'The Eiffel Tower is located in Berlin, Germany.', demo2: 'Water boils at 100°C at standard atmospheric pressure.', demo3: 'The Great Wall of China is visible from space with the naked eye.',
     step1Title: 'Submit', step1Desc: 'Paste text or a URL link.', step2Title: 'Extract', step2Desc: 'AI breaks text into facts.', step3Title: 'Verify', step3Desc: 'Agents gather live evidence.', step4Title: 'Report', step4Desc: 'Get your truth certificate.',
-    footerTagline: 'The source of truth in an age of uncertainty.', product: 'Product', company: 'Company', legal: 'Legal', about: 'About', careers: 'Careers', blog: 'Blog', privacy: 'Privacy Policy', terms: 'Terms of Service', security: 'Security', rights: 'All rights reserved.'
+    footerTagline: 'The source of truth in an age of uncertainty.', product: 'Product', company: 'Company', legal: 'Legal', about: 'About', careers: 'Careers', blog: 'Blog', privacy: 'Privacy Policy', terms: 'Terms of Service', security: 'Security', rights: 'All rights reserved.',
+    ctaTitle: 'Start verifying facts with confidence today.', ctaSubtitle: 'Join thousands of journalists, researchers, and enterprises who trust VeriXa to surface truth from noise.', ctaBtn: 'Launch VeriXa Free'
   },
   es: {
     navFeatures: 'Características', navHowItWorks: 'Cómo funciona', navPricing: 'Precios', navTestimonials: 'Testimonios', navDashboard: 'Dashboard', navExtension: 'Extensión', navTrending: 'Tendencias', signIn: 'Iniciar sesión', logout: 'Cerrar sesión', hi: 'Hola', user: 'Usuario', identityAccess: 'ACCESO_IDENTIDAD', tools: 'Herramientas', textVerify: 'Verificar Texto', account: 'Cuenta', signUp: 'Registrarse', myAccount: 'Mi Cuenta',
@@ -21,7 +22,8 @@ const translations = {
     testimonialsLabel: 'Testimonios', trustedAccuracy: 'Confiado por quienes exigen precisión.', pricingLabel: 'Acceso por niveles', scaleTruth: 'Escala con la verdad absoluta.', starterPlan: 'Starter', proPlan: 'Professional', enterprisePlan: 'Enterprise', startFreeCTA: 'Empezar gratis', soonCTA: 'Pagos próximamente',
     demo1: 'La Torre Eiffel se encuentra en Berlín, Alemania.', demo2: 'El agua hierve a 100°C a presión atmosférica estándar.', demo3: 'La Gran Muralla China es visible desde el espacio a simple vista.',
     step1Title: 'Enviar', step1Desc: 'Pega texto o un enlace URL.', step2Title: 'Extraer', step2Desc: 'IA descompone el texto en hechos.', step3Title: 'Verificar', step3Desc: 'Agentes reúnen evidencia en vivo.', step4Title: 'Reporte', step4Desc: 'Obtén tu certificado de verdad.',
-    footerTagline: 'La fuente de la verdad en una era de incertidumbre.', product: 'Producto', company: 'Compañía', legal: 'Legal', about: 'Sobre nosotros', careers: 'Carreras', blog: 'Blog', privacy: 'Política de privacidad', terms: 'Términos de servicio', security: 'Seguridad', rights: 'Todos los derechos reservados.'
+    footerTagline: 'La fuente de la verdad en una era de incertidumbre.', product: 'Producto', company: 'Compañía', legal: 'Legal', about: 'Sobre nosotros', careers: 'Carreras', blog: 'Blog', privacy: 'Política de privacidad', terms: 'Términos de servicio', security: 'Seguridad', rights: 'Todos los derechos reservados.',
+    ctaTitle: 'Comienza a verificar hechos con confianza hoy.', ctaSubtitle: 'Únete a miles de periodistas, investigadores y empresas que confían en VeriXa para extraer la verdad del ruido.', ctaBtn: 'Iniciar VeriXa Gratis'
   },
   fr: {
     navFeatures: 'Fonctionnalités', navHowItWorks: 'Comment ça marche', navPricing: 'Tarifs', navTestimonials: 'Témoignages', navDashboard: 'Tableau de bord', navExtension: 'Extension', navTrending: 'Tendances', signIn: 'Se connecter', logout: 'Déconnexion', hi: 'Salut', user: 'Utilisateur', identityAccess: 'ACCÈS_IDENTITÉ', tools: 'Outils', textVerify: 'Vérifier le texte', account: 'Compte', signUp: 'S\'inscrire', myAccount: 'Mon Compte',
@@ -30,7 +32,8 @@ const translations = {
     testimonialsLabel: 'Témoignages', trustedAccuracy: 'Approuvé par ceux qui exigent de la précision.', pricingLabel: 'Accès par paliers', scaleTruth: 'Évoluez avec la vérité absolue.', starterPlan: 'Starter', proPlan: 'Professionnel', enterprisePlan: 'Entreprise', startFreeCTA: 'Commencer gratuitement', soonCTA: 'Paiements bientôt disponibles',
     demo1: 'La tour Eiffel est située à Berlin, en Allemagne.', demo2: 'L\'eau bout à 100°C à pression atmosphérique normale.', demo3: 'La Grande Muraille de Chine est visible depuis l\'espace à l\'œil nu.',
     step1Title: 'Soumettre', step1Desc: 'Collez du texte ou un lien URL.', step2Title: 'Extraire', step2Desc: 'L\'IA décompose le texte en faits.', step3Title: 'Vérifier', step3Desc: 'Des agents rassemblent des preuves en direct.', step4Title: 'Rapport', step4Desc: 'Obtenez votre certificat de vérité.',
-    footerTagline: 'La source de vérité dans une ère d\'incertitude.', product: 'Produit', company: 'Entreprise', legal: 'Légal', about: 'À propos', careers: 'Carrières', blog: 'Blog', privacy: 'Politique de confidentialité', terms: 'Conditions d\'utilisation', security: 'Sécurité', rights: 'Tous droits réservés.'
+    footerTagline: 'La source de vérité dans une ère d\'incertitude.', product: 'Produit', company: 'Entreprise', legal: 'Légal', about: 'À propos', careers: 'Carrières', blog: 'Blog', privacy: 'Politique de confidentialité', terms: 'Conditions d\'utilisation', security: 'Sécurité', rights: 'Tous droits réservés.',
+    ctaTitle: 'Commencez à vérifier les faits avec confiance dès aujourd\'hui.', ctaSubtitle: 'Rejoignez des milliers de journalistes, de chercheurs et d\'entreprises qui font confiance à VeriXa pour faire émerger la vérité du bruit.', ctaBtn: 'Lancer VeriXa Gratuitement'
   },
   de: {
     navFeatures: 'Funktionen', navHowItWorks: 'Wie es funktioniert', navPricing: 'Preise', navTestimonials: 'Referenzen', navDashboard: 'Dashboard', navExtension: 'Erweiterung', navTrending: 'Trends', signIn: 'Anmelden', logout: 'Abmelden', hi: 'Hallo', user: 'Benutzer', identityAccess: 'IDENTITÄTS_ZUGANG', tools: 'Werkzeuge', textVerify: 'Text prüfen', account: 'Konto', signUp: 'Registrieren', myAccount: 'Mein Konto',
@@ -39,7 +42,8 @@ const translations = {
     testimonialsLabel: 'Referenzen', trustedAccuracy: 'Vertraut von denen, die Genauigkeit fordern.', pricingLabel: 'Gestufter Zugang', scaleTruth: 'Mit absoluter Wahrheit skalieren.', starterPlan: 'Starter', proPlan: 'Professional', enterprisePlan: 'Enterprise', startFreeCTA: 'Kostenlos starten', soonCTA: 'Zahlungen bald möglich',
     demo1: 'Der Eiffelturm befindet sich in Berlin, Deutschland.', demo2: 'Wasser siedet bei 100°C bei normalem Luftdruck.', demo3: 'Die Chinesische Mauer ist vom Weltraum aus mit bloßem Auge sichtbar.',
     step1Title: 'Einreichen', step1Desc: 'Text oder URL-Link einfügen.', step2Title: 'Extrahieren', step2Desc: 'KI zerlegt Text in Fakten.', step3Title: 'Verifizieren', step3Desc: 'Agenten sammeln Live-Beweise.', step4Title: 'Bericht', step4Desc: 'Wahrheitszertifikat erhalten.',
-    footerTagline: 'Die Quelle der Wahrheit in einer Zeit der Ungewissheit.', product: 'Produkt', company: 'Unternehmen', legal: 'Rechtliches', about: 'Über uns', careers: 'Karriere', blog: 'Blog', privacy: 'Datenschutz', terms: 'Nutzungsbedingungen', security: 'Sicherheit', rights: 'Alle Rechte vorbehalten.'
+    footerTagline: 'Die Quelle der Wahrheit in einer Zeit der Ungewissheit.', product: 'Produkt', company: 'Unternehmen', legal: 'Rechtliches', about: 'Über uns', careers: 'Karriere', blog: 'Blog', privacy: 'Datenschutz', terms: 'Nutzungsbedingungen', security: 'Sicherheit', rights: 'Alle Rechte vorbehalten.',
+    ctaTitle: 'Beginnen Sie noch heute damit, Fakten mit Zuversicht zu prüfen.', ctaSubtitle: 'Schließen Sie sich Tausenden von Journalisten, Forschern und Unternehmen an, die VeriXa vertrauen, um die Wahrheit aus dem Lärm zu filtern.', ctaBtn: 'VeriXa kostenlos starten'
   },
   hi: {
     navFeatures: 'विशेषताएं', navHowItWorks: 'यह कैसे काम करता है', navPricing: 'मूल्य निर्धारण', navTestimonials: 'प्रशंसापत्र', navDashboard: 'डैशबोर्ड', navExtension: 'एक्सटेंशन', navTrending: 'ट्रेंडिंग', signIn: 'साइन इन करें', logout: 'लॉग आउट', hi: 'नमस्ते', user: 'उपयोगकर्ता', identityAccess: 'पहचान_पहुँच', tools: 'उपकरण', textVerify: 'टेक्स्ट सत्यापन', account: 'खाता', signUp: 'साइन अप करें', myAccount: 'मेरा खाता',
@@ -48,7 +52,8 @@ const translations = {
     testimonialsLabel: 'प्रशंसापत्र', trustedAccuracy: 'उन लोगों द्वारा विश्वसनीय जो सटीकता की मांग करते हैं।', pricingLabel: 'स्तरित पहुँच', scaleTruth: 'पूर्ण सत्य के साथ स्केल करें।', starterPlan: 'स्टार्टर', proPlan: 'प्रोफेशनल', enterprisePlan: 'एंटरप्राइज', startFreeCTA: 'मुफ्त शुरू करें', soonCTA: 'भुगतान जल्द ही शुरू होगा',
     demo1: 'एफिल टॉवर बर्लिन, जर्मनी में स्थित है।', demo2: 'पानी सामान्य वायुमंडलीय दबाव पर 100°C पर उबलता है।', demo3: 'चीन की महान दीवार अंतरिक्ष से नग्न आंखों से दिखाई देती है।',
     step1Title: 'जमा करें', step1Desc: 'टेक्स्ट या URL लिंक पेस्ट करें।', step2Title: 'निकालें', step2Desc: 'AI टेक्स्ट को तथ्यों में तोड़ता है।', step3Title: 'सत्यापित करें', step3Desc: 'एजेंट लाइव साक्ष्य इकट्ठा करते हैं।', step4Title: 'रिपोर्ट', step4Desc: 'अपना सत्य प्रमाण पत्र प्राप्त करें।',
-    footerTagline: 'अनिश्चितता के युग में सत्य का स्रोत।', product: 'उत्पाद', company: 'कंपनी', legal: 'कानूनी', about: 'के बारे में', careers: 'करियर', blog: 'ब्लॉग', privacy: 'गोपनीयता नीति', terms: 'सेवा की शर्तें', security: 'सुरक्षा', rights: 'सर्वाधिकार सुरक्षित।'
+    footerTagline: 'अनिश्चितता के युग में सत्य का स्रोत।', product: 'उत्पाद', company: 'कंपनी', legal: 'कानूनी', about: 'के बारे में', careers: 'करियर', blog: 'ब्लॉग', privacy: 'गोपनीयता नीति', terms: 'सेवा की शर्तें', security: 'सुरक्षा', rights: 'सर्वाधिकार सुरक्षित।',
+    ctaTitle: 'आज ही विश्वास के साथ तथ्यों की पुष्टि करना शुरू करें।', ctaSubtitle: 'उन हजारों पत्रकारों, शोधकर्ताओं और उद्यमों में शामिल हों जो शोर से सच्चाई को सतह पर लाने के लिए VeriXa पर भरोसा करते हैं।', ctaBtn: 'VeriXa मुफ्त में लॉन्च करें'
   },
   bn: {
     navFeatures: 'বৈশিষ্ট্য', navHowItWorks: 'কিভাবে এটি কাজ করে', navPricing: 'মূল্য নির্ধারণ', navTestimonials: 'প্রশংসাপত্র', navDashboard: 'ড্যাশবোর্ড', navExtension: 'এক্সটেনশন', navTrending: 'ট্রেন্ডিং', signIn: 'সাইন ইন', logout: 'লগ আউট', hi: 'হ্যালো', user: 'ব্যবহারকারী', identityAccess: 'পরিচয়_অ্যাক্সেস', tools: 'সরঞ্জাম', textVerify: 'টেক্সট যাচাই', account: 'অ্যাকাউন্ট', signUp: 'সাইন আপ', myAccount: 'আমার অ্যাকাউন্ট',
@@ -57,7 +62,8 @@ const translations = {
     testimonialsLabel: 'প্রশংসাপত্র', trustedAccuracy: 'যারা নির্ভুলতা চান তাদের দ্বারা বিশ্বস্ত।', pricingLabel: 'স্তরযুক্ত অ্যাক্সেস', scaleTruth: 'পরম সত্যের সাথে এগিয়ে যান।', starterPlan: 'স্টার্টার', proPlan: 'প্রফেশনাল', enterprisePlan: 'এন্টারপ্রাইজ', startFreeCTA: 'বিনামূল্যে শুরু করুন', soonCTA: 'পেমেন্ট শীঘ্রই শুরু হবে',
     demo1: 'আইফেল টাওয়ার জার্মানির বার্লিনে অবস্থিত।', demo2: 'স্বাভাবিক বায়ুমণ্ডলীয় চাপে জল ১০০° সেলসিয়াসে ফোটে।', demo3: 'চীনের মহাপ্রাচীর মহাকাশ থেকে খালি চোখে দেখা যায়।',
     step1Title: 'জমা দিন', step1Desc: 'টেক্সট বা URL লিঙ্ক পেস্ট করুন।', step2Title: 'বের করুন', step2Desc: 'AI টেক্সটকে তথ্যে বিভক্ত করে।', step3Title: 'যাচাই করুন', step3Desc: 'এজেন্টরা সরাসরি প্রমাণ সংগ্রহ করে।', step4Title: 'রিপোর্ট', step4Desc: 'আপনার সত্যের শংসাপত্র পান।',
-    footerTagline: 'অনিশ্চয়তার যুগে সত্যের উৎস।', product: 'পণ্য', company: 'কোম্পানি', legal: 'আইনি', about: 'সম্পর্কে', careers: 'ক্যারিয়ার', blog: 'ব্লগ', privacy: 'গোপনীয়তা নীতি', terms: 'পরিষেবার শর্তাবলী', security: 'নিরাপত্তা', rights: 'সর্বস্বত্ব সংরক্ষিত।'
+    footerTagline: 'অনিশ্চয়তার যুগে সত্যের উৎস।', product: 'পণ্য', company: 'কোম্পানি', legal: 'আইনি', about: 'সম্পর্কে', careers: 'ক্যারিয়ার', blog: 'ব্লগ', privacy: 'গোপনীয়তা নীতি', terms: 'পরিষেবার শর্তাবলী', security: 'নিরাপত্তা', rights: 'সর্বস্বত্ব সংরক্ষিত।',
+    ctaTitle: 'আজই আত্মবিশ্বাসের সাথে তথ্য যাচাই করা শুরু করুন।', ctaSubtitle: 'হাজার হাজার সাংবাদিক, গবেষক এবং উদ্যোগের সাথে যোগ দিন যারা বিভ্রান্তি থেকে সত্য খুঁজে পেতে VeriXa-এর ওপর আস্থা রাখেন।', ctaBtn: 'বিনামূল্যে VeriXa শুরু করুন'
   },
   it: {
     navFeatures: 'Caratteristiche', navHowItWorks: 'Come funziona', navPricing: 'Prezzi', navTestimonials: 'Testimonianze', navDashboard: 'Dashboard', navExtension: 'Estensione', navTrending: 'Tendenze', signIn: 'Accedi', logout: 'Esci', hi: 'Ciao', user: 'Utente', identityAccess: 'ACCESSO_IDENTITÀ', tools: 'Strumenti', textVerify: 'Verifica Testo', account: 'Account', signUp: 'Registrati', myAccount: 'Il mio Account',
@@ -66,7 +72,8 @@ const translations = {
     testimonialsLabel: 'Testimonianze', trustedAccuracy: 'Scelto da chi esige accuratezza.', pricingLabel: 'Accesso a livelli', scaleTruth: 'Scala con la verità assoluta.', starterPlan: 'Starter', proPlan: 'Professionale', enterprisePlan: 'Enterprise', startFreeCTA: 'Inizia gratis', soonCTA: 'Pagamenti a breve',
     demo1: 'La Torre Eiffel si trova a Berlino, in Germania.', demo2: 'L\'acqua bolle a 100°C alla pressione atmosferica standard.', demo3: 'La Grande Muraglia Cinese è visibile dallo spazio a occhio nudo.',
     step1Title: 'Invia', step1Desc: 'Incolla il testo o un link URL.', step2Title: 'Estrai', step2Desc: 'L\'IA scompone il testo in fatti.', step3Title: 'Verifica', step3Desc: 'Gli agenti raccolgono prove dal vivo.', step4Title: 'Rapporto', step4Desc: 'Ottieni il tuo certificato di verità.',
-    footerTagline: 'La fonte della verità in un\'era di incertezza.', product: 'Prodotto', company: 'Azienda', legal: 'Legale', about: 'Chi siamo', careers: 'Carriere', blog: 'Blog', privacy: 'Privacy', terms: 'Termini', security: 'Sicurezza', rights: 'Tutti i diritti riservati.'
+    footerTagline: 'La fonte della verità in un\'era di incertezza.', product: 'Prodotto', company: 'Azienda', legal: 'Legale', about: 'Chi siamo', careers: 'Carriere', blog: 'Blog', privacy: 'Privacy', terms: 'Termini', security: 'Sicurezza', rights: 'Tutti i diritti riservati.',
+    ctaTitle: 'Inizia oggi stesso a verificare i fatti con sicurezza.', ctaSubtitle: 'Unisciti a migliaia di giornalisti, ricercatori e aziende che si affidano a VeriXa per far emergere la verità dal rumore.', ctaBtn: 'Avvia VeriXa Gratis'
   },
   pt: {
     navFeatures: 'Funcionalidades', navHowItWorks: 'Como funciona', navPricing: 'Preços', navTestimonials: 'Depoimentos', navDashboard: 'Painel', navExtension: 'Extensão', navTrending: 'Tendências', signIn: 'Entrar', logout: 'Sair', hi: 'Olá', user: 'Usuário', identityAccess: 'ACESSO_IDENTIDADE', tools: 'Ferramentas', textVerify: 'Verificar Texto', account: 'Conta', signUp: 'Cadastrar', myAccount: 'Minha Conta',
@@ -75,7 +82,8 @@ const translations = {
     testimonialsLabel: 'Depoimentos', trustedAccuracy: 'Confiado por quem exige precisão.', pricingLabel: 'Acesso por níveis', scaleTruth: 'Escala com a verdade absoluta.', starterPlan: 'Starter', proPlan: 'Profissional', enterprisePlan: 'Enterprise', startFreeCTA: 'Começar Grátis', soonCTA: 'Pagamentos em breve',
     demo1: 'A Torre Eiffel está localizada em Berlim, Alemanha.', demo2: 'A água ferve a 100°C à pressão atmosférica padrão.', demo3: 'A Grande Muralha da China é visível do espaço a olho nu.',
     step1Title: 'Enviar', step1Desc: 'Cole o texto ou um link URL.', step2Title: 'Extrair', step2Desc: 'A IA divide o texto em factos.', step3Title: 'Verificar', step3Desc: 'Agentes recolhem provas ao vivo.', step4Title: 'Relatório', step4Desc: 'Obtenha o seu certificado da verdade.',
-    footerTagline: 'A fonte da verdade numa era de incerteza.', product: 'Produto', company: 'Empresa', legal: 'Jurídico', about: 'Sobre', careers: 'Carreiras', blog: 'Blog', privacy: 'Política de Privacidade', terms: 'Termos de Serviço', security: 'Segurança', rights: 'Todos os direitos reservados.'
+    footerTagline: 'A fonte da verdade numa era de incerteza.', product: 'Produto', company: 'Empresa', legal: 'Jurídico', about: 'Sobre', careers: 'Carreiras', blog: 'Blog', privacy: 'Política de Privacidade', terms: 'Termos de Serviço', security: 'Segurança', rights: 'Todos os direitos reservados.',
+    ctaTitle: 'Comece a verificar factos com confiança hoje.', ctaSubtitle: 'Junte-se a milhares de jornalistas, investigadores e empresas que confiam no VeriXa para extrair a verdade do ruído.', ctaBtn: 'Iniciar VeriXa Grátis'
   },
   ru: {
     navFeatures: 'Функции', navHowItWorks: 'Как это работает', navPricing: 'Цены', navTestimonials: 'Отзывы', navDashboard: 'Панель', navExtension: 'Расширение', navTrending: 'Тренды', signIn: 'Войти', logout: 'Выйти', hi: 'Привет', user: 'Пользователь', identityAccess: 'ИДЕНТИФИКАЦИЯ', tools: 'Инструменты', textVerify: 'Проверка текста', account: 'Аккаунт', signUp: 'Регистрация', myAccount: 'Мой аккаунт',
@@ -84,7 +92,8 @@ const translations = {
     testimonialsLabel: 'Отзывы', trustedAccuracy: 'Доверяют те, кто требует точности.', pricingLabel: 'Уровни доступа', scaleTruth: 'Масштабируйтесь с абсолютной истиной.', starterPlan: 'Стартовый', proPlan: 'Профессиональный', enterprisePlan: 'Корпоративный', startFreeCTA: 'Начать бесплатно', soonCTA: 'Платежи скоро начнутся',
     demo1: 'Эйфелева башня находится в Берлине, Германия.', demo2: 'Вода кипит при 100°C при нормальном атмосферном давлении.', demo3: 'Великую Китайскую стену видно из космоса невооруженным глазом.',
     step1Title: 'Отправить', step1Desc: 'Вставьте текст или ссылку на URL.', step2Title: 'Извлечь', step2Desc: 'ИИ разбивает текст на факты.', step3Title: 'Проверить', step3Desc: 'Агенты собирают живые доказательства.', step4Title: 'Отчет', step4Desc: 'Получите сертификат истины.',
-    footerTagline: 'Источник истины в эпоху неопределенности.', product: 'Продукт', company: 'Компания', legal: 'Юридическая информация', about: 'О нас', careers: 'Вакансии', blog: 'Блог', privacy: 'Политика конфиденциальности', terms: 'Условия использования', security: 'Безопасность', rights: 'Все права защищены.'
+    footerTagline: 'Источник истины в эпоху неопределенности.', product: 'Продукт', company: 'Компания', legal: 'Юридическая информация', about: 'О нас', careers: 'Вакансии', blog: 'Блог', privacy: 'Политика конфиденциальности', terms: 'Условия использования', security: 'Безопасность', rights: 'Все права защищены.',
+    ctaTitle: 'Начните проверять факты с уверенностью сегодня.', ctaSubtitle: 'Присоединяйтесь к тысячам журналистов, исследователей и компаний, которые доверяют VeriXa извлекать правду из шума.', ctaBtn: 'Запустить VeriXa бесплатно'
   },
   zh: {
     navFeatures: '功能', navHowItWorks: '运作原理', navPricing: '价格', navTestimonials: '客户见证', navDashboard: '仪表板', navExtension: '扩展程序', navTrending: '热门趋势', signIn: '登录', logout: '退出', hi: '您好', user: '用户', identityAccess: '身份访问', tools: '工具', textVerify: '文本验证', account: '账户', signUp: '注册', myAccount: '我的账户',
@@ -93,7 +102,8 @@ const translations = {
     testimonialsLabel: '客户见证', trustedAccuracy: '深受追求准确性的人士信赖。', pricingLabel: '分级访问', scaleTruth: '以绝对真理进行扩展。', starterPlan: '入门版', proPlan: '专业版', enterprisePlan: '企业版', startFreeCTA: '免费开始', soonCTA: '支付功能即将开启',
     demo1: '埃菲尔铁塔位于德国柏林。', demo2: '在标准大气压下，水的沸点为 100°C。', demo3: '肉眼可以从太空看到中国长城。',
     step1Title: '提交', step1Desc: '粘贴文本或 URL 链接。', step2Title: '提取', step2Desc: 'AI 将文本分解为事实。', step3Title: '验证', step3Desc: '代理收集实时证据。', step4Title: '报告', step4Desc: '获取您的真理证书。',
-    footerTagline: '不确定时代的事实源泉。', product: '产品', company: '公司', legal: '法律', about: '关于', careers: '职业', blog: '博客', privacy: '隐私政策', terms: '服务条款', security: '安全', rights: '版权所有。'
+    footerTagline: '不确定时代的事实源泉。', product: '产品', company: '公司', legal: '法律', about: '关于', careers: '职业', blog: '博客', privacy: '隐私政策', terms: '服务条款', security: '安全', rights: '版权所有。',
+    ctaTitle: '今天就开始满怀信心地验证事实。', ctaSubtitle: '加入成千上万名信赖 VeriXa 从噪音中发掘真相的记者、研究人员和企业。', ctaBtn: '免费启动 VeriXa'
   },
   ja: {
     navFeatures: '機能', navHowItWorks: '仕組み', navPricing: '料金', navTestimonials: 'お客様の声', navDashboard: 'ダッシュボード', navExtension: '拡張機能', navTrending: 'トレンド', signIn: 'サインイン', logout: 'ログアウト', hi: 'こんにちは', user: 'ユーザー', identityAccess: 'IDアクセス', tools: 'ツール', textVerify: 'テキスト検証', account: 'アカウント', signUp: '新規登録', myAccount: 'マイアカウント',
@@ -102,7 +112,8 @@ const translations = {
     testimonialsLabel: 'お客様の声', trustedAccuracy: '正確さを求める人々に信頼されています。', pricingLabel: '段階的アクセス', scaleTruth: '絶対的な真実でスケールアップ', starterPlan: 'スターター', proPlan: 'プロフェッショナル', enterprisePlan: 'エンタープライズ', startFreeCTA: '無料で開始', soonCTA: 'お支払いは近日開始予定',
     demo1: 'エッフェル塔はドイツのベルリンにあります。', demo2: '水は標準気圧で100℃で沸騰します。', demo3: '万里の長城は宇宙から肉眼で見ることができます。',
     step1Title: '送信', step1Desc: 'テキストまたはURLリンクを貼り付け。', step2Title: '抽出', step2Desc: 'AIがテキストを事実に分解。', step3Title: '検証', step3Desc: 'エージェントがライブ証拠を収集。', step4Title: 'レポート', step4Desc: '真実の証明書を取得。',
-    footerTagline: '不確実な時代における真実の情報源。', product: '製品', company: '企業', legal: '法務', about: '概要', careers: '採用', blog: 'ブログ', privacy: 'プライバシーポリシー', terms: '利用規約', security: 'セキュリティ', rights: 'All rights reserved.'
+    footerTagline: '不確実な時代における真実の情報源。', product: '製品', company: '企業', legal: '法務', about: '概要', careers: '採用', blog: 'ブログ', privacy: 'プライバシーポリシー', terms: '利用規約', security: 'セキュリティ', rights: 'All rights reserved.',
+    ctaTitle: '今日から自信を持って事実の検証を始めましょう。', ctaSubtitle: 'ノイズから真実を浮き彫りにするために VeriXa を信頼している何千人ものジャーナリスト、研究者、企業に加わりましょう。', ctaBtn: 'VeriXa を無料で起動'
   },
   tr: {
     navFeatures: 'Özellikler', navHowItWorks: 'Nasıl Çalışır', navPricing: 'Fiyatlandırma', navTestimonials: 'Referanslar', navDashboard: 'Panel', navExtension: 'Uzantı', navTrending: 'Trendler', signIn: 'Giriş Yap', logout: 'Çıkış Yap', hi: 'Merhaba', user: 'Kullanıcı', identityAccess: 'KİMLİK_ERİŞİMİ', tools: 'Araçlar', textVerify: 'Metin Doğrulama', account: 'Hesap', signUp: 'Kayıt Ol', myAccount: 'Hesabım',
@@ -111,7 +122,8 @@ const translations = {
     testimonialsLabel: 'Referanslar', trustedAccuracy: 'Doğruluk bekleyenler tarafından güvenilir.', pricingLabel: 'Kademeli Erişim', scaleTruth: 'Mutlak gerçekle ölçeklenin.', starterPlan: 'Başlangıç', proPlan: 'Profesyonel', enterprisePlan: 'Kurumsal', startFreeCTA: 'Ücretsiz Başla', soonCTA: 'Ödemeler Yakında Başlıyor',
     demo1: 'Eyfel Kulesi Almanya\'nın Berlin şehrinde bulunmaktadır.', demo2: 'Su, standart atmosfer basıncında 100°C\'de kaynar.', demo3: 'Çin Seddi uzaydan çıplak gözle görülebilir.',
     step1Title: 'Gönder', step1Desc: 'Metni veya bir URL bağlantısını yapıştırın.', step2Title: 'Ayıkla', step2Desc: 'Yapay zeka metni gerçeklere böler.', step3Title: 'Doğrula', step3Desc: 'Ajanlar canlı kanıt toplar.', step4Title: 'Rapor', step4Desc: 'Gerçeklik sertifikanızı alın.',
-    footerTagline: 'Belirsizlik çağında gerçeğin kaynağı.', product: 'Ürün', company: 'Şirket', legal: 'Yasal', about: 'Hakkında', careers: 'Kariyer', blog: 'Blog', privacy: 'Gizlilik Politikası', terms: 'Hizmet Şartları', security: 'Güvenlik', rights: 'Tüm hakları saklıdır.'
+    footerTagline: 'Belirsizlik çağında gerçeğin kaynağı.', product: 'Ürün', company: 'Şirket', legal: 'Yasal', about: 'Hakkında', careers: 'Kariyer', blog: 'Blog', privacy: 'Gizlilik Politikası', terms: 'Hizmet Şartları', security: 'Güvenlik', rights: 'Tüm hakları saklıdır.',
+    ctaTitle: 'Bugün gerçekleri güvenle doğrulamaya başlayın.', ctaSubtitle: 'Gürültüden gerçeği ortaya çıkarmak için VeriXa\'ya güvenen binlerce gazeteci, araştırmacı ve kuruluşa katılın.', ctaBtn: 'VeriXa\'yı Ücretsiz Başlat'
   },
   id: {
     navFeatures: 'Fitur', navHowItWorks: 'Cara Kerja', navPricing: 'Harga', navTestimonials: 'Testimoni', navDashboard: 'Dasbor', navExtension: 'Ekstensi', navTrending: 'Tren', signIn: 'Masuk', logout: 'Keluar', hi: 'Halo', user: 'Pengguna', identityAccess: 'AKSES_IDENTITAS', tools: 'Alat', textVerify: 'Verifikasi Teks', account: 'Akun', signUp: 'Daftar', myAccount: 'Akun Saya',
@@ -120,7 +132,8 @@ const translations = {
     testimonialsLabel: 'Testimoni', trustedAccuracy: 'Dipercayai oleh mereka yang menuntut akurasi.', pricingLabel: 'Akses Bertingkat', scaleTruth: 'Skala dengan kebenaran mutlak.', starterPlan: 'Starter', proPlan: 'Profesional', enterprisePlan: 'Enterprise', startFreeCTA: 'Mulai Gratis', soonCTA: 'Pembayaran Segera Dimulai',
     demo1: 'Menara Eiffel terletak di Berlin, Jerman.', demo2: 'Air mendidih pada 100°C pada tekanan atmosfer standar.', demo3: 'Tembok Besar Cina terlihat dari luar angkasa dengan mata telanjang.',
     step1Title: 'Kirim', step1Desc: 'Tempel teks atau tautan URL.', step2Title: 'Ekstrak', step2Desc: 'AI memecah teks menjadi fakta.', step3Title: 'Verifikasi', step3Desc: 'Agen mengumpulkan bukti langsung.', step4Title: 'Laporan', step4Desc: 'Dapatkan sertifikat kebenaran Anda.',
-    footerTagline: 'Sumber kebenaran di era ketidakpastian.', product: 'Produk', company: 'Perusahaan', legal: 'Legal', about: 'Tentang', careers: 'Karir', blog: 'Blog', privacy: 'Kebijakan Privasi', terms: 'Ketentuan Layanan', security: 'Keamanan', rights: 'Seluruh hak cipta dilindungi undang-undang.'
+    footerTagline: 'Sumber kebenaran di era ketidakpastian.', product: 'Produk', company: 'Perusahaan', legal: 'Legal', about: 'Tentang', careers: 'Karir', blog: 'Blog', privacy: 'Kebijakan Privasi', terms: 'Ketentuan Layanan', security: 'Keamanan', rights: 'Seluruh hak cipta dilindungi undang-undang.',
+    ctaTitle: 'Mulai verifikasi fakta dengan percaya diri hari ini.', ctaSubtitle: 'Bergabunglah dengan ribuan jurnalis, peneliti, dan perusahaan yang mempercayai VeriXa untuk memunculkan kebenaran dari kebisingan.', ctaBtn: 'Luncurkan VeriXa Gratis'
   }
 };
 
