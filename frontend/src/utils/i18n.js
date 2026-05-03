@@ -18,11 +18,16 @@ export const translations = {
     expertTitle: 'Senior Verification Specialist', globalNetwork: 'Global Intelligence Network', profileUpdated: 'Profile Updated Successfully', headOfOrg: 'HEAD OF ORGANIZATION', verifiedEmployee: 'VERIFIED EMPLOYEE', audits: 'TOTAL AUDITS', accuracy: 'AVG ACCURACY', professionalBio: 'PROFESSIONAL BIO', bioPlaceholder: 'Write your professional background...', noBio: 'No professional bio provided yet.', emailLabel: 'PRIMARY EMAIL', orgLabel: 'ORGANIZATION', officeLabel: 'LOCATION / OFFICE', accessTier: 'ACCESS TIER', enterpriseTier: 'Enterprise Node', standardNode: 'Standard Node', notSet: 'Not Set', secureLabel: 'SECURE', saving: 'Saving...', saveProfile: 'Save Changes', cancel: 'Cancel', editProfile: 'Edit Professional Profile',
     verifyNow: 'Verify Now', imageVerify: 'Image Verification',
     input: 'Input', history: 'History', newAudit: 'New Audit', text: 'Text', url: 'URL', pdf: 'PDF',
+    inputSubtitle: 'Submit content for deep-trace verification.', enterText: 'Enter text to verify...',
+    pasteUrl: 'Paste a news or article URL...', fetchUrl: 'Fetch Content', dragDropFiles: 'Drag & Drop files to verify',
+    startVerification: 'Start Verification', readyToVerify: 'Ready to Verify', readyDesc: 'Submit text, a URL, or a file to begin the AI-powered integrity audit.',
+    accuracyReport: 'ACCURACY REPORT', trueLabel: 'ACCURATE', falseLabel: 'FALSE', partialLabel: 'PARTIAL', unclearLabel: 'UNCLEAR',
+    mostlyAccurate: 'Mostly Accurate', mixedAccuracy: 'Mixed Accuracy', mostlyInaccurate: 'Mostly Inaccurate', unverifiable: 'Unverifiable',
     clickDragPdf: 'Click or drag PDF here', extractingPdf: 'Extracting text from PDF...', max10mb: 'Max 10MB',
     loaded: 'Loaded', scannedPdfDetected: 'Scanned PDF detected. Traditional text extraction failed.',
     performDeepScan: 'Perform AI Deep Scan', fetching: 'Fetching...', fetch: 'Fetch', stop: 'Stop', goVoice: 'Go Voice',
     scanning: 'Scanning...',
-    // Extension
+    generated: 'Generated on', claimsAnalyzed: 'claims analyzed', evidenceSources: 'Evidence Sources', highlyAccurate: 'Highly Accurate',
     rightClickVerify: 'Right-click to verify', rightClickDesc: 'Verify any claim instantly via context menu.',
     instantResults: 'Instant results', instantResultsDesc: 'Get accuracy reports without leaving the page.',
     worksEverywhere: 'Works everywhere', worksEverywhereDesc: 'Supported on news sites, social media, and more.',
@@ -37,7 +42,6 @@ export const translations = {
     everythingYouNeed: 'Everything you need to browse with truth.', setup: 'SETUP', installIn60: 'Install in under 60 seconds.',
     extensionDirHint: 'The extension is located in the', directory: 'directory of this project.',
     verifyWithVerixa: 'Verify with VeriXa',
-    // Image
     imageIntel: 'IMAGE INTELLIGENCE', isImage: 'Is this image', imageDesc: 'Our AI analyzes pixel artifacts, metadata, and consistency to detect deepfakes and AI-generated media.',
     imageUrl: 'Image URL', uploadImage: 'Upload Image', analyze: 'Analyze', analyzing: 'Analyzing...', clickDragImage: 'Click or drag image here',
     analyzingWithAI: 'Analyzing with VeriXa AI...', checkingArtifacts: 'Checking pixel artifacts and neural patterns...',
@@ -46,13 +50,11 @@ export const translations = {
     analyzeAnother: 'Analyze Another Image', trySamples: 'TRY SAMPLES', sampleRealPortrait: 'Real Portrait', sampleRealLandscape: 'Real Landscape', sampleRealStreet: 'Real Street Photography',
     aiGenerated: 'AI Generated', likelyAI: 'Likely AI Generated', uncertain: 'Uncertain', likelyReal: 'Likely Real', real: 'Real',
     highRisk: 'High', mediumRisk: 'Medium', lowRisk: 'Low',
-    // Auth
     welcomeBack: 'Welcome Back', accessSuite: 'Access the VeriXa intelligence suite.', workEmail: 'Work Email', password: 'Password', authenticating: 'Authenticating...',
     newToVerixa: 'New to VeriXa?', createAccount: 'Create Account', loginFailed: 'Login failed', unexpectedError: 'An unexpected error occurred.',
     joinNetwork: 'Join the Network', establishIdentity: 'Establish your professional identity.', fullName: 'Full Name', organization: 'Organization', confirmPassword: 'Confirm Password',
     passwordsDoNotMatch: 'Passwords do not match', passwordMinLength: 'Password must be at least 6 characters', signupFailed: 'Signup failed', unexpectedErrorTryAgain: 'An unexpected error occurred. Please try again.',
     establishingIdentity: 'Establishing Identity...', joinVerixa: 'Join VeriXa', alreadyRegistered: 'Already registered?',
-    // Trending
     liveLeaderboard: 'LIVE LEADERBOARD', trendingTitlePart1: 'The pulse of', trendingTitlePart2: 'misinformation.', trendingSubtitle: 'Real-time tracking of the most viral unverified claims across the digital landscape.',
     totalTracked: 'TOTAL TRACKED', autoRefresh: 'AUTO REFRESH', lastChecked: 'LAST CHECKED', justNow: 'just now', ago: 'ago', timesChecked: 'times checked',
     share: 'Share', copy: 'Copy', copied: 'Copied'
@@ -81,7 +83,7 @@ export const translations = {
     testimonialsLabel: 'Témoignages', trustedAccuracy: 'Approuvé par ceux qui exigent de la précision.', pricingLabel: 'Accès par paliers', scaleTruth: 'Évoluez avec la vérité absolue.', starterPlan: 'Starter', proPlan: 'Professionnel', enterprisePlan: 'Entreprise', startFreeCTA: 'Commencer gratuitement', soonCTA: 'Paiements bientôt disponibles',
     demo1: 'La tour Eiffel est située à Berlin, en Allemagne.', demo2: 'L\'eau bout à 100°C à pression atmosphérique normale.', demo3: 'La Grande Muraille de Chine est visible depuis l\'espace à l\'œil nu.',
     step1Title: 'Soumettre', step1Desc: 'Collez du texte ou un lien URL.', step2Title: 'Extraire', step2Desc: 'L\'IA décompose le texte en faits.', step3Title: 'Vérifier', step3Desc: 'Des agents rassemblent des preuves en direct.', step4Title: 'Rapport', step4Desc: 'Obtenez votre certificat de vérité.',
-    footerTagline: 'La source de vérité dans une ère d\'incertitude.', product: 'Produit', company: 'Entreprise', legal: 'Légal', about: 'À propos', careers: 'Carrières', blog: 'Blog', privacy: 'Politique de confidentialité', terms: 'Conditions d\'utilisation', security: 'Sécurité', rights: 'Tous droits réservés.',
+    footerTagline: 'La source de vérité dans une ére d\'incertitude.', product: 'Produit', company: 'Entreprise', legal: 'Légal', about: 'À propos', careers: 'Carrières', blog: 'Blog', privacy: 'Politique de confidentialité', terms: 'Conditions d\'utilisation', security: 'Sécurité', rights: 'Tous droits réservés.',
     ctaTitle: 'Commencez à vérifier les faits avec confiance dès aujourd\'hui.', ctaSubtitle: 'Rejoignez des milliers de journalistes, de chercheurs et d\'entreprises qui font confiance à VeriXa pour faire émerger la vérité du bruit.', ctaBtn: 'Lancer VeriXa Gratuitement',
     starterDesc: 'Pour les particuliers explorant la vérification intelligente.', proDesc: 'Pour les journalistes, analystes et chercheurs sérieux.', entDesc: 'Pour les organisations nécessitant une intégration complète.',
     forever: 'toujours', perMonth: 'par mois', contactUs: 'contactez-nous', custom: 'Personnalisé',
@@ -129,7 +131,6 @@ export const translations = {
     loaded: 'लोड हो गया', scannedPdfDetected: 'स्कैन किया हुआ पीडीएफ मिला। सामान्य टेक्स्ट निष्कर्षण विफल रहा।',
     performDeepScan: 'एआई डीप स्कैन करें', fetching: 'प्राप्त किया जा रहा है...', fetch: 'प्राप्त करें', stop: 'रुकें', goVoice: 'वॉइस शुरू करें',
     scanning: 'स्कैनिंग...',
-    // Extension
     rightClickVerify: 'सत्यापित करने के लिए राइट-क्लिक करें', rightClickDesc: 'संदर्भ मेनू के माध्यम से तुरंत किसी भी दावे को सत्यापित करें।',
     instantResults: 'त्वरित परिणाम', instantResultsDesc: 'पेज छोड़े बिना सटीकता रिपोर्ट प्राप्त करें।',
     worksEverywhere: 'हर जगह काम करता है', worksEverywhereDesc: 'समाचार साइटों, सोशल मीडिया और अन्य पर समर्थित।',
@@ -144,7 +145,6 @@ export const translations = {
     everythingYouNeed: 'सत्य के साथ ब्राउज़ करने के लिए वह सब कुछ जो आपको चाहिए।', setup: 'सेटअप', installIn60: '60 सेकंड से कम में इंस्टॉल करें।',
     extensionDirHint: 'एक्सटेंशन इस प्रोजेक्ट की', directory: 'डायरेक्टरी में स्थित है।',
     verifyWithVerixa: 'VeriXa के साथ सत्यापित करें',
-    // Image
     imageIntel: 'इमेज इंटेलिजेंस', isImage: 'क्या यह इमेज', imageDesc: 'हमारा एआई डीपफेक और एआई-जनरेटेड मीडिया का पता लगाने के लिए पिक्सेल आर्टिफैक्ट्स, मेटाडेटा और निरंतरता का विश्लेषण करता है।',
     imageUrl: 'इमेज यूआरएल', uploadImage: 'इमेज अपलोड करें', analyze: 'विश्लेषण करें', analyzing: 'विश्लेषण किया जा रहा है...', clickDragImage: 'इमेज यहां क्लिक करें या ड्रैग करें',
     analyzingWithAI: 'VeriXa AI के साथ विश्लेषण किया जा रहा है...', checkingArtifacts: 'पिक्सेल आर्टिफैक्ट्स और न्यूरल पैटर्न की जाँच की जा रही है...',
@@ -153,13 +153,11 @@ export const translations = {
     analyzeAnother: 'दूसरी इमेज का विश्लेषण करें', trySamples: 'नमूने आज़माएँ', sampleRealPortrait: 'वास्तविक पोर्ट्रेट', sampleRealLandscape: 'वास्तविक लैंडस्केप', sampleRealStreet: 'वास्तविक स्ट्रीट फोटोग्राफी',
     aiGenerated: 'एआई जनरेटेड', likelyAI: 'संभावित एआई जनरेटेड', uncertain: 'अनिश्चित', likelyReal: 'संभावित वास्तविक', real: 'वास्तविक',
     highRisk: 'उच्च', mediumRisk: 'मध्यम', lowRisk: 'कम',
-    // Auth
     welcomeBack: 'स्वागत है', accessSuite: 'VeriXa इंटेलिजेंस सूट तक पहुँचें।', workEmail: 'कार्य ईमेल', password: 'पासवर्ड', authenticating: 'प्रमाणित किया जा रहा है...',
     newToVerixa: 'VeriXa में नए हैं?', createAccount: 'खाता बनाएँ', loginFailed: 'लॉगिन विफल रहा', unexpectedError: 'एक अप्रत्याशित त्रुटि हुई।',
     joinNetwork: 'नेटवर्क में शामिल हों', establishIdentity: 'अपनी पेशेवर पहचान स्थापित करें।', fullName: 'पूरा नाम', organization: 'संगठन', confirmPassword: 'पासवर्ड की पुष्टि करें',
     passwordsDoNotMatch: 'पासवर्ड मेल नहीं खाते', passwordMinLength: 'पासवर्ड कम से कम 6 अक्षरों का होना चाहिए', signupFailed: 'साइनअप विफल रहा', unexpectedErrorTryAgain: 'एक अप्रत्याशित त्रुटि हुई। कृपया पुन: प्रयास करें।',
     establishingIdentity: 'पहचान स्थापित की जा रही है...', joinVerixa: 'VeriXa से जुड़ें', alreadyRegistered: 'पहले से पंजीकृत हैं?',
-    // Trending
     liveLeaderboard: 'लाइव लीडरबोर्ड', trendingTitlePart1: 'की नब्ज', trendingTitlePart2: 'गलत सूचना।', trendingSubtitle: 'डिजिटल परिदृश्य में सबसे अधिक वायरल असत्यापित दावों की रीयल-टाइम ट्रैकिंग।',
     totalTracked: 'कुल ट्रैक किया गया', autoRefresh: 'ऑटो रिफ्रेश', lastChecked: 'पिछली जाँच', justNow: 'अभी', ago: 'पहले', timesChecked: 'बार जाँच की गई',
     share: 'साझा करें', copy: 'कॉपी करें', copied: 'कॉपी किया गया'
@@ -181,11 +179,16 @@ export const translations = {
     expertTitle: 'সিনিয়র ভেরিফিকেশন স্পেশালিস্ট', globalNetwork: 'গ্লোবাল ইন্টেলিজেন্স নেটওয়ার্ক', profileUpdated: 'প্রোফাইল সফলভাবে আপডেট হয়েছে', headOfOrg: 'সংস্থার প্রধান', verifiedEmployee: 'ভেরিফাইড এমপ্লয়ী', audits: 'মোট অডিট', accuracy: 'গড় নির্ভুলতা', professionalBio: 'পেশাদার পরিচিতি', bioPlaceholder: 'আপনার পেশাদার পরিচয় লিখুন...', noBio: 'এখনও কোনো পেশাদার পরিচিতি দেওয়া হয়নি।', emailLabel: 'প্রাথমিক ইমেল', orgLabel: 'সংস্থা', officeLabel: 'অবস্থান / অফিস', accessTier: 'অ্যাক্সেস টিয়ার', enterpriseTier: 'এন্টারপ্রাইজ নোড', standardNode: 'স্ট্যান্ডার্ড নোড', notSet: 'সেট করা হয়নি', secureLabel: 'সুরক্ষিত', saving: 'সেভ হচ্ছে...', saveProfile: 'পরিবর্তন সেভ করুন', cancel: 'বাতিল করুন', editProfile: 'পেশাদার প্রোফাইল সম্পাদনা করুন',
     verifyNow: 'এখনই যাচাই করুন', imageVerify: 'ছবি যাচাইকরণ',
     input: 'ইনপুট', history: 'ইতিহাস', newAudit: 'নতুন অডিট', text: 'টেক্সট', url: 'ইউআরএল', pdf: 'পিডিএফ',
+    inputSubtitle: 'যাচাইয়ের জন্য কন্টেন্ট জমা দিন।', enterText: 'যাচাই করার জন্য টেক্সট লিখুন...',
+    pasteUrl: 'নিউজ বা আর্টিকেলের ইউআরএল পেস্ট করুন...', fetchUrl: 'কন্টেন্ট ফেচ করুন', dragDropFiles: 'যাচাই করতে ফাইল ড্র্যাগ করুন',
+    startVerification: 'যাচাই শুরু করুন', readyToVerify: 'যাচাই করার জন্য প্রস্তুত', readyDesc: 'এআই-চালিত অডিট শুরু করতে টেক্সট, ইউআরএল বা ফাইল জমা দিন।',
+    accuracyReport: 'নির্ভুলতা রিপোর্ট', trueLabel: 'নির্ভুল', falseLabel: 'মিথ্যা', partialLabel: 'আংশিক', unclearLabel: 'অস্পষ্ট',
+    mostlyAccurate: 'বেশিরভাগ নির্ভুল', mixedAccuracy: 'মিশ্র নির্ভুলতা', mostlyInaccurate: 'বেশিরভাগ ভুল', unverifiable: 'যাচাই করা অসম্ভব',
     clickDragPdf: 'পিডিএফ এখানে ক্লিক করুন বা ড্র্যাগ করুন', extractingPdf: 'পিডিএফ থেকে টেক্সট এক্সট্রাক্ট করা হচ্ছে...', max10mb: 'সর্বোচ্চ ১০এমবি',
+    generated: 'তৈরি করা হয়েছে', claimsAnalyzed: 'টি দাবি যাচাই করা হয়েছে', evidenceSources: 'তথ্যের উৎস', highlyAccurate: 'অত্যন্ত নির্ভুল',
     loaded: 'লোড হয়েছে', scannedPdfDetected: 'স্ক্যান করা পিডিএফ সনাক্ত হয়েছে। সাধারণ টেক্সট এক্সট্রাকশন ব্যর্থ হয়েছে।',
     performDeepScan: 'এআই ডিপ স্ক্যান করুন', fetching: 'ফেচ করা হচ্ছে...', fetch: 'ফেচ', stop: 'বন্ধ করুন', goVoice: 'ভয়েস শুরু করুন',
     scanning: 'স্ক্যানিং...',
-    // Extension
     rightClickVerify: 'যাচাই করতে রাইট-ক্লিক করুন', rightClickDesc: 'কনটেক্সট মেনুর মাধ্যমে তাৎক্ষণিকভাবে যেকোনো দাবি যাচাই করুন।',
     instantResults: 'তাৎক্ষণিক ফলাফল', instantResultsDesc: 'পেজ না ছেড়েই নির্ভুলতা রিপোর্ট পান।',
     worksEverywhere: 'সব জায়গায় কাজ করে', worksEverywhereDesc: 'নিউজ সাইট, সোশ্যাল মিডিয়া এবং আরও অনেক কিছুতে সমর্থিত।',
@@ -196,11 +199,10 @@ export const translations = {
     openExtPage: 'এক্সটেনশন পেজ খুলুন', openExtPageDesc: 'আপনার ব্রাউজারে chrome://extensions-এ যান।',
     enableDevMode: 'ডেভেলপার মোড চালু করুন', enableDevModeDesc: 'উপরে ডানদিকে ডেভেলপার মোড টগল করুন।',
     loadUnpacked: 'লোড আনপ্যাকড', loadUnpackedDesc: 'VeriXa থেকে /extension ফোল্ডারটি নির্বাচন করুন।',
-    verifyWhile: 'ব্রাউজ করার সময় ওয়েব যাচাই করুন', browse: 'ব্রাউজ', extensionTagline: 'সত্য আপনার হাতের মুঠোয়। VeriXa এক্সটেনশন আপনার ভিজিট করা প্রতিটি পেজে এআই ফ্যাক্ট-চেকিংয়ের শক্তি নিয়ে আসে।',
+    verifyWhile: 'ব্রাউজ করার সময় ওয়েব যাচাই করুন', browse: 'ব্রাউজ', extensionTagline: 'সত্য আপনার হাতের মুঠোয়। VeriXa এক্সটেন্সন আপনার ভিজিট করা প্রতিটি পেজে এআই ফ্যাক্ট-চেকিংয়ের শক্তি নিয়ে আসে।',
     everythingYouNeed: 'সত্যের সাথে ব্রাউজ করার জন্য আপনার যা কিছু প্রয়োজন।', setup: 'সেটআপ', installIn60: '৬০ সেকেন্ডের কম সময়ে ইনস্টল করুন।',
-    extensionDirHint: 'এক্সটেনশনটি এই প্রজেক্টের', directory: 'ডিরেক্টরিতে অবস্থিত।',
+    extensionDirHint: 'এক্সটেন্সনটি এই প্রজেক্টের', directory: 'ডিরেক্টরিতে অবস্থিত।',
     verifyWithVerixa: 'VeriXa-এর সাথে যাচাই করুন',
-    // Image
     imageIntel: 'ইমেজ ইন্টেলিজেন্স', isImage: 'এই ছবিটি কি', imageDesc: 'আমাদের এআই ডিপফেক এবং এআই-জনারেটেড মিডিয়া সনাক্ত করতে পিক্সেল আর্টিফ্যাক্ট, মেটাডেটা এবং ধারাবাহিকতা বিশ্লেষণ করে।',
     imageUrl: 'ছবির ইউআরএল', uploadImage: 'ছবি আপলোড করুন', analyze: 'বিশ্লেষণ করুন', analyzing: 'বিশ্লেষণ করা হচ্ছে...', clickDragImage: 'ছবি এখানে ক্লিক করুন বা ড্র্যাগ করুন',
     analyzingWithAI: 'VeriXa AI-এর সাথে বিশ্লেষণ করা হচ্ছে...', checkingArtifacts: 'পিক্সেল আর্টিফ্যাক্ট এবং নিউরাল প্যাটার্ন পরীক্ষা করা হচ্ছে...',
@@ -209,13 +211,11 @@ export const translations = {
     analyzeAnother: 'অন্য ছবি বিশ্লেষণ করুন', trySamples: 'নমুনা দেখুন', sampleRealPortrait: 'বাস্তব পোর্ট্রেট', sampleRealLandscape: 'বাস্তব ল্যান্ডস্কেপ', sampleRealStreet: 'বাস্তব স্ট্রিট ফটোগ্রাফি',
     aiGenerated: 'এআই জেনারেটেড', likelyAI: 'সম্ভবত এআই জেনারেটেড', uncertain: 'অনিশ্চিত', likelyReal: 'সম্ভবত বাস্তব', real: 'বাস্তব',
     highRisk: 'উচ্চ', mediumRisk: 'মাঝারি', lowRisk: 'নিম্ন',
-    // Auth
     welcomeBack: 'স্বাগতম', accessSuite: 'VeriXa ইন্টেলিজেন্স স্যুট অ্যাক্সেস করুন।', workEmail: 'কাজের ইমেল', password: 'পাসওয়ার্ড', authenticating: 'প্রমাণীকরণ হচ্ছে...',
     newToVerixa: 'VeriXa-তে নতুন?', createAccount: 'অ্যাকাউন্ট তৈরি করুন', loginFailed: 'লগইন ব্যর্থ হয়েছে', unexpectedError: 'একটি অপ্রত্যাশিত ত্রুটি ঘটেছে।',
     joinNetwork: 'নেতওয়ার্কে যোগ দিন', establishIdentity: 'আপনার পেশাদার পরিচয় স্থাপন করুন।', fullName: 'পুরো নাম', organization: 'সংস্থা', confirmPassword: 'পাসওয়ার্ড নিশ্চিত করুন',
     passwordsDoNotMatch: 'পাসওয়ার্ড মিলছে না', passwordMinLength: 'পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে', signupFailed: 'সাইনআপ ব্যর্থ হয়েছে', unexpectedErrorTryAgain: 'একটি অপ্রত্যাশিত ত্রুটি ঘটেছে। দয়া করে আবার চেষ্টা করুন।',
     establishingIdentity: 'পরিচয় স্থাপন করা হচ্ছে...', joinVerixa: 'VeriXa-তে যোগ দিন', alreadyRegistered: 'আগে থেকেই নিবন্ধিত?',
-    // Trending
     liveLeaderboard: 'লাইভ লিডারবোর্ড', trendingTitlePart1: 'এর স্পন্দন', trendingTitlePart2: 'ভুল তথ্য।', trendingSubtitle: 'ডিজিটাল ল্যান্ডস্কেপ জুড়ে সবচেয়ে ভাইরাল যাচাই না করা দাবিগুলোর রিয়েল-টাইম ট্র্যাকিং।',
     totalTracked: 'মোট ট্র্যাক করা হয়েছে', autoRefresh: 'অটো রিফ্রেশ', lastChecked: 'শেষ পরীক্ষা', justNow: 'এইমাত্র', ago: 'আগে', timesChecked: 'বার যাচাই করা হয়েছে',
     share: 'শেয়ার', copy: 'কপি', copied: 'কপি করা হয়েছে'
@@ -234,11 +234,15 @@ export const translations = {
     plan1F1: '10 Verifiche / mese', plan1F2: 'Solo input di testo', plan1F3: 'Rapporto di precisione base', plan1F4: 'Supporto della comunità',
     plan2F1: '500 Verifiche / mese', plan2F2: 'URL + Input di testo', plan2F3: 'Rilevamento testo AI', plan2F4: 'Supporto prioritario', plan2F5: 'Esporta rapporti (PDF)', plan2F6: 'Punteggio di confidenza',
     plan3F1: 'Verifiche illimitate', plan3F2: 'Accesso API REST', plan3F3: 'SSO e account di squadra', plan3F4: 'Supporto dedicato', plan3F5: 'Garanzie SLA', plan3F6: 'Modelli personalizzati',
+    logBg: 'rgba(255,255,255,0.02)', emptyColor: 'rgba(245,243,239,0.5)',
+    cardBg: '#13131a', cardBorder: 'rgba(255,255,255,0.06)',
+    accent: '#c9a96e', accentMuted: 'rgba(201,169,110,0.12)',
+    generated: 'Generato il', claimsAnalyzed: 'affermazioni analizzate', evidenceSources: 'Fonti di prova', highlyAccurate: 'Altamente accurato'
   },
   pt: {
     navFeatures: 'Funcionalidades', navHowItWorks: 'Como funciona', navPricing: 'Preços', navTestimonials: 'Depoimentos', navDashboard: 'Painel', navExtension: 'Extensão', navTrending: 'Tendências', signIn: 'Entrar', logout: 'Sair', hi: 'Olá', user: 'Usuário', identityAccess: 'ACESSO_IDENTIDADE', tools: 'Ferramentas', textVerify: 'Verificar Texto', account: 'Conta', signUp: 'Cadastrar', myAccount: 'Minha Conta',
     landingBeta: 'AGORA EM BETA PÚBLICA', landingHero1: 'A verdade não é', landingHero2: 'negociável.', landingHeroSubtitle: 'VeriXa é o motor de verificação de factos por IA mais preciso do mundo. Extraia afirmações, recupere provas e gere relatórios de precisão fidedignos em segundos.', landingStartFree: 'Iniciar Verificação Gratuita', landingSeeHow: 'Veja como funciona', landingScroll: 'Rolar',
-    inputFormats: 'Formatos de entrada suportados', verdictTypes: 'Tipos de veredicto', aiModels: 'Modelos de IA', avgResponse: 'Tempo de resposta médio', livePreview: 'Visualização ao vivo', seeAction: 'Veja o VeriXa em ação.', poweredByLabel: 'Alimentado por infraestrutura de IA líder', capabilitiesLabel: 'Integridade de Engenharia', engineeredPrecision: 'Projetado para precisão absoluta.', eliminatingMisinfo: 'Eliminando a desinformação. À escala. Com rigor absoluto.', calibration: 'CALIBRACIÓN', latency: 'LATÊNCIA', integrity: 'INTEGRIDADE', urlAnalysis: 'Análise profunda de URL', deepScrapeDesc: 'Scraping avançado de sites de notícias e plataformas sociais.', conflictIntel: 'Inteligência de Conflito', conflictDesc: 'Deteção de pontos de vista conflituosos e disputas factuais.', howItWorksLabel: 'Inteligência Operacional', pathTruth: 'O caminho para a verdade absoluta.', surgicalExtraction: 'Extração cirúrgica', surgicalDesc: 'Recebemos conteúdo bruto com precisão zero de perda, isolando cada afirmação potencial.', evidenceRetrieval: 'Recuperação de evidências', evidenceDesc: 'O nosso motor cruza milhões de pontos de dados para descobrir factos ocultos.', integrityTest: 'Teste de stress de integridade', integrityDesc: 'Cada afirmação é validada contra fontes fidedignas, eliminando o ruído.', finalVerdict: 'O veredicto final', finalDesc: 'Recebe um relatório claro, baseado em evidências, que serve como fonte da verdade.',
+    inputFormats: 'Formatos de entrada suportados', verdictTypes: 'Tipos de veredicto', aiModels: 'Modelos de IA', avgResponse: 'Tempo de resposta médio', livePreview: 'Visualização ao vivo', seeAction: 'Veja o VeriXa em ação.', poweredByLabel: 'Alimentado por infraestrutura de IA líder', capabilitiesLabel: 'Integridade de Engenharia', engineeredPrecision: 'Projetado para precisão absoluta.', eliminatingMisinfo: 'Eliminando a desinformação. À escala. Com rigor absoluto.', calibration: 'CALIBRAÇÃO', latency: 'LATÊNCIA', integrity: 'INTEGRIDADE', urlAnalysis: 'Análise profunda de URL', deepScrapeDesc: 'Scraping avançado de sites de notícias e plataformas sociais.', conflictIntel: 'Inteligência de Conflito', conflictDesc: 'Deteção de pontos de vista conflituosos e disputas factuais.', howItWorksLabel: 'Inteligência Operacional', pathTruth: 'O caminho para a verdade absoluta.', surgicalExtraction: 'Extração cirúrgica', surgicalDesc: 'Recebemos conteúdo bruto com precisão zero de perda, isolando cada afirmação potencial.', evidenceRetrieval: 'Recuperação de evidências', evidenceDesc: 'O nosso motor cruza milhões de pontos de dados para descobrir factos ocultos.', integrityTest: 'Teste de stress de integridade', integrityDesc: 'Cada afirmação é validada contra fontes fidedignas, eliminando o ruído.', finalVerdict: 'O veredicto final', finalDesc: 'Recebe um relatório claro, baseado em evidências, que serve como fonte da verdade.',
     testimonialsLabel: 'Depoimentos', trustedAccuracy: 'Confiado por quem exige precisão.', pricingLabel: 'Acesso por níveis', scaleTruth: 'Escala com a verdade absoluta.', starterPlan: 'Starter', proPlan: 'Profissional', enterprisePlan: 'Enterprise', startFreeCTA: 'Começar Grátis', soonCTA: 'Pagamentos em breve',
     demo1: 'A Torre Eiffel está localizada em Berlim, Alemanha.', demo2: 'A água ferve a 100°C à pressão atmosférica padrão.', demo3: 'A Grande Muralha da China é visibile do espaço a olho nu.',
     step1Title: 'Enviar', step1Desc: 'Cole o texto ou um link URL.', step2Title: 'Extrair', step2Desc: 'A IA divide o texto em factos.', step3Title: 'Verificar', step3Desc: 'Agentes recolhem provas ao vivo.', step4Title: 'Relatório', step4Desc: 'Obtenha o seu certificado da verdade.',

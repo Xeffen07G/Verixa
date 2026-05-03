@@ -27,7 +27,7 @@ const DARK = {
   text: '#f5f3ef', text2: 'rgba(245,243,239,0.65)', text3: 'rgba(245,243,239,0.35)',
   topbar: 'rgba(10,10,15,0.95)', panelFooter: 'rgba(10,10,15,0.8)',
   inputBg: 'rgba(255,255,255,0.04)', inputBorder: 'rgba(255,255,255,0.1)',
-  logBg: 'rgba(255,255,255,0.02)', emptyColor: 'rgba(245,243,239,0.2)',
+  logBg: 'rgba(255,255,255,0.02)', emptyColor: 'rgba(245,243,239,0.55)',
   cardBg: '#13131a', cardBorder: 'rgba(255,255,255,0.06)',
   accent: '#c9a96e', accentMuted: 'rgba(201,169,110,0.12)',
 };
@@ -855,7 +855,7 @@ export default function VerifyPage() {
           {/* Empty state */}
           {!stage && claims.length === 0 && !error && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', gap: 20 }}>
-              <div style={{ width: 80, height: 80, borderRadius: '50%', background: T.accentMuted, border: `1px solid ${T.accent}1a`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, color: `${T.accent}4d` }}>◉</div>
+              <div style={{ width: 80, height: 80, borderRadius: '50%', background: T.accentMuted, border: `1px solid ${T.accent}1a`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, color: `${T.accent}4d`, animation: 'pulse-gold 2s infinite' }}>🛡️</div>
               <div style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 32, color: T.emptyColor, lineHeight: 1.2 }}>{t('readyToVerify', lang)}</div>
               <div style={{ fontSize: 14, color: T.text3, maxWidth: 340, lineHeight: 1.7 }}>{t('readyDesc', lang)}</div>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center', marginTop: 8 }}>
@@ -983,7 +983,7 @@ export default function VerifyPage() {
               <p style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: T.text3, marginBottom: 16, fontWeight: 600 }}>
                 {claims.length} Claims Analyzed
               </p>
-              {claims.map((c, i) => <ClaimCard key={i} claim={c} index={i} theme={T} />)}
+              {claims.map((c, i) => <ClaimCard key={i} claim={c} index={i} theme={T} lang={lang} />)}
             </div>
           )}
         </div>

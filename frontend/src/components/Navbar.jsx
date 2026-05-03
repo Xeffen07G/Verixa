@@ -74,6 +74,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
 
           {/* Right: Tools & Menu */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {children}
             
             {/* Tool Group (Always Visible) */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
