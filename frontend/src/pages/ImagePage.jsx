@@ -266,8 +266,8 @@ export default function ImagePage() {
           <div style={{ marginTop: 16, padding: 20, background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12 }}>
             <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12 }}>{t('trySamples', lang)}</p>
             {[
-              { label: '[AI Generated] Ultra-Realistic Portrait', url: 'https://images.unsplash.com/photo-1678047915570-5b584d41fa6f?w=600' },
-              { label: '[AI Generated] Cyberpunk Cityscape', url: 'https://images.unsplash.com/photo-1684369527928-874dbcd84439?w=600' },
+              { label: '[AI Generated] Ultra-Realistic Portrait', url: window.location.origin + '/samples/ai_portrait.png' },
+              { label: '[AI Generated] Cyberpunk Cityscape', url: window.location.origin + '/samples/ai_city.png' },
               { label: '[Real Photo] Professional Portrait', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600' },
               { label: '[Real Photo] Mountain Landscape', url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600' },
             ].map((s, i) => (
