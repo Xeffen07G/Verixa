@@ -11,8 +11,8 @@ function getGroq() {
   return _groq;
 }
 
-const SYSTEM_PROMPT = `You are VeriXa's image authenticity analysis engine.
-You analyze images to determine if they are AI-generated, manipulated, or authentic.
+const SYSTEM_PROMPT = `You are an elite Digital Forensics and Deepfake Analysis AI.
+Your sole purpose is to rigorously analyze images to determine if they are AI-generated, manipulated, or authentic.
 
 You MUST respond with ONLY valid JSON in this exact format:
 {
@@ -21,21 +21,17 @@ You MUST respond with ONLY valid JSON in this exact format:
   "real_probability": integer 0-100,
   "confidence": integer 0-100,
   "risk_level": "High" | "Medium" | "Low",
-  "assessment": "1-2 sentence assessment of the image",
-  "indicators": ["list", "of", "specific", "indicators", "found"],
-  "extracted_text": "string containing any text found in the image, or empty string if none"
+  "assessment": "Provide a comprehensive, multi-sentence forensic assessment explaining exactly why this is AI or Real. Be highly analytical.",
+  "indicators": ["List", "specific", "anomalies", "like '6 fingers on left hand', 'asymmetrical pupils', 'melting background textures'"],
+  "forensic_breakdown": {
+    "lighting_and_shadows": "Detail any inconsistencies in light physics, reflections, or shadow angles.",
+    "anatomy_and_geometry": "Detail structural anomalies (hands, eyes, facial symmetry, object geometry).",
+    "textures_and_artifacts": "Detail AI smoothing, noise patterns, blur, or synthetic textures."
+  },
+  "extracted_text": "string containing any text found, or empty"
 }
 
-Analyze carefully for:
-- Unnatural smoothness, warping, or artifacts typical of AI generation
-- Inconsistent lighting, shadows, or reflections
-- Anomalies in text, hands, fingers, teeth, or fine details
-- Background inconsistencies or blending artifacts
-- Overly perfect symmetry or composition
-- Signs of deepfake manipulation in faces
-- Metadata-level clues (if available)
-
-Be precise and calibrated. Do not default to uncertain — commit to a verdict based on evidence.`;
+Scrutinize the background, the physics of light, anatomical proportions, and the texture of surfaces. Do not default to uncertain — commit to a verdict based on evidence.`;
 
 /**
  * POST /api/image/url — Analyze an image from URL
@@ -47,8 +43,6 @@ router.post("/url", async (req, res) => {
   }
 
   try {
-    // Fetch the image server-side and convert to base64
-    // (Llama 4 Scout cannot fetch external URLs directly)
     const imgResponse = await fetch(imageUrl, {
       headers: { 'User-Agent': 'VeriXa-ImageAnalyzer/1.0' },
       timeout: 15000,
@@ -76,14 +70,14 @@ router.post("/url", async (req, res) => {
     const dataUrl = `data:${contentType};base64,${base64}`;
 
     const completion = await getGroq().chat.completions.create({
-      model: "meta-llama/llama-4-scout-17b-16e-instruct",
+      model: "llama-3.2-90b-vision-preview",
       messages: [
         {
           role: "user",
           content: [
             {
               type: "text",
-              text: `${SYSTEM_PROMPT}\n\nAnalyze this image for authenticity. Is it AI-generated, manipulated, or real? Respond with ONLY the JSON format specified.`,
+              text: `${SYSTEM_PROMPT}\n\nAnalyze this image for authenticity. Respond with ONLY the JSON format specified.`,
             },
             {
               type: "image_url",
@@ -101,7 +95,6 @@ router.post("/url", async (req, res) => {
     const cleaned = raw.replace(/```json|```/g, "").trim();
     const result = JSON.parse(cleaned);
 
-    // Ensure required fields
     result.ai_probability = result.ai_probability ?? 50;
     result.real_probability = result.real_probability ?? (100 - result.ai_probability);
     result.confidence = result.confidence ?? 60;
@@ -110,6 +103,7 @@ router.post("/url", async (req, res) => {
     result.assessment = result.assessment ?? "Analysis completed.";
     result.indicators = result.indicators ?? [];
     result.extracted_text = result.extracted_text ?? "";
+    result.forensic_breakdown = result.forensic_breakdown || null;
 
     res.json(result);
   } catch (err) {
@@ -143,20 +137,19 @@ router.post("/upload", async (req, res) => {
       return res.status(400).json({ error: "Image too large. Max 10MB." });
     }
 
-    // Determine mime type from content-type header or default
     const contentType = req.headers["content-type"] || "image/jpeg";
     const base64 = buffer.toString("base64");
     const dataUrl = `data:${contentType};base64,${base64}`;
 
     const completion = await getGroq().chat.completions.create({
-      model: "meta-llama/llama-4-scout-17b-16e-instruct",
+      model: "llama-3.2-90b-vision-preview",
       messages: [
         {
           role: "user",
           content: [
             {
               type: "text",
-              text: `${SYSTEM_PROMPT}\n\nAnalyze this image for authenticity. Is it AI-generated, manipulated, or real? Respond with ONLY the JSON format specified.`,
+              text: `${SYSTEM_PROMPT}\n\nAnalyze this image for authenticity. Respond with ONLY the JSON format specified.`,
             },
             {
               type: "image_url",
@@ -174,7 +167,6 @@ router.post("/upload", async (req, res) => {
     const cleaned = raw.replace(/```json|```/g, "").trim();
     const result = JSON.parse(cleaned);
 
-    // Ensure required fields
     result.ai_probability = result.ai_probability ?? 50;
     result.real_probability = result.real_probability ?? (100 - result.ai_probability);
     result.confidence = result.confidence ?? 60;
@@ -182,6 +174,7 @@ router.post("/upload", async (req, res) => {
     result.verdict = result.verdict ?? "Uncertain";
     result.assessment = result.assessment ?? "Analysis completed.";
     result.indicators = result.indicators ?? [];
+    result.forensic_breakdown = result.forensic_breakdown || null;
 
     res.json(result);
   } catch (err) {

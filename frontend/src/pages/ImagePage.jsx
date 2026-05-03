@@ -227,6 +227,22 @@ export default function ImagePage() {
               <p style={{ fontSize: 14, color: T.text, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 1, fontWeight: 500 }}>{result.assessment}</p>
             </div>
 
+            {result.forensic_breakdown && (
+              <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16, animation: 'fadeUp 0.5s ease' }}>
+                <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 16 }}>Detailed Forensic Breakdown</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {Object.entries(result.forensic_breakdown).map(([key, value]) => (
+                    <div key={key} style={{ padding: '16px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8, borderLeft: `3px solid ${T.accent}` }}>
+                      <p style={{ margin: '0 0 8px 0', fontSize: 12, textTransform: 'capitalize', fontWeight: 700, color: T.text, letterSpacing: 0.5 }}>
+                        {key.replace(/_/g, ' ')}
+                      </p>
+                      <p style={{ margin: 0, fontSize: 13, color: T.text2, lineHeight: 1.6 }}>{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {result.indicators?.length > 0 && (
               <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
                 <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 14 }}>{t('detectionIndicators', lang)}</p>
