@@ -19,10 +19,24 @@ export default function AccountPage() {
     name: user?.name || '',
     organization: user?.organization || '',
     profilePic: user?.profilePic || '',
-    title: user?.title || t('expertTitle', lang),
+    title: user?.title || '',
     bio: user?.bio || '',
-    location: user?.location || t('globalNetwork', lang)
+    location: user?.location || ''
   });
+
+  useEffect(() => {
+    if (user) {
+      setEditData(prev => ({
+        ...prev,
+        name: user.name || prev.name,
+        organization: user.organization || prev.organization,
+        profilePic: user.profilePic || prev.profilePic,
+        title: user.title || prev.title,
+        bio: user.bio || prev.bio,
+        location: user.location || prev.location
+      }));
+    }
+  }, [user]);
   const fileInputRef = useRef(null);
 
   const T = darkMode ? {
@@ -205,7 +219,7 @@ export default function AccountPage() {
                   <button onClick={handleSave} disabled={isSaving} style={{ flex: 2, padding: '14px', borderRadius: 14, background: T.accent, border: 'none', color: '#0a0a0f', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer' }}>
                     {isSaving ? t('saving', lang) : <><Save size={18} /> {t('saveProfile', lang)}</>}
                   </button>
-                  <button onClick={() => { setIsEditing(false); setEditData({ name: user?.name || '', organization: user?.organization || '', profilePic: user?.profilePic || '', title: user?.title || t('expertTitle', lang), bio: user?.bio || '', location: user?.location || t('globalNetwork', lang) }); }} style={{ flex: 1, padding: '14px', borderRadius: 14, background: 'rgba(255,255,255,0.05)', border: `1px solid ${T.border}`, color: T.text, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+                  <button onClick={() => { setIsEditing(false); setEditData({ name: user?.name || '', organization: user?.organization || '', profilePic: user?.profilePic || '', title: user?.title || '', bio: user?.bio || '', location: user?.location || '' }); }} style={{ flex: 1, padding: '14px', borderRadius: 14, background: 'rgba(255,255,255,0.05)', border: `1px solid ${T.border}`, color: T.text, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
                     {t('cancel', lang)}
                   </button>
                 </>

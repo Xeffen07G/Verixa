@@ -1,6 +1,11 @@
+import React, { useState, useEffect, useMemo } from 'react';
 import { TrendingUp, ShieldCheck, AlertCircle, Clock, Download, ChevronRight, Users, Activity, BarChart3, User, History } from 'lucide-react';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
+import { useAuth } from '../context/AuthContext';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 

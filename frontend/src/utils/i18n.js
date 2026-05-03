@@ -16,7 +16,12 @@ export const translations = {
     plan2F1: '500 Verifications / mo', plan2F2: 'URL + Text input', plan2F3: 'AI Text detection', plan2F4: 'Priority support', plan2F5: 'Export reports (PDF)', plan2F6: 'Confidence scoring',
     plan3F1: 'Unlimited Verifications', plan3F2: 'REST API Access', plan3F3: 'SSO & Team accounts', plan3F4: 'Dedicated support', plan3F5: 'SLA guarantees', plan3F6: 'Custom models',
     expertTitle: 'Senior Verification Specialist', globalNetwork: 'Global Intelligence Network', profileUpdated: 'Profile Updated Successfully', headOfOrg: 'HEAD OF ORGANIZATION', verifiedEmployee: 'VERIFIED EMPLOYEE', audits: 'TOTAL AUDITS', accuracy: 'AVG ACCURACY', professionalBio: 'PROFESSIONAL BIO', bioPlaceholder: 'Write your professional background...', noBio: 'No professional bio provided yet.', emailLabel: 'PRIMARY EMAIL', orgLabel: 'ORGANIZATION', officeLabel: 'LOCATION / OFFICE', accessTier: 'ACCESS TIER', enterpriseTier: 'Enterprise Node', standardNode: 'Standard Node', notSet: 'Not Set', secureLabel: 'SECURE', saving: 'Saving...', saveProfile: 'Save Changes', cancel: 'Cancel', editProfile: 'Edit Professional Profile',
-    verifyNow: 'Verify Now', imageVerify: 'Image Verification'
+    verifyNow: 'Verify Now', imageVerify: 'Image Verification',
+    input: 'Input', history: 'History', newAudit: 'New Audit', text: 'Text', url: 'URL', pdf: 'PDF',
+    clickDragPdf: 'Click or drag PDF here', extractingPdf: 'Extracting text from PDF...', max10mb: 'Max 10MB',
+    loaded: 'Loaded', scannedPdfDetected: 'Scanned PDF detected. Traditional text extraction failed.',
+    performDeepScan: 'Perform AI Deep Scan', fetching: 'Fetching...', fetch: 'Fetch', stop: 'Stop', goVoice: 'Go Voice',
+    scanning: 'Scanning...'
   },
   es: {
     navFeatures: 'Características', navHowItWorks: 'Cómo funciona', navPricing: 'Precios', navTestimonials: 'Testimonios', navDashboard: 'Dashboard', navExtension: 'Extensión', navTrending: 'Tendencias', signIn: 'Iniciar sesión', logout: 'Cerrar sesión', hi: 'Hola', user: 'Usuario', identityAccess: 'ACCESO_IDENTIDAD', tools: 'Herramientas', textVerify: 'Verificar Texto', account: 'Cuenta', signUp: 'Registrarse', myAccount: 'Mi Cuenta',
@@ -84,7 +89,12 @@ export const translations = {
     plan2F1: '500 सत्यापन / माह', plan2F2: 'URL + टेक्स्ट इनपुट', plan2F3: 'AI टेक्स्ट डिटेक्शन', plan2F4: 'प्राथमिकता सहायता', plan2F5: 'निर्यात रिपोर्ट (PDF)', plan2F6: 'विश्वास स्कोरिंग',
     plan3F1: 'असीमित सत्यापन', plan3F2: 'REST API एक्सेस', plan3F3: 'SSO और टीम खाते', plan3F4: 'समर्पित सहायता', plan3F5: 'SLA गारंटी', plan3F6: 'कस्टम मॉडल',
     expertTitle: 'वरिष्ठ सत्यापन विशेषज्ञ', globalNetwork: 'वैश्विक इंटेलिजेंस नेटवर्क', profileUpdated: 'प्रोफ़ाइल सफलतापूर्वक अपडेट की गई', headOfOrg: 'संगठन प्रमुख', verifiedEmployee: 'सत्यापित कर्मचारी', audits: 'कुल ऑडिट', accuracy: 'औसत सटीकता', professionalBio: 'पेशेवर बायो', bioPlaceholder: 'अपनी पेशेवर पृष्ठभूमि लिखें...', noBio: 'अभी तक कोई पेशेवर बायो नहीं दिया गया है।', emailLabel: 'प्राथमिक ईमेल', orgLabel: 'संगठन', officeLabel: 'स्थान / कार्यालय', accessTier: 'एक्सेस टियर', enterpriseTier: 'एंटरप्राइज नोड', standardNode: 'स्टैंडर्ड नोड', notSet: 'सेट नहीं किया गया', secureLabel: 'सुरक्षित', saving: 'सहेज रहा है...', saveProfile: 'परिवर्तन सहेजें', cancel: 'रद्द करें', editProfile: 'पेशेवर प्रोफ़ाइल संपादित करें',
-    verifyNow: 'अभी सत्यापित करें', imageVerify: 'छवि सत्यापन'
+    verifyNow: 'अभी सत्यापित करें', imageVerify: 'छवि सत्यापन',
+    input: 'इनपुट', history: 'इतिहास', newAudit: 'नई ऑडिट', text: 'टेक्स्ट', url: 'यूआरएल', pdf: 'पीडीएफ',
+    clickDragPdf: 'पीडीएफ यहां क्लिक करें या ड्रैग करें', extractingPdf: 'पीडीएफ से टेक्स्ट निकाला जा रहा है...', max10mb: 'अधिकतम 10MB',
+    loaded: 'लोड हो गया', scannedPdfDetected: 'स्कैन किया हुआ पीडीएफ मिला। सामान्य टेक्स्ट निष्कर्षण विफल रहा।',
+    performDeepScan: 'एआई डीप स्कैन करें', fetching: 'प्राप्त किया जा रहा है...', fetch: 'प्राप्त करें', stop: 'रुकें', goVoice: 'वॉइस शुरू करें',
+    scanning: 'स्कैनिंग...'
   },
   bn: {
     navFeatures: 'বৈশিষ্ট্য', navHowItWorks: 'কিভাবে এটি কাজ করে', navPricing: 'মূল্য নির্ধারণ', navTestimonials: 'প্রশংসাপত্র', navDashboard: 'ড্যাশবোর্ড', navExtension: 'এক্সটেনশন', navTrending: 'ট্রেন্ডিং', signIn: 'সাইন ইন', logout: 'লগ আউট', hi: 'হ্যালো', user: 'ব্যবহারকারী', identityAccess: 'পরিচয়_অ্যাক্সেস', tools: 'সরঞ্জাম', textVerify: 'টেক্সট যাচাই', account: 'অ্যাকাউন্ট', signUp: 'সাইন আপ', myAccount: 'আমার অ্যাকাউন্ট',
@@ -101,7 +111,12 @@ export const translations = {
     plan2F1: '৫০০টি যাচাইকরণ / মাস', plan2F2: 'URL এবং টেক্সট', plan2F3: 'AI টেক্সট সনাক্তকরণ', plan2F4: 'অগ্রাধিকার সাপোর্ট', plan2F5: 'PDF রিপোর্ট এক্সপোর্ট', plan2F6: 'কনফিডেন্স স্কোরিং',
     plan3F1: 'অসীমিত যাচাইকরণ', plan3F2: 'REST API অ্যাক্সেস', plan3F3: 'SSO এবং টিম অ্যাকাউন্ট', plan3F4: 'ডেডিকেটেড সাপোর্ট', plan3F5: 'SLA গ্যারান্টি', plan3F6: 'কাস্টম মডেল',
     expertTitle: 'সিনিয়র ভেরিফিকেশন স্পেশালিস্ট', globalNetwork: 'গ্লোবাল ইন্টেলিজেন্স নেটওয়ার্ক', profileUpdated: 'প্রোফাইল সফলভাবে আপডেট হয়েছে', headOfOrg: 'সংস্থার প্রধান', verifiedEmployee: 'ভেরিফাইড এমপ্লয়ী', audits: 'মোট অডিট', accuracy: 'গড় নির্ভুলতা', professionalBio: 'পেশাদার পরিচিতি', bioPlaceholder: 'আপনার পেশাদার পরিচয় লিখুন...', noBio: 'এখনও কোনো পেশাদার পরিচিতি দেওয়া হয়নি।', emailLabel: 'প্রাথমিক ইমেল', orgLabel: 'সংস্থা', officeLabel: 'অবস্থান / অফিস', accessTier: 'অ্যাক্সেস টিয়ার', enterpriseTier: 'এন্টারপ্রাইজ নোড', standardNode: 'স্ট্যান্ডার্ড নোড', notSet: 'সেট করা হয়নি', secureLabel: 'সুরক্ষিত', saving: 'সেভ হচ্ছে...', saveProfile: 'পরিবর্তন সেভ করুন', cancel: 'বাতিল করুন', editProfile: 'পেশাদার প্রোফাইল সম্পাদনা করুন',
-    verifyNow: 'এখনই যাচাই করুন', imageVerify: 'ছবি যাচাইকরণ'
+    verifyNow: 'এখনই যাচাই করুন', imageVerify: 'ছবি যাচাইকরণ',
+    input: 'ইনপুট', history: 'ইতিহাস', newAudit: 'নতুন অডিট', text: 'টেক্সট', url: 'ইউআরএল', pdf: 'পিডিএফ',
+    clickDragPdf: 'পিডিএফ এখানে ক্লিক করুন বা ড্র্যাগ করুন', extractingPdf: 'পিডিএফ থেকে টেক্সট এক্সট্রাক্ট করা হচ্ছে...', max10mb: 'সর্বোচ্চ ১০এমবি',
+    loaded: 'লোড হয়েছে', scannedPdfDetected: 'স্ক্যান করা পিডিএফ সনাক্ত হয়েছে। সাধারণ টেক্সট এক্সট্রাকশন ব্যর্থ হয়েছে।',
+    performDeepScan: 'এআই ডিপ স্ক্যান করুন', fetching: 'ফেচ করা হচ্ছে...', fetch: 'ফেচ', stop: 'বন্ধ করুন', goVoice: 'ভয়েস শুরু করুন',
+    scanning: 'স্ক্যানিং...'
   },
   it: {
     navFeatures: 'Caratteristiche', navHowItWorks: 'Come funziona', navPricing: 'Prezzi', navTestimonials: 'Testimonianze', navDashboard: 'Dashboard', navExtension: 'Estensione', navTrending: 'Tendenze', signIn: 'Accedi', logout: 'Esci', hi: 'Ciao', user: 'Utente', identityAccess: 'ACCESSO_IDENTITÀ', tools: 'Strumenti', textVerify: 'Verifica Testo', account: 'Account', signUp: 'Registrati', myAccount: 'Il mio Account',

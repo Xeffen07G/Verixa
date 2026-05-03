@@ -695,7 +695,7 @@ export default function VerifyPage() {
         {stage === 'done' && (
           <button onClick={() => { reset(); setShowConfetti(false); }}
             style={{ padding: '7px 18px', borderRadius: 8, background: T.accent, border: 'none', color: '#0a0a0f', fontSize: 12, fontWeight: 700, cursor: 'pointer', boxShadow: `0 4px 12px ${T.accent}33` }}>
-            + New Audit
+            {t('newAudit', lang)}
           </button>
         )}
       </Navbar>
@@ -708,7 +708,7 @@ export default function VerifyPage() {
           {/* Tabs */}
           <div style={{ padding: '12px 20px', borderBottom: `1px solid ${T.border}`, display: 'flex', gap: 4 }}>
             {[{ id: 'input', label: 'Input' }, { id: 'history', label: `History${history.length > 0 ? ` (${history.length})` : ''}` }].map(t => (
-              <button key={t.id} onClick={() => setLeftTab(t.id)} className="tab-btn" style={tabBtn(leftTab === t.id)}>{t.label}</button>
+              <button key={t.id} onClick={() => setLeftTab(t.id)} className="tab-btn" style={tabBtn(leftTab === t.id)}>{t(t.id, lang)}{t.id === 'history' ? ` (${history.length})` : ''}</button>
             ))}
           </div>
 
@@ -724,7 +724,7 @@ export default function VerifyPage() {
                 <div style={{ display: 'flex', gap: 4, marginBottom: 14, background: T.surface2, borderRadius: 10, padding: 4 }}>
                   {[{ id: 'text', label: 'Text' }, { id: 'url', label: 'URL' }, { id: 'pdf', label: 'PDF' }].map(m => (
                     <button key={m.id} className="input-tab-btn" style={{ flex: 1, borderRadius: 7, border: 'none', cursor: 'pointer', fontWeight: 600, background: inputMode === m.id ? T.surface : 'transparent', color: inputMode === m.id ? T.text : T.text3, transition: 'all 0.18s', boxShadow: inputMode === m.id ? `0 1px 4px rgba(0,0,0,0.1)` : 'none' }}
-                      onClick={() => setInputMode(m.id)}>{m.label}</button>
+                      onClick={() => setInputMode(m.id)}>{t(m.id, lang)}</button>
                   ))}
                 </div>
 
@@ -736,18 +736,18 @@ export default function VerifyPage() {
                       onDrop={async e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f?.type === 'application/pdf') await handlePdfUpload(f); }}
                       onClick={() => !uploadingPdf && document.getElementById('pdf-input').click()}>
                       <div style={{ fontSize: 24, marginBottom: 8, color: T.accent }}>{uploadingPdf ? '⟳' : '⬡'}</div>
-                      <p style={{ fontSize: 13, color: uploadingPdf ? T.accent : T.text3, margin: 0, fontWeight: uploadingPdf ? 500 : 400 }}>{uploadingPdf ? 'Extracting text from PDF...' : 'Click or drag PDF here'}</p>
-                      <p style={{ fontSize: 11, color: T.text3, marginTop: 4, opacity: 0.6 }}>Max 10MB</p>
+                      <p style={{ fontSize: 13, color: uploadingPdf ? T.accent : T.text3, margin: 0, fontWeight: uploadingPdf ? 500 : 400 }}>{uploadingPdf ? t('extractingPdf', lang) : t('clickDragPdf', lang)}</p>
+                      <p style={{ fontSize: 11, color: T.text3, marginTop: 4, opacity: 0.6 }}>{t('max10mb', lang)}</p>
                       <AnimatedLoadingBar active={uploadingPdf} indeterminate height={3} style={{ marginTop: 14, borderRadius: 6 }} />
                     </div>
                     <input id="pdf-input" type="file" accept="application/pdf" style={{ display: 'none' }} onChange={e => { const f = e.target.files[0]; if (f) handlePdfUpload(f); }} />
-                    {pdfInfo?.filename && !isScannedPdf && <div style={{ marginTop: 8, padding: '8px 12px', background: 'rgba(74,222,128,0.06)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: 8, fontSize: 12, color: '#4ade80' }}>Loaded: {pdfInfo.filename}</div>}
+                    {pdfInfo?.filename && !isScannedPdf && <div style={{ marginTop: 8, padding: '8px 12px', background: 'rgba(74,222,128,0.06)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: 8, fontSize: 12, color: '#4ade80' }}>{t('loaded', lang)}: {pdfInfo.filename}</div>}
                     {isScannedPdf && (
                       <div style={{ marginTop: 12, padding: '14px', background: 'rgba(201,169,110,0.05)', border: `1px solid ${T.accent}33`, borderRadius: 12, textAlign: 'center' }}>
-                        <p style={{ fontSize: 12, color: T.accent, marginBottom: 10, fontWeight: 500 }}>Scanned PDF detected. Traditional text extraction failed.</p>
+                        <p style={{ fontSize: 12, color: T.accent, marginBottom: 10, fontWeight: 500 }}>{t('scannedPdfDetected', lang)}</p>
                         <button onClick={handleDeepScan} disabled={uploadingPdf}
                           style={{ padding: '8px 16px', borderRadius: 8, background: T.accent, color: '#0a0a0f', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer', boxShadow: `0 4px 12px ${T.accent}4d` }}>
-                          {uploadingPdf ? 'Scanning...' : '🚀 Perform AI Deep Scan'}
+                          {uploadingPdf ? t('scanning', lang) : `🚀 ${t('performDeepScan', lang)}`}
                         </button>
                       </div>
                     )}
@@ -762,7 +762,7 @@ export default function VerifyPage() {
                         style={{ flex: 1, padding: '10px 14px', background: T.inputBg, border: `1px solid ${T.inputBorder}`, borderRadius: 10, color: T.text, fontSize: 13, outline: 'none' }} />
                       <button onClick={handleFetchUrl} disabled={fetchingUrl}
                         style={{ padding: '10px 16px', borderRadius: 10, border: `1px solid ${T.accent}4d`, background: fetchingUrl ? `${T.accent}26` : T.accentMuted, color: T.accent, fontSize: 12, fontWeight: 600, cursor: fetchingUrl ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
-                        {fetchingUrl ? 'Fetching...' : 'Fetch'}
+                        {fetchingUrl ? t('fetching', lang) : t('fetch', lang)}
                       </button>
                     </div>
                     <AnimatedLoadingBar active={fetchingUrl} indeterminate height={3} style={{ marginTop: 8, borderRadius: 6 }} />
@@ -795,7 +795,7 @@ export default function VerifyPage() {
                     className="voice-btn"
                   >
                     {listening ? <span style={{display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#ff4d4d', marginRight: 4}} /> : <Mic size={14} />}
-                    {listening ? 'Stop' : 'Go Voice'}
+                    {listening ? t('stop', lang) : t('goVoice', lang)}
                   </button>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
