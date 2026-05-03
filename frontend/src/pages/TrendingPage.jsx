@@ -176,7 +176,7 @@ export default function TrendingPage() {
               borderTop: '2px solid #c9a96e', borderRadius: '50%',
               animation: 'spin 0.8s linear infinite', margin: '0 auto 16px',
             }} />
-            <p style={{ color: T.text2, fontSize: 14 }}>Loading trending misinformation...</p>
+            <p style={{ color: T.text2, fontSize: 14 }}>{t('loadingTrending', lang)}</p>
           </div>
         )}
 
@@ -214,14 +214,13 @@ export default function TrendingPage() {
                     fontSize: 11, color: T.text3,
                     fontFamily: 'DM Mono, monospace',
                   }}>
-                    {claim.avgConfidence}% confidence
+                    {claim.avgConfidence}% {t('confidence', lang)}
                   </span>
                   <span style={{ fontSize: 11, color: T.text3 }}>·</span>
                   <span style={{ fontSize: 11, color: T.text3 }}>
                     {formatTimeAgo(claim.lastChecked, lang)}
                   </span>
                 </div>
-              </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, flexShrink: 0 }}>
                 <div style={{
@@ -262,7 +261,7 @@ export default function TrendingPage() {
         {!loading && trending.length === 0 && (
           <div style={{ textAlign: 'center', padding: '60px 0', color: T.text3 }}>
             <div style={{ fontSize: 48, marginBottom: 16, opacity: 0.3 }}>📊</div>
-            <p>No trending misinformation data yet. Start verifying claims!</p>
+            <p>{t('noTrending', lang)}</p>
           </div>
         )}
       </div>

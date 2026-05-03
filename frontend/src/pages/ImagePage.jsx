@@ -154,7 +154,7 @@ export default function ImagePage() {
                 onClick={() => fileRef.current?.click()}>
                 <div style={{ fontSize: 36, marginBottom: 10, color: T.accent }}>◈</div>
                 <p style={{ fontSize: 14, color: T.text2, margin: 0 }}>{loading ? t('analyzing', lang) : t('clickDragImage', lang)}</p>
-                <p style={{ fontSize: 11, color: T.text3, marginTop: 6 }}>JPG, PNG, WEBP — Max 10MB</p>
+                <p style={{ fontSize: 11, color: T.text3, marginTop: 6 }}>JPG, PNG, WEBP — {t('max10mb', lang)}</p>
               </div>
               <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }}
                 onChange={e => { const f = e.target.files[0]; if (f) analyzeUpload(f); }} />

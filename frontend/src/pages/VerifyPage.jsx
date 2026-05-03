@@ -345,32 +345,32 @@ function generateCertificate(claims, overallScore, text, lang) {
       
       <div class="header">
         <div class="brand">VeriXa</div>
-        <div class="header-right">TRUTH IS NOT NEGOTIABLE</div>
+        <div class="header-right">${t('certTagline', lang)}</div>
       </div>
       
       <div class="content">
-        <div class="sub-title">VERIFICATION OF AUTHENTICITY</div>
-        <h1 class="main-title">Certificate of Truth</h1>
+        <div class="sub-title">${t('certSubtitle', lang)}</div>
+        <h1 class="main-title">${t('certTruth', lang)}</h1>
         <div class="divider"></div>
         
         <div class="score-box">
           <div class="score-circle">${overallScore}%</div>
           <div class="score-info">
             <h2 class="verdict-label">${label}</h2>
-            <p class="verdict-desc">Verified by VeriXa AI Evidence Pipeline</p>
+            <p class="verdict-desc">${t('certVerifiedBy', lang)}</p>
           </div>
         </div>
         
         <div class="excerpt-box">
-          <span class="excerpt-lbl">Subject Content Excerpt</span>
+          <span class="excerpt-lbl">${t('certExcerpt', lang)}</span>
           <p class="excerpt-text">"${text.slice(0, 260)}${text.length > 260 ? '...' : ''}"</p>
         </div>
       </div>
       
       <div class="footer">
         <div class="footer-left">
-          <div><b>ISSUED:</b> ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase()}</div>
-          <div style="margin-top:6px;"><b>REPORT ID:</b> VX-${Math.random().toString(36).substr(2, 9).toUpperCase()}</div>
+          <div><b>${t('certIssued', lang)}:</b> ${new Date().toLocaleDateString(lang === 'en' ? 'en-US' : lang === 'es' ? 'es-ES' : 'bn-BD', { year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase()}</div>
+          <div style="margin-top:6px;"><b>${t('certReportId', lang)}:</b> VX-${Math.random().toString(36).substr(2, 9).toUpperCase()}</div>
         </div>
         <div class="seal">
           <span style="letter-spacing:1px;">VERIFIED</span>
@@ -758,7 +758,7 @@ export default function VerifyPage() {
                 {inputMode === 'url' && (
                   <div style={{ marginBottom: 14 }}>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://example.com/article..."
+                      <input value={url} onChange={e => setUrl(e.target.value)} placeholder={t('pasteUrl', lang)}
                         style={{ flex: 1, padding: '10px 14px', background: T.inputBg, border: `1px solid ${T.inputBorder}`, borderRadius: 10, color: T.text, fontSize: 13, outline: 'none' }} />
                       <button onClick={handleFetchUrl} disabled={fetchingUrl}
                         style={{ padding: '10px 16px', borderRadius: 10, border: `1px solid ${T.accent}4d`, background: fetchingUrl ? `${T.accent}26` : T.accentMuted, color: T.accent, fontSize: 12, fontWeight: 600, cursor: fetchingUrl ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
@@ -766,7 +766,7 @@ export default function VerifyPage() {
                       </button>
                     </div>
                     <AnimatedLoadingBar active={fetchingUrl} indeterminate height={3} style={{ marginTop: 8, borderRadius: 6 }} />
-                    {!fetchingUrl && text && <p style={{ fontSize: 11, color: '#4ade80', marginTop: 6 }}>Content loaded</p>}
+                    {!fetchingUrl && text && <p style={{ fontSize: 11, color: '#4ade80', marginTop: 6 }}>{t('loaded', lang)}</p>}
                   </div>
                 )}
 
@@ -799,8 +799,8 @@ export default function VerifyPage() {
                   </button>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-                  <span style={{ fontSize: 11, color: listening ? '#f87171' : 'transparent' }}>Listening...</span>
-                  <span style={{ fontSize: 11, color: T.text3 }}>{text.length.toLocaleString()} chars</span>
+                  <span style={{ fontSize: 11, color: listening ? '#f87171' : 'transparent' }}>{t('listening', lang)}...</span>
+                  <span style={{ fontSize: 11, color: T.text3 }}>{text.length.toLocaleString()} {t('chars', lang)}</span>
                 </div>
 
                 {/* AI Detection Toggle */}
@@ -809,8 +809,8 @@ export default function VerifyPage() {
                     <div style={{ position: 'absolute', top: 3, left: detectAI ? 18 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
                   </button>
                   <div style={{ flex: 1 }}>
-                    <p style={{ margin: 0, fontSize: 12, color: T.text, fontWeight: 600 }}>AI Text Detection</p>
-                    <p style={{ margin: '1px 0 0', fontSize: 10, color: T.text3 }}>Identify machine-generated text</p>
+                    <p style={{ margin: 0, fontSize: 12, color: T.text, fontWeight: 600 }}>{t('aiDetection', lang)}</p>
+                    <p style={{ margin: '1px 0 0', fontSize: 10, color: T.text3 }}>{t('aiDetectionDesc', lang)}</p>
                   </div>
                 </div>
 
@@ -873,14 +873,16 @@ export default function VerifyPage() {
                 <div style={{ width: 64, height: 64, borderRadius: '50%', border: `3px solid ${T.accent}22`, borderTopColor: T.accent, margin: '0 auto 24px', animation: 'spin 1s linear infinite' }} />
                 
                 <h2 style={{ fontFamily: 'serif', fontSize: 28, fontWeight: 300, color: T.text, margin: '0 0 8px' }}>
-                  {stage === 'extracting' ? 'Extracting Claims' : stage === 'searching' ? 'Retrieving Evidence' : 'Verifying Truth'}...
+                  {stage === 'extracting' ? t('extractingClaims', lang) : stage === 'searching' ? t('retrievingEvidence', lang) : t('verifyingTruth', lang)}...
                 </h2>
-                <p style={{ color: T.text3, fontSize: 13, marginBottom: 40 }}>Running deep-trace intelligence audit across global sources.</p>
+                <p style={{ color: T.text3, fontSize: 13, marginBottom: 40 }}>{t('deepAuditDesc', lang)}</p>
 
                 {/* Progress Steps */}
                 <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   {['Extracting', 'Searching', 'Verifying'].map((s, i) => {
                     const stageMap = ['extracting', 'searching', 'verifying'];
+                    const localizedStages = [t('extracting', lang), t('searching', lang), t('verifying', lang)];
+                    const label = localizedStages[i];
                     const currentIdx = stageMap.indexOf(stage);
                     const isDone = i < currentIdx;
                     const isActive = i === currentIdx;
@@ -904,7 +906,7 @@ export default function VerifyPage() {
                           {isDone ? <span style={{ color: '#0a0a0f', fontSize: 10, fontWeight: 900 }}>✓</span> : isActive ? <div style={{ width: 6, height: 6, borderRadius: '50%', background: T.accent, animation: 'pulse-gold 1.5s infinite' }} /> : null}
                         </div>
                         
-                        <span style={{ fontSize: 10, fontWeight: 700, color: isDone || isActive ? T.text : T.text3, textTransform: 'uppercase', letterSpacing: 1 }}>{s}</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: isDone || isActive ? T.text : T.text3, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</span>
                       </div>
                     );
                   })}
@@ -934,7 +936,7 @@ export default function VerifyPage() {
                   style={{ flex: 1, minWidth: 160, borderRadius: 12, background: T.accentMuted, border: `1.5px solid ${T.accent}33`, color: T.accent, cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s' }}
                   onMouseEnter={e => e.currentTarget.style.background = `${T.accent}1a`}
                   onMouseLeave={e => e.currentTarget.style.background = T.accentMuted}>
-                  <Download size={18} /> Export Full Report
+                  <Download size={18} /> {t('exportReport', lang)}
                 </button>
                 <button onClick={() => generateCertificate(claims, overallScore, text, lang)}
                   className="action-btn"
@@ -949,7 +951,7 @@ export default function VerifyPage() {
                   }}
                   onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(201,169,110,0.4)'; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(201,169,110,0.3)'; }}>
-                  🏆 Get Truth Certificate
+                  🏆 {t('generateCert', lang)}
                 </button>
               </div>
 
@@ -957,14 +959,14 @@ export default function VerifyPage() {
               {aiDetection && (
                 <div style={{ padding: '18px 22px', borderRadius: 14, background: T.surface, border: `1px solid ${T.border}`, marginBottom: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
-                    <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: T.text }}>AI Text Detection</p>
+                    <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: T.text }}>{t('aiDetection', lang)}</p>
                     <span style={{ fontSize: 12, padding: '3px 12px', borderRadius: 999, background: aiDetection.ai_probability > 60 ? '#fee2e2' : '#dcfce7', color: aiDetection.ai_probability > 60 ? '#991b1b' : '#166534', fontWeight: 700 }}>
-                      {aiDetection.ai_probability > 60 ? 'Likely AI Generated' : 'Likely Human Written'}
+                      {aiDetection.ai_probability > 60 ? t('aiGenerated', lang) : t('humanWritten', lang)}
                     </span>
                   </div>
                   <p style={{ fontSize: 13, color: T.text2, margin: '0 0 12px', fontStyle: 'italic' }}>{aiDetection.assessment}</p>
                   <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                    {[['AI', aiDetection.ai_probability, '#f87171'], ['Human', aiDetection.human_probability, '#4ade80']].map(([label, val, color]) => (
+                    {[[t('aiLabel', lang), aiDetection.ai_probability, '#f87171'], [t('humanLabel', lang), aiDetection.human_probability, '#4ade80']].map(([label, val, color]) => (
                       <div key={label} style={{ flex: 1, minWidth: 100 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                           <span style={{ fontSize: 12, color: T.text3 }}>{label}</span>
@@ -981,7 +983,7 @@ export default function VerifyPage() {
 
               {/* Claims */}
               <p style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: T.text3, marginBottom: 16, fontWeight: 600 }}>
-                {claims.length} Claims Analyzed
+                {claims.length} {t('claimsAnalyzed', lang)}
               </p>
               {claims.map((c, i) => <ClaimCard key={i} claim={c} index={i} theme={T} lang={lang} />)}
             </div>
