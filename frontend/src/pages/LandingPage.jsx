@@ -325,11 +325,12 @@ export default function LandingPage() {
               transformOrigin: 'top center'
             }}
           >
-            <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', width: '100%', aspectRatio: '16/9', background: '#050508' }}>
+            {/* Bulletproof 16:9 container */}
+            <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', width: '100%', paddingBottom: '56.25%', background: '#050508' }}>
               <video 
-                autoPlay loop muted playsInline
-                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85, mixBlendMode: darkMode ? 'screen' : 'normal' }}
-                src="https://assets.mixkit.co/videos/preview/mixkit-abstract-technology-network-connection-background-27894-large.mp4"
+                autoPlay={true} loop={true} muted={true} playsInline={true}
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85, mixBlendMode: darkMode ? 'screen' : 'normal' }}
+                src="https://cdn.dribbble.com/users/32512/screenshots/4334336/media/4e176d63e9f4d762e58c973562ba7657.mp4"
               />
               <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${darkMode ? '#050508' : 'rgba(0,0,0,0.4)'} 0%, transparent 30%)`, pointerEvents: 'none' }} />
             </div>
