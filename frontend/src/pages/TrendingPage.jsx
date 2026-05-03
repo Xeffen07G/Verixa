@@ -116,56 +116,56 @@ export default function TrendingPage() {
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '100px 24px 60px' }}>
         {/* Header */}
         <ScrollReveal animation="blurIn" duration={800}>
-        <div style={{ textAlign: 'center', marginBottom: 56 }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px',
-            border: '1px solid rgba(248,113,113,0.3)', borderRadius: 999,
-            background: 'rgba(248,113,113,0.08)', marginBottom: 20,
-            fontSize: 11, color: '#f87171', letterSpacing: 1.5, fontWeight: 600, textTransform: 'uppercase',
-          }}>
-            <span style={{
-              width: 6, height: 6, borderRadius: '50%', background: '#f87171',
-              animation: 'pulse-live 2s infinite', display: 'inline-block',
-            }} />
-            {t('liveLeaderboard', lang)}
-          </div>
+          <div style={{ textAlign: 'center', marginBottom: 56 }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px',
+              border: '1px solid rgba(248,113,113,0.3)', borderRadius: 999,
+              background: 'rgba(248,113,113,0.08)', marginBottom: 20,
+              fontSize: 11, color: '#f87171', letterSpacing: 1.5, fontWeight: 600, textTransform: 'uppercase',
+            }}>
+              <span style={{
+                width: 6, height: 6, borderRadius: '50%', background: '#f87171',
+                animation: 'pulse-live 2s infinite', display: 'inline-block',
+              }} />
+              {t('liveLeaderboard', lang)}
+            </div>
 
-          <h1 style={{
-            fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
-            fontSize: 'clamp(36px, 6vw, 56px)', color: T.text,
-            lineHeight: 1.1, margin: '0 0 16px',
-          }}>
-            {t('trendingTitlePart1', lang)} <span style={{ fontStyle: 'italic', color: '#f87171' }}>{t('trendingTitlePart2', lang)}</span>
-          </h1>
-          <p style={{ fontSize: 15, color: T.text2, maxWidth: 520, margin: '0 auto', lineHeight: 1.7 }}>
-            {t('trendingSubtitle', lang)}
-          </p>
-        </div>
+            <h1 style={{
+              fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
+              fontSize: 'clamp(36px, 6vw, 56px)', color: T.text,
+              lineHeight: 1.1, margin: '0 0 16px',
+            }}>
+              {t('trendingTitlePart1', lang)} <span style={{ fontStyle: 'italic', color: '#f87171' }}>{t('trendingTitlePart2', lang)}</span>
+            </h1>
+            <p style={{ fontSize: 15, color: T.text2, maxWidth: 520, margin: '0 auto', lineHeight: 1.7 }}>
+              {t('trendingSubtitle', lang)}
+            </p>
+          </div>
         </ScrollReveal>
 
         {/* Stats bar */}
         <ScrollReveal animation="fadeUp" delay={150}>
-        <div style={{
-          display: 'flex', gap: 16, marginBottom: 32, flexWrap: 'wrap', justifyContent: 'center',
-        }}>
-          {[
-            { label: t('totalTracked', lang), value: totalTracked, icon: '📊' },
-            { label: t('autoRefresh', lang), value: '30s', icon: '🔄' },
-            { label: t('lastChecked', lang), value: lastUpdated || '—', icon: '⏱️' },
-          ].map((s, i) => (
-            <div key={i} style={{
-              padding: '12px 20px', borderRadius: 12,
-              background: T.cardBg, border: `1px solid ${T.border}`,
-              display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 160,
-            }}>
-              <span style={{ fontSize: 18 }}>{s.icon}</span>
-              <div>
-                <div style={{ fontSize: 11, color: T.text3, textTransform: 'uppercase', letterSpacing: 1 }}>{s.label}</div>
-                <div style={{ fontSize: 16, fontWeight: 600, color: T.text, fontFamily: 'Cormorant Garamond, serif' }}>{s.value}</div>
+          <div style={{
+            display: 'flex', gap: 16, marginBottom: 32, flexWrap: 'wrap', justifyContent: 'center',
+          }}>
+            {[
+              { label: t('totalTracked', lang), value: totalTracked, icon: '📊' },
+              { label: t('autoRefresh', lang), value: '30s', icon: '🔄' },
+              { label: t('lastChecked', lang), value: lastUpdated || '—', icon: '⏱️' },
+            ].map((s, i) => (
+              <div key={i} style={{
+                padding: '12px 20px', borderRadius: 12,
+                background: T.cardBg, border: `1px solid ${T.border}`,
+                display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 160,
+              }}>
+                <span style={{ fontSize: 18 }}>{s.icon}</span>
+                <div>
+                  <div style={{ fontSize: 11, color: T.text3, textTransform: 'uppercase', letterSpacing: 1 }}>{s.label}</div>
+                  <div style={{ fontSize: 16, fontWeight: 600, color: T.text, fontFamily: 'Cormorant Garamond, serif' }}>{s.value}</div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
         </ScrollReveal>
 
         {/* Loading */}
@@ -221,6 +221,7 @@ export default function TrendingPage() {
                     {formatTimeAgo(claim.lastChecked, lang)}
                   </span>
                 </div>
+              </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, flexShrink: 0 }}>
                 <div style={{
