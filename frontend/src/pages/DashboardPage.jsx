@@ -39,7 +39,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   // Check if current user is Admin (Head of Company)
-  const isAdmin = user?.role === 'admin' || user?.email?.includes('admin'); // Fallback for now
+  const isAdmin = user?.role === 'head' || user?.role === 'admin' || user?.email?.includes('admin'); // Fallback for now
 
   useEffect(() => {
     // Load local history for everyone
