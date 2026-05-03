@@ -307,9 +307,9 @@ export default function LandingPage() {
 
           {/* Premium Hero Video */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.2, ease: "easeOut" }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             style={{
               marginTop: 64,
               position: 'relative',
@@ -317,12 +317,10 @@ export default function LandingPage() {
               borderRadius: 24,
               overflow: 'hidden',
               border: `1px solid ${darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-              boxShadow: darkMode ? `0 40px 80px rgba(0,0,0,0.8), 0 0 40px ${T.accent}15` : '0 30px 60px rgba(0,0,0,0.15)',
+              boxShadow: darkMode ? `0 20px 60px rgba(0,0,0,0.6), 0 0 30px ${T.accent}15` : '0 20px 40px rgba(0,0,0,0.1)',
               background: darkMode ? 'rgba(20,20,30,0.5)' : 'rgba(255,255,255,0.8)',
-              padding: 8,
-              backdropFilter: 'blur(20px)',
-              transform: 'perspective(1000px) rotateX(2deg)',
-              transformOrigin: 'top center'
+              padding: 6,
+              backdropFilter: 'blur(20px)'
             }}
           >
             {/* Bulletproof 16:9 container */}
