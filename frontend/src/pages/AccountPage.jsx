@@ -259,7 +259,7 @@ export default function AccountPage() {
                   }}>
                   {!editData.profilePic && (user?.name || 'U').charAt(0).toUpperCase()}
                   {isEditing && (
-                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', flex-direction: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', opacity: 0, transition: '0.3s' }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0}>
+                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', opacity: 0, transition: '0.3s' }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0}>
                       <Camera size={32} style={{ marginBottom: 4 }} />
                       <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1 }}>UPLOAD</span>
                     </div>
