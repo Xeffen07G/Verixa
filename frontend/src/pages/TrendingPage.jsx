@@ -7,10 +7,10 @@ import { useLang } from '../context/LangContext';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
-const VERDICT_COLORS = {
-  'False': { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.2)', icon: '✕' },
-  'Partially True': { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)', border: 'rgba(251,191,36,0.2)', icon: '~' },
-};
+const VERDICT_CONFIG = (lang) => ({
+  'False':          { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.2)', icon: '✕', label: t('mostlyInaccurate', lang) },
+  'Partially True': { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)', border: 'rgba(251,191,36,0.2)', icon: '~', label: t('mixedAccuracy', lang) },
+});
 
 function formatTimeAgo(dateStr, lang) {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -80,7 +80,7 @@ export default function TrendingPage() {
   }, [fetchTrending]);
 
   const shareOnTwitter = (claim) => {
-    const text = `⚠️ Trending misinformation being fact-checked right now:\n\n"${claim.claim}"\n\nVerdict: ${claim.verdict} — verified by @VeriXaAI\n\nhttps://verixa.ai/trending`;
+    const text = `${t('trendingShareTitle', lang)}\n\n"${claim.claim}"\n\nVerdict: ${claim.verdict} — verified by @VeriXaAI\n\nhttps://verixa.ai/trending`;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -182,7 +182,7 @@ export default function TrendingPage() {
 
         {/* Claims list */}
         {!loading && trending.map((claim, i) => {
-          const cfg = VERDICT_COLORS[claim.verdict] || VERDICT_COLORS['False'];
+          const cfg = VERDICT_CONFIG(lang)[claim.verdict] || VERDICT_CONFIG(lang)['False'];
           return (
             <div key={i} id={`claim-${i}`} className="trending-card" style={{
               display: 'flex', alignItems: 'flex-start', gap: 16,
@@ -208,7 +208,7 @@ export default function TrendingPage() {
                     background: cfg.bg, border: `1px solid ${cfg.border}`,
                     color: cfg.color, fontWeight: 700,
                   }}>
-                    {cfg.icon} {claim.verdict}
+                    {cfg.icon} {cfg.label}
                   </span>
                   <span style={{
                     fontSize: 11, color: T.text3,

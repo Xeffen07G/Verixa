@@ -707,8 +707,10 @@ export default function VerifyPage() {
 
           {/* Tabs */}
           <div style={{ padding: '12px 20px', borderBottom: `1px solid ${T.border}`, display: 'flex', gap: 4 }}>
-            {[{ id: 'input', label: 'Input' }, { id: 'history', label: `History${history.length > 0 ? ` (${history.length})` : ''}` }].map(tab => (
-              <button key={tab.id} onClick={() => setLeftTab(tab.id)} className="tab-btn" style={tabBtn(leftTab === tab.id)}>{t(tab.id, lang)}{tab.id === 'history' ? ` (${history.length})` : ''}</button>
+            {[{ id: 'input', key: 'input' }, { id: 'history', key: 'history' }].map(tab => (
+              <button key={tab.id} onClick={() => setLeftTab(tab.id)} className="tab-btn" style={tabBtn(leftTab === tab.id)}>
+                {t(tab.key, lang)}{tab.id === 'history' && history.length > 0 ? ` (${history.length})` : ''}
+              </button>
             ))}
           </div>
 
@@ -722,9 +724,9 @@ export default function VerifyPage() {
 
                 {/* Input mode tabs */}
                 <div style={{ display: 'flex', gap: 4, marginBottom: 14, background: T.surface2, borderRadius: 10, padding: 4 }}>
-                  {[{ id: 'text', label: 'Text' }, { id: 'url', label: 'URL' }, { id: 'pdf', label: 'PDF' }].map(m => (
-                    <button key={m.id} className="input-tab-btn" style={{ flex: 1, borderRadius: 7, border: 'none', cursor: 'pointer', fontWeight: 600, background: inputMode === m.id ? T.surface : 'transparent', color: inputMode === m.id ? T.text : T.text3, transition: 'all 0.18s', boxShadow: inputMode === m.id ? `0 1px 4px rgba(0,0,0,0.1)` : 'none' }}
-                      onClick={() => setInputMode(m.id)}>{t(m.id, lang)}</button>
+                  {['text', 'url', 'pdf'].map(m => (
+                    <button key={m} className="input-tab-btn" style={{ flex: 1, borderRadius: 7, border: 'none', cursor: 'pointer', fontWeight: 600, background: inputMode === m ? T.surface : 'transparent', color: inputMode === m ? T.text : T.text3, transition: 'all 0.18s', boxShadow: inputMode === m ? `0 1px 4px rgba(0,0,0,0.1)` : 'none' }}
+                      onClick={() => setInputMode(m)}>{t(m, lang)}</button>
                   ))}
                 </div>
 
@@ -859,8 +861,8 @@ export default function VerifyPage() {
               <div style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 32, color: T.emptyColor, lineHeight: 1.2 }}>{t('readyToVerify', lang)}</div>
               <div style={{ fontSize: 14, color: T.text3, maxWidth: 340, lineHeight: 1.7 }}>{t('readyDesc', lang)}</div>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center', marginTop: 8 }}>
-                {['Text', 'URL', 'PDF', 'Voice', 'Drag & Drop'].map(f => (
-                  <span key={f} style={{ padding: '4px 14px', borderRadius: 999, background: T.accentMuted, border: `1px solid ${T.accent}1f`, fontSize: 12, color: T.accent }}>{f}</span>
+                {['text', 'url', 'pdf', 'goVoice', 'dragDropFiles'].map(f => (
+                  <span key={f} style={{ padding: '4px 14px', borderRadius: 999, background: T.accentMuted, border: `1px solid ${T.accent}1f`, fontSize: 12, color: T.accent }}>{t(f, lang)}</span>
                 ))}
               </div>
             </div>
