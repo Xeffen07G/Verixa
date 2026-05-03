@@ -304,11 +304,41 @@ export default function LandingPage() {
               >{t('landingSeeHow', lang)}</motion.button>
             </a>
           </motion.div>
+
+          {/* Premium Hero Video */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.2, ease: "easeOut" }}
+            style={{
+              marginTop: 64,
+              position: 'relative',
+              width: '100%',
+              borderRadius: 24,
+              overflow: 'hidden',
+              border: `1px solid ${darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+              boxShadow: darkMode ? `0 40px 80px rgba(0,0,0,0.8), 0 0 40px ${T.accent}15` : '0 30px 60px rgba(0,0,0,0.15)',
+              background: darkMode ? 'rgba(20,20,30,0.5)' : 'rgba(255,255,255,0.8)',
+              padding: 8,
+              backdropFilter: 'blur(20px)',
+              transform: 'perspective(1000px) rotateX(2deg)',
+              transformOrigin: 'top center'
+            }}
+          >
+            <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', width: '100%', aspectRatio: '16/9', background: '#050508' }}>
+              <video 
+                autoPlay loop muted playsInline
+                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85, mixBlendMode: darkMode ? 'screen' : 'normal' }}
+                src="https://assets.mixkit.co/videos/preview/mixkit-abstract-technology-network-connection-background-27894-large.mp4"
+              />
+              <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${darkMode ? '#050508' : 'rgba(0,0,0,0.4)'} 0%, transparent 30%)`, pointerEvents: 'none' }} />
+            </div>
+          </motion.div>
         </div>
 
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1.4 }}
+            transition={{ duration: 1, delay: 1.6 }}
             style={{
               marginTop: 64, display: 'flex', flexDirection: 'column', alignItems: 'center',
               gap: 8, color: T.text3, fontSize: 11, letterSpacing: 2, textTransform: 'uppercase',
