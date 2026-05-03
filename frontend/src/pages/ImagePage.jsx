@@ -266,10 +266,10 @@ export default function ImagePage() {
           <div style={{ marginTop: 16, padding: 20, background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12 }}>
             <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12 }}>{t('trySamples', lang)}</p>
             {[
-              { label: '[AI Deepfake] Pope Francis in Puffer Jacket', url: 'https://upload.wikimedia.org/wikipedia/en/8/8b/Pope_Francis_Puffer_Jacket.jpg' },
-              { label: '[AI Generated] Cyberpunk Cityscape', url: 'https://images.unsplash.com/photo-1684369527928-874dbcd84439?w=400' },
-              { label: t('sampleRealPortrait', lang) + ' (Barack Obama)', url: 'https://upload.wikimedia.org/wikipedia/commons/8/8d/President_Barack_Obama.jpg' },
-              { label: t('sampleRealLandscape', lang), url: 'https://images.unsplash.com/photo-1470770903676-69b98201ea1c?w=400' },
+              { label: '[AI Generated] Ultra-Realistic Portrait', url: 'https://images.unsplash.com/photo-1678047915570-5b584d41fa6f?w=600' },
+              { label: '[AI Generated] Cyberpunk Cityscape', url: 'https://images.unsplash.com/photo-1684369527928-874dbcd84439?w=600' },
+              { label: '[Real Photo] Professional Portrait', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600' },
+              { label: '[Real Photo] Mountain Landscape', url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600' },
             ].map((s, i) => (
               <button key={i} onClick={() => { setImageUrl(s.url); setInputMode('url'); }}
                 style={{ display: 'block', width: '100%', textAlign: 'left', padding: '12px', marginBottom: 6, background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', border: `1px solid ${T.border}`, borderRadius: 6, color: T.accent, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s' }}
