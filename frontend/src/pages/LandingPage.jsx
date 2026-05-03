@@ -232,12 +232,18 @@ export default function LandingPage() {
 
 
       {/* ══════════ HERO SECTION ══════════ */}
-      <Section style={{ padding: '30px 0 100px', textAlign: 'center', position: 'relative' }}>
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-          background: `radial-gradient(circle at 50% 30%, ${T.accent}0a 0%, transparent 70%)`,
-          zIndex: 0
-        }} />
+      <Section style={{ padding: '30px 0 100px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        {/* Full Hero Background Video Scaffolding */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden' }}>
+          <video 
+            autoPlay={true} loop={true} muted={true} playsInline={true}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: darkMode ? 0.35 : 0.15 }}
+            src="YOUR_VIDEO_URL_HERE"
+          />
+          {/* Gradients to ensure text readability */}
+          <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 50% 50%, ${T.bg}00 0%, ${T.bg} 80%)` }} />
+          <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to bottom, transparent 60%, ${T.bg} 100%)` }} />
+        </div>
 
         <div style={{ padding: '0 24px', maxWidth: 1000, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           <motion.div
@@ -303,35 +309,6 @@ export default function LandingPage() {
                 }}
               >{t('landingSeeHow', lang)}</motion.button>
             </a>
-          </motion.div>
-
-          {/* Premium Hero Video */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            style={{
-              marginTop: 64,
-              position: 'relative',
-              width: '100%',
-              borderRadius: 24,
-              overflow: 'hidden',
-              border: `1px solid ${darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-              boxShadow: darkMode ? `0 20px 60px rgba(0,0,0,0.6), 0 0 30px ${T.accent}15` : '0 20px 40px rgba(0,0,0,0.1)',
-              background: darkMode ? 'rgba(20,20,30,0.5)' : 'rgba(255,255,255,0.8)',
-              padding: 6,
-              backdropFilter: 'blur(20px)'
-            }}
-          >
-            {/* Bulletproof 16:9 container */}
-            <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', width: '100%', paddingBottom: '56.25%', background: '#050508' }}>
-              <video 
-                autoPlay={true} loop={true} muted={true} playsInline={true}
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85, mixBlendMode: darkMode ? 'screen' : 'normal' }}
-                src="https://cdn.dribbble.com/users/32512/screenshots/4334336/media/4e176d63e9f4d762e58c973562ba7657.mp4"
-              />
-              <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${darkMode ? '#050508' : 'rgba(0,0,0,0.4)'} 0%, transparent 30%)`, pointerEvents: 'none' }} />
-            </div>
           </motion.div>
         </div>
 
