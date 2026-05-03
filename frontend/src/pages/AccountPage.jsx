@@ -3,14 +3,17 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import { Mail, Shield, Building, Calendar, Settings, Camera, Save, X, MapPin, Quote, TrendingUp, Award, Zap } from 'lucide-react';
+import { Mail, Shield, Building, Calendar, Settings, Camera, Save, X, MapPin, Quote, TrendingUp, Award, Zap, Activity, CheckCircle2 } from 'lucide-react';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
 
 export default function AccountPage() {
   const { lang } = useLang();
   const { user, logout, setUser } = useAuth();
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('verixa-theme') === 'dark');
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('verixa-theme');
+    return saved ? saved === 'dark' : true;
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -37,19 +40,44 @@ export default function AccountPage() {
       }));
     }
   }, [user]);
+
   const fileInputRef = useRef(null);
 
-  const T = darkMode ? {
-    bg: '#0a0a0f', surface: '#13131a', border: 'rgba(255,255,255,0.07)',
-    text: '#f5f3ef', text2: 'rgba(245,243,239,0.65)', text3: 'rgba(245,243,239,0.35)',
-    accent: '#c9a96e', accentMuted: 'rgba(201,169,110,0.12)',
-    card: 'rgba(20,20,30,0.6)', input: 'rgba(255,255,255,0.05)'
-  } : {
-    bg: '#e8e5de', surface: '#f5f3ed', border: 'rgba(0,0,0,0.12)',
-    text: '#0d0d0d', text2: '#2a2a2a', text3: '#555555',
-    accent: '#5a421a', accentMuted: 'rgba(90,66,26,0.15)',
-    card: '#f0ede6', input: 'rgba(0,0,0,0.05)'
+  const T_DARK = {
+    bg: '#050508',
+    surface: 'rgba(255,255,255,0.02)',
+    border: 'rgba(255,255,255,0.06)',
+    borderHighlight: 'rgba(255,255,255,0.15)',
+    text: '#ffffff',
+    text2: 'rgba(255,255,255,0.65)',
+    text3: 'rgba(255,255,255,0.4)',
+    accent: '#d4af37',
+    accentMuted: 'rgba(212,175,55,0.1)',
+    card: 'rgba(15,15,22,0.6)',
+    glass: 'rgba(20,20,30,0.4)',
+    input: 'rgba(0,0,0,0.3)',
+    shadow: '0 8px 32px rgba(0,0,0,0.5)',
+    glow: '0 0 20px rgba(212,175,55,0.15)'
   };
+
+  const T_LIGHT = {
+    bg: '#f8f9fa',
+    surface: '#ffffff',
+    border: 'rgba(0,0,0,0.08)',
+    borderHighlight: 'rgba(0,0,0,0.15)',
+    text: '#0d0d12',
+    text2: '#4a4a55',
+    text3: '#71717a',
+    accent: '#a67c00',
+    accentMuted: 'rgba(166,124,0,0.1)',
+    card: 'rgba(255,255,255,0.8)',
+    glass: 'rgba(255,255,255,0.6)',
+    input: 'rgba(0,0,0,0.03)',
+    shadow: '0 8px 32px rgba(0,0,0,0.05)',
+    glow: '0 0 20px rgba(166,124,0,0.15)'
+  };
+
+  const T = darkMode ? T_DARK : T_LIGHT;
 
   useEffect(() => {
     const history = JSON.parse(localStorage.getItem('verixa_history') || '[]');
@@ -73,14 +101,14 @@ export default function AccountPage() {
       const ctx = canvas.getContext('2d');
       const img = new Image();
       img.onload = () => {
-        const maxSize = 200;
+        const maxSize = 300;
         let w = img.width, h = img.height;
         if (w > h) { h = (h / w) * maxSize; w = maxSize; }
         else { w = (w / h) * maxSize; h = maxSize; }
         canvas.width = w;
         canvas.height = h;
         ctx.drawImage(img, 0, 0, w, h);
-        setEditData({ ...editData, profilePic: canvas.toDataURL('image/jpeg', 0.8) });
+        setEditData({ ...editData, profilePic: canvas.toDataURL('image/jpeg', 0.9) });
       };
       img.src = URL.createObjectURL(file);
     }
@@ -90,21 +118,13 @@ export default function AccountPage() {
     setIsSaving(true);
     const updatedUser = { ...user, ...editData };
 
-    // Step 1: Always save to localStorage (instant, always works)
     if (typeof setUser === 'function') setUser(updatedUser);
     localStorage.setItem('verixa_user', JSON.stringify(updatedUser));
 
-    // Step 2: Try to sync to server (for global visibility)
     try {
       const API = process.env.REACT_APP_API_URL || '';
-      await axios.post(`${API}/api/user/profile`, {
-        email: user?.email,
-        ...editData
-      });
-      console.log('Profile synced to cloud successfully');
-    } catch (err) {
-      console.log('Cloud sync skipped (local save succeeded):', err.message);
-    }
+      await axios.post(`${API}/api/user/profile`, { email: user?.email, ...editData });
+    } catch (err) {}
 
     setIsSaving(false);
     setIsEditing(false);
@@ -115,134 +135,240 @@ export default function AccountPage() {
   const isAdmin = user?.role === 'admin' || user?.email?.includes('admin');
 
   return (
-    <div style={{ background: T.bg, minHeight: '100vh', transition: 'background 0.3s', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: T.bg, minHeight: '100vh', transition: 'background 0.4s ease, color 0.4s ease', display: 'flex', flexDirection: 'column', fontFamily: 'DM Sans, sans-serif', overflowX: 'hidden' }}>
+      <style>{`
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        @keyframes fadeUpStagger { from { opacity: 0; transform: translateY(30px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 ${T.accent}40; } 70% { box-shadow: 0 0 0 15px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        
+        .glass-panel {
+          background: ${T.glass};
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border: 1px solid ${T.border};
+          border-top: 1px solid ${T.borderHighlight};
+          box-shadow: ${T.shadow};
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-panel:hover {
+          transform: translateY(-4px);
+          border: 1px solid ${T.accent}40;
+          box-shadow: ${T.glow}, ${T.shadow};
+        }
+        
+        .animated-gradient-text {
+          background: linear-gradient(135deg, ${T.text} 0%, ${T.accent} 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card { transition: all 0.3s; }
+        .stat-card:hover { transform: scale(1.02) translateY(-2px); }
+        
+        .premium-input {
+          background: ${T.input};
+          border: 1px solid ${T.border};
+          color: ${T.text};
+          transition: all 0.3s ease;
+        }
+        .premium-input:focus {
+          border-color: ${T.accent};
+          box-shadow: 0 0 0 3px ${T.accent}20;
+          outline: none;
+          background: ${T.surface};
+        }
+        
+        /* Subtle background grid */
+        .bg-grid {
+          position: fixed; inset: 0; z-index: 0; pointer-events: none;
+          background-image: linear-gradient(to right, ${T.border} 1px, transparent 1px), linear-gradient(to bottom, ${T.border} 1px, transparent 1px);
+          background-size: 60px 60px;
+          mask-image: radial-gradient(circle at center, black, transparent 80%);
+          -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
+          opacity: 0.3;
+        }
+      `}</style>
+
+      <div className="bg-grid" />
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
-      <main className="account-main" style={{ flex: 1, maxWidth: 900, width: '100%', margin: '60px auto', padding: '0 24px', animation: 'fadeUp 0.6s ease' }}>
+      <main style={{ flex: 1, maxWidth: 1000, width: '100%', margin: '0 auto', padding: '100px 24px 60px', position: 'relative', zIndex: 1 }}>
         
+        {/* Success Toast */}
         {saveSuccess && (
-          <div style={{ position: 'fixed', top: 100, right: 30, zIndex: 9999, padding: '16px 24px', borderRadius: 14, background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10, animation: 'fadeUp 0.4s ease', backdropFilter: 'blur(12px)' }}>
-            ✅ {t('profileUpdated', lang)}
+          <div style={{ position: 'fixed', top: 90, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, padding: '12px 24px', borderRadius: 999, background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10, backdropFilter: 'blur(12px)', animation: 'fadeUpStagger 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+            <CheckCircle2 size={18} /> {t('profileUpdated', lang)}
           </div>
         )}
 
-        <div className="account-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 32, alignItems: 'start' }}>
+        {/* Profile Banner */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 260, background: `radial-gradient(ellipse at top, ${T.accent}20 0%, transparent 70%)`, opacity: 0.6, pointerEvents: 'none' }} />
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 32, alignItems: 'start' }}>
           
-          {/* LEFT: Identity Card */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div style={{ padding: '40px 32px', borderRadius: 24, background: T.card, border: `1px solid ${T.border}`, backdropFilter: 'blur(12px)', textAlign: 'center', position: 'relative' }}>
-              <div className="avatar-wrap" style={{ position: 'relative', width: 140, height: 140, margin: '0 auto 24px' }}>
-                <div onClick={() => isEditing && fileInputRef.current?.click()} style={{ width: 140, height: 140, borderRadius: '50%', background: editData.profilePic ? `url(${editData.profilePic}) center/cover` : `linear-gradient(135deg, ${T.accent}, #a07b42)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 56, fontWeight: 300, color: '#0a0a0f', border: `4px solid ${isEditing ? T.accent : T.border}`, transition: 'all 0.3s', overflow: 'hidden', cursor: isEditing ? 'pointer' : 'default' }}>
+          {/* Header Section */}
+          <div className="glass-panel" style={{ borderRadius: 32, padding: '40px', position: 'relative', overflow: 'hidden', animation: 'fadeUpStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1)', animationFillMode: 'both' }}>
+            
+            {/* Background elements for card */}
+            <div style={{ position: 'absolute', top: -100, right: -100, width: 300, height: 300, background: `radial-gradient(circle, ${T.accent}15 0%, transparent 70%)`, borderRadius: '50%', pointerEvents: 'none' }} />
+            
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+              
+              {/* Avatar Container */}
+              <div style={{ position: 'relative', width: 140, height: 140, marginBottom: 10 }}>
+                <div 
+                  onClick={() => isEditing && fileInputRef.current?.click()} 
+                  style={{ 
+                    width: '100%', height: '100%', borderRadius: '50%', 
+                    background: editData.profilePic ? `url(${editData.profilePic}) center/cover` : `linear-gradient(135deg, ${T.accent}, #a07b42)`, 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                    fontSize: 56, fontWeight: 300, color: '#000', 
+                    border: `4px solid ${T.card}`, 
+                    boxShadow: `0 12px 30px rgba(0,0,0,0.3), ${isEditing ? T.glow : 'none'}`,
+                    transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', 
+                    cursor: isEditing ? 'pointer' : 'default',
+                    overflow: 'hidden',
+                    animation: isEditing ? 'pulseGlow 2s infinite' : 'none'
+                  }}>
                   {!editData.profilePic && (user?.name || 'U').charAt(0).toUpperCase()}
-                  {isEditing && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}><Camera size={32} /></div>}
+                  {isEditing && (
+                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', opacity: 0, transition: '0.3s' }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0}>
+                      <Camera size={32} />
+                    </div>
+                  )}
                 </div>
                 <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" style={{ display: 'none' }} />
+                
+                {/* Admin/Verified Badge Float */}
+                <div style={{ position: 'absolute', bottom: 5, right: 5, width: 32, height: 32, borderRadius: '50%', background: isAdmin ? T.accent : '#60a5fa', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `3px solid ${T.card}`, color: '#000', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }} title={isAdmin ? t('headOfOrg', lang) : t('verifiedEmployee', lang)}>
+                  <Shield size={16} fill="currentColor" />
+                </div>
               </div>
 
-              {isEditing ? (
-                <input value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} style={{ background: T.input, border: `1px solid ${T.accent}33`, borderRadius: 8, padding: '8px', color: T.text, fontSize: 24, textAlign: 'center', width: '100%', marginBottom: 8, outline: 'none' }} />
-              ) : (
-                <h1 style={{ fontFamily: 'serif', fontSize: 28, fontWeight: 300, color: T.text, margin: '0 0 4px' }}>{editData.name || user?.name}</h1>
-              )}
+              {/* Name & Title */}
+              <div style={{ textAlign: 'center', width: '100%', maxWidth: 400 }}>
+                {isEditing ? (
+                  <input value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} className="premium-input" style={{ borderRadius: 12, padding: '10px', fontSize: 28, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, textAlign: 'center', width: '100%', marginBottom: 8 }} />
+                ) : (
+                  <h1 className="animated-gradient-text" style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 600, margin: '0 0 8px', letterSpacing: '-0.5px' }}>{editData.name || user?.name}</h1>
+                )}
 
-              {isEditing ? (
-                <input value={editData.title} onChange={e => setEditData({ ...editData, title: e.target.value })} placeholder={t('expertTitle', lang)} style={{ background: T.input, border: 'none', color: T.accent, fontSize: 13, textAlign: 'center', width: '100%', outline: 'none', fontWeight: 600, marginBottom: 12 }} />
-              ) : (
-                <p style={{ color: T.accent, fontSize: 13, fontWeight: 600, margin: '0 0 16px' }}>{editData.title || t('expertTitle', lang)}</p>
-              )}
-
-              <div style={{ padding: '4px 12px', borderRadius: 999, background: isAdmin ? `${T.accent}14` : 'rgba(96,165,250,0.08)', border: `1px solid ${isAdmin ? `${T.accent}33` : 'rgba(96,165,250,0.2)'}`, color: isAdmin ? T.accent : '#60a5fa', fontSize: 9, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase' }}>
-                {isAdmin ? t('headOfOrg', lang) : t('verifiedEmployee', lang)}
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: 12 }}>
-              <div style={{ flex: 1, padding: '16px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, textAlign: 'center' }}>
-                <TrendingUp size={16} color={T.accent} style={{ marginBottom: 4 }} />
-                <div style={{ fontSize: 18, fontWeight: 700, color: T.text }}>{stats.total}</div>
-                <div style={{ fontSize: 9, color: T.text3, fontWeight: 700 }}>{t('audits', lang)}</div>
-              </div>
-              <div style={{ flex: 1, padding: '16px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, textAlign: 'center' }}>
-                <Award size={16} color="#4ade80" style={{ marginBottom: 4 }} />
-                <div style={{ fontSize: 18, fontWeight: 700, color: T.text }}>{stats.avg}%</div>
-                <div style={{ fontSize: 9, color: T.text3, fontWeight: 700 }}>{t('accuracy', lang)}</div>
+                {isEditing ? (
+                  <input value={editData.title} onChange={e => setEditData({ ...editData, title: e.target.value })} placeholder={t('expertTitle', lang)} className="premium-input" style={{ borderRadius: 8, padding: '8px', fontSize: 14, textAlign: 'center', width: '100%', fontWeight: 500 }} />
+                ) : (
+                  <p style={{ color: T.accent, fontSize: 15, fontWeight: 600, margin: '0 0 20px', letterSpacing: '1px', textTransform: 'uppercase' }}>{editData.title || t('expertTitle', lang)}</p>
+                )}
+                
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 16px', borderRadius: 999, background: isAdmin ? `${T.accent}15` : 'rgba(96,165,250,0.1)', border: `1px solid ${isAdmin ? `${T.accent}40` : 'rgba(96,165,250,0.3)'}`, color: isAdmin ? T.accent : '#60a5fa', fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', backdropFilter: 'blur(10px)' }}>
+                  <Shield size={12} />
+                  {isAdmin ? t('headOfOrg', lang) : t('verifiedEmployee', lang)}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* RIGHT: Professional Details */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
             
-            <div style={{ padding: '28px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 24 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: T.accent, marginBottom: 16 }}>
-                <Quote size={16} />
-                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2 }}>{t('professionalBio', lang)}</span>
-              </div>
-              {isEditing ? (
-                <textarea value={editData.bio} onChange={e => setEditData({ ...editData, bio: e.target.value })} placeholder={t('bioPlaceholder', lang)} style={{ width: '100%', minHeight: 100, background: T.input, border: `1px solid ${T.border}`, borderRadius: 12, padding: '12px', color: T.text, fontSize: 14, outline: 'none', resize: 'none', fontFamily: 'inherit' }} />
-              ) : (
-                <p style={{ fontSize: 15, color: T.text2, lineHeight: 1.7, margin: 0, fontStyle: editData.bio ? 'normal' : 'italic' }}>
-                  {editData.bio || t('noBio', lang)}
-                </p>
-              )}
-            </div>
-
-            <div style={{ padding: '28px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
-              {[
-                { icon: Mail, label: t('emailLabel', lang), value: user?.email, locked: true },
-                { icon: Building, label: t('orgLabel', lang), value: editData.organization, key: 'organization' },
-                { icon: MapPin, label: t('officeLabel', lang), value: editData.location, key: 'location' },
-                { icon: Zap, label: t('accessTier', lang), value: isAdmin ? t('enterpriseTier', lang) : t('standardNode', lang), locked: true }
-              ].map((item, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 10, background: T.surface, border: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.accent }}>
-                      <item.icon size={16} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 10, color: T.text3, fontWeight: 700, letterSpacing: 1 }}>{item.label}</div>
-                      {isEditing && !item.locked ? (
-                        <input value={editData[item.key]} onChange={e => setEditData({ ...editData, [item.key]: e.target.value })} style={{ background: 'none', border: 'none', borderBottom: `1px solid ${T.accent}`, color: T.text, fontSize: 14, outline: 'none', width: '100%', maxWidth: '200px', padding: '2px 0' }} />
-                      ) : (
-                        <div style={{ fontSize: 14, color: T.text, fontWeight: 600 }}>{item.value || t('notSet', lang)}</div>
-                      )}
-                    </div>
-                  </div>
-                  {item.locked && <div style={{ fontSize: 8, padding: '2px 8px', borderRadius: 4, background: `${T.border}`, color: T.text3, fontWeight: 700 }}>{t('secureLabel', lang)}</div>}
+            {/* Stats Column */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              
+              <div className="glass-panel" style={{ borderRadius: 24, padding: '32px', animation: 'fadeUpStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s', animationFillMode: 'both' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
+                  <Activity size={18} color={T.accent} />
+                  <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 2, color: T.text3, textTransform: 'uppercase' }}>Performance</span>
                 </div>
-              ))}
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div className="stat-card" style={{ padding: '24px', background: T.surface, borderRadius: 20, border: `1px solid ${T.border}`, position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 3, background: `linear-gradient(90deg, ${T.accent}, transparent)` }} />
+                    <TrendingUp size={24} color={T.accent} style={{ marginBottom: 12, opacity: 0.8 }} />
+                    <div style={{ fontSize: 32, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: T.text, lineHeight: 1 }}>{stats.total}</div>
+                    <div style={{ fontSize: 11, color: T.text2, fontWeight: 600, marginTop: 8, textTransform: 'uppercase', letterSpacing: 1 }}>{t('audits', lang)}</div>
+                  </div>
+                  
+                  <div className="stat-card" style={{ padding: '24px', background: T.surface, borderRadius: 20, border: `1px solid ${T.border}`, position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 3, background: `linear-gradient(90deg, #4ade80, transparent)` }} />
+                    <Award size={24} color="#4ade80" style={{ marginBottom: 12, opacity: 0.8 }} />
+                    <div style={{ fontSize: 32, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: T.text, lineHeight: 1 }}>{stats.avg}%</div>
+                    <div style={{ fontSize: 11, color: T.text2, fontWeight: 600, marginTop: 8, textTransform: 'uppercase', letterSpacing: 1 }}>{t('accuracy', lang)}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="glass-panel" style={{ borderRadius: 24, padding: '24px', animation: 'fadeUpStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s', animationFillMode: 'both' }}>
+                {isEditing ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <button onClick={handleSave} disabled={isSaving} style={{ width: '100%', padding: '16px', borderRadius: 16, background: `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none', color: '#000', fontSize: 15, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', transition: 'all 0.3s', boxShadow: T.glow }}>
+                      {isSaving ? <div style={{ animation: 'pulse 1s infinite' }}>{t('saving', lang)}</div> : <><Save size={18} /> {t('saveProfile', lang)}</>}
+                    </button>
+                    <button onClick={() => { setIsEditing(false); setEditData({ name: user?.name || '', organization: user?.organization || '', profilePic: user?.profilePic || '', title: user?.title || '', bio: user?.bio || '', location: user?.location || '' }); }} style={{ width: '100%', padding: '16px', borderRadius: 16, background: 'transparent', border: `1px solid ${T.borderHighlight}`, color: T.text, fontSize: 15, fontWeight: 600, cursor: 'pointer', transition: 'all 0.3s' }} onMouseEnter={e => e.currentTarget.style.background = T.surface} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                      {t('cancel', lang)}
+                    </button>
+                  </div>
+                ) : (
+                  <button onClick={() => setIsEditing(true)} style={{ width: '100%', padding: '16px', borderRadius: 16, background: T.surface, border: `1px solid ${T.accent}60`, color: T.accent, fontSize: 15, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', transition: 'all 0.3s' }} onMouseEnter={e => { e.currentTarget.style.background = T.accentMuted; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = T.glow; }} onMouseLeave={e => { e.currentTarget.style.background = T.surface; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
+                    <Settings size={18} /> {t('editProfile', lang)}
+                  </button>
+                )}
+              </div>
+
             </div>
 
-            <div style={{ display: 'flex', gap: 12 }}>
-              {isEditing ? (
-                <>
-                  <button onClick={handleSave} disabled={isSaving} style={{ flex: 2, padding: '14px', borderRadius: 14, background: T.accent, border: 'none', color: '#0a0a0f', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer' }}>
-                    {isSaving ? t('saving', lang) : <><Save size={18} /> {t('saveProfile', lang)}</>}
-                  </button>
-                  <button onClick={() => { setIsEditing(false); setEditData({ name: user?.name || '', organization: user?.organization || '', profilePic: user?.profilePic || '', title: user?.title || '', bio: user?.bio || '', location: user?.location || '' }); }} style={{ flex: 1, padding: '14px', borderRadius: 14, background: 'rgba(255,255,255,0.05)', border: `1px solid ${T.border}`, color: T.text, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
-                    {t('cancel', lang)}
-                  </button>
-                </>
-              ) : (
-                <button onClick={() => setIsEditing(true)} style={{ width: '100%', padding: '14px', borderRadius: 14, background: T.surface, border: `1px solid ${T.accent}4d`, color: T.accent, fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', transition: '0.2s' }} onMouseEnter={e => e.currentTarget.style.background = T.accentMuted}>
-                  <Settings size={18} /> {t('editProfile', lang)}
-                </button>
-              )}
+            {/* Details Column */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              
+              <div className="glass-panel" style={{ borderRadius: 24, padding: '32px', animation: 'fadeUpStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s', animationFillMode: 'both' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: T.text3, marginBottom: 20 }}>
+                  <Quote size={18} color={T.accent} />
+                  <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 2, textTransform: 'uppercase' }}>{t('professionalBio', lang)}</span>
+                </div>
+                {isEditing ? (
+                  <textarea value={editData.bio} onChange={e => setEditData({ ...editData, bio: e.target.value })} placeholder={t('bioPlaceholder', lang)} className="premium-input" style={{ width: '100%', minHeight: 120, borderRadius: 16, padding: '16px', fontSize: 15, resize: 'none', fontFamily: 'inherit', lineHeight: 1.6 }} />
+                ) : (
+                  <p style={{ fontSize: 16, color: T.text2, lineHeight: 1.8, margin: 0, fontStyle: editData.bio ? 'normal' : 'italic', fontWeight: 400 }}>
+                    {editData.bio || t('noBio', lang)}
+                  </p>
+                )}
+              </div>
+
+              <div className="glass-panel" style={{ borderRadius: 24, padding: '32px', display: 'flex', flexDirection: 'column', gap: 24, animation: 'fadeUpStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s', animationFillMode: 'both' }}>
+                {[
+                  { icon: Mail, label: t('emailLabel', lang), value: user?.email, locked: true },
+                  { icon: Building, label: t('orgLabel', lang), value: editData.organization, key: 'organization' },
+                  { icon: MapPin, label: t('officeLabel', lang), value: editData.location, key: 'location' },
+                  { icon: Zap, label: t('accessTier', lang), value: isAdmin ? t('enterpriseTier', lang) : t('standardNode', lang), locked: true }
+                ].map((item, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: i !== 3 ? 24 : 0, borderBottom: i !== 3 ? `1px solid ${T.border}` : 'none' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 20, width: '100%' }}>
+                      <div style={{ width: 44, height: 44, borderRadius: 14, background: T.surface, border: `1px solid ${T.borderHighlight}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.accent, flexShrink: 0, boxShadow: `0 4px 12px rgba(0,0,0,0.1)` }}>
+                        <item.icon size={20} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 11, color: T.text3, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4 }}>{item.label}</div>
+                        {isEditing && !item.locked ? (
+                          <input value={editData[item.key]} onChange={e => setEditData({ ...editData, [item.key]: e.target.value })} className="premium-input" style={{ borderRadius: 8, padding: '8px 12px', fontSize: 15, width: '100%', maxWidth: '300px' }} />
+                        ) : (
+                          <div style={{ fontSize: 15, color: T.text, fontWeight: 500 }}>{item.value || <span style={{ color: T.text3, fontStyle: 'italic' }}>{t('notSet', lang)}</span>}</div>
+                        )}
+                      </div>
+                    </div>
+                    {item.locked && (
+                      <div style={{ fontSize: 9, padding: '4px 10px', borderRadius: 6, background: T.surface, border: `1px solid ${T.border}`, color: T.text3, fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', flexShrink: 0 }}>
+                        {t('secureLabel', lang)}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
             </div>
           </div>
         </div>
       </main>
 
       <Footer darkMode={darkMode} />
-      <style>{`
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 768px) {
-          .account-main { padding: 0 16px !important; margin: 40px auto !important; }
-          .account-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
-          .avatar-wrap { width: 110px !important; height: 110px !important; }
-          .avatar-wrap > div:first-child { width: 110px !important; height: 110px !important; font-size: 40px !important; }
-        }
-      `}</style>
     </div>
   );
 }
