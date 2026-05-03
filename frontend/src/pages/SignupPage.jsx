@@ -16,6 +16,7 @@ export default function SignupPage() {
   const [name, setName] = useState('');
   const [organization, setOrganization] = useState('');
   const [role, setRole] = useState('employee');
+  const [designation, setDesignation] = useState('Individual');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -40,7 +41,7 @@ export default function SignupPage() {
 
     setIsLoading(true);
     try {
-      const result = await register(email, password, name, organization, role);
+      const result = await register(email, password, name, organization, role, designation);
       if (result.success) {
         navigate('/verify');
       } else {
@@ -100,30 +101,31 @@ export default function SignupPage() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
-            <span style={{ fontSize: 13, color: T.text2, marginLeft: 4 }}>Role in Organization</span>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <button 
-                type="button" 
-                onClick={() => setRole('head')}
-                style={{ 
-                  padding: '12px', borderRadius: 12, background: role === 'head' ? `${T.accent}1a` : T.inputBg, 
-                  border: `1px solid ${role === 'head' ? T.accent : T.inputBorder}`, 
-                  color: role === 'head' ? T.accent : T.text2, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' 
-                }}
-              >
-                Organization Head
-              </button>
-              <button 
-                type="button" 
-                onClick={() => setRole('employee')}
-                style={{ 
-                  padding: '12px', borderRadius: 12, background: role === 'employee' ? `${T.accent}1a` : T.inputBg, 
-                  border: `1px solid ${role === 'employee' ? T.accent : T.inputBorder}`, 
-                  color: role === 'employee' ? T.accent : T.text2, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' 
-                }}
-              >
-                Employee
-              </button>
+            <span style={{ fontSize: 13, color: T.text2, marginLeft: 4 }}>Who are you? (Designation)</span>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              {[
+                { label: 'Head of Organization', role: 'head' },
+                { label: 'Head of Institution', role: 'head' },
+                { label: 'Team Leader', role: 'head' },
+                { label: 'Employee', role: 'employee' },
+                { label: 'Student', role: 'employee' },
+                { label: 'Researcher', role: 'employee' },
+                { label: 'Public Official', role: 'employee' },
+                { label: 'Individual', role: 'employee' },
+              ].map((d) => (
+                <button 
+                  key={d.label}
+                  type="button" 
+                  onClick={() => { setDesignation(d.label); setRole(d.role); }}
+                  style={{ 
+                    padding: '10px', borderRadius: 10, background: designation === d.label ? `${T.accent}1a` : T.inputBg, 
+                    border: `1px solid ${designation === d.label ? T.accent : T.inputBorder}`, 
+                    color: designation === d.label ? T.accent : T.text2, fontSize: 11, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' 
+                  }}
+                >
+                  {d.label}
+                </button>
+              ))}
             </div>
           </div>
 

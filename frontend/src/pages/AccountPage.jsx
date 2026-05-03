@@ -305,7 +305,7 @@ export default function AccountPage() {
               
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 20px', borderRadius: 999, background: isAdmin ? `linear-gradient(135deg, ${T.accent}20, transparent)` : 'linear-gradient(135deg, rgba(96,165,250,0.15), transparent)', border: `1px solid ${isAdmin ? `${T.accent}50` : 'rgba(96,165,250,0.4)'}`, color: isAdmin ? T.accent : '#60a5fa', fontSize: 11, fontWeight: 800, letterSpacing: 2, textTransform: 'uppercase', boxShadow: `0 8px 20px ${isAdmin ? `${T.accent}15` : 'rgba(96,165,250,0.1)'}` }}>
                 <Shield size={14} fill={isAdmin ? T.accent : '#60a5fa'} />
-                {isAdmin ? t('headOfOrg', lang) : t('verifiedEmployee', lang)}
+                {user.designation || (isAdmin ? t('headOfOrg', lang) : t('verifiedEmployee', lang))}
               </div>
             </div>
           </div>
