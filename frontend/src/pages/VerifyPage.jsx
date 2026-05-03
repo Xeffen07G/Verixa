@@ -854,7 +854,7 @@ export default function VerifyPage() {
                   {isLoading ? t('verifying', lang) : t('verifyNow', lang)}
                 </button>
                 <div style={{ textAlign: 'center', marginTop: 12, opacity: 0.3, fontSize: 8, letterSpacing: 1 }}>
-                  BUILD 2.1.3 — LATEST
+                  BUILD 2.2.0 — LATEST
                 </div>
               </div>
             </>

@@ -85,7 +85,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
                   <span style={{ fontSize: 11, fontWeight: 700 }}>{currentLang?.code.toUpperCase()}</span>
                 </button>
                 {langOpen && (
-                  <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 12, background: darkMode ? '#15151a' : '#fff', border: `1px solid ${border}`, borderRadius: 12, padding: '8px', minWidth: 160, boxShadow: '0 10px 40px rgba(0,0,0,0.4)', animation: 'fadeIn 0.2s ease', zIndex: 2001 }}>
+                  <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 12, background: darkMode ? '#15151a' : '#fff', border: `1px solid ${border}`, borderRadius: 12, padding: '8px', minWidth: 180, maxHeight: '70vh', overflowY: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.4)', animation: 'fadeIn 0.2s ease', zIndex: 2001 }}>
                     {LANGUAGES.map(l => (
                       <button key={l.code} onClick={() => handleLangChange(l.code)} style={{ width: '100%', padding: '10px 12px', background: lang === l.code ? `${T.accent}1a` : 'none', border: 'none', color: lang === l.code ? T.accent : textColor, textAlign: 'left', cursor: 'pointer', borderRadius: 8, fontSize: 13, fontWeight: 500 }} onMouseEnter={e => e.target.style.background = `${T.accent}0d`}>
                         {l.label}

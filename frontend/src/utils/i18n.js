@@ -258,14 +258,69 @@ const translations = {
     dashboardTitle: 'సంస్థ డాష్‌బోర్డ్',
     extensionTitle: 'బ్రౌజర్ పొడిగింపు',
   },
+  es: {
+    features: 'Características', howItWorks: 'Cómo funciona', pricing: 'Precios',
+    trending: 'Tendencias', signIn: 'Iniciar sesión', logout: 'Cerrar sesión',
+    verifyNow: 'Verificar ahora', verifying: 'Verificando...', inputTab: 'Entrada',
+    historyTab: 'Historial', text: 'Texto', accuracyReport: 'Informe de precisión'
+  },
+  fr: {
+    features: 'Fonctionnalités', howItWorks: 'Comment ça marche', pricing: 'Tarification',
+    trending: 'Tendances', signIn: 'Se connecter', logout: 'Déconnexion',
+    verifyNow: 'Vérifier maintenant', verifying: 'Vérification...', inputTab: 'Entrée',
+    historyTab: 'Historique', text: 'Texte', accuracyReport: 'Rapport de précision'
+  },
+  de: {
+    features: 'Funktionen', howItWorks: 'Wie es funktioniert', pricing: 'Preise',
+    trending: 'Trends', signIn: 'Anmelden', logout: 'Abmelden',
+    verifyNow: 'Jetzt verifizieren', verifying: 'Verifizierung...', inputTab: 'Eingabe',
+    historyTab: 'Verlauf', text: 'Text', accuracyReport: 'Genauigkeitsbericht'
+  },
+  zh: {
+    features: '功能', howItWorks: '运作方式', pricing: '定价',
+    trending: '趋势', signIn: '登录', logout: '登出',
+    verifyNow: '立即验证', verifying: '验证中...', inputTab: '输入',
+    historyTab: '历史', text: '文本', accuracyReport: '准确性报告'
+  },
+  ja: {
+    features: '特徴', howItWorks: '仕組み', pricing: '料金',
+    trending: 'トレンド', signIn: 'サインイン', logout: 'ログアウト',
+    verifyNow: '今すぐ検証', verifying: '検証中...', inputTab: '入力',
+    historyTab: '履歴', text: 'テキスト', accuracyReport: '精度レポート'
+  },
+  ar: {
+    features: 'الميزات', howItWorks: 'كيف يعمل', pricing: 'الأسعار',
+    trending: 'الرائج', signIn: 'تسجيل الدخول', logout: 'تسجيل الخروج',
+    verifyNow: 'تحقق الآن', verifying: 'جاري التحقق...', inputTab: 'مدخلات',
+    historyTab: 'السجل', text: 'نص', accuracyReport: 'تقرير الدقة'
+  }
 };
 
 export const LANGUAGES = [
   { code: 'en', label: 'English', nativeLabel: 'English' },
+  { code: 'es', label: 'Spanish', nativeLabel: 'Español' },
+  { code: 'fr', label: 'French', nativeLabel: 'Français' },
+  { code: 'de', label: 'German', nativeLabel: 'Deutsch' },
+  { code: 'it', label: 'Italian', nativeLabel: 'Italiano' },
+  { code: 'pt', label: 'Portuguese', nativeLabel: 'Português' },
+  { code: 'ru', label: 'Russian', nativeLabel: 'Русский' },
+  { code: 'zh', label: 'Chinese', nativeLabel: '中文' },
+  { code: 'ja', label: 'Japanese', nativeLabel: '日本語' },
+  { code: 'ko', label: 'Korean', nativeLabel: '한국어' },
+  { code: 'ar', label: 'Arabic', nativeLabel: 'العربية' },
+  { code: 'tr', label: 'Turkish', nativeLabel: 'Türkçe' },
   { code: 'hi', label: 'Hindi', nativeLabel: 'हिन्दी' },
   { code: 'bn', label: 'Bengali', nativeLabel: 'বাংলা' },
   { code: 'ta', label: 'Tamil', nativeLabel: 'தமிழ்' },
   { code: 'te', label: 'Telugu', nativeLabel: 'తెలుగు' },
+  { code: 'mr', label: 'Marathi', nativeLabel: 'मराठी' },
+  { code: 'gu', label: 'Gujarati', nativeLabel: 'ગુજરાતી' },
+  { code: 'kn', label: 'Kannada', nativeLabel: 'ಕನ್ನಡ' },
+  { code: 'ml', label: 'Malayalam', nativeLabel: 'മലയാളம்' },
+  { code: 'pa', label: 'Punjabi', nativeLabel: 'ਪੰਜਾਬੀ' },
+  { code: 'id', label: 'Indonesian', nativeLabel: 'Bahasa Indonesia' },
+  { code: 'vi', label: 'Vietnamese', nativeLabel: 'Tiếng Việt' },
+  { code: 'th', label: 'Thai', nativeLabel: 'ไทย' },
 ];
 
 /**
