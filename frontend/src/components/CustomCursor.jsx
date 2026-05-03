@@ -23,21 +23,15 @@ export default function CustomCursor() {
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
 
-  // Generate trailing springs with increasing delay/stiffness
-  const trailSprings = Array.from({ length: BLOBS_COUNT }).map((_, i) => {
-    // Each blob follows the previous one or the mouse with slightly different physics
-    const config = {
-      damping: 20 + i * 2,
-      stiffness: 200 - i * 20,
-      mass: 0.5 + i * 0.1
-    };
-    
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return {
-      x: useSpring(mouseX, config),
-      y: useSpring(mouseY, config)
-    };
-  });
+  // Define springs individually to comply with Rules of Hooks
+  const spring1 = { x: useSpring(mouseX, { damping: 20, stiffness: 200 }), y: useSpring(mouseY, { damping: 20, stiffness: 200 }) };
+  const spring2 = { x: useSpring(mouseX, { damping: 22, stiffness: 180 }), y: useSpring(mouseY, { damping: 22, stiffness: 180 }) };
+  const spring3 = { x: useSpring(mouseX, { damping: 24, stiffness: 160 }), y: useSpring(mouseY, { damping: 24, stiffness: 160 }) };
+  const spring4 = { x: useSpring(mouseX, { damping: 26, stiffness: 140 }), y: useSpring(mouseY, { damping: 26, stiffness: 140 }) };
+  const spring5 = { x: useSpring(mouseX, { damping: 28, stiffness: 120 }), y: useSpring(mouseY, { damping: 28, stiffness: 120 }) };
+  const spring6 = { x: useSpring(mouseX, { damping: 30, stiffness: 100 }), y: useSpring(mouseY, { damping: 30, stiffness: 100 }) };
+
+  const trailSprings = [spring1, spring2, spring3, spring4, spring5, spring6];
 
   useEffect(() => {
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
