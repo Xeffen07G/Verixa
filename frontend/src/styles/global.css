@@ -23,7 +23,7 @@
   --gray: #9ca3af;
   --gray-bg: rgba(156, 163, 175, 0.08);
   --font-display: 'Cormorant Garamond', serif;
-  --font-body: 'DM Sans', sans-serif;
+  --font-body: 'DM Sans', 'Noto Sans Bengali', 'Noto Sans Devanagari', sans-serif;
   --font-mono: 'DM Mono', monospace;
   --radius: 8px;
   --radius-lg: 14px;
