@@ -1,6 +1,7 @@
 /**
  * VeriXa i18n — Multilingual Support
- * Supports: English, Hindi, Bengali, Tamil, Telugu
+ * Supports: English, Hindi, Bengali, Tamil, Telugu, Spanish
+ * Version: 2.2.3
  */
 
 const translations = {
@@ -97,15 +98,20 @@ const translations = {
     extensionFeature2: 'Instant results overlay',
     extensionFeature3: 'Works on any webpage',
     extensionFeature4: 'Save verification history',
+    navFeatures: 'Features',
+    navHowItWorks: 'How It Works',
+    navPricing: 'Pricing',
+    navTestimonials: 'Testimonials',
+    navDashboard: 'Dashboard',
 
     // Landing Page
-    beta: 'NOW IN PUBLIC BETA',
-    heroTitle1: 'Truth is not',
-    heroTitle2: 'negotiable.',
-    heroSubtitle: 'VeriXa is the world\'s most precise AI-powered fact verification engine. Extract claims, retrieve evidence, and generate authoritative accuracy reports in seconds.',
-    startFree: 'Start Verifying Free',
-    seeHow: 'See How It Works',
-    scroll: 'Scroll',
+    landingBeta: 'NOW IN PUBLIC BETA',
+    landingHero1: 'Truth is not',
+    landingHero2: 'negotiable.',
+    landingHeroSubtitle: 'VeriXa is the world\'s most precise AI-powered fact verification engine. Extract claims, retrieve evidence, and generate authoritative accuracy reports in seconds.',
+    landingStartFree: 'Start Verifying Free',
+    landingSeeHow: 'See How It Works',
+    landingScroll: 'Scroll',
     inputFormats: 'Input formats supported',
     verdictTypes: 'Verdict types',
     aiModels: 'AI models powering engine',
@@ -137,6 +143,12 @@ const translations = {
     enterprisePlan: 'Enterprise',
     startFreeCTA: 'Start Free',
     soonCTA: 'Payments Beginning Soon',
+    test1Text: 'VeriXa has become indispensable to our compliance workflow. It catches misinformation before it reaches our clients with a precision I have never seen in any other tool.',
+    test2Text: 'The claim extraction is extraordinary. What used to take my team three hours of manual fact-checking now takes VeriXa under two minutes. The source citations are impeccable.',
+    test3Text: 'We integrated VeriXa into our research pipeline. The confidence scoring system has become the gold standard for how we evaluate information quality across the firm.',
+    demo1: 'The Eiffel Tower is located in Berlin, Germany.',
+    demo2: 'Water boils at 100°C at standard atmospheric pressure.',
+    demo3: 'The Great Wall of China is visible from space with the naked eye.',
   },
 
   hi: {
@@ -299,10 +311,31 @@ const translations = {
     extensionTitle: 'బ్రౌజర్ పొడిగింపు',
   },
   es: {
-    features: 'Características', howItWorks: 'Cómo funciona', pricing: 'Precios',
-    trending: 'Tendencias', signIn: 'Iniciar sesión', logout: 'Cerrar sesión',
-    verifyNow: 'Verificar ahora', verifying: 'Verificando...', inputTab: 'Entrada',
-    historyTab: 'Historial', text: 'Texto', accuracyReport: 'Informe de precisión'
+    accuracyReport: 'Informe de precisión',
+    navFeatures: 'Características',
+    navHowItWorks: 'Cómo funciona',
+    navPricing: 'Precios',
+    navTestimonials: 'Testimonios',
+    navDashboard: 'Dashboard',
+    landingBeta: 'AHORA EN BETA PÚBLICA',
+    landingHero1: 'La verdad no es',
+    landingHero2: 'negociable.',
+    landingHeroSubtitle: 'VeriXa es el motor de verificación de hechos por IA más preciso del mundo. Extraiga afirmaciones, recupere evidencia y genere informes de precisión autorizados en segundos.',
+    landingStartFree: 'Comenzar verificación gratis',
+    landingSeeHow: 'Ver cómo funciona',
+    landingScroll: 'Deslizar',
+    test1Text: 'VeriXa se ha vuelto indispensable para nuestro flujo de trabajo de cumplimiento. Captura la desinformación antes de que llegue a nuestros clientes con una precisión que nunca he visto en ninguna otra herramienta.',
+    test2Text: 'La extracción de afirmaciones es extraordinaria. Lo que antes le tomaba a mi equipo tres horas de verificación manual, ahora VeriXa lo hace en menos de dos minutos.',
+    test3Text: 'Integramos VeriXa en nuestra línea de investigación. El sistema de puntuación de confianza se ha convertido en el estándar de oro para evaluar la calidad de la información.',
+    demo1: 'La Torre Eiffel se encuentra en Berlín, Alemania.',
+    demo2: 'El agua hierve a 100°C a presión atmosférica estándar.',
+    demo3: 'La Gran Muralla China es visible desde el espacio a simple vista.',
+    starterDesc: 'Para personas que exploran la verificación inteligente de hechos.',
+    proDesc: 'Para periodistas, analistas e investigadores serios.',
+    entDesc: 'Para organizaciones que requieren integración completa.',
+    forever: 'para siempre',
+    perMonth: 'por mes',
+    contactUs: 'contáctenos',
   },
   fr: {
     features: 'Fonctionnalités', howItWorks: 'Comment ça marche', pricing: 'Tarification',

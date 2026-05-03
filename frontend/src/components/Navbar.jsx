@@ -25,13 +25,13 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
     setLangOpen(false);
   };
 
-  const navLinks = [
-    { label: t('features', lang), href: '#features' },
-    { label: t('howItWorks', lang), href: '#how-it-works' },
-    { label: 'Dashboard', href: '/dashboard' },
-    { label: t('pricing', lang), href: '#pricing' },
-    { label: t('testimonials', lang), href: '#testimonials' },
-  ];
+  const navLinks = React.useMemo(() => [
+    { label: t('navFeatures', lang), href: '#features' },
+    { label: t('navHowItWorks', lang), href: '#how-it-works' },
+    { label: t('navDashboard', lang), href: '/dashboard' },
+    { label: t('navPricing', lang), href: '#pricing' },
+    { label: t('navTestimonials', lang), href: '#testimonials' },
+  ], [lang]);
 
   const textColor = darkMode ? '#ffffff' : '#000000';
   const textMuted = darkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)';

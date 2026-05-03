@@ -92,16 +92,16 @@ function StaggerCard({ children, index, style, onMouseEnter, onMouseLeave }) {
 
 /* ─────────── Live Demo Data ─────────── */
 const demoClaims = [
-  { text: 'The Eiffel Tower is located in Berlin, Germany.', verdict: 'False', confidence: 97, color: '#f87171', Icon: XCircle },
-  { text: 'Water boils at 100°C at standard atmospheric pressure.', verdict: 'True', confidence: 99, color: '#4ade80', Icon: CheckCircle2 },
-  { text: 'The Great Wall of China is visible from space with the naked eye.', verdict: 'Partially True', confidence: 72, color: '#fbbf24', Icon: MinusCircle },
+  { textKey: 'demo1', verdict: 'False', confidence: 97, color: '#f87171', Icon: XCircle },
+  { textKey: 'demo2', verdict: 'True', confidence: 99, color: '#4ade80', Icon: CheckCircle2 },
+  { textKey: 'demo3', verdict: 'Partially True', confidence: 72, color: '#fbbf24', Icon: MinusCircle },
 ];
 
 /* ─────────── Static Data ─────────── */
 const testimonials = [
-  { name: 'Aditya Seth', role: 'Software, Strategy and AI Initiative', text: 'VeriXa has become indispensable to our compliance workflow. It catches misinformation before it reaches our clients with a precision I have never seen in any other tool.', avatar: 'AS' },
-  { name: 'Arnab Basu', role: 'Academic Coordinator at Techno India University', text: 'The claim extraction is extraordinary. What used to take my team three hours of manual fact-checking now takes VeriXa under two minutes. The source citations are impeccable.', avatar: 'AB' },
-  { name: 'Arnab Saha', role: 'Senior Programme Coordinator at Techno India University', text: 'We integrated VeriXa into our research pipeline. The confidence scoring system has become the gold standard for how we evaluate information quality across the firm.', avatar: 'AS' },
+  { name: 'Aditya Seth', role: 'Software, Strategy and AI Initiative', textKey: 'test1Text', avatar: 'AS' },
+  { name: 'Arnab Basu', role: 'Academic Coordinator at Techno India University', textKey: 'test2Text', avatar: 'AB' },
+  { name: 'Arnab Saha', role: 'Senior Programme Coordinator at Techno India University', textKey: 'test3Text', avatar: 'AS' },
 ];
 
 const features = [
@@ -121,9 +121,9 @@ const steps = [
 ];
 
 const plans = [
-  { name: 'Starter', price: '0', period: 'forever', highlight: false, desc: 'For individuals exploring intelligent fact-checking.', features: ['10 verifications / month', 'Text input only', 'Basic accuracy report', 'Community support'], cta: 'Start Free' },
-  { name: 'Professional', price: '29', period: 'per month', highlight: true, desc: 'For journalists, analysts, and serious researchers.', features: ['500 verifications / month', 'URL + text input', 'AI text detection', 'Priority support', 'Export reports (PDF)', 'Confidence scoring'], cta: 'Payments Beginning Soon' },
-  { name: 'Enterprise', price: 'Custom', period: 'contact us', highlight: false, desc: 'For organizations requiring full pipeline integration.', features: ['Unlimited verifications', 'REST API access', 'SSO and team accounts', 'Dedicated support', 'SLA guarantees', 'Custom models'], cta: 'Payments Beginning Soon' },
+  { nameKey: 'starterPlan', price: '0', periodKey: 'forever', highlight: false, descKey: 'starterDesc', features: ['10 verifications / month', 'Text input only', 'Basic accuracy report', 'Community support'], ctaKey: 'startFreeCTA' },
+  { nameKey: 'proPlan', price: '29', periodKey: 'perMonth', highlight: true, descKey: 'proDesc', features: ['500 verifications / month', 'URL + text input', 'AI text detection', 'Priority support', 'Export reports (PDF)', 'Confidence scoring'], ctaKey: 'soonCTA' },
+  { nameKey: 'enterprisePlan', price: 'Custom', periodKey: 'contactUs', highlight: false, descKey: 'entDesc', features: ['Unlimited verifications', 'REST API access', 'SSO and team accounts', 'Dedicated support', 'SLA guarantees', 'Custom models'], ctaKey: 'soonCTA' },
 ];
 
 
@@ -148,12 +148,11 @@ export default function LandingPage() {
   const [stat4, ref4] = useCountUp(2);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeFeature, setActiveFeature] = useState(0);
-  const [demoStep, setDemoStep] = useState(0); // 0=typing, 1..3=claims appearing
+  const [demoStep, setDemoStep] = useState(0); 
   const [typedText, setTypedText] = useState('');
 
   const demoInput = 'The Eiffel Tower is in Berlin. Water boils at 100°C. The Great Wall is visible from space.';
 
-  // Typewriter effect
   useEffect(() => {
     if (demoStep !== 0) return;
     let i = 0;
@@ -168,7 +167,6 @@ export default function LandingPage() {
     return () => clearInterval(timer);
   }, [demoStep]);
 
-  // Claims appearing one by one
   useEffect(() => {
     if (demoStep < 1 || demoStep > 3) return;
     const timer = setTimeout(() => {
@@ -178,10 +176,9 @@ export default function LandingPage() {
     return () => clearTimeout(timer);
   }, [demoStep]);
 
-  // Testimonial carousel
   useEffect(() => {
     const timer = setInterval(() => setActiveTestimonial(p => (p + 1) % testimonials.length), 5000);
-    return () => clearInterval(timer);
+    return () => clearTimeout(timer);
   }, []);
 
   /* ── Theme tokens ── */
@@ -236,7 +233,6 @@ export default function LandingPage() {
 
       {/* ══════════ HERO SECTION ══════════ */}
       <Section style={{ padding: '30px 0 100px', textAlign: 'center', position: 'relative' }}>
-        {/* Subtle Background Glow */}
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
           background: `radial-gradient(circle at 50% 30%, ${T.accent}0a 0%, transparent 70%)`,
@@ -255,7 +251,7 @@ export default function LandingPage() {
               background: `${T.accent}0a`, marginBottom: 32,
             }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: T.accent }} />
-              <span style={{ fontSize: 10, fontWeight: 700, color: T.accent, letterSpacing: 1.5 }}>{t('beta', lang)}</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: T.accent, letterSpacing: 1.5 }}>{t('landingBeta', lang)}</span>
             </div>
 
             <h1 style={{
@@ -264,8 +260,8 @@ export default function LandingPage() {
               fontWeight: 300, color: T.text, lineHeight: 1.1,
               marginBottom: 32, letterSpacing: -1,
             }}>
-              {t('heroTitle1', lang)} <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: T.accent }}>{t('heroTitle2', lang)}</span>
+              {t('landingHero1', lang)} <br />
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: T.accent }}>{t('landingHero2', lang)}</span>
             </h1>
           </motion.div>
 
@@ -277,7 +273,7 @@ export default function LandingPage() {
               margin: '0 auto 48px', fontWeight: 300,
             }}
           >
-            {t('heroSubtitle', lang)}
+            {t('landingHeroSubtitle', lang)}
           </motion.p>
 
           <motion.div
@@ -294,7 +290,7 @@ export default function LandingPage() {
                   background: `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none',
                   color: darkMode ? '#0a0a0f' : '#fff', letterSpacing: 0.5, cursor: 'pointer',
                 }}
-              >{t('startFree', lang)}</motion.button>
+              >{t('landingStartFree', lang)}</motion.button>
             </Link>
             <a href="#how-it-works">
               <motion.button
@@ -305,7 +301,7 @@ export default function LandingPage() {
                   background: 'transparent', border: `1px solid ${T.border}`,
                   color: T.text, letterSpacing: 0.5, cursor: 'pointer',
                 }}
-              >{t('seeHow', lang)}</motion.button>
+              >{t('landingSeeHow', lang)}</motion.button>
             </a>
           </motion.div>
         </div>
@@ -319,7 +315,7 @@ export default function LandingPage() {
             }}
           >
             <div style={{ width: 1, height: 40, background: `linear-gradient(to bottom, ${T.accent}66, transparent)` }} />
-            <span>{t('scroll', lang)}</span>
+            <span>{t('landingScroll', lang)}</span>
           </motion.div>
       </Section>
 
@@ -372,12 +368,10 @@ export default function LandingPage() {
             backdropFilter: 'blur(16px)', padding: '28px 28px 20px',
             boxShadow: darkMode ? '0 20px 80px rgba(0,0,0,0.4)' : '0 20px 60px rgba(0,0,0,0.08)',
           }}>
-            {/* Scanline */}
             {demoStep === 0 && typedText.length > 10 && (
               <div className="scan-line-effect" />
             )}
 
-            {/* Header bar */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20,
               paddingBottom: 16, borderBottom: `1px solid ${T.border}`,
@@ -390,7 +384,6 @@ export default function LandingPage() {
               }}>verixa-engine v2.0</span>
             </div>
 
-            {/* Input area */}
             <div style={{
               background: darkMode ? 'rgba(10,10,15,0.6)' : 'rgba(0,0,0,0.03)',
               borderRadius: 12, padding: '16px 20px', marginBottom: 20,
@@ -406,7 +399,6 @@ export default function LandingPage() {
               )}
             </div>
 
-            {/* Claims results */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <AnimatePresence>
                 {demoClaims.slice(0, Math.max(0, demoStep)).map((claim, i) => (
@@ -424,7 +416,7 @@ export default function LandingPage() {
                     }}
                   >
                     <claim.Icon size={18} color={claim.color} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, color: T.text2, flex: 1, lineHeight: 1.5 }}>{claim.text}</span>
+                    <span style={{ fontSize: 13, color: T.text2, flex: 1, lineHeight: 1.5 }}>{t(claim.textKey, lang)}</span>
                     <span style={{
                       fontSize: 11, fontWeight: 600, color: claim.color, letterSpacing: 0.5,
                       padding: '4px 10px', borderRadius: 6,
@@ -459,7 +451,6 @@ export default function LandingPage() {
         <div style={{ padding: '0 24px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           <div className="capabilities-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 60, alignItems: 'center' }}>
             
-            {/* Left Column: Vision & Identity */}
             <div>
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
@@ -488,7 +479,6 @@ export default function LandingPage() {
                   </p>
                 </div>
 
-                {/* Status HUD */}
                 <div style={{ display: 'flex', gap: 40, marginTop: 48, flexWrap: 'wrap' }}>
                   {[
                     { label: t('calibration', lang), val: '99.9%', color: '#4ade80' },
@@ -504,7 +494,6 @@ export default function LandingPage() {
               </motion.div>
             </div>
 
-            {/* Right Column: Grid */}
             <div className="capabilities-sub-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               {features.slice(0, 4).map((f, i) => (
                 <motion.div
@@ -536,7 +525,6 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Full Width Extended Features */}
           <div className="extended-features-grid" style={{ 
             display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', 
             gap: 20, marginTop: 40 
@@ -664,14 +652,12 @@ export default function LandingPage() {
             <div style={{ ...dividerStyle, margin: '20px auto' }} />
           </div>
 
-          {/* Carousel */}
           <div className="testimonial-card" style={{
             position: 'relative', minHeight: 220,
             background: T.testimonialBg, borderRadius: 20,
             border: `1px solid ${T.border}`, padding: '44px 40px',
             overflow: 'hidden',
           }}>
-            {/* Decorative quote mark */}
             <div style={{
               position: 'absolute', top: 16, left: 28, fontSize: 72,
               fontFamily: 'Cormorant Garamond, serif', color: `${T.accent}1a`,
@@ -679,7 +665,7 @@ export default function LandingPage() {
             }}>"</div>
 
             <AnimatePresence mode="wait">
-              {testimonials.map((t, i) => i === activeTestimonial && (
+              {testimonials.map((tItem, i) => i === activeTestimonial && (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
@@ -688,7 +674,7 @@ export default function LandingPage() {
                   transition={{ duration: 0.5 }}
                 >
                   <p style={{ fontSize: 16, color: T.text2, lineHeight: 1.8, fontWeight: 300, fontStyle: 'italic', marginBottom: 28 }}>
-                    "{t.text}"
+                    "{t(tItem.textKey, lang)}"
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                     <div style={{
@@ -697,17 +683,16 @@ export default function LandingPage() {
                       border: `1px solid ${T.accent}4d`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 13, fontWeight: 600, color: T.accent, flexShrink: 0,
-                    }}>{t.avatar}</div>
+                    }}>{tItem.avatar}</div>
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{t.name}</div>
-                      <div style={{ fontSize: 12, color: T.text3, marginTop: 2 }}>{t.role}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{tItem.name}</div>
+                      <div style={{ fontSize: 12, color: T.text3, marginTop: 2 }}>{tItem.role}</div>
                     </div>
                   </div>
                 </motion.div>
               ))}
             </AnimatePresence>
 
-            {/* Navigation: Arrows + Dots */}
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16, marginTop: 28 }}>
               <button
                 onClick={() => setActiveTestimonial(p => (p - 1 + testimonials.length) % testimonials.length)}
@@ -787,13 +772,13 @@ export default function LandingPage() {
                 <div style={{
                   fontFamily: 'Cormorant Garamond, serif', fontWeight: 500,
                   fontSize: 24, color: T.text, marginBottom: 8,
-                }}>{plan.name}</div>
-                <div style={{ fontSize: 13, color: T.text3, lineHeight: 1.5, marginBottom: 32 }}>{plan.desc}</div>
+                }}>{t(plan.nameKey, lang)}</div>
+                <div style={{ fontSize: 13, color: T.text3, lineHeight: 1.5, marginBottom: 32 }}>{t(plan.descKey, lang)}</div>
                 <div style={{
                   fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
                   fontSize: 56, color: T.text, lineHeight: 1,
                 }}>{plan.price === 'Custom' ? 'Custom' : `$${plan.price}`}</div>
-                <div style={{ fontSize: 12, color: T.text3, marginTop: 8, marginBottom: 32 }}>{plan.period}</div>
+                <div style={{ fontSize: 12, color: T.text3, marginTop: 8, marginBottom: 32 }}>{t(plan.periodKey, lang)}</div>
                 <ul style={{ listStyle: 'none', marginBottom: 40, flex: 1 }}>
                   {plan.features.map((f, j) => (
                     <li key={j} style={{
@@ -806,17 +791,13 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link to="/verify" style={{ marginTop: 'auto' }}>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    style={{
-                      width: '100%', padding: '16px', borderRadius: 12, fontSize: 14, fontWeight: 600,
-                      background: plan.highlight ? `linear-gradient(135deg, ${T.accent}, #a07b42)` : 'transparent',
-                      border: plan.highlight ? 'none' : `1px solid ${T.border}`,
-                      color: plan.highlight ? (darkMode ? '#0a0a0f' : '#fff') : T.text, cursor: 'pointer',
-                      transition: 'all 0.3s ease'
-                    }}
-                  >{plan.cta}</motion.button>
+                  <button style={{
+                    width: '100%', padding: '16px', borderRadius: 12,
+                    background: plan.highlight ? T.accent : 'transparent',
+                    border: plan.highlight ? 'none' : `1px solid ${T.border}`,
+                    color: plan.highlight ? (darkMode ? '#0a0a0f' : '#fff') : T.text,
+                    fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s',
+                  }}>{t(plan.ctaKey, lang)}</button>
                 </Link>
               </motion.div>
             ))}
