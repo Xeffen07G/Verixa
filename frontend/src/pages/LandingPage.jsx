@@ -390,11 +390,11 @@ export default function LandingPage() {
               }}>verixa-engine v2.0</span>
             </div>
 
-            <div style={{
+            <div className="demo-terminal-box" style={{
               background: darkMode ? 'rgba(10,10,15,0.6)' : 'rgba(0,0,0,0.03)',
-              borderRadius: 12, padding: '16px 20px', marginBottom: 20,
+              borderRadius: 12, marginBottom: 20,
               border: `1px solid ${T.border}`, minHeight: 56,
-              fontFamily: 'DM Mono, monospace', fontSize: 13, color: T.text2, lineHeight: 1.7,
+              fontFamily: 'DM Mono, monospace', color: T.text2, lineHeight: 1.7,
             }}>
               {typedText}
               {demoStep === 0 && (
@@ -414,19 +414,20 @@ export default function LandingPage() {
                     animate={{ opacity: 1, x: 0, height: 'auto' }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4, ease: 'easeOut' }}
+                    className="demo-claim-card"
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
-                      padding: '12px 16px', borderRadius: 10,
+                      borderRadius: 10,
                       background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
                       border: `1px solid ${T.border}`,
                     }}
                   >
-                    <claim.Icon size={18} color={claim.color} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, color: T.text2, flex: 1, lineHeight: 1.5 }}>{t(claim.textKey, lang)}</span>
-                    <span style={{
-                      fontSize: 11, fontWeight: 600, color: claim.color, letterSpacing: 0.5,
-                      padding: '4px 10px', borderRadius: 6,
-                      background: `${claim.color}15`, whiteSpace: 'normal', textAlign: 'right'
+                    <claim.Icon size={18} color={claim.color} style={{ flexShrink: 0 }} className="demo-icon" />
+                    <span className="demo-claim-text" style={{ color: T.text2, flex: 1, lineHeight: 1.5 }}>{t(claim.textKey, lang)}</span>
+                    <span className="demo-claim-badge" style={{
+                      fontWeight: 600, color: claim.color, letterSpacing: 0.5,
+                      borderRadius: 6,
+                      background: `${claim.color}15`, whiteSpace: 'nowrap', textAlign: 'right'
                     }}>{claim.verdict} · {claim.confidence}%</span>
                   </motion.div>
                 ))}
@@ -641,9 +642,22 @@ export default function LandingPage() {
           </div>
         </div>
         <style>{`
+          .demo-terminal-box { padding: 16px 20px; font-size: 13px; }
+          .demo-claim-card { padding: 12px 16px; }
+          .demo-claim-text { font-size: 13px; }
+          .demo-claim-badge { font-size: 11px; padding: 4px 10px; }
+          .demo-icon { width: 18px; height: 18px; }
+          
           @media (max-width: 1024px) {
             .desktop-wave { display: none !important; }
             .journey-step { align-self: center !important; margin: 0 auto !important; width: 100% !important; }
+          }
+          @media (max-width: 600px) {
+            .demo-terminal-box { padding: 12px 14px; font-size: 11px; }
+            .demo-claim-card { padding: 10px 12px; gap: 8px !important; flex-wrap: wrap; }
+            .demo-claim-text { font-size: 11px; }
+            .demo-claim-badge { font-size: 9px; padding: 3px 8px; }
+            .demo-icon { width: 14px !important; height: 14px !important; }
           }
         `}</style>
       </Section>
