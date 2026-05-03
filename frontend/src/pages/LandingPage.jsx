@@ -151,7 +151,7 @@ export default function LandingPage() {
   const [demoStep, setDemoStep] = useState(0); 
   const [typedText, setTypedText] = useState('');
 
-  const demoInput = 'The Eiffel Tower is in Berlin. Water boils at 100°C. The Great Wall is visible from space.';
+  const demoInput = t('demo1', lang) + ' ' + t('demo2', lang) + ' ' + t('demo3', lang);
 
   useEffect(() => {
     if (demoStep !== 0) return;

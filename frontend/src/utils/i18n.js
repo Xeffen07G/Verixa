@@ -1,7 +1,7 @@
 /**
  * VeriXa i18n — Multilingual Support
  * Supports: 24 Global Languages
- * Version: 2.2.8 (Definitive Universal Release)
+ * Version: 2.2.9 (Definitive Universal Release)
  */
 
 const translations = {
@@ -46,6 +46,10 @@ const translations = {
     calibration: 'CALIBRATION',
     latency: 'LATENCY',
     integrity: 'INTEGRITY',
+    urlAnalysis: 'URL Deep-Analysis',
+    deepScrapeDesc: 'Advanced scraping of news sites and social platforms.',
+    conflictIntel: 'Conflict Intelligence',
+    conflictDesc: 'Detection of conflicting viewpoints and factual disputes.',
     howItWorksLabel: 'Operational Intelligence',
     pathTruth: 'The Path to Absolute Truth.',
     surgicalExtraction: 'Surgical Extraction',
@@ -380,6 +384,10 @@ const translations = {
     calibration: 'CALIBRACIÓN',
     latency: 'LATENCIA',
     integrity: 'INTEGRIDAD',
+    urlAnalysis: 'Análisis Profundo de URL',
+    deepScrapeDesc: 'Scrapeo avanzado de sitios de noticias y redes sociales.',
+    conflictIntel: 'Inteligencia de Conflictos',
+    conflictDesc: 'Detección de puntos de vista en conflicto y disputas fácticas.',
     howItWorksLabel: 'Inteligencia Operacional',
     pathTruth: 'El camino hacia la verdad absoluta.',
     surgicalExtraction: 'Extracción quirúrgica',
@@ -693,7 +701,7 @@ export const LANGUAGES = [
   { code: 'te', label: 'Telugu', nativeLabel: 'తెలుగు' },
   { code: 'mr', label: 'Marathi', nativeLabel: 'मराठी' },
   { code: 'gu', label: 'Gujarati', nativeLabel: 'ગુજરાતી' },
-  { code: 'kn', label: 'Kannada', nativeLabel: 'ಕன்னಡ' },
+  { code: 'kn', label: 'Kannada', nativeLabel: 'ಕನ್ನಡ' },
   { code: 'ml', label: 'Malayalam', nativeLabel: 'മലയാളം' },
   { code: 'pa', label: 'Punjabi', nativeLabel: 'ਪੰਜਾਬੀ' },
   { code: 'id', label: 'Indonesian', nativeLabel: 'Bahasa Indonesia' },
