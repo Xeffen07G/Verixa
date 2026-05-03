@@ -134,22 +134,15 @@ export default function ImagePage() {
           </div>
 
           {inputMode === 'url' && (
-            <div>
-              <div style={{ display: 'flex', gap: 10 }}>
-                <input value={imageUrl} onChange={e => setImageUrl(e.target.value)}
-                  placeholder="https://example.com/image.jpg"
-                  onKeyDown={e => e.key === 'Enter' && analyzeUrl()}
-                  style={{ flex: 1, padding: '12px 16px', background: darkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', border: `1px solid ${T.border}`, borderRadius: 8, color: T.text, fontSize: 13, outline: 'none', fontFamily: 'DM Sans, sans-serif' }} />
-                <button onClick={analyzeUrl} disabled={loading || !imageUrl.trim()}
-                  style={{ padding: '12px 24px', borderRadius: 8, background: loading ? `${T.accent}33` : `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none', color: loading ? T.accent : (darkMode ? '#0a0a0f' : '#fff'), fontSize: 13, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.3s' }}>
-                  {loading ? '...' : t('analyze', lang)}
-                </button>
-              </div>
-              <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 11, color: T.text3, textTransform: 'uppercase', letterSpacing: 1 }}>Try Examples:</span>
-                <button onClick={() => setImageUrl('https://upload.wikimedia.org/wikipedia/en/8/8b/Pope_Francis_Puffer_Jacket.jpg')} style={{ padding: '4px 10px', background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', borderRadius: 6, fontSize: 11, cursor: 'pointer' }}>AI: Pope in Puffer</button>
-                <button onClick={() => setImageUrl('https://upload.wikimedia.org/wikipedia/commons/8/8d/President_Barack_Obama.jpg')} style={{ padding: '4px 10px', background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', borderRadius: 6, fontSize: 11, cursor: 'pointer' }}>Real: Barack Obama</button>
-              </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <input value={imageUrl} onChange={e => setImageUrl(e.target.value)}
+                placeholder="https://example.com/image.jpg"
+                onKeyDown={e => e.key === 'Enter' && analyzeUrl()}
+                style={{ flex: 1, padding: '12px 16px', background: darkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', border: `1px solid ${T.border}`, borderRadius: 8, color: T.text, fontSize: 13, outline: 'none', fontFamily: 'DM Sans, sans-serif' }} />
+              <button onClick={analyzeUrl} disabled={loading || !imageUrl.trim()}
+                style={{ padding: '12px 24px', borderRadius: 8, background: loading ? `${T.accent}33` : `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none', color: loading ? T.accent : (darkMode ? '#0a0a0f' : '#fff'), fontSize: 13, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.3s' }}>
+                {loading ? '...' : t('analyze', lang)}
+              </button>
             </div>
           )}
 
@@ -273,9 +266,10 @@ export default function ImagePage() {
           <div style={{ marginTop: 16, padding: 20, background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12 }}>
             <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12 }}>{t('trySamples', lang)}</p>
             {[
-              { label: t('sampleRealPortrait', lang), url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400' },
+              { label: '[AI Deepfake] Pope Francis in Puffer Jacket', url: 'https://upload.wikimedia.org/wikipedia/en/8/8b/Pope_Francis_Puffer_Jacket.jpg' },
+              { label: '[AI Generated] Cyberpunk Cityscape', url: 'https://images.unsplash.com/photo-1684369527928-874dbcd84439?w=400' },
+              { label: t('sampleRealPortrait', lang) + ' (Barack Obama)', url: 'https://upload.wikimedia.org/wikipedia/commons/8/8d/President_Barack_Obama.jpg' },
               { label: t('sampleRealLandscape', lang), url: 'https://images.unsplash.com/photo-1470770903676-69b98201ea1c?w=400' },
-              { label: t('sampleRealStreet', lang), url: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=400' },
             ].map((s, i) => (
               <button key={i} onClick={() => { setImageUrl(s.url); setInputMode('url'); }}
                 style={{ display: 'block', width: '100%', textAlign: 'left', padding: '12px', marginBottom: 6, background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', border: `1px solid ${T.border}`, borderRadius: 6, color: T.accent, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s' }}
