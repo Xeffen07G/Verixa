@@ -8,8 +8,16 @@ document.addEventListener('DOMContentLoaded', () => {
   chrome.runtime.sendMessage({ action: 'getLastResult' }, (result) => {
     if (result && result.overallScore !== undefined) {
       const score = result.overallScore;
+      const lang = result.lang || 'en';
       const color = score >= 70 ? '#4ade80' : score >= 40 ? '#fbbf24' : '#f87171';
-      const label = score >= 70 ? 'Mostly Accurate' : score >= 40 ? 'Mixed Accuracy' : 'Mostly Inaccurate';
+      
+      const labels = {
+        en: { high: 'Highly Accurate', mid: 'Mixed Accuracy', low: 'Mostly Inaccurate' },
+        es: { high: 'Altamente preciso', mid: 'Precisión mixta', low: 'Mayormente inexacto' },
+        bn: { high: 'অত্যন্ত নির্ভুল', mid: 'মিশ্র নির্ভুলতা', low: 'বেশিরভাগ ভুল' }
+      };
+      const l = labels[lang] || labels.en;
+      const label = score >= 70 ? l.high : score >= 40 ? l.mid : l.low;
 
       const verdictColors = {
         'True': { color: '#4ade80', icon: '✓' },
@@ -41,7 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.get(['history'], (data) => {
       const history = data.history || [];
       if (history.length === 0) {
-        body.innerHTML = '<div class="status"><div class="status-icon">📋</div><p>No verification history yet.</p></div>';
+        const lang = (localStorage.getItem('verixa-lang') || 'en').split('-')[0];
+        const msg = {
+          en: 'No verification history yet.',
+          es: 'Aún no hay historial de verificación.',
+          bn: 'এখনও কোনো যাচাইকরণের ইতিহাস নেই।'
+        };
+        body.innerHTML = `<div class="status"><div class="status-icon">📋</div><p>${msg[lang] || msg.en}</p></div>`;
         return;
       }
 
