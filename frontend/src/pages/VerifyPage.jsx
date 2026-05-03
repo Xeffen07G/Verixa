@@ -707,8 +707,8 @@ export default function VerifyPage() {
 
           {/* Tabs */}
           <div style={{ padding: '12px 20px', borderBottom: `1px solid ${T.border}`, display: 'flex', gap: 4 }}>
-            {[{ id: 'input', label: 'Input' }, { id: 'history', label: `History${history.length > 0 ? ` (${history.length})` : ''}` }].map(t => (
-              <button key={t.id} onClick={() => setLeftTab(t.id)} className="tab-btn" style={tabBtn(leftTab === t.id)}>{t(t.id, lang)}{t.id === 'history' ? ` (${history.length})` : ''}</button>
+            {[{ id: 'input', label: 'Input' }, { id: 'history', label: `History${history.length > 0 ? ` (${history.length})` : ''}` }].map(tab => (
+              <button key={tab.id} onClick={() => setLeftTab(tab.id)} className="tab-btn" style={tabBtn(leftTab === tab.id)}>{t(tab.id, lang)}{tab.id === 'history' ? ` (${history.length})` : ''}</button>
             ))}
           </div>
 
@@ -925,18 +925,18 @@ export default function VerifyPage() {
             <div style={{ animation: 'fadeUp 0.5s ease forwards' }}>
 
               {/* Color coded score banner */}
-              <ScoreBanner score={overallScore} claims={claims} />
+              <ScoreBanner score={overallScore} claims={claims} lang={lang} />
 
               {/* Action Buttons */}
               <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
-                <button onClick={() => exportToPDF(claims, overallScore, text)}
+                <button onClick={() => exportToPDF(claims, overallScore, text, lang)}
                   className="action-btn"
                   style={{ flex: 1, minWidth: 160, borderRadius: 12, background: T.accentMuted, border: `1.5px solid ${T.accent}33`, color: T.accent, cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s' }}
                   onMouseEnter={e => e.currentTarget.style.background = `${T.accent}1a`}
                   onMouseLeave={e => e.currentTarget.style.background = T.accentMuted}>
                   <Download size={18} /> Export Full Report
                 </button>
-                <button onClick={() => generateCertificate(claims, overallScore, text)}
+                <button onClick={() => generateCertificate(claims, overallScore, text, lang)}
                   className="action-btn"
                   style={{ 
                     flex: 1.5, minWidth: 200, borderRadius: 12, 
