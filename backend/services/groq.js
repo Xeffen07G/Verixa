@@ -116,22 +116,9 @@ Return ONLY this exact JSON format:
 }
 
 async function searchEvidence(claim) {
-  const queryPrompt = `Create the best Google search query to fact-check this claim.
-The query should find authoritative sources like Wikipedia, BBC, Reuters, WHO, CDC, official websites.
-Return ONLY the search query — no explanation, no quotes, no punctuation at the end.
-
-Claim: "${claim}"`;
-
-  let searchQuery = claim;
-  try {
-    // Using 8b model for search query generation
-    searchQuery = await askGroq(queryPrompt, false, "llama-3.1-8b-instant");
-    searchQuery = searchQuery.replace(/"/g, "").trim();
-  } catch (e) {
-    // fallback to raw claim
-  }
-
-  return await tavilySearch(searchQuery);
+  // Bypassing LLM query generation to massively improve speed and avoid rate limits
+  // Tavily is smart enough to handle raw claims as search queries directly
+  return await tavilySearch(claim);
 }
 
 async function verifyClaims(claimsWithEvidence) {

@@ -21,20 +21,28 @@ router.post("/", async (req, res) => {
   };
 
   try {
-    send("stage", { stage: "extracting", message: "Decomposing text into verifiable claims..." });
-    const claims = await extractClaims(text);
-    send("log", { message: `Found ${claims.length} verifiable claims` });
+    send("stage", { stage: "extracting", message: "Decomposing text & analyzing origin..." });
+    
+    // Run extraction and AI detection in parallel to save significant time
+    const extractPromise = extractClaims(text).then(claims => {
+      send("log", { message: `Found ${claims.length} verifiable claims` });
+      return claims;
+    });
 
-    let aiDetection = null;
+    let aiDetectionPromise = Promise.resolve(null);
     if (detectAI) {
-      send("stage", { stage: "analyzing", message: "Analyzing text origin..." });
-      try {
-        aiDetection = await detectAIText(text);
-        send("log", { message: `AI probability: ${aiDetection.ai_probability}%` });
-      } catch (e) {
-        send("log", { message: "AI detection skipped: " + e.message });
-      }
+      aiDetectionPromise = detectAIText(text)
+        .then(res => {
+          send("log", { message: `AI probability: ${res.ai_probability}%` });
+          return res;
+        })
+        .catch(e => {
+          send("log", { message: "AI detection skipped: " + e.message });
+          return null;
+        });
     }
+
+    const [claims, aiDetection] = await Promise.all([extractPromise, aiDetectionPromise]);
 
     send("stage", { stage: "searching", message: "Retrieving evidence from the web..." });
     const claimsWithEvidence = await Promise.all(claims.map(async (claim) => {
