@@ -5,7 +5,7 @@ let _lastVerifiedText = '';
 
 // --- Auto-inject: If we're on localhost:3000/verify?source=extension, pull text from chrome.storage ---
 (function autoInjectForVerifyPage() {
-  if (window.location.origin === 'http://localhost:3000' && window.location.pathname === '/verify') {
+  if (window.location.origin.includes('verixa') && window.location.pathname === '/verify') {
     const params = new URLSearchParams(window.location.search);
     if (params.get('source') === 'extension') {
       chrome.storage.local.get(['extensionText'], (data) => {
@@ -160,7 +160,7 @@ function showResults(data) {
     reportBtn.addEventListener('click', () => {
       // Store the text in chrome.storage so the verify page can read it
       chrome.storage.local.set({ extensionText: _lastVerifiedText }, () => {
-        window.open('http://localhost:3000/verify?source=extension', '_blank');
+        window.open('https://verixa-gamma.vercel.app/verify?source=extension', '_blank');
       });
     });
   }
