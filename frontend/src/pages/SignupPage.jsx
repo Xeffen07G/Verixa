@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { User, Building, Mail, Lock } from 'lucide-react';
+import { t } from '../utils/i18n';
+import { useLang } from '../context/LangContext';
 
 const T = {
   bg: '#0a0a0f', card: 'rgba(22,22,31,0.95)', border: 'rgba(255,255,255,0.07)',
@@ -10,6 +9,7 @@ const T = {
 };
 
 export default function SignupPage() {
+  const { lang } = useLang();
   const [name, setName] = useState('');
   const [organization, setOrganization] = useState('');
   const [email, setEmail] = useState('');
@@ -25,12 +25,12 @@ export default function SignupPage() {
     setErr('');
     
     if (password !== confirm) {
-      setErr('Passwords do not match');
+      setErr(t('passwordsDoNotMatch', lang));
       return;
     }
     
     if (password.length < 6) {
-      setErr('Password must be at least 6 characters');
+      setErr(t('passwordMinLength', lang));
       return;
     }
 
@@ -40,10 +40,10 @@ export default function SignupPage() {
       if (result.success) {
         navigate('/verify');
       } else {
-        setErr(result.error || 'Signup failed');
+        setErr(result.error || t('signupFailed', lang));
       }
     } catch (error) {
-      setErr('An unexpected error occurred. Please try again.');
+      setErr(t('unexpectedErrorTryAgain', lang));
     } finally {
       setIsLoading(false);
     }
@@ -72,8 +72,8 @@ export default function SignupPage() {
       <div style={{ maxWidth: 460, width: '100%', padding: '48px 40px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 24, boxShadow: '0 24px 64px rgba(0,0,0,0.4)', animation: 'fadeUp 0.5s ease' }}>
 
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <h1 style={{ fontFamily: 'serif', fontSize: 34, fontWeight: 300, color: T.text, margin: '0 0 8px' }}>Join the Network.</h1>
-          <p style={{ fontSize: 14, color: T.text2, margin: 0 }}>Establish your enterprise identity for shared integrity.</p>
+          <h1 style={{ fontFamily: 'serif', fontSize: 34, fontWeight: 300, color: T.text, margin: '0 0 8px' }}>{t('joinNetwork', lang)}</h1>
+          <p style={{ fontSize: 14, color: T.text2, margin: 0 }}>{t('establishIdentity', lang)}</p>
         </div>
 
         {err && (
@@ -87,38 +87,38 @@ export default function SignupPage() {
           <div className="signup-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div style={{ position: 'relative' }}>
               <User size={16} style={iconStyle} />
-              <input required placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} className="form-input" style={inputStyle} />
+              <input required placeholder={t('fullName', lang)} value={name} onChange={e => setName(e.target.value)} className="form-input" style={inputStyle} />
             </div>
             <div style={{ position: 'relative' }}>
               <Building size={16} style={iconStyle} />
-              <input required placeholder="Organization" value={organization} onChange={e => setOrganization(e.target.value)} className="form-input" style={inputStyle} />
+              <input required placeholder={t('organization', lang)} value={organization} onChange={e => setOrganization(e.target.value)} className="form-input" style={inputStyle} />
             </div>
           </div>
 
           <div style={{ position: 'relative' }}>
             <Mail size={16} style={iconStyle} />
-            <input type="email" required placeholder="Work Email" value={email} onChange={e => setEmail(e.target.value)} className="form-input" style={inputStyle} />
+            <input type="email" required placeholder={t('workEmail', lang)} value={email} onChange={e => setEmail(e.target.value)} className="form-input" style={inputStyle} />
           </div>
 
           <div style={{ position: 'relative' }}>
             <Lock size={16} style={iconStyle} />
-            <input type="password" required placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="form-input" style={inputStyle} />
+            <input type="password" required placeholder={t('password', lang)} value={password} onChange={e => setPassword(e.target.value)} className="form-input" style={inputStyle} />
           </div>
 
           <div style={{ position: 'relative' }}>
             <Lock size={16} style={iconStyle} />
-            <input type="password" required placeholder="Confirm Password" value={confirm} onChange={e => setConfirm(e.target.value)} className="form-input" style={inputStyle} />
+            <input type="password" required placeholder={t('confirmPassword', lang)} value={confirm} onChange={e => setConfirm(e.target.value)} className="form-input" style={inputStyle} />
           </div>
 
           <button type="submit" disabled={isLoading}
             style={{ width: '100%', padding: '14px', marginTop: 12, borderRadius: 12, background: isLoading ? 'rgba(201,169,110,0.2)' : T.accent, border: 'none', color: '#0a0a0f', fontSize: 14, fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
-            {isLoading ? 'Establishing Identity...' : 'Join VeriXa'}
+            {isLoading ? t('establishingIdentity', lang) : t('joinVerixa', lang)}
           </button>
         </form>
 
         <div style={{ textAlign: 'center', marginTop: 24 }}>
           <p style={{ fontSize: 13, color: T.text2, margin: 0 }}>
-            Already registered? <Link to="/login" style={{ color: T.accent, textDecoration: 'none', fontWeight: 600 }}>Sign in</Link>
+            {t('alreadyRegistered', lang)} <Link to="/login" style={{ color: T.accent, textDecoration: 'none', fontWeight: 600 }}>{t('signIn', lang)}</Link>
           </p>
         </div>
       </div>

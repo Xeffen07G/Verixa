@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, User, Building } from 'lucide-react';
+import { t } from '../utils/i18n';
+import { useLang } from '../context/LangContext';
 
 const T = {
   bg: '#0a0a0f', card: 'rgba(22,22,31,0.95)', border: 'rgba(255,255,255,0.07)',
@@ -10,6 +10,7 @@ const T = {
 };
 
 export default function LoginPage() {
+  const { lang } = useLang();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [err, setErr] = useState('');
@@ -27,10 +28,10 @@ export default function LoginPage() {
       if (result.success) {
         navigate('/verify');
       } else {
-        setErr(result.error || 'Login failed');
+        setErr(result.error || t('loginFailed', lang));
       }
     } catch (error) {
-      setErr('An unexpected error occurred.');
+      setErr(t('unexpectedError', lang));
     } finally {
       setIsLoading(false);
     }
@@ -56,8 +57,8 @@ export default function LoginPage() {
       <div style={{ maxWidth: 400, width: '100%', padding: '48px 40px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 24, boxShadow: '0 24px 64px rgba(0,0,0,0.4)', animation: 'fadeUp 0.5s ease' }}>
 
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <h1 style={{ fontFamily: 'serif', fontSize: 34, fontWeight: 300, color: T.text, margin: '0 0 8px' }}>Welcome Back.</h1>
-          <p style={{ fontSize: 14, color: T.text2, margin: 0 }}>Access your enterprise verification suite.</p>
+          <h1 style={{ fontFamily: 'serif', fontSize: 34, fontWeight: 300, color: T.text, margin: '0 0 8px' }}>{t('welcomeBack', lang)}</h1>
+          <p style={{ fontSize: 14, color: T.text2, margin: 0 }}>{t('accessSuite', lang)}</p>
         </div>
 
         {err && (
@@ -69,23 +70,23 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ position: 'relative' }}>
             <Mail size={16} style={iconStyle} />
-            <input type="email" required placeholder="Work Email" value={email} onChange={e => setEmail(e.target.value)} className="form-input" style={inputStyle} />
+            <input type="email" required placeholder={t('workEmail', lang)} value={email} onChange={e => setEmail(e.target.value)} className="form-input" style={inputStyle} />
           </div>
 
           <div style={{ position: 'relative' }}>
             <Lock size={16} style={iconStyle} />
-            <input type="password" required placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="form-input" style={inputStyle} />
+            <input type="password" required placeholder={t('password', lang)} value={password} onChange={e => setPassword(e.target.value)} className="form-input" style={inputStyle} />
           </div>
 
           <button type="submit" disabled={isLoading}
             style={{ width: '100%', padding: '14px', marginTop: 12, borderRadius: 12, background: isLoading ? 'rgba(201,169,110,0.2)' : T.accent, border: 'none', color: '#0a0a0f', fontSize: 14, fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
-            {isLoading ? 'Authenticating...' : 'Sign In'}
+            {isLoading ? t('authenticating', lang) : t('signIn', lang)}
           </button>
         </form>
 
         <div style={{ textAlign: 'center', marginTop: 24 }}>
           <p style={{ fontSize: 13, color: T.text2, margin: 0 }}>
-            New to VeriXa? <Link to="/signup" style={{ color: T.accent, textDecoration: 'none', fontWeight: 600 }}>Create account</Link>
+            {t('newToVerixa', lang)} <Link to="/signup" style={{ color: T.accent, textDecoration: 'none', fontWeight: 600 }}>{t('createAccount', lang)}</Link>
           </p>
         </div>
       </div>

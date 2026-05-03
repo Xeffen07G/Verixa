@@ -104,8 +104,8 @@ const testimonials = [
   { name: 'Arnab Saha', role: 'Senior Programme Coordinator at Techno India University', textKey: 'test3Text', avatar: 'AS' },
 ];
 
-const features = [
-  { Icon: Shield, key: 'features', descKey: 'extractingDesc' }, // Reusing existing keys
+const featuresList = [
+  { Icon: Shield, key: 'surgicalExtraction', descKey: 'surgicalDesc' },
   { Icon: Search, key: 'searchingEvidence', descKey: 'searchingDesc' },
   { Icon: BarChart3, key: 'verifyingClaims', descKey: 'verifyingDesc' },
   { Icon: Brain, key: 'aiTextDetection', descKey: 'aiDetectDesc' },
@@ -113,17 +113,17 @@ const features = [
   { Icon: AlertTriangle, key: 'conflictIntel', descKey: 'conflictDesc' },
 ];
 
-const steps = [
-  { num: '01', title: 'Submit', desc: 'Paste text or a URL link.' },
-  { num: '02', title: 'Extract', desc: 'AI breaks text into facts.' },
-  { num: '03', title: 'Verify', desc: 'Agents gather live evidence.' },
-  { num: '04', title: 'Report', desc: 'Get your truth certificate.' },
+const stepsList = (lang) => [
+  { num: '01', title: t('step1Title', lang), desc: t('step1Desc', lang) },
+  { num: '02', title: t('step2Title', lang), desc: t('step2Desc', lang) },
+  { num: '03', title: t('step3Title', lang), desc: t('step3Desc', lang) },
+  { num: '04', title: t('step4Title', lang), desc: t('step4Desc', lang) },
 ];
 
-const plans = [
-  { nameKey: 'starterPlan', price: '0', periodKey: 'forever', highlight: false, descKey: 'starterDesc', features: ['10 verifications / month', 'Text input only', 'Basic accuracy report', 'Community support'], ctaKey: 'startFreeCTA' },
-  { nameKey: 'proPlan', price: '29', periodKey: 'perMonth', highlight: true, descKey: 'proDesc', features: ['500 verifications / month', 'URL + text input', 'AI text detection', 'Priority support', 'Export reports (PDF)', 'Confidence scoring'], ctaKey: 'soonCTA' },
-  { nameKey: 'enterprisePlan', price: 'Custom', periodKey: 'contactUs', highlight: false, descKey: 'entDesc', features: ['Unlimited verifications', 'REST API access', 'SSO and team accounts', 'Dedicated support', 'SLA guarantees', 'Custom models'], ctaKey: 'soonCTA' },
+const plansList = (lang) => [
+  { nameKey: 'starterPlan', price: '0', periodKey: 'forever', highlight: false, descKey: 'starterDesc', features: [t('plan1F1', lang), t('plan1F2', lang), t('plan1F3', lang), t('plan1F4', lang)], ctaKey: 'startFreeCTA' },
+  { nameKey: 'proPlan', price: '29', periodKey: 'perMonth', highlight: true, descKey: 'proDesc', features: [t('plan2F1', lang), t('plan2F2', lang), t('plan2F3', lang), t('plan2F4', lang), t('plan2F5', lang), t('plan2F6', lang)], ctaKey: 'soonCTA' },
+  { nameKey: 'enterprisePlan', price: t('custom', lang), periodKey: 'contactUs', highlight: false, descKey: 'entDesc', features: [t('plan3F1', lang), t('plan3F2', lang), t('plan3F3', lang), t('plan3F4', lang), t('plan3F5', lang), t('plan3F6', lang)], ctaKey: 'soonCTA' },
 ];
 
 
@@ -433,7 +433,7 @@ export default function LandingPage() {
       {/* ══════════ POWERED BY ══════════ */}
       <Section style={{ padding: '40px 0 60px', overflow: 'hidden' }}>
         <p style={{ textAlign: 'center', fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: T.text3, marginBottom: 24, fontWeight: 500 }}>
-          Powered by leading AI infrastructure
+          {t('poweredByLabel', lang)}
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 48, flexWrap: 'wrap', padding: '0 24px' }}>
           {['Groq', 'LLaMA', 'Tavily', 'React'].map((name, i) => (
@@ -495,7 +495,7 @@ export default function LandingPage() {
             </div>
 
             <div className="capabilities-sub-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              {features.slice(0, 4).map((f, i) => (
+              {featuresList.slice(0, 4).map((f, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -529,7 +529,7 @@ export default function LandingPage() {
             display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', 
             gap: 20, marginTop: 40 
           }}>
-            {features.slice(4).map((f, i) => (
+            {featuresList.slice(4).map((f, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -746,7 +746,7 @@ export default function LandingPage() {
             display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: 24, alignItems: 'stretch',
           }}>
-            {plans.map((plan, i) => (
+            {plansList(lang).map((plan, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 30 }}
@@ -777,7 +777,7 @@ export default function LandingPage() {
                 <div style={{
                   fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
                   fontSize: 56, color: T.text, lineHeight: 1,
-                }}>{plan.price === 'Custom' ? 'Custom' : `$${plan.price}`}</div>
+                }}>{plan.price === t('custom', lang) ? plan.price : `$${plan.price}`}</div>
                 <div style={{ fontSize: 12, color: T.text3, marginTop: 8, marginBottom: 32 }}>{t(plan.periodKey, lang)}</div>
                 <ul style={{ listStyle: 'none', marginBottom: 40, flex: 1 }}>
                   {plan.features.map((f, j) => (

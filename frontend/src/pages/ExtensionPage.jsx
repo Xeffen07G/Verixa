@@ -1,30 +1,30 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { t } from '../utils/i18n';
+import { useLang } from '../context/LangContext';
 
 /**
  * Browser Extension landing page
  * Showcases the Chrome Extension with installation instructions
  */
 
-const FEATURES = [
-  { icon: '🖱️', title: 'Right-Click Verify', desc: 'Select any text on any webpage, right-click, and choose "Verify with VeriXa" for instant fact-checking.' },
-  { icon: '⚡', title: 'Instant Results', desc: 'Get verdicts in seconds with a sleek overlay — no need to leave the page you\'re reading.' },
-  { icon: '🌐', title: 'Works Everywhere', desc: 'Activate on news sites, social media, articles, or any webpage with text content.' },
-  { icon: '💾', title: 'Save History', desc: 'All your verifications are saved locally. Review past fact-checks anytime from the popup.' },
-  { icon: '🎨', title: 'Native Feel', desc: 'Matches VeriXa\'s premium gold & dark aesthetic. Feels like a natural part of your browser.' },
-  { icon: '🔒', title: 'Privacy First', desc: 'Only processes text you explicitly select. No tracking, no data collection, no background scanning.' },
+const FEATURES = (lang) => [
+  { icon: '🖱️', title: t('rightClickVerify', lang), desc: t('rightClickDesc', lang) },
+  { icon: '⚡', title: t('instantResults', lang), desc: t('instantResultsDesc', lang) },
+  { icon: '🌐', title: t('worksEverywhere', lang), desc: t('worksEverywhereDesc', lang) },
+  { icon: '💾', title: t('saveHistory', lang), desc: t('saveHistoryDesc', lang) },
+  { icon: '🎨', title: t('nativeFeel', lang), desc: t('nativeFeelDesc', lang) },
+  { icon: '🔒', title: t('privacyFirst', lang), desc: t('privacyFirstDesc', lang) },
 ];
 
-const INSTALL_STEPS = [
-  { num: '01', title: 'Download Extension', desc: 'Download the VeriXa extension folder from the project\'s /extension directory.' },
-  { num: '02', title: 'Open Extensions Page', desc: 'Navigate to chrome://extensions in your Chrome browser address bar.' },
-  { num: '03', title: 'Enable Developer Mode', desc: 'Toggle on "Developer mode" in the top-right corner of the extensions page.' },
-  { num: '04', title: 'Load Unpacked', desc: 'Click "Load unpacked" button and select the downloaded extension folder.' },
+const INSTALL_STEPS = (lang) => [
+  { num: '01', title: t('downloadExt', lang), desc: t('downloadExtDesc', lang) },
+  { num: '02', title: t('openExtPage', lang), desc: t('openExtPageDesc', lang) },
+  { num: '03', title: t('enableDevMode', lang), desc: t('enableDevModeDesc', lang) },
+  { num: '04', title: t('loadUnpacked', lang), desc: t('loadUnpackedDesc', lang) },
 ];
 
 export default function ExtensionPage() {
+  const { lang } = useLang();
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('verixa-theme');
     return saved ? saved === 'dark' : true;
@@ -87,7 +87,7 @@ export default function ExtensionPage() {
               fontSize: 11, color: T.accent, letterSpacing: 1.5, fontWeight: 600, textTransform: 'uppercase',
             }}
           >
-            🧩 Chrome Extension
+            🧩 {t('navExtension', lang).toUpperCase()}
           </motion.div>
 
           <motion.h1
@@ -99,8 +99,8 @@ export default function ExtensionPage() {
               color: T.text, margin: '0 0 20px',
             }}
           >
-            Verify while you{' '}
-            <span style={{ fontStyle: 'italic', color: T.accent }}>browse.</span>
+            {t('verifyWhile', lang)}{' '}
+            <span style={{ fontStyle: 'italic', color: T.accent }}>{t('browse', lang)}.</span>
           </motion.h1>
 
           <motion.p
@@ -111,8 +111,7 @@ export default function ExtensionPage() {
               maxWidth: 520, margin: '0 auto 36px', fontWeight: 300,
             }}
           >
-            Right-click any text on any webpage and verify it instantly with VeriXa.
-            The most viral feature possible — use it every day while reading news.
+            {t('extensionTagline', lang)}
           </motion.p>
 
           {/* Browser mockup */}
@@ -150,9 +149,9 @@ export default function ExtensionPage() {
             <div style={{ padding: '24px 28px', position: 'relative', minHeight: 200 }}>
               <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.8, marginBottom: 16 }}>
                 <span style={{ background: darkMode ? 'rgba(201,169,110,0.15)' : 'rgba(90,66,26,0.15)', padding: '2px 0', borderRadius: 2 }}>
-                  Studies show that vaccines cause autism in children
+                  {t('demo4', lang)}
                 </span>
-                , according to a viral social media post...
+                ...
               </div>
 
               {/* Fake context menu */}
@@ -168,7 +167,7 @@ export default function ExtensionPage() {
                   <div key={i} style={{
                     padding: '8px 16px', fontSize: 12, color: T.text3,
                     borderBottom: i === 2 ? `1px solid ${T.border}` : 'none',
-                  }}>{item}</div>
+                  }}>{t(item.toLowerCase().replace(/ /g, '_'), lang) || item}</div>
                 ))}
                 <div style={{
                   padding: '8px 16px', fontSize: 12, color: T.accent,
@@ -181,7 +180,7 @@ export default function ExtensionPage() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 10, color: darkMode ? '#0a0a0f' : '#fff', fontWeight: 800,
                   }}>V</span>
-                  Verify with VeriXa
+                  {t('verifyWithVerixa', lang)}
                 </div>
               </div>
             </div>
@@ -196,18 +195,18 @@ export default function ExtensionPage() {
             <p style={{
               fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
               color: T.accent, marginBottom: 12, fontWeight: 500,
-            }}>Capabilities</p>
+            }}>{t('capabilitiesLabel', lang)}</p>
             <h2 style={{
               fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
               fontSize: 'clamp(32px, 5vw, 48px)', color: T.text, margin: 0,
-            }}>Everything you need.</h2>
+            }}>{t('everythingYouNeed', lang)}</h2>
           </div>
 
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: 16,
           }}>
-            {FEATURES.map((f, i) => (
+            {FEATURES(lang).map((f, i) => (
               <div key={i} className="ext-feature" style={{
                 padding: '28px 24px', borderRadius: 14,
                 background: T.glassBg, border: `1px solid ${T.glassBorder}`,
@@ -239,15 +238,15 @@ export default function ExtensionPage() {
             <p style={{
               fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
               color: T.accent, marginBottom: 12, fontWeight: 500,
-            }}>Setup</p>
+            }}>{t('setup', lang)}</p>
             <h2 style={{
               fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
               fontSize: 'clamp(32px, 5vw, 48px)', color: T.text, margin: 0,
-            }}>Install in 60 seconds.</h2>
+            }}>{t('installIn60', lang)}</h2>
           </div>
 
           <div className="install-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
-            {INSTALL_STEPS.map((step, i) => (
+            {INSTALL_STEPS(lang).map((step, i) => (
               <div key={i} style={{
                 padding: '28px 24px', borderRadius: 14,
                 background: T.cardBg, border: `1px solid ${T.border}`,
@@ -273,10 +272,10 @@ export default function ExtensionPage() {
 
           <div style={{ textAlign: 'center', marginTop: 40 }}>
             <p style={{ fontSize: 13, color: T.text3, marginBottom: 16, lineHeight: 1.7 }}>
-              Extension files are included in the project's <code style={{
+              {t('extensionDirHint', lang)} <code style={{
                 background: T.accentMuted, padding: '2px 8px', borderRadius: 4,
                 fontFamily: 'DM Mono, monospace', fontSize: 12, color: T.accent,
-              }}>/extension</code> directory
+              }}>/extension</code> {t('directory', lang)}
             </p>
           </div>
         </div>

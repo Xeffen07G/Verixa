@@ -4,8 +4,11 @@ import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { Mail, Shield, Building, Calendar, Settings, Camera, Save, X, MapPin, Quote, TrendingUp, Award, Zap } from 'lucide-react';
+import { t } from '../utils/i18n';
+import { useLang } from '../context/LangContext';
 
 export default function AccountPage() {
+  const { lang } = useLang();
   const { user, logout, setUser } = useAuth();
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('verixa-theme') === 'dark');
   const [isEditing, setIsEditing] = useState(false);
@@ -16,9 +19,9 @@ export default function AccountPage() {
     name: user?.name || '',
     organization: user?.organization || '',
     profilePic: user?.profilePic || '',
-    title: user?.title || 'Analysis Expert',
+    title: user?.title || t('expertTitle', lang),
     bio: user?.bio || '',
-    location: user?.location || 'Global Network'
+    location: user?.location || t('globalNetwork', lang)
   });
   const fileInputRef = useRef(null);
 
@@ -105,7 +108,7 @@ export default function AccountPage() {
         
         {saveSuccess && (
           <div style={{ position: 'fixed', top: 100, right: 30, zIndex: 9999, padding: '16px 24px', borderRadius: 14, background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10, animation: 'fadeUp 0.4s ease', backdropFilter: 'blur(12px)' }}>
-            ✅ Profile updated successfully!
+            ✅ {t('profileUpdated', lang)}
           </div>
         )}
 
@@ -129,13 +132,13 @@ export default function AccountPage() {
               )}
 
               {isEditing ? (
-                <input value={editData.title} onChange={e => setEditData({ ...editData, title: e.target.value })} placeholder="Your professional title" style={{ background: T.input, border: 'none', color: T.accent, fontSize: 13, textAlign: 'center', width: '100%', outline: 'none', fontWeight: 600, marginBottom: 12 }} />
+                <input value={editData.title} onChange={e => setEditData({ ...editData, title: e.target.value })} placeholder={t('expertTitle', lang)} style={{ background: T.input, border: 'none', color: T.accent, fontSize: 13, textAlign: 'center', width: '100%', outline: 'none', fontWeight: 600, marginBottom: 12 }} />
               ) : (
-                <p style={{ color: T.accent, fontSize: 13, fontWeight: 600, margin: '0 0 16px' }}>{editData.title || 'Analysis Expert'}</p>
+                <p style={{ color: T.accent, fontSize: 13, fontWeight: 600, margin: '0 0 16px' }}>{editData.title || t('expertTitle', lang)}</p>
               )}
 
               <div style={{ padding: '4px 12px', borderRadius: 999, background: isAdmin ? `${T.accent}14` : 'rgba(96,165,250,0.08)', border: `1px solid ${isAdmin ? `${T.accent}33` : 'rgba(96,165,250,0.2)'}`, color: isAdmin ? T.accent : '#60a5fa', fontSize: 9, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase' }}>
-                {isAdmin ? 'Head of Organization' : 'Verified Employee'}
+                {isAdmin ? t('headOfOrg', lang) : t('verifiedEmployee', lang)}
               </div>
             </div>
 
@@ -143,12 +146,12 @@ export default function AccountPage() {
               <div style={{ flex: 1, padding: '16px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, textAlign: 'center' }}>
                 <TrendingUp size={16} color={T.accent} style={{ marginBottom: 4 }} />
                 <div style={{ fontSize: 18, fontWeight: 700, color: T.text }}>{stats.total}</div>
-                <div style={{ fontSize: 9, color: T.text3, fontWeight: 700 }}>AUDITS</div>
+                <div style={{ fontSize: 9, color: T.text3, fontWeight: 700 }}>{t('audits', lang)}</div>
               </div>
               <div style={{ flex: 1, padding: '16px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, textAlign: 'center' }}>
                 <Award size={16} color="#4ade80" style={{ marginBottom: 4 }} />
                 <div style={{ fontSize: 18, fontWeight: 700, color: T.text }}>{stats.avg}%</div>
-                <div style={{ fontSize: 9, color: T.text3, fontWeight: 700 }}>ACCURACY</div>
+                <div style={{ fontSize: 9, color: T.text3, fontWeight: 700 }}>{t('accuracy', lang)}</div>
               </div>
             </div>
           </div>
@@ -159,23 +162,23 @@ export default function AccountPage() {
             <div style={{ padding: '28px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 24 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: T.accent, marginBottom: 16 }}>
                 <Quote size={16} />
-                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2 }}>PROFESSIONAL BIO</span>
+                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2 }}>{t('professionalBio', lang)}</span>
               </div>
               {isEditing ? (
-                <textarea value={editData.bio} onChange={e => setEditData({ ...editData, bio: e.target.value })} placeholder="Tell us about your professional expertise..." style={{ width: '100%', minHeight: 100, background: T.input, border: `1px solid ${T.border}`, borderRadius: 12, padding: '12px', color: T.text, fontSize: 14, outline: 'none', resize: 'none', fontFamily: 'inherit' }} />
+                <textarea value={editData.bio} onChange={e => setEditData({ ...editData, bio: e.target.value })} placeholder={t('bioPlaceholder', lang)} style={{ width: '100%', minHeight: 100, background: T.input, border: `1px solid ${T.border}`, borderRadius: 12, padding: '12px', color: T.text, fontSize: 14, outline: 'none', resize: 'none', fontFamily: 'inherit' }} />
               ) : (
                 <p style={{ fontSize: 15, color: T.text2, lineHeight: 1.7, margin: 0, fontStyle: editData.bio ? 'normal' : 'italic' }}>
-                  {editData.bio || "No professional summary provided. Click 'Edit' to add your bio."}
+                  {editData.bio || t('noBio', lang)}
                 </p>
               )}
             </div>
 
             <div style={{ padding: '28px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
               {[
-                { icon: Mail, label: 'Email', value: user?.email, locked: true },
-                { icon: Building, label: 'Organization', value: editData.organization, key: 'organization' },
-                { icon: MapPin, label: 'Office Location', value: editData.location, key: 'location' },
-                { icon: Zap, label: 'Access Tier', value: isAdmin ? 'Unlimited Enterprise' : 'Standard Node', locked: true }
+                { icon: Mail, label: t('emailLabel', lang), value: user?.email, locked: true },
+                { icon: Building, label: t('orgLabel', lang), value: editData.organization, key: 'organization' },
+                { icon: MapPin, label: t('officeLabel', lang), value: editData.location, key: 'location' },
+                { icon: Zap, label: t('accessTier', lang), value: isAdmin ? t('enterpriseTier', lang) : t('standardNode', lang), locked: true }
               ].map((item, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -187,11 +190,11 @@ export default function AccountPage() {
                       {isEditing && !item.locked ? (
                         <input value={editData[item.key]} onChange={e => setEditData({ ...editData, [item.key]: e.target.value })} style={{ background: 'none', border: 'none', borderBottom: `1px solid ${T.accent}`, color: T.text, fontSize: 14, outline: 'none', width: '100%', maxWidth: '200px', padding: '2px 0' }} />
                       ) : (
-                        <div style={{ fontSize: 14, color: T.text, fontWeight: 600 }}>{item.value || 'Not set'}</div>
+                        <div style={{ fontSize: 14, color: T.text, fontWeight: 600 }}>{item.value || t('notSet', lang)}</div>
                       )}
                     </div>
                   </div>
-                  {item.locked && <div style={{ fontSize: 8, padding: '2px 8px', borderRadius: 4, background: `${T.border}`, color: T.text3, fontWeight: 700 }}>SECURE</div>}
+                  {item.locked && <div style={{ fontSize: 8, padding: '2px 8px', borderRadius: 4, background: `${T.border}`, color: T.text3, fontWeight: 700 }}>{t('secureLabel', lang)}</div>}
                 </div>
               ))}
             </div>
@@ -200,15 +203,15 @@ export default function AccountPage() {
               {isEditing ? (
                 <>
                   <button onClick={handleSave} disabled={isSaving} style={{ flex: 2, padding: '14px', borderRadius: 14, background: T.accent, border: 'none', color: '#0a0a0f', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer' }}>
-                    {isSaving ? 'Saving...' : <><Save size={18} /> Save Profile</>}
+                    {isSaving ? t('saving', lang) : <><Save size={18} /> {t('saveProfile', lang)}</>}
                   </button>
-                  <button onClick={() => { setIsEditing(false); setEditData({ name: user?.name || '', organization: user?.organization || '', profilePic: user?.profilePic || '', title: user?.title || 'Analysis Expert', bio: user?.bio || '', location: user?.location || 'Global Network' }); }} style={{ flex: 1, padding: '14px', borderRadius: 14, background: 'rgba(255,255,255,0.05)', border: `1px solid ${T.border}`, color: T.text, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
-                    Cancel
+                  <button onClick={() => { setIsEditing(false); setEditData({ name: user?.name || '', organization: user?.organization || '', profilePic: user?.profilePic || '', title: user?.title || t('expertTitle', lang), bio: user?.bio || '', location: user?.location || t('globalNetwork', lang) }); }} style={{ flex: 1, padding: '14px', borderRadius: 14, background: 'rgba(255,255,255,0.05)', border: `1px solid ${T.border}`, color: T.text, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+                    {t('cancel', lang)}
                   </button>
                 </>
               ) : (
                 <button onClick={() => setIsEditing(true)} style={{ width: '100%', padding: '14px', borderRadius: 14, background: T.surface, border: `1px solid ${T.accent}4d`, color: T.accent, fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', transition: '0.2s' }} onMouseEnter={e => e.currentTarget.style.background = T.accentMuted}>
-                  <Settings size={18} /> Edit Professional Profile
+                  <Settings size={18} /> {t('editProfile', lang)}
                 </button>
               )}
             </div>

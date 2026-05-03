@@ -119,48 +119,48 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
       }}>
         <button onClick={() => setMobileOpen(false)} style={{ position: 'absolute', top: 24, right: 40, background: 'none', border: 'none', color: textColor, cursor: 'pointer' }}><X size={32} /></button>
         
-        <div style={{ fontSize: 10, letterSpacing: 4, color: T.accent, fontWeight: 900, marginBottom: 40 }}>{user ? `HI, ${user.name?.toUpperCase() || 'USER'}` : 'IDENTITY_ACCESS'}</div>
+        <div style={{ fontSize: 10, letterSpacing: 4, color: T.accent, fontWeight: 900, marginBottom: 40 }}>{user ? `${t('hi', lang)}, ${user.name?.toUpperCase() || t('user', lang).toUpperCase()}` : t('identityAccess', lang)}</div>
         
         {/* Verification Tools Section */}
         <div style={{ marginBottom: 48 }}>
-          <div style={{ fontSize: 11, color: textMuted, fontWeight: 700, marginBottom: 20, letterSpacing: 1 }}>TOOLS</div>
+          <div style={{ fontSize: 11, color: textMuted, fontWeight: 700, marginBottom: 20, letterSpacing: 1 }}>{t('tools', lang).toUpperCase()}</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <Link to="/verify" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(201,169,110,0.1)', color: T.accent, textDecoration: 'none', transition: '0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,169,110,0.15)'}>
               <FileText size={20} />
-              <span style={{ fontSize: 18, fontWeight: 700 }}>Text Verify</span>
+              <span style={{ fontSize: 18, fontWeight: 700 }}>{t('textVerify', lang)}</span>
             </Link>
             <Link to="/image" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
               <Image size={20} />
-              <span style={{ fontSize: 18, fontWeight: 700 }}>Image Verify</span>
+              <span style={{ fontSize: 18, fontWeight: 700 }}>{t('imageVerify', lang)}</span>
             </Link>
             <Link to="/trending" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
               <TrendingUp size={20} />
-              <span style={{ fontSize: 18, fontWeight: 700 }}>Trending</span>
+              <span style={{ fontSize: 18, fontWeight: 700 }}>{t('navTrending', lang)}</span>
             </Link>
           </div>
         </div>
 
         {/* Navigation & Auth */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ fontSize: 11, color: textMuted, fontWeight: 700, marginBottom: 8, letterSpacing: 1 }}>ACCOUNT</div>
+          <div style={{ fontSize: 11, color: textMuted, fontWeight: 700, marginBottom: 8, letterSpacing: 1 }}>{t('account', lang).toUpperCase()}</div>
           {!user ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <Link to="/login" onClick={() => setMobileOpen(false)} style={{ padding: '14px', textAlign: 'center', borderRadius: 12, border: `1px solid ${border}`, color: textColor, textDecoration: 'none', fontSize: 14, fontWeight: 700 }}>Sign In</Link>
-              <Link to="/signup" onClick={() => setMobileOpen(false)} style={{ padding: '14px', textAlign: 'center', borderRadius: 12, background: T.accent, color: '#000', textDecoration: 'none', fontSize: 14, fontWeight: 700 }}>Sign Up</Link>
+              <Link to="/login" onClick={() => setMobileOpen(false)} style={{ padding: '14px', textAlign: 'center', borderRadius: 12, border: `1px solid ${border}`, color: textColor, textDecoration: 'none', fontSize: 14, fontWeight: 700 }}>{t('signIn', lang)}</Link>
+              <Link to="/signup" onClick={() => setMobileOpen(false)} style={{ padding: '14px', textAlign: 'center', borderRadius: 12, background: T.accent, color: '#000', textDecoration: 'none', fontSize: 14, fontWeight: 700 }}>{t('signUp', lang)}</Link>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <Link to="/dashboard" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
                 <Layout size={20} />
-                <span style={{ fontSize: 18, fontWeight: 700 }}>Dashboard</span>
+                <span style={{ fontSize: 18, fontWeight: 700 }}>{t('navDashboard', lang)}</span>
               </Link>
               <Link to="/account" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
                 <User size={20} />
-                <span style={{ fontSize: 18, fontWeight: 700 }}>My Account</span>
+                <span style={{ fontSize: 18, fontWeight: 700 }}>{t('myAccount', lang)}</span>
               </Link>
               <button onClick={() => { logout(); setMobileOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', textAlign: 'left' }}>
                 <LogOut size={20} />
-                <span style={{ fontSize: 18, fontWeight: 700 }}>Logout</span>
+                <span style={{ fontSize: 18, fontWeight: 700 }}>{t('logout', lang)}</span>
               </button>
             </div>
           )}

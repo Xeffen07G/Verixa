@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import ScrollReveal from '../components/ScrollReveal';
+import { t } from '../utils/i18n';
+import { useLang } from '../context/LangContext';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
@@ -10,15 +9,15 @@ const VERDICT_COLORS = {
   'Partially True': { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)', border: 'rgba(251,191,36,0.2)', icon: '~' },
 };
 
-function formatTimeAgo(dateStr) {
+function formatTimeAgo(dateStr, lang) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return t('justNow', lang);
+  if (mins < 60) return `${mins}m ${t('ago', lang)}`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
+  if (hrs < 24) return `${hrs}h ${t('ago', lang)}`;
   const days = Math.floor(hrs / 24);
-  return `${days}d ago`;
+  return `${days}d ${t('ago', lang)}`;
 }
 
 function RankBadge({ rank }) {
@@ -40,6 +39,7 @@ function RankBadge({ rank }) {
 }
 
 export default function TrendingPage() {
+  const { lang } = useLang();
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('verixa-theme');
     return saved ? saved === 'dark' : true;
@@ -124,7 +124,7 @@ export default function TrendingPage() {
               width: 6, height: 6, borderRadius: '50%', background: '#f87171',
               animation: 'pulse-live 2s infinite', display: 'inline-block',
             }} />
-            Live Leaderboard
+            {t('liveLeaderboard', lang)}
           </div>
 
           <h1 style={{
@@ -132,10 +132,10 @@ export default function TrendingPage() {
             fontSize: 'clamp(36px, 6vw, 56px)', color: T.text,
             lineHeight: 1.1, margin: '0 0 16px',
           }}>
-            Trending <span style={{ fontStyle: 'italic', color: '#f87171' }}>Misinformation</span>
+            {t('trendingTitlePart1', lang)} <span style={{ fontStyle: 'italic', color: '#f87171' }}>{t('trendingTitlePart2', lang)}</span>
           </h1>
           <p style={{ fontSize: 15, color: T.text2, maxWidth: 520, margin: '0 auto', lineHeight: 1.7 }}>
-            The most frequently fact-checked false claims right now. Updated in real-time from VeriXa verifications.
+            {t('trendingSubtitle', lang)}
           </p>
         </div>
         </ScrollReveal>
@@ -146,9 +146,9 @@ export default function TrendingPage() {
           display: 'flex', gap: 16, marginBottom: 32, flexWrap: 'wrap', justifyContent: 'center',
         }}>
           {[
-            { label: 'Total Tracked', value: totalTracked, icon: '📊' },
-            { label: 'Auto-Refresh', value: '30s', icon: '🔄' },
-            { label: 'Last Updated', value: lastUpdated || '—', icon: '⏱️' },
+            { label: t('totalTracked', lang), value: totalTracked, icon: '📊' },
+            { label: t('autoRefresh', lang), value: '30s', icon: '🔄' },
+            { label: t('lastChecked', lang), value: lastUpdated || '—', icon: '⏱️' },
           ].map((s, i) => (
             <div key={i} style={{
               padding: '12px 20px', borderRadius: 12,
@@ -215,7 +215,7 @@ export default function TrendingPage() {
                   </span>
                   <span style={{ fontSize: 11, color: T.text3 }}>·</span>
                   <span style={{ fontSize: 11, color: T.text3 }}>
-                    {formatTimeAgo(claim.lastChecked)}
+                    {formatTimeAgo(claim.lastChecked, lang)}
                   </span>
                 </div>
               </div>
@@ -229,7 +229,7 @@ export default function TrendingPage() {
                   {claim.count.toLocaleString()}
                 </div>
                 <span style={{ fontSize: 9, color: T.text3, textTransform: 'uppercase', letterSpacing: 1 }}>
-                  times checked
+                  {t('timesChecked', lang)}
                 </span>
                 <div style={{ display: 'flex', gap: 4 }}>
                   <button onClick={() => shareOnTwitter(claim)} style={{
@@ -240,7 +240,7 @@ export default function TrendingPage() {
                     onMouseEnter={e => { e.currentTarget.style.borderColor = '#1DA1F2'; e.currentTarget.style.color = '#1DA1F2'; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.text3; }}
                   >
-                    𝕏 Share
+                    𝕏 {t('share', lang)}
                   </button>
                   <button onClick={() => copyLink(i)} style={{
                     padding: '4px 10px', borderRadius: 6, border: `1px solid ${T.border}`,
@@ -248,7 +248,7 @@ export default function TrendingPage() {
                     color: copiedIdx === i ? '#4ade80' : T.text3, fontSize: 10, cursor: 'pointer',
                     transition: 'all 0.2s',
                   }}>
-                    {copiedIdx === i ? '✓ Copied' : '🔗 Copy'}
+                    {copiedIdx === i ? `✓ ${t('copied', lang)}` : `🔗 ${t('copy', lang)}`}
                   </button>
                 </div>
               </div>

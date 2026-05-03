@@ -12,12 +12,12 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
-const VERDICT_CONFIG = {
-  'True':           { color: '#166534', bg: '#dcfce7', border: '#bbf7d0', icon: '✓', label: 'Verified True',   short: 'TRUE'    },
-  'False':          { color: '#991b1b', bg: '#fee2e2', border: '#fecaca', icon: '✕', label: 'Verified False',  short: 'FALSE'   },
-  'Partially True': { color: '#92400e', bg: '#fef3c7', border: '#fde68a', icon: '~', label: 'Partially True',  short: 'PARTIAL' },
-  'Unverifiable':   { color: '#374151', bg: '#f3f4f6', border: '#e5e7eb', icon: '?', label: 'Unverifiable',    short: 'UNCLEAR' },
-};
+const VERDICT_CONFIG = (lang) => ({
+  'True':           { color: '#166534', bg: '#dcfce7', border: '#bbf7d0', icon: '✓', label: t('mostlyAccurate', lang),   short: 'TRUE'    },
+  'False':          { color: '#991b1b', bg: '#fee2e2', border: '#fecaca', icon: '✕', label: t('mostlyInaccurate', lang),  short: 'FALSE'   },
+  'Partially True': { color: '#92400e', bg: '#fef3c7', border: '#fde68a', icon: '~', label: t('mixedAccuracy', lang),  short: 'PARTIAL' },
+  'Unverifiable':   { color: '#374151', bg: '#f3f4f6', border: '#e5e7eb', icon: '?', label: t('unverifiable', lang),    short: 'UNCLEAR' },
+});
 
 const STAGES = ['extracting', 'searching', 'verifying', 'done'];
 
@@ -43,10 +43,10 @@ const LIGHT = {
   accent: '#5a421a', accentMuted: 'rgba(90,66,26,0.15)',
 };
 
-function ScoreBanner({ score, claims }) {
+function ScoreBanner({ score, claims, lang }) {
   const color = score >= 70 ? '#166534' : score >= 40 ? '#92400e' : '#991b1b';
   const bg = score >= 70 ? 'linear-gradient(135deg, #14532d, #166534)' : score >= 40 ? 'linear-gradient(135deg, #78350f, #92400e)' : 'linear-gradient(135deg, #7f1d1d, #991b1b)';
-  const label = score >= 70 ? 'Mostly Accurate' : score >= 40 ? 'Mixed Accuracy' : 'Mostly Inaccurate';
+  const label = score >= 70 ? t('mostlyAccurate', lang) : score >= 40 ? t('mixedAccuracy', lang) : t('mostlyInaccurate', lang);
   const trueCount = claims.filter(c => c.verdict === 'True').length;
   const falseCount = claims.filter(c => c.verdict === 'False').length;
   const partialCount = claims.filter(c => c.verdict === 'Partially True').length;
@@ -59,7 +59,7 @@ function ScoreBanner({ score, claims }) {
       <div style={{ position: 'relative', zIndex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
           <div style={{ flex: 1, minWidth: 140 }}>
-            <p style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', margin: '0 0 6px', fontFamily: 'DM Sans, sans-serif' }}>Accuracy Report</p>
+            <p style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', margin: '0 0 6px', fontFamily: 'DM Sans, sans-serif' }}>{t('accuracyReport', lang)}</p>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
               <span className="score-text" style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 64, fontWeight: 300, color: '#fff', lineHeight: 1 }}>{score}</span>
               <span style={{ fontSize: 24, color: 'rgba(255,255,255,0.6)', fontFamily: 'Cormorant Garamond, serif' }}>%</span>
@@ -68,10 +68,10 @@ function ScoreBanner({ score, claims }) {
           </div>
           <div className="report-stats-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {[
-              { count: trueCount, label: 'True', color: '#4ade80' },
-              { count: falseCount, label: 'False', color: '#f87171' },
-              { count: partialCount, label: 'Partial', color: '#fbbf24' },
-              { count: unclearCount, label: 'Unclear', color: '#d1d5db' },
+              { count: trueCount, label: t('trueLabel', lang), color: '#4ade80' },
+              { count: falseCount, label: t('falseLabel', lang), color: '#f87171' },
+              { count: partialCount, label: t('partialLabel', lang), color: '#fbbf24' },
+              { count: unclearCount, label: t('unclearLabel', lang), color: '#d1d5db' },
             ].map(item => (
               <div key={item.label} style={{ textAlign: 'center', padding: '8px 16px', background: 'rgba(255,255,255,0.1)', borderRadius: 8, minWidth: 60 }}>
                 <div style={{ fontSize: 22, fontWeight: 700, color: item.color, fontFamily: 'Cormorant Garamond, serif', lineHeight: 1 }}>{item.count}</div>
@@ -88,17 +88,17 @@ function ScoreBanner({ score, claims }) {
   );
 }
 
-function ClaimCard({ claim, index, theme }) {
+function ClaimCard({ claim, index, theme, lang }) {
   const [open, setOpen] = useState(false);
-  const cfg = VERDICT_CONFIG[claim.verdict] || VERDICT_CONFIG['Unverifiable'];
+  const cfg = VERDICT_CONFIG(lang)[claim.verdict] || VERDICT_CONFIG(lang)['Unverifiable'];
 
   function getCredibilityLabel(url = '') {
     const high = ['wikipedia.org', 'reuters.com', 'bbc.com', 'who.int', 'cdc.gov', 'nasa.gov', '.gov', '.edu'];
     const medium = ['theguardian.com', 'nytimes.com', 'apnews.com', 'bloomberg.com'];
     const lower = url.toLowerCase();
-    if (high.some(d => lower.includes(d))) return { label: 'Authoritative', color: '#166534', bg: '#dcfce7' };
-    if (medium.some(d => lower.includes(d))) return { label: 'Reputable', color: '#92400e', bg: '#fef3c7' };
-    return { label: 'General', color: '#374151', bg: '#f3f4f6' };
+    if (high.some(d => lower.includes(d))) return { label: t('authoritative', lang), color: '#166534', bg: '#dcfce7' };
+    if (medium.some(d => lower.includes(d))) return { label: t('reputable', lang), color: '#92400e', bg: '#fef3c7' };
+    return { label: t('general', lang), color: '#374151', bg: '#f3f4f6' };
   }
 
   return (
@@ -129,7 +129,7 @@ function ClaimCard({ claim, index, theme }) {
           {/* Sources */}
           {claim.sources?.length > 0 && (
             <div>
-              <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: theme.text3, margin: '0 0 12px', fontWeight: 600 }}>Evidence Sources</p>
+              <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: theme.text3, margin: '0 0 12px', fontWeight: 600 }}>{t('evidenceSources', lang)}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {claim.sources.map((src, j) => {
                   const cred = getCredibilityLabel(src.url);
@@ -141,7 +141,7 @@ function ClaimCard({ claim, index, theme }) {
                           <span style={{ fontSize: 10, padding: '1px 8px', borderRadius: 999, background: cred.bg, color: cred.color, fontWeight: 700 }}>{cred.label}</span>
                         </div>
                         {src.snippet && <p style={{ fontSize: 12, color: theme.text3, margin: 0, lineHeight: 1.5 }}>{src.snippet}</p>}
-                        {src.url && <a href={src.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: theme.accent, marginTop: 4, display: 'inline-block' }}>Read source →</a>}
+                        {src.url && <a href={src.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: theme.accent, marginTop: 4, display: 'inline-block' }}>{t('readSource', lang)} →</a>}
                       </div>
                     </div>
                   );
@@ -177,12 +177,12 @@ function AnimatedLoadingBar({ active, color, height = 3, borderRadius = 4, style
   );
 }
 
-function PipelineProgress({ stage, theme, darkMode }) {
-  const labels = ['Extracting', 'Searching', 'Verifying', 'Done'];
+function PipelineProgress({ stage, theme, darkMode, lang }) {
+  const labels = [t('extracting', lang), t('searching', lang), t('verifying', lang), t('done', lang)];
   const idx = STAGES.indexOf(stage);
   const progressMap = { extracting: 15, searching: 45, verifying: 75, done: 100 };
   const progress = progressMap[stage] || (stage === 'done' ? 100 : 0);
-  const currentLabel = labels[idx] || (stage === 'done' ? 'Complete' : 'Processing');
+  const currentLabel = labels[idx] || (stage === 'done' ? t('done', lang) : t('verifying', lang));
 
   return (
     <div style={{ padding: '20px 0 8px' }}>
@@ -228,11 +228,11 @@ function PipelineProgress({ stage, theme, darkMode }) {
   );
 }
 
-function HistoryPanel({ history, onLoad, onDelete, theme }) {
+function HistoryPanel({ history, onLoad, onDelete, theme, lang }) {
   if (history.length === 0) return (
     <div style={{ textAlign: 'center', padding: '48px 20px', color: theme.text3, fontSize: 13 }}>
       <div style={{ fontSize: 32, marginBottom: 12, opacity: 0.3 }}>◉</div>
-      No verifications yet.<br />Run one to see it here.
+      {t('noVerifications', lang)}<br />{t('runOneToSee', lang)}
     </div>
   );
   return (
@@ -253,7 +253,7 @@ function HistoryPanel({ history, onLoad, onDelete, theme }) {
               </div>
             </div>
             <p style={{ margin: '0 0 10px', fontSize: 12, color: theme.text2, lineHeight: 1.5 }}>{item.text?.slice(0, 90)}{item.text?.length > 90 ? '...' : ''}</p>
-            <button onClick={() => onLoad(item)} style={{ fontSize: 11, color: theme.accent, background: theme.accentMuted, border: `1px solid ${theme.accent}33`, borderRadius: 6, padding: '4px 12px', cursor: 'pointer' }}>Load →</button>
+            <button onClick={() => onLoad(item)} style={{ fontSize: 11, color: theme.accent, background: theme.accentMuted, border: `1px solid ${theme.accent}33`, borderRadius: 6, padding: '4px 12px', cursor: 'pointer' }}>{t('load', lang)} →</button>
           </div>
         );
       })}
@@ -261,17 +261,18 @@ function HistoryPanel({ history, onLoad, onDelete, theme }) {
   );
 }
 
-function exportToPDF(claims, overallScore, text) {
-  const html = `<html><head><style>body{font-family:'Segoe UI',system-ui,sans-serif;max-width:800px;margin:40px auto;color:#1a1a1a;line-height:1.6;}h1{font-size:28px;font-weight:300;border-bottom:2px solid #c9a96e;padding-bottom:12px;color:#0a0a0f}.score{font-size:56px;font-weight:300;color:${overallScore>=70?'#166534':overallScore>=40?'#92400e':'#991b1b'}}.claim{border:1px solid #e5e7eb;border-radius:10px;padding:18px;margin-bottom:14px;}.badge{display:inline-block;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:8px}.reasoning{color:#555;font-size:13px;margin-top:8px;line-height:1.6}.source{font-size:11px;color:#888;margin-top:6px}</style></head><body><h1>VeriXa Accuracy Report</h1><p style="color:#666;margin-bottom:4px">Generated ${new Date().toLocaleString()} · ${claims.length} claims</p><div class="score">${overallScore}%</div><p style="color:#666;margin:4px 0 28px">${overallScore>=70?'Mostly Accurate':overallScore>=40?'Mixed Accuracy':'Mostly Inaccurate'}</p>${claims.map((c,i)=>`<div class="claim"><div class="badge" style="background:${VERDICT_CONFIG[c.verdict]?.bg};color:${VERDICT_CONFIG[c.verdict]?.color}">${VERDICT_CONFIG[c.verdict]?.icon} ${c.verdict}</div><strong style="font-size:15px;display:block;margin-bottom:6px">${i+1}. ${c.claim}</strong><div class="reasoning">${c.reasoning}</div>${c.sources?.length?`<div class="source">Sources: ${c.sources.map(s=>s.title).join(' · ')}</div>`:''}</div>`).join('')}</body></html>`;
+function exportToPDF(claims, overallScore, text, lang) {
+  const label = overallScore >= 70 ? t('mostlyAccurate', lang) : overallScore >= 40 ? t('mixedAccuracy', lang) : t('mostlyInaccurate', lang);
+  const html = `<html><head><style>body{font-family:'Segoe UI',system-ui,sans-serif;max-width:800px;margin:40px auto;color:#1a1a1a;line-height:1.6;}h1{font-size:28px;font-weight:300;border-bottom:2px solid #c9a96e;padding-bottom:12px;color:#0a0a0f}.score{font-size:56px;font-weight:300;color:${overallScore>=70?'#166534':overallScore>=40?'#92400e':'#991b1b'}}.claim{border:1px solid #e5e7eb;border-radius:10px;padding:18px;margin-bottom:14px;}.badge{display:inline-block;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:8px}.reasoning{color:#555;font-size:13px;margin-top:8px;line-height:1.6}.source{font-size:11px;color:#888;margin-top:6px}</style></head><body><h1>VeriXa ${t('accuracyReport', lang)}</h1><p style="color:#666;margin-bottom:4px">${t('generated', lang)} ${new Date().toLocaleString()} · ${claims.length} ${t('claimsAnalyzed', lang)}</p><div class="score">${overallScore}%</div><p style="color:#666;margin:4px 0 28px">${label}</p>${claims.map((c,i)=>`<div class="claim"><div class="badge" style="background:${VERDICT_CONFIG(lang)[c.verdict]?.bg};color:${VERDICT_CONFIG(lang)[c.verdict]?.color}">${VERDICT_CONFIG(lang)[c.verdict]?.icon} ${c.verdict}</div><strong style="font-size:15px;display:block;margin-bottom:6px">${i+1}. ${c.claim}</strong><div class="reasoning">${c.reasoning}</div>${c.sources?.length?`<div class="source">${t('evidenceSources', lang)}: ${c.sources.map(s=>s.title).join(' · ')}</div>`:''}</div>`).join('')}</body></html>`;
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const win = window.open(url, '_blank');
   if (win) setTimeout(() => { win.print(); URL.revokeObjectURL(url); }, 800);
 }
 
-function generateCertificate(claims, overallScore, text) {
+function generateCertificate(claims, overallScore, text, lang) {
   const scoreColor = overallScore >= 70 ? '#4ade80' : overallScore >= 40 ? '#fbbf24' : '#f87171';
-  const label = overallScore >= 90 ? 'HIGHLY ACCURATE' : overallScore >= 70 ? 'MOSTLY ACCURATE' : overallScore >= 40 ? 'MIXED ACCURACY' : 'LOW ACCURACY';
+  const label = overallScore >= 90 ? t('highlyAccurate', lang) : overallScore >= 70 ? t('mostlyAccurate', lang) : overallScore >= 40 ? t('mixedAccuracy', lang) : t('mostlyInaccurate', lang);
   const html = `<html><head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -298,15 +299,6 @@ function generateCertificate(claims, overallScore, text) {
     
     .ornament-outer { position: absolute; inset: 15px; border: 1px solid rgba(201,169,110,0.15); pointer-events: none; }
     .ornament-inner { position: absolute; inset: 25px; border: 1.5px solid rgba(201,169,110,0.25); pointer-events: none; }
-    
-    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(201,169,110,0.15); padding-bottom: 20px; }
-    .brand { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: #c9a96e; letter-spacing: 3px; }
-    .header-right { font-size: 10px; color: rgba(201,169,110,0.4); letter-spacing: 3px; text-transform: uppercase; }
-    
-    .content { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px 0; }
-    .sub-title { font-size: 12px; color: #c9a96e; letter-spacing: 4px; margin-bottom: 12px; font-weight: 700; text-transform: uppercase; }
-    .main-title { font-family: 'Cormorant Garamond', serif; font-size: 64px; font-weight: 600; margin: 0 0 30px; line-height: 1; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-    .divider { width: 140px; height: 1.5px; background: linear-gradient(90deg, transparent, #c9a96e, transparent); margin-bottom: 40px; }
     
     .score-box { display: flex; align-items: center; gap: 40px; margin-bottom: 40px; }
     .score-circle { 

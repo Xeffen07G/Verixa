@@ -1,9 +1,6 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
 import { TrendingUp, ShieldCheck, AlertCircle, Clock, Download, ChevronRight, Users, Activity, BarChart3, User, History } from 'lucide-react';
+import { t } from '../utils/i18n';
+import { useLang } from '../context/LangContext';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
@@ -28,6 +25,7 @@ function StatCard({ icon: Icon, value, label, theme, color = '#c9a96e' }) {
 }
 
 export default function DashboardPage() {
+  const { lang } = useLang();
   const { user } = useAuth();
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('verixa-theme') === 'dark');
   const [orgHistory, setOrgHistory] = useState([]);
@@ -103,32 +101,32 @@ export default function DashboardPage() {
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 48, flexWrap: 'wrap', gap: 24 }}>
           <div>
             <div style={{ fontSize: 10, letterSpacing: 4, color: T.accent, fontWeight: 900, marginBottom: 12 }}>
-              {isAdmin ? 'ORGANIZATION_INTELLIGENCE' : 'PERSONAL_AUDIT_TERMINAL'}
+              {isAdmin ? t('orgIntel', lang) : t('personalAudit', lang)}
             </div>
             <h1 style={{ fontFamily: 'serif', fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 300, color: T.text, margin: 0, lineHeight: 1 }}>
-              {isAdmin ? `${user?.organization} Network` : 'Your Activity'}<span style={{ color: T.accent }}>.</span>
+              {isAdmin ? `${user?.organization} ${t('network', lang)}` : t('yourActivity', lang)}<span style={{ color: T.accent }}>.</span>
             </h1>
             <p style={{ color: T.text2, marginTop: 12, fontSize: 14 }}>
-              {isAdmin ? 'Monitoring all team activity across the global network.' : 'Track your personal verifications and accuracy scores.'}
+              {isAdmin ? t('monitoringTeam', lang) : t('trackPersonal', lang)}
             </p>
           </div>
           {isAdmin && (
             <button style={{ padding: '12px 24px', borderRadius: 10, background: T.accent, border: 'none', color: '#0a0a0f', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Download size={16} /> Export Global Audit
+              <Download size={16} /> {t('exportGlobalAudit', lang)}
             </button>
           )}
         </div>
 
         {/* Stats Grid */}
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginBottom: 64 }}>
-          <StatCard icon={isAdmin ? BarChart3 : History} value={stats.total} label={isAdmin ? "Total Org Scans" : "Your Scans"} theme={T} />
-          <StatCard icon={Activity} value={`${stats.avg}%`} label={isAdmin ? "Team Accuracy" : "Your Accuracy"} theme={T} color="#4ade80" />
+          <StatCard icon={isAdmin ? BarChart3 : History} value={stats.total} label={isAdmin ? t('totalOrgScans', lang) : t('yourScans', lang)} theme={T} />
+          <StatCard icon={Activity} value={`${stats.avg}%`} label={isAdmin ? t('teamAccuracy', lang) : t('yourAccuracy', lang)} theme={T} color="#4ade80" />
           {isAdmin ? (
-             <StatCard icon={Users} value={members.length} label="Active Employees" theme={T} color="#60a5fa" />
+             <StatCard icon={Users} value={members.length} label={t('activeEmployees', lang)} theme={T} color="#60a5fa" />
           ) : (
-            <StatCard icon={ShieldCheck} value={personalHistory.length > 0 ? "Secure" : "Inactive"} label="Status" theme={T} color="#60a5fa" />
+            <StatCard icon={ShieldCheck} value={personalHistory.length > 0 ? t('secure', lang) : t('inactive', lang)} label={t('status', lang)} theme={T} color="#60a5fa" />
           )}
-          <StatCard icon={AlertCircle} value={stats.falseClaims} label={isAdmin ? "Global Falsehoods" : "False Claims Detected"} theme={T} color="#f87171" />
+          <StatCard icon={AlertCircle} value={stats.falseClaims} label={isAdmin ? t('globalFalsehoods', lang) : t('falseDetected', lang)} theme={T} color="#f87171" />
         </div>
 
         {/* Main Feed Area */}
@@ -138,9 +136,9 @@ export default function DashboardPage() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
               <h2 style={{ fontSize: 18, color: T.text, fontWeight: 600, margin: 0 }}>
-                {isAdmin ? 'Master Activity Feed' : 'Recent Verifications'}
+                {isAdmin ? t('masterActivityFeed', lang) : t('recentVerifications', lang)}
               </h2>
-              <span style={{ fontSize: 12, color: T.text3 }}>{isAdmin ? orgHistory.length : personalHistory.length} operations logged</span>
+              <span style={{ fontSize: 12, color: T.text3 }}>{isAdmin ? orgHistory.length : personalHistory.length} {t('opsLogged', lang)}</span>
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -153,7 +151,7 @@ export default function DashboardPage() {
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: T.text, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.text}</div>
                       <div style={{ fontSize: 11, color: T.text3 }}>
-                        {isAdmin ? `Verified by ${h.userName || 'Unknown'}` : 'Verified locally'} • {new Date(h.timestamp).toLocaleString()}
+                        {isAdmin ? `${t('verifiedBy', lang)} ${h.userName || t('unknown', lang)}` : t('verifiedLocally', lang)} • {new Date(h.timestamp).toLocaleString()}
                       </div>
                     </div>
                   </div>
@@ -161,7 +159,7 @@ export default function DashboardPage() {
                 </div>
               )) : (
                 <div style={{ padding: '60px', textAlign: 'center', border: `1px dashed ${T.border}`, borderRadius: 16 }}>
-                  <p style={{ color: T.text3, fontSize: 14 }}>No activity logged yet.</p>
+                  <p style={{ color: T.text3, fontSize: 14 }}>{t('noActivityLogged', lang)}</p>
                 </div>
               )}
             </div>
@@ -170,7 +168,7 @@ export default function DashboardPage() {
           {/* Right Column: Only for Admins */}
           {isAdmin && (
             <div>
-              <h2 style={{ fontSize: 18, color: T.text, fontWeight: 600, marginBottom: 24 }}>Employee Performance</h2>
+              <h2 style={{ fontSize: 18, color: T.text, fontWeight: 600, marginBottom: 24 }}>{t('employeePerformance', lang)}</h2>
               <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderRadius: 16, padding: '24px' }}>
                 {members.length > 0 ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -183,14 +181,14 @@ export default function DashboardPage() {
                             {(m.name || 'U').charAt(0).toUpperCase()}
                           </div>
                           <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{m.name || 'Team Member'}</div>
-                            <div style={{ fontSize: 11, color: T.text3 }}>{userWork.length} verifications • {userScore}% Accuracy</div>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{m.name || t('teamMember', lang)}</div>
+                            <div style={{ fontSize: 11, color: T.text3 }}>{userWork.length} {t('verifications', lang)} • {userScore}% {t('accuracy', lang)}</div>
                           </div>
                         </div>
                       );
                     })}
                   </div>
-                ) : <p style={{ color: T.text3, fontSize: 13 }}>No other team members found.</p>}
+                ) : <p style={{ color: T.text3, fontSize: 13 }}>{t('noTeamFound', lang)}</p>}
               </div>
             </div>
           )}
