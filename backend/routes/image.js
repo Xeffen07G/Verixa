@@ -104,7 +104,7 @@ router.post("/url", async (req, res) => {
           content: [
             {
               type: "text",
-              text: `${SYSTEM_PROMPT}\n\nAnalyze this image for authenticity. Respond with ONLY the JSON format specified.`,
+              text: `${SYSTEM_PROMPT}\n\nPerform a ZERO-TOLERANCE forensic audit on this image. If you find even one minor rendering artifact, you MUST classify it as AI Generated.`,
             },
             {
               type: "image_url",
@@ -114,7 +114,7 @@ router.post("/url", async (req, res) => {
         },
       ],
       response_format: { type: "json_object" },
-      temperature: 0.1,
+      temperature: 0.0,
       max_tokens: 1024,
     });
 
