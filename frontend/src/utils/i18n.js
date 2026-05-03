@@ -232,7 +232,7 @@ const translations = {
     extensionDirHint: 'Extension files are included in the project\'s',
     directory: 'directory',
     copy: 'Copy',
-    search_google_for...: 'Search Google for...',
+    'search_google_for...': 'Search Google for...',
     translate_to_english: 'Translate to English',
 
     // Trending Page
@@ -570,7 +570,7 @@ const translations = {
     extensionDirHint: 'Los archivos están incluidos en el',
     directory: 'directorio',
     copy: 'Copiar',
-    search_google_for...: 'Buscar en Google...',
+    'search_google_for...': 'Buscar en Google...',
     translate_to_english: 'Traducir al Inglés',
 
     // Trending Page
