@@ -15,6 +15,7 @@ export default function SignupPage() {
   const { lang } = useLang();
   const [name, setName] = useState('');
   const [organization, setOrganization] = useState('');
+  const [role, setRole] = useState('employee');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -39,7 +40,7 @@ export default function SignupPage() {
 
     setIsLoading(true);
     try {
-      const result = await register(email, password, name, organization);
+      const result = await register(email, password, name, organization, role);
       if (result.success) {
         navigate('/verify');
       } else {
@@ -98,7 +99,35 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <div style={{ position: 'relative' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+            <span style={{ fontSize: 13, color: T.text2, marginLeft: 4 }}>Role in Organization</span>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <button 
+                type="button" 
+                onClick={() => setRole('head')}
+                style={{ 
+                  padding: '12px', borderRadius: 12, background: role === 'head' ? `${T.accent}1a` : T.inputBg, 
+                  border: `1px solid ${role === 'head' ? T.accent : T.inputBorder}`, 
+                  color: role === 'head' ? T.accent : T.text2, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' 
+                }}
+              >
+                Organization Head
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setRole('employee')}
+                style={{ 
+                  padding: '12px', borderRadius: 12, background: role === 'employee' ? `${T.accent}1a` : T.inputBg, 
+                  border: `1px solid ${role === 'employee' ? T.accent : T.inputBorder}`, 
+                  color: role === 'employee' ? T.accent : T.text2, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' 
+                }}
+              >
+                Employee
+              </button>
+            </div>
+          </div>
+
+          <div style={{ position: 'relative', marginTop: 4 }}>
             <Mail size={16} style={iconStyle} />
             <input type="email" required placeholder={t('workEmail', lang)} value={email} onChange={e => setEmail(e.target.value)} className="form-input" style={inputStyle} />
           </div>

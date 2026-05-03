@@ -25,6 +25,7 @@ const createModel = (file) => ({
     const data = loadData(file);
     return data.filter(u => {
       return Object.entries(query).every(([k, v]) => {
+        if (v && v.$regex) return new RegExp(v.$regex, v.$options || 'i').test(u[k]);
         if (v instanceof RegExp) return v.test(u[k]);
         return u[k] === v;
       });

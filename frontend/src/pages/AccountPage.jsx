@@ -26,6 +26,8 @@ export default function AccountPage() {
     bio: user?.bio || '',
     location: user?.location || ''
   });
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [orgHistory, setOrgHistory] = useState([]);
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
@@ -142,7 +144,22 @@ export default function AccountPage() {
     setTimeout(() => setSaveSuccess(false), 3000);
   };
 
-  const isAdmin = user?.role === 'admin' || user?.email?.includes('admin');
+  const isAdmin = user?.role === 'head' || user?.role === 'admin' || user?.email?.includes('admin');
+
+  useEffect(() => {
+    if (isAdmin && user?.organization) {
+      const API = process.env.REACT_APP_API_URL || '';
+      // Fetch organization members
+      axios.get(`${API}/api/organization/${encodeURIComponent(user.organization)}/members`)
+        .then(res => setTeamMembers(res.data))
+        .catch(console.error);
+        
+      // Fetch organization history to calculate stats
+      axios.get(`${API}/api/organization/${encodeURIComponent(user.organization)}/history`)
+        .then(res => setOrgHistory(res.data))
+        .catch(console.error);
+    }
+  }, [isAdmin, user?.organization]);
 
   return (
     <div style={{ background: T.bg, minHeight: '100vh', transition: 'background 0.5s ease, color 0.5s ease', display: 'flex', flexDirection: 'column', fontFamily: 'DM Sans, sans-serif', overflowX: 'hidden' }}>
@@ -294,7 +311,37 @@ export default function AccountPage() {
           </div>
 
           {/* Bottom Grid Layout */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isAdmin ? '1fr' : 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32 }}>
+            
+            {isAdmin && (
+              <div className="premium-glass-card" style={{ padding: 40, animation: 'fadeUpStagger 0.9s cubic-bezier(0.16, 1, 0.3, 1)', gridColumn: '1 / -1' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                  <h3 style={{ margin: 0, fontSize: 24, fontFamily: 'serif', display: 'flex', alignItems: 'center', gap: 12, color: T.text }}><Building size={24} color={T.accent} /> {user.organization} Team</h3>
+                  <div style={{ background: `${T.accent}15`, padding: '6px 12px', borderRadius: 8, fontSize: 13, color: T.accent, fontWeight: 700 }}>{teamMembers.length} Employees</div>
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+                  {teamMembers.map(member => {
+                    const memberVerifications = orgHistory.filter(h => h.userName === member.name).length;
+                    return (
+                      <div key={member.email} style={{ padding: 20, background: 'rgba(255,255,255,0.02)', border: `1px solid ${T.border}`, borderRadius: 16, display: 'flex', alignItems: 'center', gap: 16, transition: '0.3s', cursor: 'default' }} onMouseEnter={e => e.currentTarget.style.borderColor = `${T.accent}50`} onMouseLeave={e => e.currentTarget.style.borderColor = T.border}>
+                        <div style={{ width: 44, height: 44, borderRadius: 12, background: `linear-gradient(135deg, ${T.accent}40, transparent)`, border: `1px solid ${T.accent}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.accent, fontWeight: 700, fontSize: 18 }}>
+                          {member.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ color: T.text, fontWeight: 600, fontSize: 15 }}>{member.name}</div>
+                          <div style={{ color: T.text2, fontSize: 13 }}>{member.email}</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ color: T.accent, fontWeight: 800, fontSize: 16 }}>{memberVerifications}</div>
+                          <div style={{ color: T.text3, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>Scans</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             
             {/* Left Column: Stats & Actions */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>

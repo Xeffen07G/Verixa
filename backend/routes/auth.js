@@ -12,7 +12,7 @@ const generateToken = (id) => {
 // @desc Register a new user
 // @route POST /api/auth/register
 router.post('/register', async (req, res) => {
-    const { email, password, name, organization } = req.body;
+    const { email, password, name, organization, role } = req.body;
 
     try {
         const userExists = await User.findOne({ email });
@@ -21,7 +21,7 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: 'User already exists' });
         }
 
-        const user = await User.create({ email, password, name, organization });
+        const user = await User.create({ email, password, name, organization, role: role || 'employee' });
 
         if (user) {
             res.status(201).json({
