@@ -1,3 +1,6 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { User, Building, Mail, Lock } from 'lucide-react';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';

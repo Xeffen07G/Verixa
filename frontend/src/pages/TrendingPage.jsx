@@ -1,3 +1,6 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import ScrollReveal from '../components/ScrollReveal';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';

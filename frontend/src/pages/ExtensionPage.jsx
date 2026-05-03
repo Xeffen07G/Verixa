@@ -1,6 +1,9 @@
+import React, { useState } from 'react';
+import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
+import { motion } from 'framer-motion';
 
 /**
  * Browser Extension landing page

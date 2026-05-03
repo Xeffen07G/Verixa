@@ -1,4 +1,6 @@
+import React, { useState, useRef } from 'react';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
 
