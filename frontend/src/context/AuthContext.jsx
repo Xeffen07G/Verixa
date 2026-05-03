@@ -45,6 +45,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         localStorage.removeItem('verixa_user');
+        localStorage.removeItem('verixa_history');
         setUser(null);
     };
 

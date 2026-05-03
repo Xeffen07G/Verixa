@@ -2,14 +2,23 @@ import React, { useState, useRef, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Mail, Shield, Building, Calendar, Settings, Camera, Save, X, MapPin, Quote, TrendingUp, Award, Zap, Activity, CheckCircle2, ChevronRight, Edit3 } from 'lucide-react';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
 
 export default function AccountPage() {
+  const navigate = useNavigate();
   const { lang } = useLang();
-  const { user, logout, setUser } = useAuth();
+  const { user, logout, setUser, loading } = useAuth();
+  
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/');
+    }
+  }, [user, loading, navigate]);
+
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('verixa-theme');
     return saved ? saved === 'dark' : true;
@@ -160,6 +169,9 @@ export default function AccountPage() {
         .catch(console.error);
     }
   }, [isAdmin, user?.organization]);
+
+  if (loading) return null;
+  if (!user) return null;
 
   return (
     <div style={{ background: T.bg, minHeight: '100vh', transition: 'background 0.5s ease, color 0.5s ease', display: 'flex', flexDirection: 'column', fontFamily: 'DM Sans, sans-serif', overflowX: 'hidden' }}>

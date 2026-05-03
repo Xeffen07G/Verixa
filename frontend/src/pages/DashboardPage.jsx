@@ -29,9 +29,19 @@ function StatCard({ icon: Icon, value, label, theme, color = '#c9a96e' }) {
   );
 }
 
+import { useNavigate } from 'react-router-dom';
+
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const { lang } = useLang();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/');
+    }
+  }, [user, authLoading, navigate]);
+
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('verixa-theme') === 'dark');
   const [orgHistory, setOrgHistory] = useState([]);
   const [members, setMembers] = useState([]);
@@ -42,7 +52,9 @@ export default function DashboardPage() {
   const isAdmin = user?.role === 'head' || user?.role === 'admin' || user?.email?.includes('admin'); // Fallback for now
 
   useEffect(() => {
-    // Load local history for everyone
+    if (!user) return;
+    
+    // Load local history
     const saved = localStorage.getItem('verixa_history');
     if (saved) setPersonalHistory(JSON.parse(saved));
 
@@ -95,6 +107,9 @@ export default function DashboardPage() {
     localStorage.setItem('verixa-theme', newVal ? 'dark' : 'light');
     window.dispatchEvent(new Event('storage'));
   };
+
+  if (authLoading) return null; // Or a loader
+  if (!user) return null;
 
   return (
     <div className="page-wrapper" style={{ background: T.bg, minHeight: '100vh', transition: 'background 0.3s' }}>

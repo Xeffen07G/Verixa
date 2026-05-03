@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
+import { useAuth } from '../context/AuthContext';
 
 /* ─────────── Counter Hook ─────────── */
 function useCountUp(target, duration = 1800) {
@@ -132,6 +133,7 @@ const plansList = (lang) => [
 
 export default function LandingPage() {
   const { lang } = useLang();
+  const { user } = useAuth();
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('verixa-theme');
     return saved ? saved === 'dark' : true;
@@ -287,7 +289,7 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.9 }}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}
           >
-            <Link to="/verify">
+            <Link to={user ? "/dashboard" : "/verify"}>
               <motion.button
                 whileHover={{ scale: 1.04, boxShadow: `0 8px 32px ${T.accent}40` }}
                 whileTap={{ scale: 0.97 }}
@@ -296,7 +298,7 @@ export default function LandingPage() {
                   background: `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none',
                   color: darkMode ? '#0a0a0f' : '#fff', letterSpacing: 0.5, cursor: 'pointer',
                 }}
-              >{t('landingStartFree', lang)}</motion.button>
+              >{user ? t('navDashboard', lang) : t('landingStartFree', lang)}</motion.button>
             </Link>
             <a href="#how-it-works">
               <motion.button
