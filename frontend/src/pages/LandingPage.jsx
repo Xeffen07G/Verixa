@@ -4,6 +4,8 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { Shield, Search, BarChart3, Brain, Link2, AlertTriangle, Zap, Clock, CheckCircle2, XCircle, MinusCircle, ShieldCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { t } from '../utils/i18n';
+import { useLang } from '../context/LangContext';
 
 /* ─────────── Counter Hook ─────────── */
 function useCountUp(target, duration = 1800) {
@@ -103,12 +105,12 @@ const testimonials = [
 ];
 
 const features = [
-  { Icon: Shield, title: 'Claim Extraction', desc: 'Atomic decomposition of text into verifiable facts.' },
-  { Icon: Search, title: 'Live Retrieval', desc: 'Autonomous intelligence gathering from global sources.' },
-  { Icon: BarChart3, title: 'Verdict Scoring', desc: 'Precise True/False scores with transparent reasoning.' },
-  { Icon: Brain, title: 'AI Detection', desc: 'Identify LLM-generated content with 99% accuracy.' },
-  { Icon: Link2, title: 'URL Analysis', desc: 'Deep-scrape and verify any news link instantly.' },
-  { Icon: AlertTriangle, title: 'Conflict Intel', desc: 'Surface source disagreements with absolute clarity.' },
+  { Icon: Shield, key: 'features', descKey: 'extractingDesc' }, // Reusing existing keys
+  { Icon: Search, key: 'searchingEvidence', descKey: 'searchingDesc' },
+  { Icon: BarChart3, key: 'verifyingClaims', descKey: 'verifyingDesc' },
+  { Icon: Brain, key: 'aiTextDetection', descKey: 'aiDetectDesc' },
+  { Icon: Link2, key: 'urlAnalysis', descKey: 'deepScrapeDesc' },
+  { Icon: AlertTriangle, key: 'conflictIntel', descKey: 'conflictDesc' },
 ];
 
 const steps = [
@@ -129,6 +131,7 @@ const plans = [
 /* ═══════════════════════════════ COMPONENT ═══════════════════════════════ */
 
 export default function LandingPage() {
+  const { lang } = useLang();
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('verixa-theme');
     return saved ? saved === 'dark' : true;
@@ -252,7 +255,7 @@ export default function LandingPage() {
               background: `${T.accent}0a`, marginBottom: 32,
             }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: T.accent }} />
-              <span style={{ fontSize: 10, fontWeight: 700, color: T.accent, letterSpacing: 1.5 }}>NOW IN PUBLIC BETA</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: T.accent, letterSpacing: 1.5 }}>{t('beta', lang)}</span>
             </div>
 
             <h1 style={{
@@ -261,8 +264,8 @@ export default function LandingPage() {
               fontWeight: 300, color: T.text, lineHeight: 1.1,
               marginBottom: 32, letterSpacing: -1,
             }}>
-              Truth is not <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: T.accent }}>negotiable.</span>
+              {t('heroTitle1', lang)} <br />
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: T.accent }}>{t('heroTitle2', lang)}</span>
             </h1>
           </motion.div>
 
@@ -274,8 +277,7 @@ export default function LandingPage() {
               margin: '0 auto 48px', fontWeight: 300,
             }}
           >
-            VeriXa is the world's most precise AI-powered fact verification engine.<br />
-            Extract claims, retrieve evidence, and generate authoritative accuracy reports in seconds.
+            {t('heroSubtitle', lang)}
           </motion.p>
 
           <motion.div
@@ -292,7 +294,7 @@ export default function LandingPage() {
                   background: `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none',
                   color: darkMode ? '#0a0a0f' : '#fff', letterSpacing: 0.5, cursor: 'pointer',
                 }}
-              >Start Verifying Free</motion.button>
+              >{t('startFree', lang)}</motion.button>
             </Link>
             <a href="#how-it-works">
               <motion.button
@@ -303,7 +305,7 @@ export default function LandingPage() {
                   background: 'transparent', border: `1px solid ${T.border}`,
                   color: T.text, letterSpacing: 0.5, cursor: 'pointer',
                 }}
-              >See How It Works</motion.button>
+              >{t('seeHow', lang)}</motion.button>
             </a>
           </motion.div>
         </div>
@@ -317,7 +319,7 @@ export default function LandingPage() {
             }}
           >
             <div style={{ width: 1, height: 40, background: `linear-gradient(to bottom, ${T.accent}66, transparent)` }} />
-            <span>Scroll</span>
+            <span>{t('scroll', lang)}</span>
           </motion.div>
       </Section>
 
@@ -336,10 +338,10 @@ export default function LandingPage() {
             }}
           >
             {[
-              { val: stat1, suffix: '+', label: 'Input formats supported', r: ref1 },
-              { val: stat2, suffix: '', label: 'Verdict types', r: ref2 },
-              { val: stat3, suffix: '', label: 'AI models powering engine', r: ref3 },
-              { val: stat4, suffix: 's', label: 'Avg. response time', r: ref4 },
+              { val: stat1, suffix: '+', label: t('inputFormats', lang), r: ref1 },
+              { val: stat2, suffix: '', label: t('verdictTypes', lang), r: ref2 },
+              { val: stat3, suffix: '', label: t('aiModels', lang), r: ref3 },
+              { val: stat4, suffix: 's', label: t('avgResponse', lang), r: ref4 },
             ].map((s, i) => (
               <div key={i} ref={s.r} style={{ padding: '48px 24px', textAlign: 'center', background: T.statBg }}>
                 <div style={{
@@ -359,8 +361,8 @@ export default function LandingPage() {
       <Section id="live-demo" style={{ padding: '40px 0 100px' }}>
         <div style={{ padding: '0 24px', maxWidth: 900, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <p style={sectionLabelStyle}>Live Preview</p>
-            <h2 style={sectionHeadingStyle}>See VeriXa in action.</h2>
+            <p style={sectionLabelStyle}>{t('livePreview', lang)}</p>
+            <h2 style={sectionHeadingStyle}>{t('seeAction', lang)}</h2>
             <div style={{ ...dividerStyle, margin: '20px auto' }} />
           </div>
 
@@ -465,15 +467,14 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
-                <p style={sectionLabelStyle}>Engineering Integrity</p>
+                <p style={sectionLabelStyle}>{t('capabilitiesLabel', lang)}</p>
                 <h2 style={{
                   ...sectionHeadingStyle,
                   fontSize: 'clamp(42px, 6vw, 72px)',
                   lineHeight: 1,
                   marginBottom: 32
                 }}>
-                  Engineered for<br />
-                  <span style={{ color: T.accent, fontStyle: 'italic' }}>absolute precision.</span>
+                  {t('engineeredPrecision', lang)}
                 </h2>
                 
                 <div style={{ 
@@ -483,16 +484,16 @@ export default function LandingPage() {
                   backdropFilter: 'blur(10px)', marginBottom: 40
                 }}>
                   <p style={{ fontSize: 18, color: T.text2, lineHeight: 1.5, margin: 0, fontWeight: 300 }}>
-                    Eliminating misinformation. At scale. With absolute rigor.
+                    {t('eliminatingMisinfo', lang)}
                   </p>
                 </div>
 
                 {/* Status HUD */}
                 <div style={{ display: 'flex', gap: 40, marginTop: 48, flexWrap: 'wrap' }}>
                   {[
-                    { label: 'CALIBRATION', val: '99.9%', color: '#4ade80' },
-                    { label: 'LATENCY', val: '< 800ms', color: T.accent },
-                    { label: 'INTEGRITY', val: 'SECURE', color: '#60a5fa' }
+                    { label: t('calibration', lang), val: '99.9%', color: '#4ade80' },
+                    { label: t('latency', lang), val: '< 800ms', color: T.accent },
+                    { label: t('integrity', lang), val: 'SECURE', color: '#60a5fa' }
                   ].map((h, i) => (
                     <div key={i} style={{ minWidth: 100 }}>
                       <div style={{ fontSize: 9, color: T.text3, letterSpacing: 2, marginBottom: 8, fontWeight: 700 }}>{h.label}</div>
@@ -528,8 +529,8 @@ export default function LandingPage() {
                   }}>
                     <f.Icon size={16} color={T.accent} />
                   </div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 4 }}>{f.title}</h3>
-                  <p style={{ fontSize: 12, color: T.text3, lineHeight: 1.5, margin: 0 }}>{f.desc}</p>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 4 }}>{t(f.key, lang)}</h3>
+                  <p style={{ fontSize: 12, color: T.text3, lineHeight: 1.5, margin: 0 }}>{t(f.descKey, lang)}</p>
                 </motion.div>
               ))}
             </div>
@@ -564,9 +565,9 @@ export default function LandingPage() {
                   <f.Icon size={20} />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 6 }}>{f.title}</h3>
+                  <h3 style={{ fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 6 }}>{t(f.key, lang)}</h3>
                   <div style={{ height: 0, opacity: 0, transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)', overflow: 'hidden' }} className="hover-desc">
-                    <p style={{ fontSize: 13, color: T.text3, lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
+                    <p style={{ fontSize: 13, color: T.text3, lineHeight: 1.6, margin: 0 }}>{t(f.descKey, lang)}</p>
                   </div>
                 </div>
               </motion.div>
@@ -579,8 +580,8 @@ export default function LandingPage() {
       <Section id="how-it-works" style={{ padding: '120px 0', background: T.sectionBg, position: 'relative', overflow: 'hidden' }}>
         <div style={{ padding: '0 24px', maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           <div style={{ textAlign: 'center', marginBottom: 80 }}>
-            <p style={sectionLabelStyle}>Operational Intelligence</p>
-            <h2 style={{ ...sectionHeadingStyle, fontSize: 'clamp(32px, 4vw, 48px)' }}>The Path to <span style={{ color: T.accent, fontStyle: 'italic' }}>Absolute Truth.</span></h2>
+            <p style={sectionLabelStyle}>{t('howItWorksLabel', lang)}</p>
+            <h2 style={{ ...sectionHeadingStyle, fontSize: 'clamp(32px, 4vw, 48px)' }}>{t('pathTruth', lang)}</h2>
             <div style={{ ...dividerStyle, margin: '24px auto' }} />
           </div>
 
@@ -600,10 +601,10 @@ export default function LandingPage() {
             </svg>
 
             {[
-              { num: '01', side: 'left', label: 'Surgical Extraction', desc: 'We intake raw content with zero-loss precision, isolating every potential claim.', icon: Zap },
-              { num: '02', side: 'right', label: 'Evidence Retrieval', desc: 'Our engine cross-references millions of data points to uncover hidden facts.', icon: Search },
-              { num: '03', side: 'left', label: 'Integrity Stress-Test', desc: 'Every claim is validated against authoritative sources, eliminating noise.', icon: ShieldCheck },
-              { num: '04', side: 'right', label: 'The Final Verdict', desc: 'You receive a clear, evidence-backed report that serves as the source of truth.', icon: CheckCircle2 }
+              { num: '01', side: 'left', label: t('surgicalExtraction', lang), desc: t('surgicalDesc', lang), icon: Zap },
+              { num: '02', side: 'right', label: t('evidenceRetrieval', lang), desc: t('evidenceDesc', lang), icon: Search },
+              { num: '03', side: 'left', label: t('integrityTest', lang), desc: t('integrityDesc', lang), icon: ShieldCheck },
+              { num: '04', side: 'right', label: t('finalVerdict', lang), desc: t('finalDesc', lang), icon: CheckCircle2 }
             ].map((step, i) => (
               <motion.div
                 key={i}
@@ -658,8 +659,8 @@ export default function LandingPage() {
       <Section id="testimonials" style={{ padding: '100px 0' }}>
         <div style={{ padding: '0 24px', maxWidth: 800, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <p style={sectionLabelStyle}>Testimonials</p>
-            <h2 style={sectionHeadingStyle}>Trusted by those who <br className="desktop-br" />demand accuracy.</h2>
+            <p style={sectionLabelStyle}>{t('testimonialsLabel', lang)}</p>
+            <h2 style={sectionHeadingStyle}>{t('trustedAccuracy', lang)}</h2>
             <div style={{ ...dividerStyle, margin: '20px auto' }} />
           </div>
 
@@ -751,8 +752,8 @@ export default function LandingPage() {
       <Section id="pricing" style={{ padding: '140px 0', background: T.sectionBg }}>
         <div style={{ padding: '0 24px', maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 80 }}>
-            <p style={sectionLabelStyle}>Tiered Access</p>
-            <h2 style={sectionHeadingStyle}>Scale with absolute truth.</h2>
+            <p style={sectionLabelStyle}>{t('pricingLabel', lang)}</p>
+            <h2 style={sectionHeadingStyle}>{t('scaleTruth', lang)}</h2>
             <div style={{ ...dividerStyle, margin: '20px auto' }} />
           </div>
 

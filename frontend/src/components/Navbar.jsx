@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LANGUAGES, getStoredLanguage, setStoredLanguage, t } from '../utils/i18n';
+import { LANGUAGES, t } from '../utils/i18n';
+import { useLang } from '../context/LangContext';
 import { Menu, X, Sun, Moon, Globe, Image, TrendingUp, LogOut, User, FileText, Layout } from 'lucide-react';
 
 export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const [lang, setLang] = useState(getStoredLanguage());
+  const { lang, changeLanguage } = useLang();
   const { user, logout } = useAuth();
   const location = useLocation();
   const isLanding = location.pathname === '/';
@@ -20,10 +21,8 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   }, []);
 
   const handleLangChange = (code) => {
-    setLang(code);
-    setStoredLanguage(code);
+    changeLanguage(code);
     setLangOpen(false);
-    window.dispatchEvent(new CustomEvent('verixa-lang-change', { detail: code }));
   };
 
   const navLinks = [

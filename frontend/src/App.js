@@ -10,13 +10,15 @@ import DashboardPage from './pages/DashboardPage';
 import ExtensionPage from './pages/ExtensionPage';
 import AccountPage from './pages/AccountPage';
 import { AuthProvider } from './context/AuthContext';
+import { LangProvider } from './context/LangContext';
 import DragDropOverlay from './components/DragDropOverlay';
 import CustomCursor from './components/CustomCursor';
 
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
+      <LangProvider>
+        <Router>
         <CustomCursor />
         <DragDropOverlay>
           <Routes>
@@ -32,6 +34,7 @@ export default function App() {
           </Routes>
         </DragDropOverlay>
       </Router>
+      </LangProvider>
     </AuthProvider>
   );
 }

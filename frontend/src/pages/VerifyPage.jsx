@@ -6,7 +6,8 @@ import { useVerify } from '../hooks/useVerify';
 import { useAuth } from '../context/AuthContext';
 import SkeletonLoading from '../components/SkeletonCard';
 import Confetti from '../components/Confetti';
-import { t, getStoredLanguage } from '../utils/i18n';
+import { t } from '../utils/i18n';
+import { useLang } from '../context/LangContext';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
@@ -419,7 +420,7 @@ export default function VerifyPage() {
   const [uploadingPdf, setUploadingPdf] = useState(false);
   const [isScannedPdf, setIsScannedPdf] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [lang, setLang] = useState(getStoredLanguage());
+  const { lang } = useLang();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const [darkMode, setDarkMode] = useState(() => {
@@ -444,12 +445,7 @@ export default function VerifyPage() {
 
   const { stage, logs, claims, overallScore, aiDetection, error, isLoading, verify, reset } = useVerify();
 
-  // Listen for language changes from Navbar
-  useEffect(() => {
-    const handler = (e) => setLang(e.detail);
-    window.addEventListener('verixa-lang-change', handler);
-    return () => window.removeEventListener('verixa-lang-change', handler);
-  }, []);
+  // Auto-fill from search params
 
   // Load text from drag-drop via sessionStorage
   useEffect(() => {
@@ -854,7 +850,7 @@ export default function VerifyPage() {
                   {isLoading ? t('verifying', lang) : t('verifyNow', lang)}
                 </button>
                 <div style={{ textAlign: 'center', marginTop: 12, opacity: 0.3, fontSize: 8, letterSpacing: 1 }}>
-                  BUILD 2.2.0 — LATEST
+                  BUILD 2.2.1 — LATEST
                 </div>
               </div>
             </>
