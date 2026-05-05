@@ -920,7 +920,55 @@ const id = {
   trendingShareTitle: '⚠️ Misinformasi tren sedang diverifikasi sekarang:',
 };
 
-export const translations = { en, es, bn, hi, fr, de, id };
+const pt = {
+  navFeatures: 'Recursos', navHowItWorks: 'Como Funciona', navPricing: 'Preços', navTestimonials: 'Depoimentos',
+  navDashboard: 'Painel', navExtension: 'Extensão', navTrending: 'Tendências',
+  signIn: 'Entrar', logout: 'Sair', hi: 'Olá', user: 'Usuário', identityAccess: 'ACESSO_IDENTIDADE', tools: 'Ferramentas',
+  textVerify: 'Verificar Texto', account: 'Conta', signUp: 'Cadastrar', myAccount: 'Minha Conta',
+  landingBeta: 'AGORA EM BETA PÚBLICO', landingHero1: 'A verdade não é', landingHero2: 'negociável.',
+};
+
+const it = {
+  navFeatures: 'Funzionalità', navHowItWorks: 'Come Funziona', navPricing: 'Prezzi', navTestimonials: 'Testimonianze',
+  navDashboard: 'Dashboard', navExtension: 'Estensione', navTrending: 'Tendenze',
+  signIn: 'Accedi', logout: 'Esci', hi: 'Ciao', user: 'Utente', identityAccess: 'ACCESSO_IDENTITÀ', tools: 'Strumenti',
+  textVerify: 'Verifica Testo', account: 'Account', signUp: 'Registrati', myAccount: 'Il Mio Account',
+  landingBeta: 'ORA IN BETA PUBBLICA', landingHero1: 'La verità non è', landingHero2: 'trattabile.',
+};
+
+const ar = {
+  navFeatures: 'الميزات', navHowItWorks: 'كيف يعمل', navPricing: 'الأسعار', navTestimonials: 'الشهادات',
+  navDashboard: 'لوحة القيادة', navExtension: 'الإضافة', navTrending: 'الرائج',
+  signIn: 'تسجيل الدخول', logout: 'تسجيل الخروج', hi: 'مرحباً', user: 'مستخدم', identityAccess: 'الوصول_إلى_الهوية', tools: 'الأدوات',
+  textVerify: 'التحقق من النص', account: 'الحساب', signUp: 'اشتراك', myAccount: 'حسابي',
+  landingBeta: 'الآن في المرحلة التجريبية العامة', landingHero1: 'الحقيقة ليست', landingHero2: 'قابلة للتفاوض.',
+};
+
+const ru = {
+  navFeatures: 'Функции', navHowItWorks: 'Как это работает', navPricing: 'Цены', navTestimonials: 'Отзывы',
+  navDashboard: 'Панель управления', navExtension: 'Расширение', navTrending: 'Тренды',
+  signIn: 'Войти', logout: 'Выйти', hi: 'Привет', user: 'Пользователь', identityAccess: 'ДОСТУП_К_ЛИЧНОСТИ', tools: 'Инструменты',
+  textVerify: 'Проверить текст', account: 'Аккаунт', signUp: 'Регистрация', myAccount: 'Мой аккаунт',
+  landingBeta: 'ТЕПЕРЬ В ПУБЛИЧНОЙ БЕТЕ', landingHero1: 'Истина не', landingHero2: 'обсуждается.',
+};
+
+const ja = {
+  navFeatures: '機能', navHowItWorks: '仕組み', navPricing: '料金', navTestimonials: 'お客様の声',
+  navDashboard: 'ダッシュボード', navExtension: '拡張機能', navTrending: 'トレンド',
+  signIn: 'ログイン', logout: 'ログアウト', hi: 'こんにちは', user: 'ユーザー', identityAccess: 'IDアクセス', tools: 'ツール',
+  textVerify: 'テキスト検証', account: 'アカウント', signUp: '新規登録', myAccount: 'マイアカウント',
+  landingBeta: '現在パブリックベータ版', landingHero1: '真実は', landingHero2: '譲れない。',
+};
+
+const zh = {
+  navFeatures: '功能', navHowItWorks: '工作原理', navPricing: '价格', navTestimonials: '客户评价',
+  navDashboard: '仪表板', navExtension: '扩展程序', navTrending: '趋势',
+  signIn: '登录', logout: '登出', hi: '你好', user: '用户', identityAccess: '身份访问', tools: '工具',
+  textVerify: '文本验证', account: '账户', signUp: '注册', myAccount: '我的账户',
+  landingBeta: '现在处于公开测试阶段', landingHero1: '真理不容', landingHero2: '谈判。',
+};
+
+export const translations = { en, es, bn, hi, fr, de, id, pt, it, ar, ru, ja, zh };
 
 export function t(key, lang = 'en') {
   if (!key) return '';
@@ -947,5 +995,11 @@ export const LANGUAGES = [
   { code: 'hi', label: 'Hindi', nativeLabel: 'हिन्दी' },
   { code: 'fr', label: 'French', nativeLabel: 'Français' },
   { code: 'de', label: 'German', nativeLabel: 'Deutsch' },
-  { code: 'id', label: 'Indonesian', nativeLabel: 'Bahasa Indonesia' }
+  { code: 'id', label: 'Indonesian', nativeLabel: 'Bahasa Indonesia' },
+  { code: 'pt', label: 'Portuguese', nativeLabel: 'Português' },
+  { code: 'it', label: 'Italian', nativeLabel: 'Italiano' },
+  { code: 'ar', label: 'Arabic', nativeLabel: 'العربية' },
+  { code: 'ru', label: 'Russian', nativeLabel: 'Русский' },
+  { code: 'ja', label: 'Japanese', nativeLabel: '日本語' },
+  { code: 'zh', label: 'Chinese', nativeLabel: '中文' }
 ];
