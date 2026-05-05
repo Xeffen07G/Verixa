@@ -29,6 +29,7 @@
   --radius-lg: 14px;
   --radius-xl: 20px;
   --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --nav-h: 80px;
 }
 
 *, *::before, *::after {
