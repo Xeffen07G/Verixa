@@ -293,6 +293,7 @@ export default function LandingPage() {
               <motion.button
                 whileHover={{ scale: 1.04, boxShadow: `0 8px 32px ${T.accent}40` }}
                 whileTap={{ scale: 0.97 }}
+                className="shimmer-btn"
                 style={{
                   padding: '15px 38px', borderRadius: 10, fontSize: 14, fontWeight: 600,
                   background: `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none',
@@ -344,10 +345,10 @@ export default function LandingPage() {
             {[
               { val: stat1, suffix: '+', label: t('inputFormats', lang), r: ref1 },
               { val: stat2, suffix: '', label: t('verdictTypes', lang), r: ref2 },
-              { val: stat3, suffix: '', label: t('aiModels', lang), r: ref3 },
+              { val: stat3, suffix: '', label: stat3 === 1 ? t('aiModels', lang).replace('s', '') : t('aiModels', lang), r: ref3 },
               { val: stat4, suffix: 's', label: t('avgResponse', lang), r: ref4 },
             ].map((s, i) => (
-              <div key={i} ref={s.r} style={{ padding: '48px 24px', textAlign: 'center', background: T.statBg }}>
+              <div key={i} ref={s.r} className="glassmorphism" style={{ padding: '48px 24px', textAlign: 'center', background: T.statBg, borderRadius: 24 }}>
                 <div style={{
                   fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 52,
                   color: T.accent, lineHeight: 1,
@@ -390,6 +391,10 @@ export default function LandingPage() {
               <span style={{
                 marginLeft: 12, fontSize: 12, color: T.text3, fontFamily: 'DM Mono, monospace',
               }}>verixa-engine v2.0</span>
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 10px #4ade80' }} />
+                <span style={{ fontSize: 10, fontWeight: 700, color: '#4ade80', letterSpacing: 1 }}>LIVE</span>
+              </div>
             </div>
 
             <div className="demo-terminal-box" style={{

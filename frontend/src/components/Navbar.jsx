@@ -106,7 +106,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
               </button>
 
               {/* The "Three Lines" Menu Trigger (Now right of Tools) */}
-              <button onClick={() => setMobileOpen(true)} style={{ background: 'none', border: 'none', color: textColor, cursor: 'pointer', padding: '8px 12px', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button onClick={() => { setMobileOpen(true); setLangOpen(false); }} style={{ background: 'none', border: 'none', color: textColor, cursor: 'pointer', padding: '8px 12px', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Menu size={20} />
               </button>
             </div>
@@ -125,7 +125,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
       }}>
         <button onClick={() => setMobileOpen(false)} style={{ position: 'absolute', top: 24, right: 40, background: 'none', border: 'none', color: textColor, cursor: 'pointer' }}><X size={32} /></button>
         
-        <div style={{ fontSize: 10, letterSpacing: 4, color: T.accent, fontWeight: 900, marginBottom: 40 }}>{user ? `${t('hi', lang)}, ${user.name?.toUpperCase() || t('user', lang).toUpperCase()}` : t('identityAccess', lang)}</div>
+        <div style={{ fontSize: 10, letterSpacing: 4, color: T.accent, fontWeight: 900, marginBottom: 40 }}>{user ? `${t('hi', lang)}, ${user.name?.toUpperCase() || t('user', lang).toUpperCase()}` : t('identityAccess', lang).toUpperCase().replace('_', ' ')}</div>
         
         {/* Verification Tools Section */}
         <div style={{ marginBottom: 48 }}>

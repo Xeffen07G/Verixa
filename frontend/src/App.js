@@ -12,14 +12,14 @@ import AccountPage from './pages/AccountPage';
 import { AuthProvider } from './context/AuthContext';
 import { LangProvider } from './context/LangContext';
 import DragDropOverlay from './components/DragDropOverlay';
-import CustomCursor from './components/CustomCursor';
+
 
 export default function App() {
   return (
     <AuthProvider>
       <LangProvider>
         <Router>
-        <CustomCursor />
+
         <DragDropOverlay>
           <Routes>
             <Route path="/" element={<LandingPage />} />

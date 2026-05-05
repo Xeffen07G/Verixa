@@ -185,6 +185,20 @@ input, textarea { font-family: var(--font-body); }
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.glassmorphism::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
 }
 
 .glassmorphism-light {
@@ -276,9 +290,7 @@ input, textarea { font-family: var(--font-body); }
   z-index: 9999;
 }
 
-/* ===== Custom Cursor ===== */
-/* Cursor styles are injected dynamically by CustomCursor.jsx */
-/* No cursor:none needed — SVG cursor replaces default */
+
 
 /* ===== Universal Hover & Interaction Animations ===== */
 
@@ -428,6 +440,32 @@ input, textarea, select {
 
 input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(201,169,110,0.1) !important;
+}
+
+/* Primary Action Shimmer */
+.shimmer-btn {
+  position: relative;
+  isolation: isolate;
+}
+
+.shimmer-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.shimmer-btn:hover::after {
+  transform: translateX(100%);
 }
 
 /* ===== Animated Gradient Border ===== */
