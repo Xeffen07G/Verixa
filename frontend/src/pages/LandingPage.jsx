@@ -244,7 +244,11 @@ export default function LandingPage() {
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden' }}>
           <video 
             autoPlay={true} loop={true} muted={true} playsInline={true}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: darkMode ? 0.35 : 0.12 }}
+            style={{ 
+              width: '100%', height: '100%', objectFit: 'cover', 
+              opacity: darkMode ? 0.55 : 0.25,
+              filter: 'brightness(1.1) contrast(1.1)'
+            }}
             src="/hero-bg.mp4"
           />
           {/* Gradients to ensure text readability */}
