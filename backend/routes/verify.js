@@ -44,50 +44,61 @@ router.post("/", async (req, res) => {
 
     const [claims, aiDetection] = await Promise.all([extractPromise, aiDetectionPromise]);
 
-    send("stage", { stage: "searching", message: "Retrieving evidence from the web..." });
-    const claimsWithEvidence = await Promise.all(claims.map(async (claim) => {
+    // Send extracted claims immediately to the frontend so they can see what's being checked
+    send("claims_extracted", { claims });
+
+    send("stage", { stage: "searching", message: "Retrieving evidence & verifying truth..." });
+    
+    // Process each claim independently and stream results back immediately
+    const verifiedResults = [];
+    await Promise.all(claims.map(async (claim, index) => {
       try {
-        const result = await searchEvidence(claim);
-        return { claim, evidenceText: result.text, sources: result.sources };
+        // 1. Search evidence for this specific claim
+        const evidence = await searchEvidence(claim);
+        send("log", { message: `Evidence found for claim #${index + 1}` });
+
+        // 2. Verify this specific claim immediately
+        // We'll wrap the single claim in an array for the existing verifyClaims service
+        const singleClaimResult = await verifyClaims([{ claim, evidenceText: evidence.text, sources: evidence.sources }]);
+        const result = singleClaimResult[0];
+
+        // 3. Stream this specific result to the frontend
+        send("claim_verified", { claim: result, index });
+        verifiedResults.push(result);
       } catch (e) {
-        return { claim, evidenceText: "Search failed.", sources: [] };
+        console.error(`Error verifying claim #${index + 1}:`, e);
+        const errorResult = { claim, verdict: "Unverifiable", confidence_score: 0, reasoning: "Internal processing error.", sources: [] };
+        send("claim_verified", { claim: errorResult, index });
+        verifiedResults.push(errorResult);
       }
     }));
 
-    send("stage", { stage: "verifying", message: "Running verification logic..." });
-    const verified = await verifyClaims(claimsWithEvidence);
-
     const scoreMap = { True: 100, "Partially True": 50, False: 0, Unverifiable: 50 };
     const overallScore = Math.round(
-      verified.reduce((s, c) => s + (scoreMap[c.verdict] ?? 50), 0) / verified.length
+      verifiedResults.reduce((s, c) => s + (scoreMap[c.verdict] ?? 50), 0) / verifiedResults.length
     );
 
     send("result", {
       stage: "done",
-      claims: verified,
+      claims: verifiedResults,
       overallScore,
-      totalClaims: verified.length,
+      totalClaims: verifiedResults.length,
       aiDetection,
       timestamp: new Date().toISOString(),
     });
 
-    // Report false/partial claims to trending leaderboard
+    // Report to trending (same logic as before)
     try {
-      const trendingRouter = require("./trending");
-      // Direct in-process report (avoid HTTP roundtrip)
-      const falseOrPartial = verified.filter(c => c.verdict === "False" || c.verdict === "Partially True");
+      const falseOrPartial = verifiedResults.filter(c => c.verdict === "False" || c.verdict === "Partially True");
       if (falseOrPartial.length > 0) {
-        // Use the trending module's internal store via a lightweight approach
-        const trendingModule = require("./trending");
-        // We'll use a simple fetch to our own endpoint
         const port = process.env.PORT || 5000;
         fetch(`http://localhost:${port}/api/trending/report`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ claims: falseOrPartial }),
-        }).catch(() => {}); // fire-and-forget
+        }).catch(() => {});
       }
-    } catch (e) { /* ignore trending errors */ }
+    } catch (e) {}
 
   } catch (err) {
     console.error("Pipeline error:", err);

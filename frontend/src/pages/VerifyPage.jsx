@@ -17,6 +17,7 @@ const VERDICT_CONFIG = (lang) => ({
   'False':          { color: '#991b1b', bg: '#fee2e2', border: '#fecaca', icon: '✕', label: t('mostlyInaccurate', lang),  short: t('falseShort', lang)   },
   'Partially True': { color: '#92400e', bg: '#fef3c7', border: '#fde68a', icon: '~', label: t('mixedAccuracy', lang),  short: t('partialShort', lang) },
   'Unverifiable':   { color: '#374151', bg: '#f3f4f6', border: '#e5e7eb', icon: '?', label: t('unverifiable', lang),    short: t('unclearShort', lang) },
+  'Pending':        { color: '#c9a96e', bg: 'rgba(201,169,110,0.08)', border: 'rgba(201,169,110,0.2)', icon: '◈', label: 'Processing...', short: '...' },
 });
 
 const STAGES = ['extracting', 'searching', 'verifying', 'done'];
@@ -106,7 +107,12 @@ function ClaimCard({ claim, index, theme, lang }) {
       <div className="claim-card-header" onClick={() => setOpen(!open)} style={{ padding: '20px 24px', cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: 16, background: open ? cfg.bg : 'transparent', transition: 'background 0.22s' }}>
 
         {/* Verdict badge */}
-        <div style={{ width: 44, height: 44, borderRadius: 12, background: cfg.bg, border: `1.5px solid ${cfg.border}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0, gap: 1 }}>
+        <div style={{ 
+          width: 44, height: 44, borderRadius: 12, background: cfg.bg, 
+          border: `1.5px solid ${cfg.border}`, display: 'flex', flexDirection: 'column', 
+          alignItems: 'center', justifyContent: 'center', flexShrink: 0, gap: 1,
+          animation: claim.verdict === 'Pending' ? 'pulse-gold 1.5s infinite' : 'none'
+        }}>
           <span style={{ fontSize: 16, color: cfg.color, fontWeight: 700, lineHeight: 1 }}>{cfg.icon}</span>
           <span style={{ fontSize: 7, color: cfg.color, fontWeight: 800, letterSpacing: 0.5, lineHeight: 1 }}>{cfg.short}</span>
         </div>
@@ -182,47 +188,131 @@ function PipelineProgress({ stage, theme, darkMode, lang }) {
   const idx = STAGES.indexOf(stage);
   const progressMap = { extracting: 15, searching: 45, verifying: 75, done: 100 };
   const progress = progressMap[stage] || (stage === 'done' ? 100 : 0);
-  const currentLabel = labels[idx] || (stage === 'done' ? t('done', lang) : t('verifying', lang));
 
   return (
-    <div style={{ padding: '20px 0 8px' }}>
-      {/* Animated progress bar */}
-      <div style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-          <span style={{ fontSize: 10, color: theme.accent, letterSpacing: 1, textTransform: 'uppercase', fontWeight: 600 }}>
-            {currentLabel}...
-          </span>
-          <span style={{ fontSize: 10, color: theme.text3, fontFamily: 'DM Mono, monospace' }}>{progress}%</span>
+    <div style={{ padding: '32px 0 16px', position: 'relative' }}>
+      <style>{`
+        @keyframes scan-sweep {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(300%); }
+        }
+        @keyframes neural-pulse {
+          0%, 100% { opacity: 0.3; stroke-width: 1; }
+          50% { opacity: 1; stroke-width: 2; filter: drop-shadow(0 0 5px ${theme.accent}); }
+        }
+        @keyframes float-particle {
+          0% { transform: translateY(0) scale(1); opacity: 0; }
+          50% { opacity: 0.5; }
+          100% { transform: translateY(-40px) scale(0); opacity: 0; }
+        }
+      `}</style>
+
+      {/* Progress Overview */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <div>
+          <div style={{ fontSize: 10, color: theme.accent, letterSpacing: 2, textTransform: 'uppercase', fontWeight: 800, marginBottom: 4 }}>
+            System Pipeline
+          </div>
+          <div style={{ fontSize: 18, color: theme.text, fontWeight: 300, fontFamily: 'Cormorant Garamond, serif' }}>
+            {labels[idx] || 'Verifying'}...
+          </div>
         </div>
-        <div style={{ width: '100%', height: 4, borderRadius: 4, background: theme.accentMuted, overflow: 'hidden', position: 'relative' }}>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: 24, color: theme.text, fontWeight: 300, fontFamily: 'Cormorant Garamond, serif', lineHeight: 1 }}>
+            {progress}%
+          </div>
+          <div style={{ fontSize: 9, color: theme.text3, letterSpacing: 1 }}>OPERATIONAL</div>
+        </div>
+      </div>
+
+      {/* Cinematic Bar */}
+      <div style={{ width: '100%', height: 6, borderRadius: 12, background: theme.surface2, overflow: 'hidden', position: 'relative', marginBottom: 40, border: `1px solid ${theme.border2}` }}>
+        <div style={{
+          height: '100%', width: `${progress}%`,
+          background: `linear-gradient(90deg, ${theme.accent}, #e8d5a3, ${theme.accent})`,
+          backgroundSize: '200% 100%',
+          transition: 'width 1s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          boxShadow: `0 0 20px ${theme.accent}4d`,
+          position: 'relative'
+        }}>
           <div style={{
-            height: '100%', borderRadius: 4,
-            background: `linear-gradient(90deg, ${theme.accent}, #e8d5a3, ${theme.accent})`,
-            backgroundSize: '200% 100%',
-            width: `${progress}%`,
-            transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-            animation: stage !== 'done' ? 'loading-glow 2s ease-in-out infinite, bar-pulse 1.5s ease-in-out infinite' : 'none',
-            boxShadow: `0 0 10px ${theme.accent}66`,
+            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+            animation: 'scan-sweep 2s infinite linear'
           }} />
         </div>
       </div>
 
-      {/* Step circles */}
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        {labels.map((label, i) => {
-          const done = i < idx || stage === 'done', active = i === idx && stage !== 'done';
-          return (
-            <React.Fragment key={i}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: 1 }}>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: done ? theme.accent : active ? theme.accentMuted : theme.surface2, border: `2px solid ${done || active ? theme.accent : theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s', boxShadow: active ? `0 0 12px ${theme.accent}4d` : 'none' }}>
-                  {done ? <span style={{ fontSize: 12, color: darkMode ? '#0a0a0f' : '#fff', fontWeight: 800 }}>✓</span> : active ? <span style={{ width: 8, height: 8, borderRadius: '50%', background: theme.accent, display: 'block', animation: 'pulse-gold 1.2s infinite' }} /> : null}
+      {/* Neural Network Visualization */}
+      <div style={{ position: 'relative', height: 80, display: 'flex', alignItems: 'center' }}>
+        <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}>
+          {/* Connecting Lines */}
+          {[0, 1, 2].map(i => {
+            const isCompleted = i < idx;
+            const isActive = i === idx;
+            return (
+              <path
+                key={i}
+                d={`M ${12.5 + i * 25}% 40 Q ${25 + i * 25}% ${i % 2 === 0 ? 20 : 60}, ${37.5 + i * 25}% 40`}
+                fill="none"
+                stroke={isCompleted ? theme.accent : theme.border}
+                strokeWidth={isCompleted ? 2 : 1}
+                style={{ 
+                  transition: 'all 0.8s', 
+                  strokeDasharray: isCompleted ? 'none' : '4 4',
+                  animation: isActive ? 'neural-pulse 1.5s infinite' : 'none'
+                }}
+              />
+            );
+          })}
+        </svg>
+
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
+          {labels.map((label, i) => {
+            const isDone = i < idx || stage === 'done';
+            const isActive = i === idx && stage !== 'done';
+            
+            return (
+              <div key={i} style={{ width: 80, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                <div style={{ 
+                  width: 44, height: 44, borderRadius: 14, 
+                  background: isDone ? theme.accent : isActive ? theme.accentMuted : theme.surface2,
+                  border: `1.5px solid ${isDone || isActive ? theme.accent : theme.border}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  transform: isActive ? 'scale(1.15)' : 'scale(1)',
+                  boxShadow: isActive ? `0 0 30px ${theme.accent}33` : 'none',
+                  position: 'relative'
+                }}>
+                  {isActive && (
+                    <div style={{ position: 'absolute', inset: -4, borderRadius: 16, border: `1px solid ${theme.accent}4d`, animation: 'pulse-gold 2s infinite' }} />
+                  )}
+                  {isDone ? (
+                    <span style={{ fontSize: 16, color: darkMode ? '#0a0a0f' : '#fff', fontWeight: 900 }}>✓</span>
+                  ) : (
+                    <span style={{ fontSize: 12, color: isActive ? theme.accent : theme.text3, fontWeight: 700, fontFamily: 'DM Mono, monospace' }}>
+                      0{i + 1}
+                    </span>
+                  )}
                 </div>
-                <span style={{ fontSize: 9, color: done || active ? theme.accent : theme.text3, letterSpacing: 1, textAlign: 'center', textTransform: 'uppercase', fontWeight: done || active ? 600 : 400 }}>{label}</span>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ 
+                    fontSize: 10, fontWeight: 800, letterSpacing: 1, 
+                    color: isDone || isActive ? theme.text : theme.text3, 
+                    textTransform: 'uppercase', transition: '0.3s' 
+                  }}>
+                    {label}
+                  </div>
+                  {isActive && (
+                    <div style={{ fontSize: 8, color: theme.accent, marginTop: 2, fontWeight: 600, animation: 'fadeIn 0.5s' }}>
+                      ACTIVE
+                    </div>
+                  )}
+                </div>
               </div>
-              {i < labels.length - 1 && <div style={{ flex: 1, height: 2, background: i < idx ? theme.accent : theme.border, marginTop: -16, transition: 'background 0.5s', borderRadius: 1 }} />}
-            </React.Fragment>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -929,7 +1019,7 @@ export default function VerifyPage() {
             <div style={{ animation: 'fadeUp 0.5s ease forwards' }}>
 
               {/* Color coded score banner */}
-              <ScoreBanner score={overallScore} claims={claims} lang={lang} />
+              {overallScore !== null && <ScoreBanner score={overallScore} claims={claims} lang={lang} />}
 
               {/* Action Buttons */}
               <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>

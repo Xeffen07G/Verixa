@@ -69,6 +69,18 @@ export function useVerify() {
               case 'log':
                 addLog(data.message);
                 break;
+              case 'claims_extracted':
+                // Initial placeholder claims
+                setClaims(data.claims.map(c => ({ claim: c, verdict: 'Pending', reasoning: 'Analyzing evidence...', sources: [] })));
+                break;
+              case 'claim_verified':
+                setClaims(prev => {
+                  const next = [...prev];
+                  if (next[data.index]) next[data.index] = data.claim;
+                  else next.push(data.claim);
+                  return next;
+                });
+                break;
               case 'result':
                 setClaims(data.claims || []);
                 setOverallScore(data.overallScore);
