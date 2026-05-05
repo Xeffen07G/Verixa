@@ -8,24 +8,43 @@ import React, { useEffect } from 'react';
  */
 export default function SimpleCursor() {
   useEffect(() => {
-    // Premium Gold Aeroplane/Arrow shape SVG in gold
-    const goldCursor = `url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16 4L6 28.5L7 29.5L16 25.5L25 29.5L26 28.5L16 4Z' fill='%23c9a96e' stroke='white' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") 16 16, auto`;
+  useEffect(() => {
+    // Premium Cartoon Golden Arrow
+    // Path: M2 2 L22 18 L14 18 L18 26 L14 28 L10 20 L4 24 Z (Approx)
+    // Refined Path for the specific look:
+    const cursorPath = "M4 4 L24 20 L15 20 L18 28 L14 30 L11 22 L4 28 Z";
     
-    // Gold Pointer for links
-    const goldPointer = `url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16 4L6 28.5L7 29.5L16 25.5L25 29.5L26 28.5L16 4Z' fill='%23e8d5a3' stroke='white' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") 16 16, pointer`;
+    const normalSvg = `<svg width='40' height='40' viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'>
+      <path d='${cursorPath}' fill='%23FFD700' stroke='%23E67E22' stroke-width='2' stroke-linejoin='round'/%3E
+      <path d='M6 7 L20 18 L14 18 L6 7 Z' fill='white' fill-opacity='0.2'/%3E
+    </svg>`;
 
+    const activeSvg = `<svg width='40' height='40' viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'>
+      <path d='M4 4 L1 1 M4 4 L4 0 M4 4 L8 1 M4 4 L2 4 M4 4 L0 4' stroke='%23E67E22' stroke-width='2' stroke-linecap='round'/%3E
+      <path d='${cursorPath}' fill='%23FFD700' stroke='%23E67E22' stroke-width='2' stroke-linejoin='round'/%3E
+      <path d='M6 7 L20 18 L14 18 L6 7 Z' fill='white' fill-opacity='0.2'/%3E
+    </svg>`;
+
+    const goldCursor = `url("data:image/svg+xml,${normalSvg.replace(/#/g, '%23')}") 4 4, auto`;
+    const goldActive = `url("data:image/svg+xml,${activeSvg.replace(/#/g, '%23')}") 4 4, auto`;
+    
     const style = document.createElement('style');
     style.id = 'gold-cursor-styles';
     style.innerHTML = `
       * {
         cursor: ${goldCursor} !important;
       }
-      a, button, [role="button"], input, select, textarea, .clickable, .interactive, .cursor-pointer {
-        cursor: ${goldPointer} !important;
+      *:active {
+        cursor: ${goldActive} !important;
       }
-      
+      a, button, [role="button"], input, select, textarea, .clickable, .interactive, .cursor-pointer {
+        cursor: ${goldCursor} !important;
+      }
+      a:active, button:active {
+        cursor: ${goldActive} !important;
+      }
       ::selection {
-        background: rgba(201, 169, 110, 0.3);
+        background: rgba(255, 215, 0, 0.3);
       }
     `;
     document.head.appendChild(style);
