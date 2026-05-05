@@ -39,6 +39,13 @@ export default function VideoPage() {
   const fileRef = useRef(null);
   const videoRef = useRef(null);
 
+  React.useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.load();
+      setPlaying(false);
+    }
+  }, [preview]);
+
   const T_DARK = {
     bg: '#0a0a0f', bg2: 'rgba(16,16,23,0.9)', text: '#f5f3ef', text2: 'rgba(245,243,239,0.45)',
     text3: 'rgba(245,243,239,0.25)', border: 'rgba(255,255,255,0.06)', accent: '#c9a96e',
@@ -167,7 +174,7 @@ export default function VideoPage() {
               <div>
                 <div style={{ borderRadius: 20, overflow: 'hidden', background: '#000', position: 'relative', border: `1px solid ${T.cardBorder}`, aspectRatio: '16/9' }}>
                   {preview && (
-                    <video ref={videoRef} src={preview} style={{ width: '100%', height: '100%' }} />
+                    <video ref={videoRef} src={preview} playsInline muted style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                   )}
                   <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))', display: 'flex', alignItems: 'center', gap: 16 }}>
                     <button onClick={() => { if (videoRef.current) { if (playing) videoRef.current.pause(); else videoRef.current.play(); setPlaying(!playing); } }}
