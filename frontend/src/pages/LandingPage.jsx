@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { Shield, Search, BarChart3, Brain, Link2, AlertTriangle, Zap, Clock, CheckCircle2, XCircle, MinusCircle, ShieldCheck, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Shield, Search, BarChart3, Brain, Link2, AlertTriangle, Zap, Clock, CheckCircle2, XCircle, MinusCircle, ShieldCheck, ChevronLeft, ChevronRight, Video } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { t } from '../utils/i18n';
@@ -114,6 +114,7 @@ const featuresList = [
   { Icon: Search, key: 'searchingEvidence', descKey: 'searchingDesc' },
   { Icon: BarChart3, key: 'verifyingClaims', descKey: 'verifyingDesc' },
   { Icon: Brain, key: 'aiTextDetection', descKey: 'aiDetectDesc' },
+  { Icon: Video, key: 'videoForensic', descKey: 'videoForensicDesc' },
   { Icon: Link2, key: 'urlAnalysis', descKey: 'deepScrapeDesc' },
   { Icon: AlertTriangle, key: 'conflictIntel', descKey: 'conflictDesc' },
 ];
