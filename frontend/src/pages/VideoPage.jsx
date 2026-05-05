@@ -102,7 +102,7 @@ export default function VideoPage() {
         <section style={{ textAlign: 'center', marginBottom: 48 }}>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '4px 12px', borderRadius: 99, background: T.accentMuted, color: T.accent, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, marginBottom: 16 }}>
-            <Activity size={14} /> VIDEO INTELLIGENCE
+            <Activity size={14} /> {t('videoVerify', lang).toUpperCase()}
           </motion.div>
           <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 300, margin: '0 0 16px' }}>
             Unmasking <span style={{ fontStyle: 'italic', color: T.accent }}>Deepfakes.</span>
