@@ -572,7 +572,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h3 style={{ fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 6 }}>{t(f.key, lang)}</h3>
-                  <div style={{ height: 0, opacity: 0, transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)', overflow: 'hidden' }} className="hover-desc">
+                  <div style={{ opacity: 1, marginTop: 8 }} className="hover-desc">
                     <p style={{ fontSize: 13, color: T.text3, lineHeight: 1.6, margin: 0 }}>{t(f.descKey, lang)}</p>
                   </div>
                 </div>
@@ -864,7 +864,7 @@ export default function LandingPage() {
       <Footer darkMode={darkMode} toggleTheme={toggleTheme} />
 
       <style>{`
-        .feature-card:hover .hover-desc { height: auto !important; opacity: 1 !important; margin-top: 8px !important; }
+        .hover-desc { opacity: 1; }
         
         @media (max-width: 768px) {
           .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
