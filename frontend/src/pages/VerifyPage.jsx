@@ -726,7 +726,7 @@ export default function VerifyPage() {
   });
 
   return (
-    <div className="page-wrapper" style={{ minHeight: '100vh', background: T.bg, display: 'flex', flexDirection: 'column', transition: 'background 0.3s', fontFamily: 'DM Sans, sans-serif' }}>
+    <div className="page-wrapper" style={{ minHeight: '100vh', background: T.bg, display: 'flex', flexDirection: 'column', transition: 'background 0.3s', fontFamily: 'DM Sans, sans-serif', paddingTop: 0 }}>
       {/* Confetti celebration for 90%+ scores */}
       <Confetti trigger={showConfetti} />
 
@@ -793,7 +793,7 @@ export default function VerifyPage() {
       <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '380px 1fr', minHeight: 0 }} className="verify-main">
 
         {/* LEFT PANEL */}
-        <div className="left-panel" style={{ borderRight: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', height: 'calc(100vh - 60px)', overflow: 'hidden', background: T.surface, transition: 'all 0.3s' }}>
+        <div className="left-panel" style={{ borderRight: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', height: '100vh', paddingTop: 'var(--nav-h)', overflow: 'hidden', background: T.surface, transition: 'all 0.3s' }}>
 
           {/* Tabs */}
           <div style={{ padding: '12px 20px', borderBottom: `1px solid ${T.border}`, display: 'flex', gap: 4 }}>
@@ -942,7 +942,7 @@ export default function VerifyPage() {
         </div>
 
         {/* RIGHT RESULTS PANEL */}
-        <div className="results-panel" style={{ flex: 1, height: 'calc(100vh - 60px)', overflowY: 'auto', padding: '32px 36px', background: T.bg, transition: 'all 0.3s' }}>
+        <div className="results-panel" style={{ flex: 1, height: '100vh', overflowY: 'auto', padding: 'calc(var(--nav-h) + 32px) 36px 32px', background: T.bg, transition: 'all 0.3s' }}>
 
           {/* Empty state */}
           {!stage && claims.length === 0 && !error && (

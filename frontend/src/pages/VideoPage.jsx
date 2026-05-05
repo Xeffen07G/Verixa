@@ -109,10 +109,10 @@ export default function VideoPage() {
   const cfg = result ? (VERDICT_CONFIG(lang)[result.verdict] || VERDICT_CONFIG(lang)['Uncertain']) : null;
 
   return (
-    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, transition: 'background 0.3s', fontFamily: 'DM Sans, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, transition: 'background 0.3s', fontFamily: 'DM Sans, sans-serif', paddingTop: 0 }}>
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
-      <main style={{ maxWidth: 1000, margin: '0 auto', padding: '100px 24px 60px' }}>
+      <main style={{ maxWidth: 1000, margin: '0 auto', padding: 'calc(var(--nav-h) + 48px) 24px 60px' }}>
         
         {/* Header */}
         <section style={{ textAlign: 'center', marginBottom: 48 }}>

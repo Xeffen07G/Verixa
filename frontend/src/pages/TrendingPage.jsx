@@ -117,7 +117,7 @@ export default function TrendingPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, transition: 'background 0.3s', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, transition: 'background 0.3s', overflowX: 'hidden', paddingTop: 0 }}>
       <style>{`
         @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
@@ -135,7 +135,7 @@ export default function TrendingPage() {
         <div style={{ position: 'absolute', bottom: '10%', right: '10%', width: '40vw', height: '40vw', background: `radial-gradient(circle, ${T.accent}0d 0%, transparent 70%)`, filter: 'blur(100px)' }} />
       </div>
 
-      <main style={{ maxWidth: 1000, margin: '0 auto', padding: '140px 24px 80px', position: 'relative', zIndex: 1 }}>
+      <main style={{ maxWidth: 1000, margin: '0 auto', padding: 'calc(var(--nav-h) + 60px) 24px 80px', position: 'relative', zIndex: 1 }}>
         
         {/* Header Section */}
         <section style={{ textAlign: 'center', marginBottom: 80 }}>

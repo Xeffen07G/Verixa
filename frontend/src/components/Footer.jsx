@@ -8,28 +8,37 @@ export default function Footer({ darkMode = true }) {
     bg: '#0a0a0f',
     border: 'rgba(255,255,255,0.06)',
     border2: 'rgba(255,255,255,0.05)',
-    text: '#f5f3ef',
-    text2: 'rgba(245,243,239,0.45)',
-    text3: 'rgba(245,243,239,0.2)',
+    text: '#ffffff',
+    text2: 'rgba(255,255,255,0.5)',
+    text3: 'rgba(255,255,255,0.2)',
     linkHover: '#c9a96e',
   } : {
-    bg: '#1a1a1a',
-    border: 'rgba(255,255,255,0.08)',
-    border2: 'rgba(255,255,255,0.06)',
-    text: '#f5f3ef',
-    text2: 'rgba(245,243,239,0.5)',
-    text3: 'rgba(245,243,239,0.25)',
-    linkHover: '#c9a96e',
+    bg: '#f5f3ed',
+    border: 'rgba(0,0,0,0.06)',
+    border2: 'rgba(0,0,0,0.04)',
+    text: '#0d0d0d',
+    text2: 'rgba(0,0,0,0.6)',
+    text3: 'rgba(0,0,0,0.3)',
+    linkHover: '#5a421a',
   };
 
   return (
-    <footer style={{ background: T.bg, borderTop: `1px solid ${T.border}`, padding: '60px 24px 32px' }}>
+    <footer style={{ 
+      background: T.bg, 
+      borderTop: `1px solid ${T.border}`, 
+      padding: '80px 24px 32px',
+      marginTop: 'auto',
+      position: 'relative'
+    }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48, marginBottom: 48 }} className="footer-grid">
 
           {/* Brand */}
           <div>
-            <span style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700, fontSize: 22, color: T.text, letterSpacing: 1, display: 'block', marginBottom: 12 }}>VeriXa</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+               <div style={{ width: 24, height: 24, borderRadius: 6, background: darkMode ? '#c9a96e' : '#5a421a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: darkMode ? '#000' : '#fff', fontWeight: 900 }}>V</div>
+               <span style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700, fontSize: 20, color: T.text, letterSpacing: 1 }}>VeriXa</span>
+            </div>
             <p style={{ fontSize: 13, color: T.text2, lineHeight: 1.7, maxWidth: 280, fontWeight: 300 }}>
               {t('landingHeroSubtitle', lang)}
             </p>

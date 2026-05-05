@@ -101,7 +101,7 @@ export default function ImagePage() {
   const riskCfg = result ? (RISK_CONFIG(lang)[result.risk_level] || RISK_CONFIG(lang)['Medium']) : null;
 
   return (
-    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, paddingTop: 60, transition: 'background 0.3s, color 0.3s', fontFamily: 'DM Sans, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, paddingTop: 0, transition: 'background 0.3s, color 0.3s', fontFamily: 'DM Sans, sans-serif' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
@@ -113,7 +113,7 @@ export default function ImagePage() {
 
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '48px 24px' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: 'calc(var(--nav-h) + 48px) 24px 80px' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: T.accent, marginBottom: 12 }}>{t('imageIntel', lang)}</p>
           <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 'clamp(36px, 6vw, 56px)', color: T.text, margin: '0 0 16px', lineHeight: 1.1 }}>
