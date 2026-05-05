@@ -13,20 +13,24 @@ function useCountUp(target, duration = 1800) {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
   useEffect(() => {
-    const observer = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        let start = 0;
-        const step = target / (duration / 16);
-        const timer = setInterval(() => {
-          start += step;
-          if (start >= target) { setCount(target); clearInterval(timer); }
-          else setCount(Math.floor(start));
-        }, 16);
-        observer.disconnect();
-      }
-    }, { threshold: 0.5 });
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
+        let timer;
+        const observer = new IntersectionObserver(([e]) => {
+          if (e.isIntersecting) {
+            let start = 0;
+            const step = target / (duration / 16);
+            timer = setInterval(() => {
+              start += step;
+              if (start >= target) { setCount(target); clearInterval(timer); }
+              else setCount(Math.floor(start));
+            }, 16);
+            observer.disconnect();
+          }
+        }, { threshold: 0.5 });
+        if (ref.current) observer.observe(ref.current);
+        return () => {
+          observer.disconnect();
+          if (timer) clearInterval(timer);
+        };
   }, [target, duration]);
   return [count, ref];
 }
@@ -180,7 +184,7 @@ export default function LandingPage() {
 
   useEffect(() => {
     const timer = setInterval(() => setActiveTestimonial(p => (p + 1) % testimonials.length), 5000);
-    return () => clearTimeout(timer);
+    return () => clearInterval(timer);
   }, []);
 
   /* ── Theme tokens ── */
@@ -237,11 +241,11 @@ export default function LandingPage() {
       <Section style={{ padding: '30px 0 100px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         {/* Full Hero Background Video Scaffolding */}
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden' }}>
-          <video 
+          {/* <video 
             autoPlay={true} loop={true} muted={true} playsInline={true}
             style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: darkMode ? 0.35 : 0.15 }}
             src="YOUR_VIDEO_URL_HERE"
-          />
+          /> */}
           {/* Gradients to ensure text readability */}
           <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 50% 50%, ${T.bg}00 0%, ${T.bg} 80%)` }} />
           <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to bottom, transparent 60%, ${T.bg} 100%)` }} />

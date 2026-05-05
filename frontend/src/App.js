@@ -12,6 +12,7 @@ import AccountPage from './pages/AccountPage';
 import { AuthProvider } from './context/AuthContext';
 import { LangProvider } from './context/LangContext';
 import DragDropOverlay from './components/DragDropOverlay';
+import SimpleCursor from './components/SimpleCursor';
 
 
 export default function App() {
@@ -19,7 +20,7 @@ export default function App() {
     <AuthProvider>
       <LangProvider>
         <Router>
-
+          <SimpleCursor />
         <DragDropOverlay>
           <Routes>
             <Route path="/" element={<LandingPage />} />
