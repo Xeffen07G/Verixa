@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { motion, useSpring, useMotionValue } from 'framer-motion';
 
 /**
- * Simple Cursor Animation
- * - Small dot with a subtle ring
- * - Smooth spring-based following
- * - Scales up slightly on hover
+ * Beautiful Gold Cursor
+ * - Elegant gold gradient and glow
+ * - Minimalist dual-layer design
+ * - Fluid spring-based motion
  */
 export default function SimpleCursor() {
   const [isHovering, setIsHovering] = useState(false);
@@ -15,8 +15,8 @@ export default function SimpleCursor() {
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
 
-  // Use a faster, tighter spring for "simple" feel
-  const springConfig = { damping: 25, stiffness: 400 };
+  // Smooth, high-fidelity spring motion
+  const springConfig = { damping: 28, stiffness: 350, mass: 0.5 };
   const cursorX = useSpring(mouseX, springConfig);
   const cursorY = useSpring(mouseY, springConfig);
 
@@ -33,7 +33,7 @@ export default function SimpleCursor() {
     };
 
     const handleOver = (e) => {
-      const target = e.target.closest('a, button, [role="button"], input, .clickable, .interactive');
+      const target = e.target.closest('a, button, [role="button"], input, .clickable, .interactive, .cursor-pointer');
       setIsHovering(!!target);
     };
 
@@ -57,9 +57,10 @@ export default function SimpleCursor() {
         pointerEvents: 'none', 
         zIndex: 999999,
         opacity: isHidden ? 0 : 1,
-        transition: 'opacity 0.2s'
+        transition: 'opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1)'
       }}
     >
+      {/* Outer Ring / Glow */}
       <motion.div
         style={{
           position: 'absolute',
@@ -67,17 +68,22 @@ export default function SimpleCursor() {
           y: cursorY,
           translateX: '-50%',
           translateY: '-50%',
-          width: 20,
-          height: 20,
+          width: 32,
+          height: 32,
           borderRadius: '50%',
-          border: '1.5px solid #c9a96e',
-          backgroundColor: isHovering ? 'rgba(201, 169, 110, 0.1)' : 'transparent',
+          border: '1px solid rgba(201, 169, 110, 0.3)',
+          background: 'radial-gradient(circle, rgba(201, 169, 110, 0.15) 0%, transparent 70%)',
+          willChange: 'transform',
         }}
         animate={{
-          scale: isHovering ? 1.5 : 1,
+          scale: isHovering ? 1.4 : 1,
+          opacity: isHovering ? 0.8 : 0.4,
+          borderColor: isHovering ? 'rgba(201, 169, 110, 0.6)' : 'rgba(201, 169, 110, 0.3)',
         }}
-        transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+        transition={{ type: 'spring', damping: 20, stiffness: 200 }}
       />
+
+      {/* Inner Precision Dot (Gold) */}
       <motion.div
         style={{
           position: 'absolute',
@@ -85,19 +91,27 @@ export default function SimpleCursor() {
           y: cursorY,
           translateX: '-50%',
           translateY: '-50%',
-          width: 4,
-          height: 4,
+          width: 6,
+          height: 6,
           borderRadius: '50%',
-          backgroundColor: '#c9a96e',
+          background: 'linear-gradient(135deg, #e8d5a3 0%, #c9a96e 100%)',
+          boxShadow: '0 0 10px rgba(201, 169, 110, 0.8)',
+          zIndex: 2,
         }}
         animate={{
-          scale: isHovering ? 0.5 : 1,
+          scale: isHovering ? 0.6 : 1,
         }}
       />
+
       <style>{`
-        /* Minimal hide native cursor on interactive elements */
+        /* Keep native cursor hidden on interactive elements but show custom pointer hint */
         a, button, [role="button"], input, .clickable, .interactive {
-          cursor: crosshair !important;
+          cursor: none !important;
+        }
+        
+        /* Apply smooth transition to all elements cursor property */
+        * {
+          transition: cursor 0.2s ease;
         }
       `}</style>
     </div>
