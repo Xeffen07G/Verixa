@@ -229,7 +229,7 @@ export default function ImagePage() {
 
             {result.forensic_breakdown && (
               <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16, animation: 'fadeUp 0.5s ease' }}>
-                <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 16 }}>Detailed Forensic Breakdown</p>
+                <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 16 }}>{t('forensicBreakdown', lang)}</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {Object.entries(result.forensic_breakdown).map(([key, value]) => (
                     <div key={key} style={{ padding: '16px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8, borderLeft: `3px solid ${T.accent}` }}>

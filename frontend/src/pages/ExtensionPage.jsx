@@ -166,12 +166,15 @@ export default function ExtensionPage() {
                 animation: 'fadeUp 0.3s ease forwards', animationDelay: '1.5s',
                 opacity: 0, animationFillMode: 'forwards',
               }}>
-                {['Copy', 'Search Google for...', 'Translate to English'].map((item, i) => (
-                  <div key={i} style={{
-                    padding: '8px 16px', fontSize: 12, color: T.text3,
-                    borderBottom: i === 2 ? `1px solid ${T.border}` : 'none',
-                  }}>{t(item.toLowerCase().replace(/ /g, '_'), lang) || item}</div>
-                ))}
+                {['Copy', 'Search Google for...', 'Translate to English'].map((item, i) => {
+                  const key = item === 'Copy' ? 'copy_menu' : item.toLowerCase().replace(/ /g, '_').replace('...', '');
+                  return (
+                    <div key={i} style={{
+                      padding: '8px 16px', fontSize: 12, color: T.text3,
+                      borderBottom: i === 2 ? `1px solid ${T.border}` : 'none',
+                    }}>{t(key, lang) || item}</div>
+                  );
+                })}
                 <div style={{
                   padding: '8px 16px', fontSize: 12, color: T.accent,
                   fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,

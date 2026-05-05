@@ -104,7 +104,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
                           transition: '0.2s'
                         }}
                       >
-                        {l.label}
+                        {l.nativeLabel}
                       </button>
                     ))}
                   </div>

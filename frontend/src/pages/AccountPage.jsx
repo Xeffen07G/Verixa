@@ -290,7 +290,7 @@ export default function AccountPage() {
                   {isEditing && (
                     <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', opacity: 0, transition: '0.3s' }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0}>
                       <Camera size={32} style={{ marginBottom: 4 }} />
-                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1 }}>UPLOAD</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1 }}>{t('upload', lang)}</span>
                     </div>
                   )}
                 </div>
@@ -346,7 +346,7 @@ export default function AccountPage() {
                         </div>
                         <div style={{ textAlign: 'right' }}>
                           <div style={{ color: T.accent, fontWeight: 800, fontSize: 16 }}>{memberVerifications}</div>
-                          <div style={{ color: T.text3, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>Scans</div>
+                          <div style={{ color: T.text3, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>{t('scans', lang)}</div>
                         </div>
                       </div>
                     );
@@ -364,7 +364,7 @@ export default function AccountPage() {
                   <div style={{ width: 32, height: 32, borderRadius: 10, background: `${T.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Activity size={16} color={T.accent} />
                   </div>
-                  <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2, color: T.text, textTransform: 'uppercase' }}>System Impact</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2, color: T.text, textTransform: 'uppercase' }}>{t('systemImpact', lang)}</span>
                 </div>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>

@@ -101,17 +101,17 @@ export default function SignupPage() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
-            <span style={{ fontSize: 13, color: T.text2, marginLeft: 4 }}>Who are you? (Designation)</span>
+            <span style={{ fontSize: 13, color: T.text2, marginLeft: 4 }}>{t('whoAreYou', lang)}</span>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               {[
-                { label: 'Head of Organization', role: 'head' },
-                { label: 'Head of Institution', role: 'head' },
-                { label: 'Team Leader', role: 'head' },
-                { label: 'Employee', role: 'employee' },
-                { label: 'Student', role: 'employee' },
-                { label: 'Researcher', role: 'employee' },
-                { label: 'Public Official', role: 'employee' },
-                { label: 'Individual', role: 'employee' },
+                { label: t('designationHeadOrg', lang), role: 'head' },
+                { label: t('designationHeadInst', lang), role: 'head' },
+                { label: t('designationTeamLeader', lang), role: 'head' },
+                { label: t('designationEmployee', lang), role: 'employee' },
+                { label: t('designationStudent', lang), role: 'employee' },
+                { label: t('designationResearcher', lang), role: 'employee' },
+                { label: t('designationPublicOfficial', lang), role: 'employee' },
+                { label: t('designationIndividual', lang), role: 'employee' },
               ].map((d) => (
                 <button 
                   key={d.label}

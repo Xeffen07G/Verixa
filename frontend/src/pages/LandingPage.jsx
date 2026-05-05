@@ -103,10 +103,10 @@ const demoClaims = [
 ];
 
 /* ─────────── Static Data ─────────── */
-const testimonials = [
-  { name: 'Aditya Seth', role: 'Software, Strategy and AI Initiative', text: 'VeriXa has become indispensable to our compliance workflow. It catches misinformation before it reaches our clients with a precision I have never seen in any other tool.', avatar: 'AS' },
-  { name: 'Arnab Basu', role: 'Academic Coordinator at Techno India University', text: 'The claim extraction is extraordinary. What used to take my team three hours of manual fact-checking now takes VeriXa under two minutes. The source citations are impeccable.', avatar: 'AB' },
-  { name: 'Arnab Saha', role: 'Senior Programme Coordinator at Techno India University', text: 'We integrated VeriXa into our research pipeline. The confidence scoring system has become the gold standard for how we evaluate information quality across the firm.', avatar: 'AS' },
+const testimonials = (lang) => [
+  { name: 'Aditya Seth', role: t('test1Role', lang), text: t('test1Text', lang), avatar: 'AS' },
+  { name: 'Arnab Basu', role: t('test2Role', lang), text: t('test2Text', lang), avatar: 'AB' },
+  { name: 'Arnab Saha', role: t('test3Role', lang), text: t('test3Text', lang), avatar: 'AS' },
 ];
 
 const featuresList = [
@@ -183,9 +183,9 @@ export default function LandingPage() {
   }, [demoStep]);
 
   useEffect(() => {
-    const timer = setInterval(() => setActiveTestimonial(p => (p + 1) % testimonials.length), 5000);
+    const timer = setInterval(() => setActiveTestimonial(p => (p + 1) % testimonials(lang).length), 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [lang]);
 
   /* ── Theme tokens ── */
   const T_DARK = {
@@ -406,10 +406,10 @@ export default function LandingPage() {
               <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#4ade80' }} />
               <span style={{
                 marginLeft: 12, fontSize: 12, color: T.text3, fontFamily: 'DM Mono, monospace',
-              }}>verixa-engine v2.0</span>
+                }}>{t('verixa_engine', lang)} v2.0</span>
               <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 10px #4ade80' }} />
-                <span style={{ fontSize: 10, fontWeight: 700, color: '#4ade80', letterSpacing: 1 }}>LIVE</span>
+                <span style={{ fontSize: 10, fontWeight: 700, color: '#4ade80', letterSpacing: 1 }}>{t('live_status', lang)}</span>
               </div>
             </div>
 
@@ -651,7 +651,7 @@ export default function LandingPage() {
                   }}>
                     <step.icon size={22} color={T.accent} strokeWidth={1.5} style={{ transform: 'rotate(-5deg)' }} />
                   </div>
-                  <div style={{ fontSize: 9, letterSpacing: 3, color: T.accent, fontWeight: 900, marginBottom: 12 }}>PHASE_{step.num}</div>
+                  <div style={{ fontSize: 9, letterSpacing: 3, color: T.accent, fontWeight: 900, marginBottom: 12 }}>{t('phaseLabel', lang)}_{step.num}</div>
                   <h3 style={{ fontSize: 22, fontWeight: 500, color: T.text, marginBottom: 12, fontFamily: 'Cormorant Garamond, serif' }}>{step.label}</h3>
                   <p style={{ fontSize: 14, color: T.text3, lineHeight: 1.6, fontWeight: 300, margin: 0 }}>{step.desc}</p>
                   <div style={{
@@ -708,7 +708,7 @@ export default function LandingPage() {
             }}>"</div>
 
             <AnimatePresence mode="wait">
-              {testimonials.map((tItem, i) => i === activeTestimonial && (
+              {testimonials(lang).map((tItem, i) => i === activeTestimonial && (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
@@ -738,7 +738,7 @@ export default function LandingPage() {
 
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16, marginTop: 28 }}>
               <button
-                onClick={() => setActiveTestimonial(p => (p - 1 + testimonials.length) % testimonials.length)}
+                onClick={() => setActiveTestimonial(p => (p - 1 + testimonials(lang).length) % testimonials(lang).length)}
                 style={{
                   width: 44, height: 44, borderRadius: '50%', border: `1px solid ${T.border}`,
                   background: `${T.accent}14`, color: T.accent, cursor: 'pointer',
@@ -749,7 +749,7 @@ export default function LandingPage() {
                 onMouseLeave={e => e.currentTarget.style.background = `${T.accent}14`}
               ><ChevronLeft size={20} /></button>
               <div style={{ display: 'flex', gap: 8 }}>
-                {testimonials.map((_, i) => (
+                {testimonials(lang).map((_, i) => (
                   <button
                     key={i} onClick={() => setActiveTestimonial(i)}
                     style={{
@@ -761,7 +761,7 @@ export default function LandingPage() {
                 ))}
               </div>
               <button
-                onClick={() => setActiveTestimonial(p => (p + 1) % testimonials.length)}
+                onClick={() => setActiveTestimonial(p => (p + 1) % testimonials(lang).length)}
                 style={{
                   width: 44, height: 44, borderRadius: '50%', border: `1px solid ${T.border}`,
                   background: `${T.accent}14`, color: T.accent, cursor: 'pointer',
@@ -810,7 +810,7 @@ export default function LandingPage() {
                     padding: '6px 14px', borderRadius: 20,
                     background: T.accent, color: darkMode ? '#0a0a0f' : '#fff',
                     fontSize: 10, fontWeight: 900, letterSpacing: 1.5,
-                  }}>POPULAR</div>
+                  }}>{t('popularBadge', lang)}</div>
                 )}
                 <div style={{
                   fontFamily: 'Cormorant Garamond, serif', fontWeight: 500,

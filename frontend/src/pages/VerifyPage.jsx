@@ -13,10 +13,10 @@ import axios from 'axios';
 const API_URL = process.env.REACT_APP_API_URL || '';
 
 const VERDICT_CONFIG = (lang) => ({
-  'True':           { color: '#166534', bg: '#dcfce7', border: '#bbf7d0', icon: '✓', label: t('mostlyAccurate', lang),   short: 'TRUE'    },
-  'False':          { color: '#991b1b', bg: '#fee2e2', border: '#fecaca', icon: '✕', label: t('mostlyInaccurate', lang),  short: 'FALSE'   },
-  'Partially True': { color: '#92400e', bg: '#fef3c7', border: '#fde68a', icon: '~', label: t('mixedAccuracy', lang),  short: 'PARTIAL' },
-  'Unverifiable':   { color: '#374151', bg: '#f3f4f6', border: '#e5e7eb', icon: '?', label: t('unverifiable', lang),    short: 'UNCLEAR' },
+  'True':           { color: '#166534', bg: '#dcfce7', border: '#bbf7d0', icon: '✓', label: t('mostlyAccurate', lang),   short: t('trueShort', lang)    },
+  'False':          { color: '#991b1b', bg: '#fee2e2', border: '#fecaca', icon: '✕', label: t('mostlyInaccurate', lang),  short: t('falseShort', lang)   },
+  'Partially True': { color: '#92400e', bg: '#fef3c7', border: '#fde68a', icon: '~', label: t('mixedAccuracy', lang),  short: t('partialShort', lang) },
+  'Unverifiable':   { color: '#374151', bg: '#f3f4f6', border: '#e5e7eb', icon: '?', label: t('unverifiable', lang),    short: t('unclearShort', lang) },
 });
 
 const STAGES = ['extracting', 'searching', 'verifying', 'done'];
@@ -263,7 +263,7 @@ function HistoryPanel({ history, onLoad, onDelete, theme, lang }) {
 
 function exportToPDF(claims, overallScore, text, lang) {
   const label = overallScore >= 70 ? t('mostlyAccurate', lang) : overallScore >= 40 ? t('mixedAccuracy', lang) : t('mostlyInaccurate', lang);
-  const html = `<html><head><style>body{font-family:'Segoe UI',system-ui,sans-serif;max-width:800px;margin:40px auto;color:#1a1a1a;line-height:1.6;}h1{font-size:28px;font-weight:300;border-bottom:2px solid #c9a96e;padding-bottom:12px;color:#0a0a0f}.score{font-size:56px;font-weight:300;color:${overallScore>=70?'#166534':overallScore>=40?'#92400e':'#991b1b'}}.claim{border:1px solid #e5e7eb;border-radius:10px;padding:18px;margin-bottom:14px;}.badge{display:inline-block;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:8px}.reasoning{color:#555;font-size:13px;margin-top:8px;line-height:1.6}.source{font-size:11px;color:#888;margin-top:6px}</style></head><body><h1>VeriXa ${t('accuracyReport', lang)}</h1><p style="color:#666;margin-bottom:4px">${t('generated', lang)} ${new Date().toLocaleString()} · ${claims.length} ${t('claimsAnalyzed', lang)}</p><div class="score">${overallScore}%</div><p style="color:#666;margin:4px 0 28px">${label}</p>${claims.map((c,i)=>`<div class="claim"><div class="badge" style="background:${VERDICT_CONFIG(lang)[c.verdict]?.bg};color:${VERDICT_CONFIG(lang)[c.verdict]?.color}">${VERDICT_CONFIG(lang)[c.verdict]?.icon} ${c.verdict}</div><strong style="font-size:15px;display:block;margin-bottom:6px">${i+1}. ${c.claim}</strong><div class="reasoning">${c.reasoning}</div>${c.sources?.length?`<div class="source">${t('evidenceSources', lang)}: ${c.sources.map(s=>s.title).join(' · ')}</div>`:''}</div>`).join('')}</body></html>`;
+  const html = `<html><head><style>body{font-family:'Segoe UI',system-ui,sans-serif;max-width:800px;margin:40px auto;color:#1a1a1a;line-height:1.6;}h1{font-size:28px;font-weight:300;border-bottom:2px solid #c9a96e;padding-bottom:12px;color:#0a0a0f}.score{font-size:56px;font-weight:300;color:${overallScore>=70?'#166534':overallScore>=40?'#92400e':'#991b1b'}}.claim{border:1px solid #e5e7eb;border-radius:10px;padding:18px;margin-bottom:14px;}.badge{display:inline-block;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:8px}.reasoning{color:#555;font-size:13px;margin-top:8px;line-height:1.6}.source{font-size:11px;color:#888;margin-top:6px}</style></head><body><h1>VeriXa ${t('accuracyReport', lang)}</h1><p style="color:#666;margin-bottom:4px">${t('generated', lang)} ${new Date().toLocaleString()} · ${claims.length} ${t('claimsAnalyzed', lang)}</p><div class="score">${overallScore}%</div><p style="color:#666;margin:4px 0 28px">${label}</p>${claims.map((c,i)=>`<div class="claim"><div class="badge" style="background:${VERDICT_CONFIG(lang)[c.verdict]?.bg};color:${VERDICT_CONFIG(lang)[c.verdict]?.color}">${VERDICT_CONFIG(lang)[c.verdict]?.icon} ${VERDICT_CONFIG(lang)[c.verdict]?.short || c.verdict}</div><strong style="font-size:15px;display:block;margin-bottom:6px">${i+1}. ${c.claim}</strong><div class="reasoning">${c.reasoning}</div>${c.sources?.length?`<div class="source">${t('evidenceSources', lang)}: ${c.sources.map(s=>s.title).join(' · ')}</div>`:''}</div>`).join('')}</body></html>`;
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const win = window.open(url, '_blank');
@@ -373,9 +373,9 @@ function generateCertificate(claims, overallScore, text, lang) {
           <div style="margin-top:6px;"><b>${t('certReportId', lang)}:</b> VX-${Math.random().toString(36).substr(2, 9).toUpperCase()}</div>
         </div>
         <div class="seal">
-          <span style="letter-spacing:1px;">VERIFIED</span>
+          <span style="letter-spacing:1px;">${t('verified', lang)}</span>
           <span style="font-size:24px; margin-top:2px;">✓</span>
-          <span style="font-size:6px; opacity:0.6;">PLATFORM-GEN</span>
+          <span style="font-size:6px; opacity:0.6;">${t('platformGen', lang)}</span>
         </div>
       </div>
     </div>
