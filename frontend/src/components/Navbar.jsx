@@ -41,9 +41,12 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const textColor = darkMode ? '#ffffff' : '#000000';
   const textMuted = darkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)';
   const border = darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
-  const bg = darkMode 
-    ? ((!isLanding || scrolled) ? 'rgba(10,10,15,0.85)' : 'transparent') 
-    : ((!isLanding || scrolled) ? 'rgba(255,255,255,0.85)' : 'transparent');
+  const bg = scrolled 
+    ? (darkMode ? 'rgba(10,10,15,0.85)' : 'rgba(255,255,255,0.85)')
+    : (isLanding ? 'transparent' : (darkMode ? 'rgba(10,10,15,1)' : 'rgba(255,255,255,1)'));
+
+  const blur = scrolled || !isLanding ? 'blur(24px)' : 'none';
+  const showBorder = scrolled || !isLanding;
   const T = { accent: '#c9a96e' };
 
   const currentLang = LANGUAGES.find(l => l.code === lang);
@@ -52,8 +55,8 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
     <>
       <nav style={{ 
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 2000,
-        background: bg, backdropFilter: (!isLanding || scrolled) ? 'blur(24px)' : 'none',
-        borderBottom: (!isLanding || scrolled) ? `1px solid ${border}` : '1px solid transparent',
+        background: bg, backdropFilter: blur,
+        borderBottom: showBorder ? `1px solid ${border}` : '1px solid transparent',
         transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
         height: 'var(--nav-h)',
         display: 'flex', alignItems: 'center'

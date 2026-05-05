@@ -233,13 +233,13 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="page-wrapper" style={{ background: T.bg, minHeight: '100vh', transition: 'background 0.3s' }}>
+    <div className="page-wrapper" style={{ background: T.bg, minHeight: '100vh', transition: 'background 0.3s', paddingTop: 0 }}>
 
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
 
       {/* ══════════ HERO SECTION ══════════ */}
-      <Section style={{ padding: '30px 0 100px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <Section style={{ padding: 'calc(var(--nav-h) + 60px) 0 100px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         {/* Full Hero Background Video Scaffolding */}
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden' }}>
           <video 
