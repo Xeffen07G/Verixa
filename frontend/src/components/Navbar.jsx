@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LANGUAGES, t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
-import { Menu, X, Sun, Moon, Globe, Image, TrendingUp, LogOut, User, FileText, Layout } from 'lucide-react';
+import { Menu, X, Sun, Moon, Globe, Image, Video, TrendingUp, LogOut, User, FileText, Layout } from 'lucide-react';
 
 export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const [scrolled, setScrolled] = useState(false);
@@ -156,6 +156,10 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
             <Link to="/image" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
               <Image size={20} />
               <span style={{ fontSize: 18, fontWeight: 700 }}>{t('imageVerify', lang)}</span>
+            </Link>
+            <Link to="/video" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
+              <Video size={20} />
+              <span style={{ fontSize: 18, fontWeight: 700 }}>{t('videoVerify', lang)}</span>
             </Link>
             <Link to="/trending" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
               <TrendingUp size={20} />

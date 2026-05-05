@@ -56,6 +56,7 @@ const en = {
   accessTier: 'ACCESS TIER', enterpriseTier: 'Enterprise Node', standardNode: 'Standard Node',
   notSet: 'Not Set', secureLabel: 'SECURE', saving: 'Saving...', saveProfile: 'Save Changes',
   cancel: 'Cancel', editProfile: 'Edit Professional Profile', verifyNow: 'Verify Now', imageVerify: 'Image Verification',
+  videoVerify: 'Video Intelligence',
   input: 'Input', history: 'History', newAudit: 'New Audit', text: 'Text', url: 'URL', pdf: 'PDF',
   inputSubtitle: 'Submit content for deep-trace verification.', enterText: 'Enter text to verify...',
   pasteText: 'Paste text to verify...', pasteUrl: 'Paste a news or article URL...',

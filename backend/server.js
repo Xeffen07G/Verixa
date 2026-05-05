@@ -52,6 +52,7 @@ app.use("/api/verify", requireApiKey, verifyRoutes);
 app.use("/api/url", requireApiKey, urlRoutes);
 app.use("/api/pdf", requireApiKey, require("./routes/pdf"));
 app.use("/api/image", requireApiKey, require("./routes/image"));
+app.use("/api/video", requireApiKey, require("./routes/video"));
 app.use("/api/health", healthRoutes);
 app.use("/api/trending", trendingRoutes);
 app.use('/api/organization', require('./routes/organization'));

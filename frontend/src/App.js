@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import VerifyPage from './pages/VerifyPage';
 import ImagePage from './pages/ImagePage';
+import VideoPage from './pages/VideoPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import TrendingPage from './pages/TrendingPage';
@@ -26,6 +27,7 @@ export default function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/verify" element={<VerifyPage />} />
             <Route path="/image" element={<ImagePage />} />
+            <Route path="/video" element={<VideoPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/trending" element={<TrendingPage />} />
