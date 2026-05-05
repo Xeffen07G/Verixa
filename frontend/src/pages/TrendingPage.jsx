@@ -220,6 +220,18 @@ export default function TrendingPage() {
                   <span style={{ fontSize: 11, color: T.text3 }}>
                     {formatTimeAgo(claim.lastChecked, lang)}
                   </span>
+                  {claim.source && (
+                    <>
+                      <span style={{ fontSize: 11, color: T.text3 }}>·</span>
+                      <span style={{
+                        fontSize: 10, padding: '2px 8px', borderRadius: 6,
+                        background: T.accentMuted, color: T.accent, fontWeight: 600,
+                        textTransform: 'uppercase', letterSpacing: 0.5
+                      }}>
+                        {claim.source}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
 
