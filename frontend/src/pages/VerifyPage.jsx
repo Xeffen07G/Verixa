@@ -600,7 +600,7 @@ export default function VerifyPage() {
       };
       
       // Update local history
-      const updated = [entry, ...history].slice(0, 10);
+      const updated = [entry, ...history];
       setHistory(updated);
       try { localStorage.setItem('verixa_history', JSON.stringify(updated)); } catch {}
 
