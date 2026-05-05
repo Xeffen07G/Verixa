@@ -246,13 +246,13 @@ export default function LandingPage() {
             autoPlay={true} loop={true} muted={true} playsInline={true}
             style={{ 
               width: '100%', height: '100%', objectFit: 'cover', 
-              opacity: darkMode ? 0.55 : 0.25,
-              filter: 'brightness(1.1) contrast(1.1)'
+              opacity: darkMode ? 0.55 : 0.45,
+              filter: 'brightness(1.1) contrast(1.1) saturate(1.1)'
             }}
             src="/hero-bg.mp4"
           />
           {/* Gradients to ensure text readability */}
-          <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 50% 50%, ${T.bg}00 0%, ${T.bg} 80%)` }} />
+          <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 50% 50%, ${T.bg}00 0%, ${T.bg} ${darkMode ? '80%' : '95%'})` }} />
           <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to bottom, transparent 60%, ${T.bg} 100%)` }} />
         </div>
 
