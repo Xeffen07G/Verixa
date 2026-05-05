@@ -341,8 +341,8 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="stats-grid"
             style={{
-              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0,
-              background: 'transparent', borderRadius: 16, overflow: 'hidden',
+              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16,
+              background: 'transparent', borderRadius: 16, overflow: 'visible',
             }}
           >
             {[
@@ -351,7 +351,20 @@ export default function LandingPage() {
               { val: stat3, suffix: '', label: stat3 === 1 ? t('aiModels', lang).replace('s', '') : t('aiModels', lang), r: ref3 },
               { val: stat4, suffix: 's', label: t('avgResponse', lang), r: ref4 },
             ].map((s, i) => (
-              <div key={i} ref={s.r} style={{ padding: '48px 24px', textAlign: 'center', background: T.statBg, border: 'none' }}>
+              <motion.div 
+                key={i} 
+                ref={s.r}
+                whileHover={{ y: -8, borderColor: T.accent, boxShadow: `0 10px 30px ${T.accent}1a` }}
+                style={{ 
+                  padding: '40px 24px', 
+                  textAlign: 'center', 
+                  background: T.statBg, 
+                  border: `1px solid ${T.accent}33`, // Slightly more visible gold border
+                  borderRadius: 16,
+                  backdropFilter: 'blur(10px)',
+                  transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
+                }}
+              >
                 <div style={{
                   fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 52,
                   color: T.accent, lineHeight: 1,
@@ -359,7 +372,7 @@ export default function LandingPage() {
                 <div style={{
                   fontSize: 10, color: T.text3, letterSpacing: 2, textTransform: 'uppercase', marginTop: 12,
                 }}>{s.label}</div>
-              </div>
+              </motion.div>
             ))}
           </motion.div>
         </div>
