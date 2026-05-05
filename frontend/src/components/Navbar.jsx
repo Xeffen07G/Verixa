@@ -92,7 +92,18 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
                 {langOpen && (
                   <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 12, background: darkMode ? '#15151a' : '#fff', border: `1px solid ${border}`, borderRadius: 12, padding: '8px', minWidth: 180, maxHeight: '70vh', overflowY: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.4)', animation: 'fadeIn 0.2s ease', zIndex: 2001 }}>
                     {LANGUAGES.map(l => (
-                      <button key={l.code} onClick={() => handleLangChange(l.code)} style={{ width: '100%', padding: '10px 12px', background: lang === l.code ? `${T.accent}1a` : 'none', border: 'none', color: lang === l.code ? T.accent : textColor, textAlign: 'left', cursor: 'pointer', borderRadius: 8, fontSize: 13, fontWeight: 500 }} onMouseEnter={e => e.target.style.background = `${T.accent}0d`}>
+                      <button 
+                        key={l.code} 
+                        onClick={() => handleLangChange(l.code)} 
+                        className={`lang-option ${lang === l.code ? 'active' : ''}`}
+                        style={{ 
+                          width: '100%', padding: '10px 12px', border: 'none', 
+                          textAlign: 'left', cursor: 'pointer', borderRadius: 8, 
+                          fontSize: 13, fontWeight: 500, background: 'none',
+                          color: lang === l.code ? T.accent : textColor,
+                          transition: '0.2s'
+                        }}
+                      >
                         {l.label}
                       </button>
                     ))}
@@ -188,6 +199,9 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
       </div>
 
       <style>{`
+        .lang-option:hover { background: ${T.accent}0d !important; }
+        .lang-option.active { background: ${T.accent}1a !important; }
+        
         :root { --nav-h: ${scrolled ? '64px' : '80px'}; }
         @media (max-width: 1024px) {
           .hide-tablet { display: none !important; }
