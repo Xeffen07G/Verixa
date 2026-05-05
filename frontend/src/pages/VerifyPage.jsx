@@ -906,7 +906,7 @@ export default function VerifyPage() {
                   </div>
                 </div>
 
-                {stage && stage !== 'done' && <PipelineProgress stage={stage} theme={T} darkMode={darkMode} />}
+                {/* Stage-based progress moved to results panel for cleaner UI */}
 
                 {/* Live logs */}
                 {logs.length > 0 && stage !== 'done' && (
@@ -969,40 +969,8 @@ export default function VerifyPage() {
                 </h2>
                 <p style={{ color: T.text3, fontSize: 13, marginBottom: 40 }}>{t('deepAuditDesc', lang)}</p>
 
-                {/* Progress Steps */}
-                <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  {['Extracting', 'Searching', 'Verifying'].map((s, i) => {
-                    const stageMap = ['extracting', 'searching', 'verifying'];
-                    const localizedStages = [t('extracting', lang), t('searching', lang), t('verifying', lang)];
-                    const label = localizedStages[i];
-                    const currentIdx = stageMap.indexOf(stage);
-                    const isDone = i < currentIdx;
-                    const isActive = i === currentIdx;
-                    
-                    return (
-                      <div key={i} style={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                        {/* Connecting Line */}
-                        {i < 2 && (
-                          <div style={{ position: 'absolute', top: 12, left: '50%', width: '100%', height: 2, background: isDone ? T.accent : T.border, zIndex: 0 }} />
-                        )}
-                        
-                        {/* Dot */}
-                        <div style={{ 
-                          width: 24, height: 24, borderRadius: '50%', 
-                          background: isDone ? T.accent : (isActive ? T.bg : T.border),
-                          border: `2px solid ${isDone || isActive ? T.accent : T.border}`,
-                          zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          transition: '0.3s',
-                          boxShadow: isActive ? `0 0 15px ${T.accent}4d` : 'none'
-                        }}>
-                          {isDone ? <span style={{ color: '#0a0a0f', fontSize: 10, fontWeight: 900 }}>✓</span> : isActive ? <div style={{ width: 6, height: 6, borderRadius: '50%', background: T.accent, animation: 'pulse-gold 1.5s infinite' }} /> : null}
-                        </div>
-                        
-                        <span style={{ fontSize: 10, fontWeight: 700, color: isDone || isActive ? T.text : T.text3, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</span>
-                      </div>
-                    );
-                  })}
-                </div>
+                {/* Unified Pipeline Progress */}
+                <PipelineProgress stage={stage} theme={T} darkMode={darkMode} lang={lang} />
               </div>
             </div>
           )}
@@ -1014,8 +982,8 @@ export default function VerifyPage() {
             </div>
           )}
 
-          {/* Results */}
-          {claims.length > 0 && (
+          {/* Results - Only show when stage is done */}
+          {claims.length > 0 && stage === 'done' && (
             <div style={{ animation: 'fadeUp 0.5s ease forwards' }}>
 
               {/* Color coded score banner */}
