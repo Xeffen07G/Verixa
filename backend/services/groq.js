@@ -104,7 +104,7 @@ Correct: {"claims": ["Elon Musk founded Apple"]}
 Wrong: {"claims": ["Elon Musk founded Apple", "The text is too short", "There are no other claims"]}
 
 Text to extract from (truncated for performance):
-"${text.slice(0, 8000)}"
+"${text.slice(0, 5000)}"
 
 Return ONLY this exact JSON format:
 {"claims": ["claim 1", "claim 2"]}`;
@@ -125,7 +125,7 @@ async function verifyClaims(claimsWithEvidence) {
   const formatted = claimsWithEvidence
     .map(
       (item, i) =>
-        `Claim ${i + 1}: "${item.claim}"\n\nEvidence Retrieved:\n${item.evidenceText.slice(0, 800)}`
+        `Claim ${i + 1}: "${item.claim}"\n\nEvidence Retrieved:\n${item.evidenceText.slice(0, 500)}`
     )
     .join("\n\n═══════════════\n\n");
 

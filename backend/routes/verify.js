@@ -51,14 +51,17 @@ router.post("/", async (req, res) => {
     
     // Process each claim independently and stream results back immediately
     const verifiedResults = [];
-    await Promise.all(claims.map(async (claim, index) => {
+    for (let index = 0; index < claims.length; index++) {
+      const claim = claims[index];
       try {
+        // Add a 500ms delay between claims to stay under TPM limits
+        if (index > 0) await new Promise(r => setTimeout(r, 500));
+
         // 1. Search evidence for this specific claim
         const evidence = await searchEvidence(claim);
         send("log", { message: `Evidence found for claim #${index + 1}` });
 
         // 2. Verify this specific claim immediately
-        // We'll wrap the single claim in an array for the existing verifyClaims service
         const singleClaimResult = await verifyClaims([{ claim, evidenceText: evidence.text, sources: evidence.sources }]);
         const result = singleClaimResult[0];
 
@@ -71,7 +74,7 @@ router.post("/", async (req, res) => {
         send("claim_verified", { claim: errorResult, index });
         verifiedResults.push(errorResult);
       }
-    }));
+    }
 
     const scoreMap = { True: 100, "Partially True": 50, False: 0, Unverifiable: 50 };
     const overallScore = Math.round(
