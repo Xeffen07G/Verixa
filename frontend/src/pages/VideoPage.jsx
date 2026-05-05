@@ -4,7 +4,7 @@ import Footer from '../components/Footer';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Video, Shield, Activity, Cpu, Search, Upload, Play, Pause, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
+import { Video, Activity, Search, Upload, Play, Pause, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
