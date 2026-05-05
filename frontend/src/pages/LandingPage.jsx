@@ -403,7 +403,7 @@ export default function LandingPage() {
             <div className="demo-terminal-box" style={{
               background: darkMode ? 'rgba(10,10,15,0.6)' : 'rgba(0,0,0,0.03)',
               borderRadius: 12, marginBottom: 20, padding: '16px',
-              border: `1px solid ${T.border}`, minHeight: 84, // Stability fix
+              border: `1px solid ${T.border}`, height: 110, overflow: 'hidden',
               fontFamily: 'DM Mono, monospace', color: T.text2, lineHeight: 1.7,
             }}>
               {typedText}
@@ -415,7 +415,7 @@ export default function LandingPage() {
               )}
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minHeight: 180 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, height: 210, overflow: 'hidden' }}>
               <AnimatePresence>
                 {demoClaims.slice(0, Math.max(0, demoStep)).map((claim, i) => (
                   <motion.div
