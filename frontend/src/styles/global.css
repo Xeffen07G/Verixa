@@ -446,6 +446,7 @@ input:focus, textarea:focus, select:focus {
 .shimmer-btn {
   position: relative;
   isolation: isolate;
+  overflow: hidden;
 }
 
 .shimmer-btn::after {
