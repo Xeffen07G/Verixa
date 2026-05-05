@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { Shield, Search, BarChart3, Brain, Link2, AlertTriangle, CheckCircle2, XCircle, MinusCircle, Video } from 'lucide-react';
+import { Shield, Search, BarChart3, Brain, Link2, AlertTriangle, CheckCircle2, XCircle, MinusCircle, Video, Zap, ShieldCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { t } from '../utils/i18n';
