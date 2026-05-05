@@ -341,9 +341,8 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="stats-grid"
             style={{
-              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1,
-              background: T.border, borderRadius: 16, overflow: 'hidden',
-              border: `1px solid ${T.border}`, boxShadow: `0 20px 40px rgba(0,0,0,0.2)`
+              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0,
+              background: 'transparent', borderRadius: 16, overflow: 'hidden',
             }}
           >
             {[
@@ -352,7 +351,7 @@ export default function LandingPage() {
               { val: stat3, suffix: '', label: stat3 === 1 ? t('aiModels', lang).replace('s', '') : t('aiModels', lang), r: ref3 },
               { val: stat4, suffix: 's', label: t('avgResponse', lang), r: ref4 },
             ].map((s, i) => (
-              <div key={i} ref={s.r} className="glassmorphism" style={{ padding: '48px 24px', textAlign: 'center', background: T.statBg, borderRadius: 24 }}>
+              <div key={i} ref={s.r} style={{ padding: '48px 24px', textAlign: 'center', background: T.statBg, border: 'none' }}>
                 <div style={{
                   fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 52,
                   color: T.accent, lineHeight: 1,
