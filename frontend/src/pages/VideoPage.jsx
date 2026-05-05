@@ -39,12 +39,21 @@ export default function VideoPage() {
   const fileRef = useRef(null);
   const videoRef = useRef(null);
 
+  const getYouTubeEmbedUrl = (url) => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
+  };
+
+  const ytEmbed = inputMode === 'url' ? getYouTubeEmbedUrl(preview) : null;
+
   React.useEffect(() => {
-    if (videoRef.current) {
+    if (videoRef.current && !ytEmbed) {
       videoRef.current.load();
       setPlaying(false);
     }
-  }, [preview]);
+  }, [preview, ytEmbed]);
 
   const T_DARK = {
     bg: '#0a0a0f', bg2: 'rgba(16,16,23,0.9)', text: '#f5f3ef', text2: 'rgba(245,243,239,0.45)',
@@ -173,22 +182,27 @@ export default function VideoPage() {
               {/* Video Player & Timeline */}
               <div>
                 <div style={{ borderRadius: 20, overflow: 'hidden', background: '#000', position: 'relative', border: `1px solid ${T.cardBorder}`, aspectRatio: '16/9' }}>
-                  {preview && (
+                  {ytEmbed ? (
+                    <iframe src={ytEmbed} style={{ width: '100%', height: '100%', border: 'none' }} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                  ) : preview ? (
                     <video ref={videoRef} src={preview} playsInline muted style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                  )}
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))', display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <button onClick={() => { if (videoRef.current) { if (playing) videoRef.current.pause(); else videoRef.current.play(); setPlaying(!playing); } }}
-                      style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>
-                      {playing ? <Pause size={24} /> : <Play size={24} />}
-                    </button>
-                    <div style={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: 2, position: 'relative' }}>
-                      <div style={{ width: '40%', height: '100%', background: T.accent, borderRadius: 2 }} />
-                      {/* Anomalies indicators */}
-                      {result.anomalies?.map((a, i) => (
-                        <div key={i} style={{ position: 'absolute', left: `${a.timestamp_pct}%`, top: -4, width: 4, height: 12, background: '#f87171', borderRadius: 2 }} />
-                      ))}
+                  ) : null}
+                  
+                  {!ytEmbed && (
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))', display: 'flex', alignItems: 'center', gap: 16 }}>
+                      <button onClick={() => { if (videoRef.current) { if (playing) videoRef.current.pause(); else videoRef.current.play(); setPlaying(!playing); } }}
+                        style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>
+                        {playing ? <Pause size={24} /> : <Play size={24} />}
+                      </button>
+                      <div style={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: 2, position: 'relative' }}>
+                        <div style={{ width: '40%', height: '100%', background: T.accent, borderRadius: 2 }} />
+                        {/* Anomalies indicators */}
+                        {result.anomalies?.map((a, i) => (
+                          <div key={i} style={{ position: 'absolute', left: `${a.timestamp_pct}%`, top: -4, width: 4, height: 12, background: '#f87171', borderRadius: 2 }} />
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 <div style={{ marginTop: 20, display: 'flex', gap: 12 }}>
