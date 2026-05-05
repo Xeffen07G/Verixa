@@ -4,7 +4,7 @@
 // In Manifest V3, content scripts can't reliably make cross-origin requests.
 // All API calls are routed through this background service worker instead.
 
-const VERIXA_API = 'https://verixa-gamma.vercel.app/api';
+const VERIXA_API = 'http://localhost:5000';
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
