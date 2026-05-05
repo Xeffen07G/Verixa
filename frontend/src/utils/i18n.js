@@ -42,7 +42,7 @@ const en = {
   ctaSubtitle: 'Join thousands of journalists, researchers, and enterprises who trust VeriXa to surface truth from noise.',
   ctaBtn: 'Launch VeriXa Free', starterDesc: 'For individuals exploring intelligent fact-checking.',
   proDesc: 'For journalists, analysts, and serious researchers.', entDesc: 'For organizations needing full pipeline integration.',
-  forever: 'forever', perMonth: 'per month', contactUs: 'contact us', custom: 'custom',
+  forever: 'forever', perMonth: 'per month', contactUs: 'Contact Us', custom: 'Custom',
   plan1F1: '10 Verifications / mo', plan1F2: 'Text input only', plan1F3: 'Basic accuracy report', plan1F4: 'Community support',
   plan2F1: '500 Verifications / mo', plan2F2: 'URL + Text input', plan2F3: 'AI Text detection', plan2F4: 'Priority support',
   plan2F5: 'Export reports (PDF)', plan2F6: 'Confidence scoring',
