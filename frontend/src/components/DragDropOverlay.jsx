@@ -123,6 +123,7 @@ export default function DragDropOverlay({ children }) {
   }, [processFile]);
 
   // Attach to window for global coverage
+  useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         setIsDragging(false);
