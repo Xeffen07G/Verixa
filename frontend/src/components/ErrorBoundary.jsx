@@ -24,14 +24,16 @@ class ErrorBoundary extends React.Component {
         text2: 'rgba(245,243,239,0.5)',
         accent: '#c9a96e',
         card: '#13131a',
-        border: 'rgba(255,255,255,0.1)'
+        border: 'rgba(255,255,255,0.1)',
+        text3: 'rgba(245,243,239,0.25)'
       } : {
         bg: '#f8f7f4',
         text: '#0d0d0d',
         text2: '#555555',
         accent: '#5a421a',
         card: '#ffffff',
-        border: 'rgba(0,0,0,0.1)'
+        border: 'rgba(0,0,0,0.1)',
+        text3: 'rgba(0,0,0,0.4)'
       };
 
       return (

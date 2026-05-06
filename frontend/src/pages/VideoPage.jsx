@@ -45,7 +45,8 @@ export default function VideoPage() {
     if (!url) return null;
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
-    return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
+    const id = (match && match[2].length === 11) ? match[2] : null;
+    return id ? `https://www.youtube.com/embed/${id}?autoplay=1&mute=1` : null;
   };
 
   const ytEmbed = inputMode === 'url' ? getYouTubeEmbedUrl(preview) : null;
@@ -189,6 +190,12 @@ export default function VideoPage() {
                     onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
                     onTimeUpdate={handleTimeUpdate}
                     onLoadedMetadata={handleLoadedMetadata}
+                    onError={() => {
+                      if (!ytEmbed) {
+                        setError('The provided URL is not a direct video file. Please use a YouTube link or upload a file.');
+                        setPreview(null);
+                      }
+                    }}
                   />
                 )}
                 
