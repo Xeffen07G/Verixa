@@ -35,7 +35,8 @@ export default function VideoPage() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const fileRef = useRef(null);
   const videoRef = useRef(null);
 
@@ -52,19 +53,34 @@ export default function VideoPage() {
     if (videoRef.current && !ytEmbed) {
       videoRef.current.load();
       setPlaying(false);
+      setCurrentTime(0);
     }
   }, [preview, ytEmbed]);
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
 
   const T_DARK = {
     bg: '#0a0a0f', bg2: 'rgba(16,16,23,0.9)', text: '#f5f3ef', text2: 'rgba(245,243,239,0.45)',
     text3: 'rgba(245,243,239,0.25)', border: 'rgba(255,255,255,0.06)', accent: '#c9a96e',
     cardBg: 'rgba(16,16,23,0.8)', cardBorder: 'rgba(255,255,255,0.07)',
+    accentMuted: 'rgba(201,169,110,0.1)',
   };
 
   const T_LIGHT = {
     bg: '#e8e5de', bg2: 'rgba(232,229,222,0.95)', text: '#0d0d0d', text2: '#2a2a2a',
     text3: '#555555', border: 'rgba(0,0,0,0.12)', accent: '#5a421a',
     cardBg: '#f0ede6', cardBorder: 'rgba(0,0,0,0.08)',
+    accentMuted: 'rgba(90,66,26,0.1)',
   };
 
   const T = darkMode ? T_DARK : T_LIGHT;
@@ -157,94 +173,161 @@ export default function VideoPage() {
           <input type="file" ref={fileRef} onChange={handleFileUpload} accept="video/*" style={{ display: 'none' }} />
         </div>
 
+        {/* Preview Area (Always visible if preview exists) */}
+        <AnimatePresence>
+          {preview && (
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+              style={{ marginBottom: 32 }}>
+              <div style={{ borderRadius: 24, overflow: 'hidden', background: '#000', position: 'relative', border: `1px solid ${T.cardBorder}`, aspectRatio: '16/9', boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>
+                {ytEmbed ? (
+                  <iframe src={ytEmbed} style={{ width: '100%', height: '100%', border: 'none' }} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                ) : (
+                  <video 
+                    ref={videoRef} src={preview} playsInline autoPlay muted 
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                    onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
+                    onTimeUpdate={handleTimeUpdate}
+                    onLoadedMetadata={handleLoadedMetadata}
+                  />
+                )}
+                
+                {!ytEmbed && (
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '24px 32px', background: 'linear-gradient(transparent, rgba(0,0,0,0.9))', display: 'flex', alignItems: 'center', gap: 20 }}>
+                    <button onClick={() => { if (videoRef.current) { if (playing) videoRef.current.pause(); else videoRef.current.play(); } }}
+                      style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', cursor: 'pointer', width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' }}>
+                      {playing ? <Pause size={20} fill="white" /> : <Play size={20} fill="white" style={{ marginLeft: 3 }} />}
+                    </button>
+                    <div style={{ flex: 1, height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, position: 'relative', cursor: 'pointer' }}
+                      onClick={(e) => {
+                        if (videoRef.current) {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          const pos = (e.clientX - rect.left) / rect.width;
+                          videoRef.current.currentTime = pos * videoRef.current.duration;
+                        }
+                      }}>
+                      <div style={{ width: duration ? `${(currentTime / duration) * 100}%` : '0%', height: '100%', background: T.accent, borderRadius: 3, transition: 'width 0.1s linear' }} />
+                      
+                      {/* Anomalies indicators */}
+                      {result?.anomalies?.map((a, i) => (
+                        <div key={i} style={{ position: 'absolute', left: `${a.timestamp_pct}%`, top: -4, width: 4, height: 14, background: '#f87171', borderRadius: 2, boxShadow: '0 0 10px #f87171' }} />
+                      ))}
+                    </div>
+                    <div style={{ fontSize: 12, color: '#fff', fontFamily: 'monospace', opacity: 0.8, minWidth: 80 }}>
+                      {Math.floor(currentTime)}s / {Math.floor(duration)}s
+                    </div>
+                  </div>
+                )}
+
+                {/* Overlay Badge */}
+                <div style={{ position: 'absolute', top: 20, left: 20, padding: '6px 12px', background: 'rgba(0,0,0,0.5)', borderRadius: 8, backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 8, height: 8, background: playing ? '#4ade80' : '#fbbf24', borderRadius: '50%' }} />
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', letterSpacing: 1 }}>{playing ? 'STREAMING' : 'READY'}</span>
+                </div>
+
+                {/* Clear Button */}
+                <button onClick={() => { setPreview(null); setVideoUrl(''); setUploadFile(null); setResult(null); setCurrentTime(0); setDuration(0); }}
+                  style={{ position: 'absolute', top: 20, right: 20, background: 'rgba(0,0,0,0.5)', border: 'none', color: '#fff', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', zIndex: 10 }}>
+                  ✕
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Results Area */}
         <AnimatePresence mode="wait">
           {loading && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              style={{ padding: '80px 0', textAlign: 'center' }}>
-              <div style={{ width: 40, height: 40, border: `2px solid ${T.accent}22`, borderTopColor: T.accent, borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
-              <h3 style={{ fontSize: 20, fontWeight: 300, color: T.text }}>Running Temporal Audit...</h3>
-              <p style={{ color: T.text3, fontSize: 13, marginTop: 8 }}>Deconstructing frames and analyzing biometric landmarks</p>
+              style={{ padding: '40px 0', textAlign: 'center' }}>
+              <div style={{ width: 48, height: 48, border: `3px solid ${T.accent}22`, borderTopColor: T.accent, borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 24px' }} />
+              <h3 style={{ fontSize: 24, fontWeight: 300, color: T.text, fontFamily: 'Cormorant Garamond, serif' }}>Running Temporal Audit...</h3>
+              <p style={{ color: T.text3, fontSize: 14, marginTop: 8 }}>Deconstructing frames and analyzing biometric landmarks</p>
             </motion.div>
           )}
 
           {error && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              style={{ padding: 16, borderRadius: 12, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', color: '#f87171', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
+              style={{ padding: 16, borderRadius: 12, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', color: '#f87171', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
               <AlertCircle size={18} /> {error}
             </motion.div>
           )}
 
           {result && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 32 }}>
-              
-              {/* Video Player & Timeline */}
-              <div>
-                <div style={{ borderRadius: 20, overflow: 'hidden', background: '#000', position: 'relative', border: `1px solid ${T.cardBorder}`, aspectRatio: '16/9' }}>
-                  {ytEmbed ? (
-                    <iframe src={ytEmbed} style={{ width: '100%', height: '100%', border: 'none' }} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-                  ) : preview ? (
-                    <video ref={videoRef} src={preview} playsInline muted style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                  ) : null}
-                  
-                  {!ytEmbed && (
-                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))', display: 'flex', alignItems: 'center', gap: 16 }}>
-                      <button onClick={() => { if (videoRef.current) { if (playing) videoRef.current.pause(); else videoRef.current.play(); setPlaying(!playing); } }}
-                        style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>
-                        {playing ? <Pause size={24} /> : <Play size={24} />}
-                      </button>
-                      <div style={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: 2, position: 'relative' }}>
-                        <div style={{ width: '40%', height: '100%', background: T.accent, borderRadius: 2 }} />
-                        {/* Anomalies indicators */}
-                        {result.anomalies?.map((a, i) => (
-                          <div key={i} style={{ position: 'absolute', left: `${a.timestamp_pct}%`, top: -4, width: 4, height: 12, background: '#f87171', borderRadius: 2 }} />
-                        ))}
-                      </div>
-                    </div>
-                  )}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              {/* Analysis Overview Banner */}
+              <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 24, padding: 32, marginBottom: 32, display: 'flex', alignItems: 'center', gap: 32 }}>
+                <div style={{ flex: 1 }}>
+                  <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 300, margin: '0 0 12px' }}>Forensic Report <span style={{ color: T.accent }}>Overview</span></h2>
+                  <p style={{ color: T.text2, fontSize: 15, lineHeight: 1.6, margin: 0 }}>
+                    Our AI model has completed a multi-pass temporal audit of the provided footage. 
+                    The analysis detected <span style={{ color: result.anomalies?.length > 0 ? '#f87171' : '#4ade80', fontWeight: 700 }}>{result.anomalies?.length || 0} critical anomalies</span> within the biometric layer.
+                  </p>
                 </div>
-
-                <div style={{ marginTop: 20, display: 'flex', gap: 12 }}>
-                  <div style={{ flex: 1, padding: 16, background: T.cardBg, borderRadius: 16, border: `1px solid ${T.cardBorder}` }}>
-                    <p style={{ fontSize: 10, color: T.text3, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Resolution</p>
-                    <p style={{ fontSize: 14, fontWeight: 700 }}>1920 x 1080 (HD)</p>
-                  </div>
-                  <div style={{ flex: 1, padding: 16, background: T.cardBg, borderRadius: 16, border: `1px solid ${T.cardBorder}` }}>
-                    <p style={{ fontSize: 10, color: T.text3, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Frame Rate</p>
-                    <p style={{ fontSize: 14, fontWeight: 700 }}>29.97 FPS</p>
-                  </div>
+                <div style={{ width: 1, height: 60, background: T.border }} />
+                <div style={{ textAlign: 'center', padding: '0 20px' }}>
+                  <div style={{ fontSize: 11, color: T.text3, letterSpacing: 2, marginBottom: 4 }}>INTEGRITY</div>
+                  <div style={{ fontSize: 24, fontWeight: 700, color: cfg.color }}>{result.verdict === 'Authentic Footage' ? 'HIGH' : 'COMPROMISED'}</div>
                 </div>
               </div>
 
-              {/* Analysis Sidebar */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                <div style={{ padding: 24, borderRadius: 20, background: cfg.bg, border: `1px solid ${cfg.border}`, textAlign: 'center' }}>
-                  <div style={{ fontSize: 48, fontWeight: 300, fontFamily: 'Cormorant Garamond, serif', color: cfg.color, marginBottom: 8 }}>{result.ai_score}%</div>
-                  <div style={{ fontSize: 11, color: cfg.color, opacity: 0.7, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 16 }}>Deepfake Probability</div>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 99, background: cfg.color + '1a', color: cfg.color, fontWeight: 700, fontSize: 13 }}>
-                    {cfg.icon} {cfg.label}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+                {/* Technical Details */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  <div style={{ padding: 32, borderRadius: 24, background: cfg.bg, border: `1px solid ${cfg.border}`, textAlign: 'center' }}>
+                    <div style={{ fontSize: 64, fontWeight: 300, fontFamily: 'Cormorant Garamond, serif', color: cfg.color, lineHeight: 1, marginBottom: 8 }}>{result.ai_score}%</div>
+                    <div style={{ fontSize: 12, color: cfg.color, opacity: 0.7, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 20 }}>Deepfake Probability</div>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '8px 20px', borderRadius: 99, background: cfg.color + '1a', color: cfg.color, fontWeight: 700, fontSize: 14 }}>
+                      <span style={{ fontSize: 18 }}>{cfg.icon}</span> {cfg.label}
+                    </div>
+                  </div>
+
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <div style={{ flex: 1, padding: 20, background: T.cardBg, borderRadius: 20, border: `1px solid ${T.cardBorder}` }}>
+                    <p style={{ fontSize: 10, color: T.text3, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Resolution</p>
+                    <p style={{ fontSize: 16, fontWeight: 700 }}>1920 x 1080 (HD)</p>
+                  </div>
+                  <div style={{ flex: 1, padding: 20, background: T.cardBg, borderRadius: 20, border: `1px solid ${T.cardBorder}` }}>
+                    <p style={{ fontSize: 10, color: T.text3, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Frame Rate</p>
+                    <p style={{ fontSize: 16, fontWeight: 700 }}>29.97 FPS</p>
                   </div>
                 </div>
 
-                <div style={{ padding: 24, borderRadius: 20, background: T.cardBg, border: `1px solid ${T.cardBorder}` }}>
-                  <h4 style={{ margin: '0 0 16px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>Technical Indicators</h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ padding: 28, borderRadius: 24, background: T.cardBg, border: `1px solid ${T.cardBorder}` }}>
+                  <h4 style={{ margin: '0 0 16px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>Forensic Assessment</h4>
+                  <p style={{ margin: 0, fontSize: 15, color: T.text, lineHeight: 1.7, fontStyle: 'italic' }}>
+                    "{result.assessment}"
+                  </p>
+                </div>
+              </div>
+
+              {/* Indicators */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <div style={{ padding: 28, borderRadius: 24, background: T.cardBg, border: `1px solid ${T.cardBorder}`, flex: 1 }}>
+                  <h4 style={{ margin: '0 0 20px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>Technical Indicators</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     {result.indicators?.map((ind, i) => (
-                      <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                        {ind.risk === 'high' ? <AlertCircle size={16} color="#f87171" /> : <CheckCircle size={16} color="#4ade80" />}
-                        <span style={{ fontSize: 13, color: T.text2 }}>{ind.text}</span>
+                      <div key={i} style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+                        <div style={{ marginTop: 2 }}>
+                          {ind.risk === 'high' ? <AlertCircle size={18} color="#f87171" /> : <CheckCircle size={18} color="#4ade80" />}
+                        </div>
+                        <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{ind.text}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div style={{ padding: 24, borderRadius: 20, background: T.cardBg, border: `1px solid ${T.cardBorder}` }}>
-                  <h4 style={{ margin: '0 0 12px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>Forensic Assessment</h4>
-                  <p style={{ margin: 0, fontSize: 14, color: T.text, lineHeight: 1.6, fontStyle: 'italic' }}>
-                    "{result.assessment}"
-                  </p>
-                </div>
+                {result.anomalies?.length > 0 && (
+                  <div style={{ padding: 28, borderRadius: 24, background: T.cardBg, border: `1px solid ${T.cardBorder}` }}>
+                    <h4 style={{ margin: '0 0 16px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>Temporal Anomalies</h4>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                      {result.anomalies.map((a, i) => (
+                        <div key={i} style={{ padding: '6px 12px', borderRadius: 8, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', color: '#f87171', fontSize: 12, fontWeight: 600 }}>
+                          {a.type} @ {a.timestamp_pct}%
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
