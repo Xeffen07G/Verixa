@@ -329,7 +329,8 @@ export default function VideoPage() {
                   </div>
                 )}
               </div>
-            </motion.div>
+            </div>
+          </motion.div>
           )}
         </AnimatePresence>
       </main>
