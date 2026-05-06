@@ -12,7 +12,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const { lang, changeLanguage } = useLang();
   const { user, logout } = useAuth();
   const location = useLocation();
-  const isLanding = location.pathname === '/';
+  const isLanding = location.pathname === '/' || location.pathname === '/index.html';
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -43,7 +43,13 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const border = darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
   const blur = 'blur(20px)';
   const showBorder = true;
-  const bg = darkMode ? 'rgba(10,10,15,0.65)' : 'rgba(245,243,239,0.65)';
+  const isTransparent = isLanding && !scrolled;
+  
+  const bg = isTransparent 
+    ? 'transparent' 
+    : (darkMode ? 'rgba(10,10,15,0.85)' : 'rgba(245,243,239,0.9)');
+  const backdrop = isTransparent ? 'none' : blur;
+  const navBorder = isTransparent ? 'transparent' : border;
   const T = { accent: '#c9a96e' };
 
   const currentLang = LANGUAGES.find(l => l.code === lang);
@@ -52,9 +58,9 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
     <>
       <nav style={{ 
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 2000,
-        background: bg, backdropFilter: blur,
-        borderBottom: showBorder ? `1px solid ${border}` : '1px solid transparent',
-        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        background: bg, backdropFilter: backdrop,
+        borderBottom: `1px solid ${navBorder}`,
+        transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
         height: 'var(--nav-h)',
         display: 'flex', alignItems: 'center'
       }}>
