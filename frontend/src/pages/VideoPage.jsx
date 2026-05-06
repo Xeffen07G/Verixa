@@ -9,10 +9,10 @@ import { Video, Activity, Search, Upload, Play, Pause, RefreshCw, AlertCircle, C
 const API_URL = process.env.REACT_APP_API_URL || '';
 
 const VERDICT_CONFIG = (lang) => ({
-  'Deepfake Detected':   { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', icon: '✗', label: 'Deepfake Detected' },
-  'Likely Synthetic':    { color: '#fb923c', bg: 'rgba(251,146,60,0.08)',  border: 'rgba(251,146,60,0.25)',  icon: '~', label: 'Likely Synthetic' },
+  'Deepfake Detected':   { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', icon: '✗', label: t('deepfakeDetected', lang) },
+  'Likely Synthetic':    { color: '#fb923c', bg: 'rgba(251,146,60,0.08)',  border: 'rgba(251,146,60,0.25)',  icon: '~', label: t('likelySynthetic', lang) },
   'Uncertain':           { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.25)',  icon: '?', label: t('uncertain', lang) },
-  'Authentic Footage':   { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: 'Authentic Footage' },
+  'Authentic Footage':   { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: t('authenticFootage', lang) },
 });
 
 export default function VideoPage() {
@@ -128,7 +128,7 @@ export default function VideoPage() {
   const cfg = result ? (VERDICT_CONFIG(lang)[result.verdict] || VERDICT_CONFIG(lang)['Uncertain']) : null;
 
   return (
-    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, transition: 'background 0.3s', fontFamily: 'DM Sans, sans-serif', paddingTop: 0 }}>
+    <div key={lang} style={{ minHeight: '100vh', background: T.bg, color: T.text, transition: 'background 0.3s', fontFamily: 'DM Sans, sans-serif', paddingTop: 0 }}>
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
       <main style={{ maxWidth: 1000, margin: '0 auto', padding: 'calc(var(--nav-h) + 48px) 24px 60px' }}>
@@ -140,7 +140,7 @@ export default function VideoPage() {
             <Activity size={14} /> {t('videoVerify', lang).toUpperCase()}
           </motion.div>
           <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 300, margin: '0 0 16px' }}>
-            {t('videoHeroTitle', lang).split('.')[0]} <span style={{ fontStyle: 'italic', color: T.accent }}>{t('videoHeroTitle', lang).split('.')[1] || ''}.</span>
+            {t('videoHeroTitle1', lang)} <span style={{ fontStyle: 'italic', color: T.accent }}>{t('videoHeroTitle2', lang)}</span>
           </h1>
           <p style={{ color: T.text2, fontSize: 16, maxWidth: 500, margin: '0 auto', lineHeight: 1.6 }}>
             {t('videoHeroSubtitle', lang)}
@@ -153,7 +153,7 @@ export default function VideoPage() {
             {['url', 'upload'].map(mode => (
               <button key={mode} onClick={() => setInputMode(mode)}
                 style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', background: inputMode === mode ? `${T.accent}1a` : 'transparent', color: inputMode === mode ? T.accent : T.text3, fontSize: 12, fontWeight: 700, transition: '0.2s' }}>
-                {mode === 'url' ? 'VIDEO URL' : 'UPLOAD FILE'}
+                {mode === 'url' ? t('videoUrlBtn', lang) : t('uploadFileBtn', lang)}
               </button>
             ))}
           </div>
@@ -161,16 +161,16 @@ export default function VideoPage() {
           <div style={{ display: 'flex', gap: 12 }}>
             {inputMode === 'url' ? (
               <input value={videoUrl} onChange={e => { setVideoUrl(e.target.value); setPreview(e.target.value); }}
-                placeholder="https://youtube.com/watch?v=..."
+                placeholder={t('videoUrlPlaceholder', lang)}
                 style={{ flex: 1, padding: '14px 18px', background: 'rgba(0,0,0,0.2)', border: `1px solid ${T.border}`, borderRadius: 12, color: T.text, outline: 'none' }} />
             ) : (
               <div onClick={() => fileRef.current.click()} style={{ flex: 1, padding: '14px 18px', background: 'rgba(0,0,0,0.2)', border: `1px solid ${T.border}`, borderRadius: 12, color: uploadFile ? T.text : T.text3, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <Upload size={18} /> {uploadFile ? uploadFile.name : 'Select video file...'}
+                <Upload size={18} /> {uploadFile ? uploadFile.name : t('selectVideoFile', lang)}
               </div>
             )}
             <button onClick={analyzeVideo} disabled={loading}
               style={{ padding: '0 32px', borderRadius: 12, background: loading ? T.border : `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none', color: darkMode ? '#0a0a0f' : '#fff', fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer', transition: '0.3s' }}>
-              {loading ? <RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'ANALYZE'}
+              {loading ? <RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} /> : t('analyzeBtn', lang)}
             </button>
           </div>
           <input type="file" ref={fileRef} onChange={handleFileUpload} accept="video/*" style={{ display: 'none' }} />
@@ -183,7 +183,7 @@ export default function VideoPage() {
               style={{ marginBottom: 32 }}>
               <div style={{ borderRadius: 24, overflow: 'hidden', background: '#000', position: 'relative', border: `1px solid ${T.cardBorder}`, aspectRatio: '16/9', boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>
                 {ytEmbed ? (
-                  <iframe src={ytEmbed} style={{ width: '100%', height: '100%', border: 'none' }} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                  <iframe src={ytEmbed} title="Video Preview" style={{ width: '100%', height: '100%', border: 'none' }} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
                 ) : (
                   <video 
                     ref={videoRef} src={preview} playsInline autoPlay muted 
@@ -226,11 +226,11 @@ export default function VideoPage() {
                     </div>
                   </div>
                 )}
-
+                
                 {/* Overlay Badge */}
                 <div style={{ position: 'absolute', top: 20, left: 20, padding: '6px 12px', background: 'rgba(0,0,0,0.5)', borderRadius: 8, backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div style={{ width: 8, height: 8, background: playing ? '#4ade80' : '#fbbf24', borderRadius: '50%' }} />
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', letterSpacing: 1 }}>{playing ? 'STREAMING' : 'READY'}</span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', letterSpacing: 1 }}>{playing ? t('streaming', lang) : t('ready', lang)}</span>
                 </div>
 
                 {/* Clear Button */}
@@ -249,8 +249,8 @@ export default function VideoPage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               style={{ padding: '40px 0', textAlign: 'center' }}>
               <div style={{ width: 48, height: 48, border: `3px solid ${T.accent}22`, borderTopColor: T.accent, borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 24px' }} />
-              <h3 style={{ fontSize: 24, fontWeight: 300, color: T.text, fontFamily: 'Cormorant Garamond, serif' }}>Running Temporal Audit...</h3>
-              <p style={{ color: T.text3, fontSize: 14, marginTop: 8 }}>Deconstructing frames and analyzing biometric landmarks</p>
+              <h3 style={{ fontSize: 24, fontWeight: 300, color: T.text, fontFamily: 'Cormorant Garamond, serif' }}>{t('runningAudit', lang)}</h3>
+              <p style={{ color: T.text3, fontSize: 14, marginTop: 8 }}>{t('deconstructingFrames', lang)}</p>
             </motion.div>
           )}
 
@@ -266,16 +266,15 @@ export default function VideoPage() {
               {/* Analysis Overview Banner */}
               <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 24, padding: 32, marginBottom: 32, display: 'flex', alignItems: 'center', gap: 32 }}>
                 <div style={{ flex: 1 }}>
-                  <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 300, margin: '0 0 12px' }}>Forensic Report <span style={{ color: T.accent }}>Overview</span></h2>
+                  <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 300, margin: '0 0 12px' }}>{t('forensicReport', lang)} <span style={{ color: T.accent }}>{t('overview', lang)}</span></h2>
                   <p style={{ color: T.text2, fontSize: 15, lineHeight: 1.6, margin: 0 }}>
-                    Our AI model has completed a multi-pass temporal audit of the provided footage. 
-                    The analysis detected <span style={{ color: result.anomalies?.length > 0 ? '#f87171' : '#4ade80', fontWeight: 700 }}>{result.anomalies?.length || 0} critical anomalies</span> within the biometric layer.
+                    {t('reportDesc1', lang)} <span style={{ color: result.anomalies?.length > 0 ? '#f87171' : '#4ade80', fontWeight: 700 }}>{result.anomalies?.length || 0} {t('reportDesc2', lang)}</span>
                   </p>
                 </div>
                 <div style={{ width: 1, height: 60, background: T.border }} />
                 <div style={{ textAlign: 'center', padding: '0 20px' }}>
-                  <div style={{ fontSize: 11, color: T.text3, letterSpacing: 2, marginBottom: 4 }}>INTEGRITY</div>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: cfg.color }}>{result.verdict === 'Authentic Footage' ? 'HIGH' : 'COMPROMISED'}</div>
+                  <div style={{ fontSize: 11, color: T.text3, letterSpacing: 2, marginBottom: 4 }}>{t('integrity', lang)}</div>
+                  <div style={{ fontSize: 24, fontWeight: 700, color: cfg.color }}>{result.verdict === 'Authentic Footage' ? t('high', lang) : t('compromised', lang)}</div>
                 </div>
               </div>
 
@@ -284,7 +283,7 @@ export default function VideoPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                   <div style={{ padding: 32, borderRadius: 24, background: cfg.bg, border: `1px solid ${cfg.border}`, textAlign: 'center' }}>
                     <div style={{ fontSize: 64, fontWeight: 300, fontFamily: 'Cormorant Garamond, serif', color: cfg.color, lineHeight: 1, marginBottom: 8 }}>{result.ai_score}%</div>
-                    <div style={{ fontSize: 12, color: cfg.color, opacity: 0.7, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 20 }}>Deepfake Probability</div>
+                    <div style={{ fontSize: 12, color: cfg.color, opacity: 0.7, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 20 }}>{t('deepfakeProbability', lang)}</div>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '8px 20px', borderRadius: 99, background: cfg.color + '1a', color: cfg.color, fontWeight: 700, fontSize: 14 }}>
                       <span style={{ fontSize: 18 }}>{cfg.icon}</span> {cfg.label}
                     </div>
@@ -292,17 +291,17 @@ export default function VideoPage() {
 
                 <div style={{ display: 'flex', gap: 12 }}>
                   <div style={{ flex: 1, padding: 20, background: T.cardBg, borderRadius: 20, border: `1px solid ${T.cardBorder}` }}>
-                    <p style={{ fontSize: 10, color: T.text3, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Resolution</p>
+                    <p style={{ fontSize: 10, color: T.text3, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>{t('resolution', lang)}</p>
                     <p style={{ fontSize: 16, fontWeight: 700 }}>1920 x 1080 (HD)</p>
                   </div>
                   <div style={{ flex: 1, padding: 20, background: T.cardBg, borderRadius: 20, border: `1px solid ${T.cardBorder}` }}>
-                    <p style={{ fontSize: 10, color: T.text3, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Frame Rate</p>
+                    <p style={{ fontSize: 10, color: T.text3, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>{t('frameRate', lang)}</p>
                     <p style={{ fontSize: 16, fontWeight: 700 }}>29.97 FPS</p>
                   </div>
                 </div>
 
                 <div style={{ padding: 28, borderRadius: 24, background: T.cardBg, border: `1px solid ${T.cardBorder}` }}>
-                  <h4 style={{ margin: '0 0 16px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>Forensic Assessment</h4>
+                  <h4 style={{ margin: '0 0 16px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>{t('forensicAssessment', lang)}</h4>
                   <p style={{ margin: 0, fontSize: 15, color: T.text, lineHeight: 1.7, fontStyle: 'italic' }}>
                     "{result.assessment}"
                   </p>
@@ -312,7 +311,7 @@ export default function VideoPage() {
               {/* Indicators */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <div style={{ padding: 28, borderRadius: 24, background: T.cardBg, border: `1px solid ${T.cardBorder}`, flex: 1 }}>
-                  <h4 style={{ margin: '0 0 20px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>Technical Indicators</h4>
+                  <h4 style={{ margin: '0 0 20px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>{t('technicalIndicators', lang)}</h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     {result.indicators?.map((ind, i) => (
                       <div key={i} style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
@@ -327,7 +326,7 @@ export default function VideoPage() {
 
                 {result.anomalies?.length > 0 && (
                   <div style={{ padding: 28, borderRadius: 24, background: T.cardBg, border: `1px solid ${T.cardBorder}` }}>
-                    <h4 style={{ margin: '0 0 16px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>Temporal Anomalies</h4>
+                    <h4 style={{ margin: '0 0 16px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>{t('temporalAnomalies', lang)}</h4>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                       {result.anomalies.map((a, i) => (
                         <div key={i} style={{ padding: '6px 12px', borderRadius: 8, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', color: '#f87171', fontSize: 12, fontWeight: 600 }}>
