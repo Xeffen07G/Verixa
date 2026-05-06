@@ -41,14 +41,13 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const textColor = darkMode ? '#ffffff' : '#000000';
   const textMuted = darkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)';
   const border = darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
-  const blur = 'blur(20px)';
-  const showBorder = true;
-  const isTransparent = isLanding && !scrolled;
+
+  const isTransparent = (location.pathname === '/' || location.pathname === '/index.html' || !location.pathname || location.pathname === '') && !scrolled;
   
   const bg = isTransparent 
     ? 'transparent' 
     : (darkMode ? 'rgba(10,10,15,0.85)' : 'rgba(245,243,239,0.9)');
-  const backdrop = isTransparent ? 'none' : blur;
+  const backdrop = isTransparent ? 'none' : 'blur(20px)';
   const navBorder = isTransparent ? 'transparent' : border;
   const T = { accent: '#c9a96e' };
 
