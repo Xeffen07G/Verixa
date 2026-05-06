@@ -249,7 +249,7 @@ export default function ImagePage() {
                 {result.indicators.map((ind, i) => (
                   <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 10 }}>
                     <span style={{ color: T.accent, fontSize: 10, marginTop: 4, flexShrink: 0 }}>◆</span>
-                    <p style={{ margin: 0, fontSize: 13, color: T.text2, lineHeight: 1.5 }}>{ind}</p>
+                    <p style={{ margin: 0, fontSize: 13, color: T.text2, lineHeight: 1.6 }}>{ind}</p>
                   </div>
                 ))}
               </div>
@@ -282,6 +282,7 @@ export default function ImagePage() {
           </div>
         )}
       </div>
+      <Footer darkMode={darkMode} />
     </div>
   );
 }

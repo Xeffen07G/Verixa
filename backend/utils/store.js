@@ -21,15 +21,46 @@ const saveData = (file, data) => {
 };
 
 const createModel = (file) => ({
-  find: async (query = {}) => {
-    const data = loadData(file);
-    return data.filter(u => {
+  find: function(query = {}) {
+    let data = loadData(file);
+    let results = data.filter(u => {
       return Object.entries(query).every(([k, v]) => {
         if (v && v.$regex) return new RegExp(v.$regex, v.$options || 'i').test(u[k]);
         if (v instanceof RegExp) return v.test(u[k]);
         return u[k] === v;
       });
     });
+
+    // Mock Mongoose chaining
+    const chain = {
+      sort: function(sortOpts) {
+        const [field, order] = Object.entries(sortOpts)[0];
+        results.sort((a, b) => {
+          if (a[field] < b[field]) return order === -1 ? 1 : -1;
+          if (a[field] > b[field]) return order === -1 ? -1 : 1;
+          return 0;
+        });
+        return this;
+      },
+      limit: function(n) {
+        results = results.slice(0, n);
+        return this;
+      },
+      select: function() { return this; }, // No-op for mock
+      then: function(resolve) { resolve(results); },
+      catch: function(reject) { /* No errors in mock */ }
+    };
+
+    // Return proxy or just make it an awaitable
+    results.sort = chain.sort.bind(chain);
+    results.limit = chain.limit.bind(chain);
+    results.select = chain.select.bind(chain);
+    
+    // Support await
+    const originalResults = [...results];
+    Object.assign(results, chain);
+    
+    return results;
   },
   findOne: async (query) => {
     const data = loadData(file);
@@ -39,7 +70,7 @@ const createModel = (file) => ({
   },
   create: async (data) => {
     const items = loadData(file);
-    const newItem = { ...data, _id: Date.now().toString(), createdAt: new Date().toISOString() };
+    const newItem = { ...data, _id: Date.now().toString(), createdAt: new Date().toISOString(), timestamp: new Date().toISOString() };
     if (file.includes('users')) {
       newItem.matchPassword = async (pass) => pass === data.password;
     }

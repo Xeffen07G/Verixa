@@ -37,6 +37,7 @@ export default function VideoPage() {
   const [error, setError] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [playing, setPlaying] = useState(false);
   const fileRef = useRef(null);
   const videoRef = useRef(null);
 

@@ -26,7 +26,7 @@ router.get('/:orgName/history', async (req, res) => {
     const { orgName } = req.params;
     const history = await Verification.find({ 
       organization: { $regex: new RegExp(`^${orgName}$`, 'i') } 
-    }).sort({ timestamp: -1 }).limit(100);
+    }).sort({ timestamp: -1 }).limit(1000);
     res.json(history);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch organization history' });

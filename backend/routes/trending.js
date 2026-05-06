@@ -146,10 +146,10 @@ router.get("/", async (req, res) => {
   const liveNews = await fetchLiveNews();
   const reported = Array.from(trendingStore.values())
     .sort((a, b) => b.count - a.count)
-    .slice(0, 15);
+    .slice(0, 50);
 
   // Merge and deduplicate
-  const all = [...liveNews, ...reported].sort((a, b) => b.count - a.count).slice(0, 25);
+  const all = [...liveNews, ...reported].sort((a, b) => b.count - a.count).slice(0, 100);
 
   res.json({
     trending: all,

@@ -41,12 +41,9 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const textColor = darkMode ? '#ffffff' : '#000000';
   const textMuted = darkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)';
   const border = darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
-  const bg = scrolled 
-    ? (darkMode ? 'rgba(10,10,15,0.85)' : 'rgba(255,255,255,0.85)')
-    : (isLanding ? 'transparent' : (darkMode ? 'rgba(10,10,15,1)' : 'rgba(255,255,255,1)'));
-
-  const blur = scrolled || !isLanding ? 'blur(24px)' : 'none';
-  const showBorder = scrolled || !isLanding;
+  const blur = 'blur(20px)';
+  const showBorder = true;
+  const bg = darkMode ? 'rgba(10,10,15,0.65)' : 'rgba(245,243,239,0.65)';
   const T = { accent: '#c9a96e' };
 
   const currentLang = LANGUAGES.find(l => l.code === lang);

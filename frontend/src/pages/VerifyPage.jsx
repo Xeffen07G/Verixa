@@ -866,6 +866,7 @@ export default function VerifyPage() {
                 <div style={{ position: 'relative' }}>
                   <textarea value={text} onChange={e => setText(e.target.value)}
                     placeholder={t('pasteText', lang)}
+                    maxLength={50000}
                     style={{ width: '100%', minHeight: 200, padding: '14px 14px 44px', background: T.inputBg, border: `1.5px solid ${T.inputBorder}`, borderRadius: 12, color: T.text, fontSize: 13, lineHeight: 1.7, resize: 'vertical', outline: 'none', fontFamily: 'DM Sans, sans-serif', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                     disabled={isLoading}
                     onFocus={e => e.target.style.borderColor = `${T.accent}66`}
@@ -892,7 +893,9 @@ export default function VerifyPage() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
                   <span style={{ fontSize: 11, color: listening ? '#f87171' : 'transparent' }}>{t('listening', lang)}...</span>
-                  <span style={{ fontSize: 11, color: T.text3 }}>{text.length.toLocaleString()} {t('chars', lang)}</span>
+                  <span style={{ fontSize: 11, color: text.length > 45000 ? '#f87171' : T.text3, fontWeight: text.length > 45000 ? 700 : 400 }}>
+                    {text.length.toLocaleString()} / 50,000 {t('chars', lang)}
+                  </span>
                 </div>
 
                 {/* AI Detection Toggle */}
@@ -1046,6 +1049,10 @@ export default function VerifyPage() {
                 {claims.length} {t('claimsAnalyzed', lang)}
               </p>
               {claims.map((c, i) => <ClaimCard key={i} claim={c} index={i} theme={T} lang={lang} />)}
+              
+              <div style={{ marginTop: 80, opacity: 0.6 }}>
+                <Footer darkMode={darkMode} />
+              </div>
             </div>
           )}
         </div>

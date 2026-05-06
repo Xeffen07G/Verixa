@@ -123,17 +123,25 @@ export default function DragDropOverlay({ children }) {
   }, [processFile]);
 
   // Attach to window for global coverage
-  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsDragging(false);
+        dragCounter.current = 0;
+      }
+    };
+
     window.addEventListener('dragenter', handleDragEnter);
     window.addEventListener('dragleave', handleDragLeave);
     window.addEventListener('dragover', handleDragOver);
     window.addEventListener('drop', handleDrop);
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       window.removeEventListener('dragenter', handleDragEnter);
       window.removeEventListener('dragleave', handleDragLeave);
       window.removeEventListener('dragover', handleDragOver);
       window.removeEventListener('drop', handleDrop);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleDragEnter, handleDragLeave, handleDragOver, handleDrop]);
 

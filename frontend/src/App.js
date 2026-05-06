@@ -14,30 +14,33 @@ import { AuthProvider } from './context/AuthContext';
 import { LangProvider } from './context/LangContext';
 import DragDropOverlay from './components/DragDropOverlay';
 import SimpleCursor from './components/SimpleCursor';
+import ErrorBoundary from './components/ErrorBoundary';
 
 
 export default function App() {
   return (
-    <AuthProvider>
-      <LangProvider>
-        <Router>
-          <SimpleCursor />
-        <DragDropOverlay>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/verify" element={<VerifyPage />} />
-            <Route path="/image" element={<ImagePage />} />
-            <Route path="/video" element={<VideoPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/trending" element={<TrendingPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/extension" element={<ExtensionPage />} />
-            <Route path="/account" element={<AccountPage />} />
-          </Routes>
-        </DragDropOverlay>
-      </Router>
-      </LangProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <LangProvider>
+          <Router>
+            <SimpleCursor />
+            <DragDropOverlay>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/verify" element={<VerifyPage />} />
+                <Route path="/image" element={<ImagePage />} />
+                <Route path="/video" element={<VideoPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/trending" element={<TrendingPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/extension" element={<ExtensionPage />} />
+                <Route path="/account" element={<AccountPage />} />
+              </Routes>
+            </DragDropOverlay>
+          </Router>
+        </LangProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
