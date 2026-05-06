@@ -139,13 +139,22 @@ export default function AccountPage() {
     setIsSaving(true);
     const updatedUser = { ...user, ...editData };
 
+    // Optimistic local update
     if (typeof setUser === 'function') setUser(updatedUser);
     localStorage.setItem('verixa_user', JSON.stringify(updatedUser));
 
+    // Async server update with timeout
     try {
       const API = process.env.REACT_APP_API_URL || '';
-      await axios.post(`${API}/api/user/profile`, { email: user?.email, ...editData });
-    } catch (err) {}
+      // We don't wait indefinitely for the server; 6s is enough
+      await axios.post(`${API}/api/user/profile`, 
+        { email: user?.email, ...editData },
+        { timeout: 6000 }
+      );
+    } catch (err) {
+      console.warn('Profile sync delayed:', err.message);
+      // We don't alert the user here because we've already updated locally
+    }
 
     setIsSaving(false);
     setIsEditing(false);
