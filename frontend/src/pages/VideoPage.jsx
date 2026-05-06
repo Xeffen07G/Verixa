@@ -43,7 +43,8 @@ export default function VideoPage() {
 
   const getYouTubeEmbedUrl = (url) => {
     if (!url) return null;
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    // Support for standard watch, shorts, live, and mobile youtu.be links
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/|live\/)([^#&?]*).*/;
     const match = url.match(regExp);
     const id = (match && match[2].length === 11) ? match[2] : null;
     return id ? `https://www.youtube.com/embed/${id}?autoplay=1&mute=1` : null;
