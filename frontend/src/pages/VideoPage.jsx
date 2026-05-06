@@ -140,10 +140,10 @@ export default function VideoPage() {
             <Activity size={14} /> {t('videoVerify', lang).toUpperCase()}
           </motion.div>
           <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 300, margin: '0 0 16px' }}>
-            Unmasking <span style={{ fontStyle: 'italic', color: T.accent }}>Deepfakes.</span>
+            {t('videoHeroTitle', lang).split('.')[0]} <span style={{ fontStyle: 'italic', color: T.accent }}>{t('videoHeroTitle', lang).split('.')[1] || ''}.</span>
           </h1>
           <p style={{ color: T.text2, fontSize: 16, maxWidth: 500, margin: '0 auto', lineHeight: 1.6 }}>
-            Advanced temporal and biometric analysis to detect synthetic media artifacts in motion.
+            {t('videoHeroSubtitle', lang)}
           </p>
         </section>
 
