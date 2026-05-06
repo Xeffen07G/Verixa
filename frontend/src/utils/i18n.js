@@ -541,6 +541,7 @@ const hi = {
   accessTier: 'पहुँच स्तर', enterpriseTier: 'एंटरप्राइज नोड', standardNode: 'स्टैंडर्ड नोड',
   notSet: 'सेट नहीं', secureLabel: 'सुरक्षित', saving: 'सहेज रहा है...', saveProfile: 'परिवर्तन सहेजें',
   cancel: 'रद्द करें', editProfile: 'पेशेवर प्रोफ़ाइल संपादित करें', verifyNow: 'अभी सत्यापित करें', imageVerify: 'छवि सत्यापन',
+  videoVerify: 'वीडियो सत्यापन',
   input: 'इनपुट', history: 'इतिहास', newAudit: 'नया ऑडिट', text: 'टेक्स्ट', url: 'URL', pdf: 'PDF',
   inputSubtitle: 'गहरी-ट्रेस सत्यापन के लिए सामग्री जमा करें।', enterText: 'सत्यापित करने के लिए टेक्स्ट दर्ज करें...',
   pasteText: 'सत्यापित करने के लिए टेक्स्ट पेस्ट करें...', pasteUrl: 'समाचार या लेख URL पेस्ट करें...',
