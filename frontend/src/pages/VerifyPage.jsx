@@ -945,7 +945,7 @@ export default function VerifyPage() {
         </div>
 
         {/* RIGHT RESULTS PANEL */}
-        <div className="results-panel" style={{ flex: 1, height: '100vh', overflowY: 'auto', padding: 'calc(var(--nav-h) + 32px) 36px 32px', background: T.bg, transition: 'all 0.3s' }}>
+        <div className="results-panel" style={{ flex: 1, height: '100vh', overflowY: 'auto', padding: 'calc(var(--nav-h, 80px) + 32px) 36px 32px', background: T.bg, transition: 'all 0.3s' }}>
 
           {/* Empty state */}
           {!stage && claims.length === 0 && !error && (

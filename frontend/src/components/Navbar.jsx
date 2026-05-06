@@ -208,6 +208,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
         
         :root { --nav-h: ${scrolled ? '64px' : '80px'}; }
         @media (max-width: 1024px) {
+          :root { --nav-h: 64px !important; }
           .hide-tablet { display: none !important; }
           .mobile-only { display: flex !important; }
           .hide-mobile { display: none !important; }

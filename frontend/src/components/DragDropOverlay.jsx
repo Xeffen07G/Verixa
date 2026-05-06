@@ -153,7 +153,7 @@ export default function DragDropOverlay({ children }) {
       {isDragging && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 10000,
-          background: 'rgba(10, 10, 15, 0.92)',
+          background: 'rgba(10, 10, 15, 0.75)',
           backdropFilter: 'blur(20px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           animation: 'fadeIn 0.2s ease',
