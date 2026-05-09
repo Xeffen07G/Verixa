@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Download, Mic } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import { useVerify } from '../hooks/useVerify';
 import { useAuth } from '../context/AuthContext';
 import SkeletonLoading from '../components/SkeletonCard';
