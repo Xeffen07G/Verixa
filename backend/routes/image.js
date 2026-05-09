@@ -223,12 +223,14 @@ router.post("/upload", async (req, res) => {
  */
 router.post("/query", async (req, res) => {
   const { query, context, imageContext, history } = req.body;
+  console.log("POST /api/image/query received:", { query, contextLength: context?.length });
+
   if (!query) return res.status(400).json({ error: "Query is required" });
 
   try {
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    
-    // Format history for the prompt
+    if (!process.env.GROQ_API_KEY) throw new Error("GROQ_API_KEY is not configured");
+
     const historyText = (history || []).map(h => `${h.role.toUpperCase()}: ${h.content}`).join("\n");
 
     const prompt = `You are VeriXa, a legal and factual intelligence assistant. 
@@ -243,15 +245,19 @@ NEW QUESTION: ${query}
 
 If the text looks like a legal document, court order, or official notice, provide a professional and helpful explanation of its meaning. If the question is about a specific detail (like dates, names, or property), extract it accurately. If you cannot answer based on the provided text, say so. Respond naturally and helpfully. Keep history in mind for context.`;
 
+    console.log("Calling Groq with prompt...");
     const completion = await groq.chat.completions.create({
       model: "llama-3.1-70b-versatile",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.2,
+      max_tokens: 1024
     });
 
-    res.json({ answer: completion.choices[0].message.content.trim() });
+    const answer = completion.choices[0].message.content.trim();
+    console.log("Groq response received:", answer.slice(0, 50) + "...");
+    res.json({ answer });
   } catch (err) {
-    console.error("Image query error:", err.message);
+    console.error("Image query error details:", err);
     res.status(500).json({ error: "Query failed: " + err.message });
   }
 });

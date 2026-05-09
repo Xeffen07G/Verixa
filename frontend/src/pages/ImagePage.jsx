@@ -41,6 +41,11 @@ export default function ImagePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const fileRef = useRef(null);
+  const chatEndRef = useRef(null);
+
+  React.useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatHistory, queryLoading]);
 
   const T_DARK = {
     bg: '#0a0a0f', bg2: 'rgba(16,16,23,0.9)', text: '#f5f3ef', text2: 'rgba(245,243,239,0.45)',
@@ -113,20 +118,30 @@ export default function ImagePage() {
     // Add user message to history
     setChatHistory(prev => [...prev, { role: 'user', content: currentQuery }]);
     
+    console.log("Image Query started:", currentQuery);
     try {
+      const payload = { 
+        query: currentQuery, 
+        context: result.extracted_text,
+        imageContext: result.assessment,
+        history: chatHistory.slice(-4)
+      };
+      console.log("Payload:", payload);
+
       const res = await fetch(`${API_URL}/api/image/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          query: currentQuery, 
-          context: result.extracted_text,
-          imageContext: result.assessment,
-          history: chatHistory.slice(-4) // Send last few turns for context
-        }),
+        body: JSON.stringify(payload),
       });
+      
+      console.log("Response status:", res.status);
       const data = await res.json();
+      console.log("Data received:", data);
+
+      if (!res.ok) throw new Error(data.error || 'Query failed');
       setChatHistory(prev => [...prev, { role: 'assistant', content: data.answer }]);
     } catch (e) {
+      console.error("Image Query Error:", e);
       setChatHistory(prev => [...prev, { role: 'assistant', content: "Error: " + e.message }]);
     } finally {
       setQueryLoading(false);
@@ -138,6 +153,7 @@ export default function ImagePage() {
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+        @keyframes pulse { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
         @media (max-width: 600px) {
           .analysis-grid { grid-template-columns: 1fr !important; }
           .analysis-grid img { height: 200px !important; }
@@ -367,6 +383,7 @@ export default function ImagePage() {
                      </div>
                    </div>
                 )}
+                <div ref={chatEndRef} />
               </div>
 
               <div style={{ position: 'relative' }}>
