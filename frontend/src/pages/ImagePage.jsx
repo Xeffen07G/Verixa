@@ -102,26 +102,32 @@ export default function ImagePage() {
 
   const [imageQuery, setImageQuery] = useState('');
   const [queryLoading, setQueryLoading] = useState(false);
-  const [queryAnswer, setQueryAnswer] = useState(null);
+  const [chatHistory, setChatHistory] = useState([]);
 
   async function handleQuery() {
     if (!imageQuery.trim() || !result) return;
-    setQueryLoading(true); setQueryAnswer(null);
+    const currentQuery = imageQuery;
+    setImageQuery('');
+    setQueryLoading(true);
+    
+    // Add user message to history
+    setChatHistory(prev => [...prev, { role: 'user', content: currentQuery }]);
+    
     try {
       const res = await fetch(`${API_URL}/api/image/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          query: imageQuery, 
+          query: currentQuery, 
           context: result.extracted_text,
           imageContext: result.assessment,
-          imageUrl: preview // Optional, if backend can re-see image
+          history: chatHistory.slice(-4) // Send last few turns for context
         }),
       });
       const data = await res.json();
-      setQueryAnswer(data.answer);
+      setChatHistory(prev => [...prev, { role: 'assistant', content: data.answer }]);
     } catch (e) {
-      setQueryAnswer("Error: " + e.message);
+      setChatHistory(prev => [...prev, { role: 'assistant', content: "Error: " + e.message }]);
     } finally {
       setQueryLoading(false);
     }
@@ -318,33 +324,67 @@ export default function ImagePage() {
               </div>
             )}
 
-            {/* ASK VERIXA SECTION */}
+            {/* ASK VERIXA CHAT SECTION */}
             <div style={{ background: T.cardBg, border: `1.5px solid ${T.accent}`, borderRadius: 16, padding: 24, marginBottom: 28, boxShadow: `0 10px 40px ${T.accent}1a`, animation: 'fadeUp 0.6s ease' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
                 <div style={{ width: 32, height: 32, borderRadius: 8, background: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: darkMode ? '#0a0a0f' : '#fff', fontSize: 14 }}>V</div>
-                <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{t('askAboutImage', lang)}</h3>
+                <div>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{t('askAboutImage', lang)}</h3>
+                  <p style={{ fontSize: 11, color: T.text3, margin: 0 }}>{t('legalIntelligenceActive', lang)}</p>
+                </div>
               </div>
+
+              {/* Chat History */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 20, maxHeight: 400, overflowY: 'auto', paddingRight: 4 }}>
+                {chatHistory.length === 0 ? (
+                  <div style={{ padding: '20px', textAlign: 'center', border: `1px dashed ${T.border}`, borderRadius: 12 }}>
+                    <p style={{ fontSize: 13, color: T.text3, margin: 0 }}>{t('noQueriesYet', lang)}</p>
+                  </div>
+                ) : (
+                  chatHistory.map((msg, i) => (
+                    <div key={i} style={{ 
+                      alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                      maxWidth: '85%',
+                      padding: '12px 16px',
+                      borderRadius: 14,
+                      background: msg.role === 'user' ? (darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)') : `${T.accent}0a`,
+                      border: `1px solid ${msg.role === 'user' ? T.border : `${T.accent}33`}`,
+                      animation: 'fadeUp 0.2s ease'
+                    }}>
+                      <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px', fontWeight: 700 }}>
+                        {msg.role === 'user' ? t('you', lang) : t('verixa', lang)}
+                      </p>
+                      <p style={{ fontSize: 14, color: T.text, margin: 0, lineHeight: 1.5 }}>{msg.content}</p>
+                    </div>
+                  ))
+                )}
+                {queryLoading && (
+                   <div style={{ alignSelf: 'flex-start', padding: '12px 16px', borderRadius: 14, background: `${T.accent}0a`, border: `1px solid ${T.accent}33` }}>
+                     <div style={{ display: 'flex', gap: 4 }}>
+                        <div style={{ width: 6, height: 6, background: T.accent, borderRadius: '50%', animation: 'pulse 1s infinite' }} />
+                        <div style={{ width: 6, height: 6, background: T.accent, borderRadius: '50%', animation: 'pulse 1s infinite 0.2s' }} />
+                        <div style={{ width: 6, height: 6, background: T.accent, borderRadius: '50%', animation: 'pulse 1s infinite 0.4s' }} />
+                     </div>
+                   </div>
+                )}
+              </div>
+
               <div style={{ position: 'relative' }}>
                 <textarea 
                   value={imageQuery} 
                   onChange={e => setImageQuery(e.target.value)}
                   placeholder={t('askAnythingPlaceholder', lang)}
-                  style={{ width: '100%', height: 100, background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', border: `1px solid ${T.border}`, borderRadius: 12, padding: '16px', color: T.text, outline: 'none', resize: 'none', fontSize: 14, fontFamily: 'inherit' }}
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleQuery(); } }}
+                  style={{ width: '100%', height: 80, background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', border: `1px solid ${T.border}`, borderRadius: 12, padding: '12px 16px', color: T.text, outline: 'none', resize: 'none', fontSize: 14, fontFamily: 'inherit' }}
                 />
                 <button 
                   onClick={handleQuery}
                   disabled={queryLoading || !imageQuery.trim()}
                   style={{ position: 'absolute', bottom: 12, right: 12, padding: '8px 20px', borderRadius: 8, background: T.accent, border: 'none', color: darkMode ? '#0a0a0f' : '#fff', fontWeight: 700, fontSize: 12, cursor: 'pointer', transition: '0.2s' }}
                 >
-                  {queryLoading ? '...' : t('askVault', lang)}
+                  {t('send', lang)}
                 </button>
               </div>
-              {queryAnswer && (
-                <div style={{ marginTop: 20, padding: '16px', background: `${T.accent}0a`, border: `1px solid ${T.accent}33`, borderRadius: 12, animation: 'fadeUp 0.3s ease' }}>
-                   <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.accent, marginBottom: 8, fontWeight: 700 }}>{t('verixaIntelligence', lang)}</p>
-                   <p style={{ fontSize: 14, color: T.text, lineHeight: 1.6, margin: 0 }}>{queryAnswer}</p>
-                </div>
-              )}
             </div>
 
             <button onClick={() => { setResult(null); setPreview(null); setImageUrl(''); setUploadFile(null); }}

@@ -222,19 +222,26 @@ router.post("/upload", async (req, res) => {
  * POST /api/image/query — Ask a question about the analyzed image
  */
 router.post("/query", async (req, res) => {
-  const { query, context, imageContext, imageUrl } = req.body;
+  const { query, context, imageContext, history } = req.body;
   if (!query) return res.status(400).json({ error: "Query is required" });
 
   try {
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    
+    // Format history for the prompt
+    const historyText = (history || []).map(h => `${h.role.toUpperCase()}: ${h.content}`).join("\n");
+
     const prompt = `You are VeriXa, a legal and factual intelligence assistant. 
 The user has provided an image with the following details:
 EXTRACTED TEXT: ${context || "None"}
 FORENSIC CONTEXT: ${imageContext || "Authenticity verified."}
 
-QUESTION: ${query}
+CHAT HISTORY:
+${historyText || "None"}
 
-If the text looks like a legal document, court order, or official notice, provide a professional and helpful explanation of its meaning. If the question is about a specific detail (like dates, names, or property), extract it accurately. If you cannot answer based on the provided text, say so. Respond naturally and helpfully.`;
+NEW QUESTION: ${query}
+
+If the text looks like a legal document, court order, or official notice, provide a professional and helpful explanation of its meaning. If the question is about a specific detail (like dates, names, or property), extract it accurately. If you cannot answer based on the provided text, say so. Respond naturally and helpfully. Keep history in mind for context.`;
 
     const completion = await groq.chat.completions.create({
       model: "llama-3.1-70b-versatile",
