@@ -58,6 +58,7 @@ app.use("/api/trending", trendingRoutes);
 app.use('/api/organization', require('./routes/organization'));
 app.use('/api/user', require('./routes/user'));
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/rag", require("./routes/rag"));
 
 // 404 handler
 app.use((req, res) => {

@@ -9,22 +9,23 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
-function StatCard({ icon: Icon, value, label, theme, color = '#c9a96e' }) {
+function StatCard({ icon: Icon, value, label, theme, color = '#d48c70' }) {
   return (
     <div style={{
-      padding: '24px', borderRadius: 16,
+      padding: '32px', borderRadius: 32,
       background: theme.cardBg, border: `1px solid ${theme.border}`,
-      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      flex: 1, minWidth: 200
+      transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+      flex: 1, minWidth: 240,
+      boxShadow: theme.shadow
     }}
-      onMouseEnter={e => { e.currentTarget.style.borderColor = `${color}4d`; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = color; e.currentTarget.style.transform = 'translateY(-6px)'; }}
       onMouseLeave={e => { e.currentTarget.style.borderColor = theme.border; e.currentTarget.style.transform = 'translateY(0)'; }}
     >
-      <div style={{ width: 40, height: 40, borderRadius: 10, background: `${color}14`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-        <Icon size={20} color={color} />
+      <div style={{ width: 44, height: 44, borderRadius: 12, background: `${color}14`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+        <Icon size={22} color={color} />
       </div>
-      <div style={{ fontFamily: 'serif', fontSize: 36, fontWeight: 300, color: theme.text, lineHeight: 1, marginBottom: 4 }}>{value}</div>
-      <div style={{ fontSize: 12, color: theme.text3, letterSpacing: 0.5, fontWeight: 600, textTransform: 'uppercase' }}>{label}</div>
+      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 300, color: theme.text, lineHeight: 1, marginBottom: 8 }}>{value}</div>
+      <div style={{ fontSize: 11, color: theme.text3, letterSpacing: 1.5, fontWeight: 700, textTransform: 'uppercase' }}>{label}</div>
     </div>
   );
 }
@@ -42,7 +43,11 @@ export default function DashboardPage() {
     }
   }, [user, authLoading, navigate]);
 
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('verixa-theme') === 'dark');
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('verixa-theme');
+    return saved ? saved === 'dark' : false; // Default to Light for "Human" feel
+  });
+
   const [orgHistory, setOrgHistory] = useState([]);
   const [members, setMembers] = useState([]);
   const [personalHistory, setPersonalHistory] = useState([]);
@@ -89,17 +94,21 @@ export default function DashboardPage() {
     return { total, avg, falseClaims };
   }, [orgHistory, personalHistory, isAdmin]);
 
-  const T = darkMode ? {
+  const T_DARK = {
     bg: '#0a0a0f', text: '#f5f3ef',
     text2: 'rgba(245,243,239,0.65)', text3: 'rgba(245,243,239,0.35)',
     border: 'rgba(255,255,255,0.07)', cardBg: 'rgba(18,18,28,0.6)',
-    accent: '#c9a96e', accentMuted: 'rgba(201,169,110,0.12)',
-  } : {
-    bg: '#e8e5de', text: '#0d0d0d',
-    text2: '#2a2a2a', text3: '#555555',
-    border: 'rgba(0,0,0,0.12)', cardBg: '#f5f3ed',
-    accent: '#5a421a', accentMuted: 'rgba(90,66,26,0.15)',
+    accent: '#c9a96e', shadow: '0 20px 60px rgba(0,0,0,0.5)',
   };
+
+  const T_LIGHT = {
+    bg: '#fdfcf9', text: '#201a18',
+    text2: '#53433e', text3: '#85736d',
+    border: 'rgba(212, 140, 112, 0.15)', cardBg: '#ffffff',
+    accent: '#d48c70', shadow: '0 20px 50px rgba(45, 45, 45, 0.05)',
+  };
+
+  const T = darkMode ? T_DARK : T_LIGHT;
 
   const toggleTheme = () => {
     const newVal = !darkMode;
@@ -120,13 +129,13 @@ export default function DashboardPage() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 48, flexWrap: 'wrap', gap: 24 }}>
           <div>
-            <div style={{ fontSize: 10, letterSpacing: 4, color: T.accent, fontWeight: 900, marginBottom: 12 }}>
+            <div style={{ fontSize: 10, letterSpacing: 4, color: T.accent, fontWeight: 900, marginBottom: 16, textTransform: 'uppercase' }}>
               {isAdmin ? t('orgIntel', lang) : t('personalAudit', lang)}
             </div>
-            <h1 style={{ fontFamily: 'serif', fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 300, color: T.text, margin: 0, lineHeight: 1 }}>
+            <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(32px, 5vw, 64px)', fontWeight: 300, color: T.text, margin: 0, lineHeight: 1, letterSpacing: -1 }}>
               {isAdmin ? `${user?.organization} ${t('network', lang)}` : t('yourActivity', lang)}<span style={{ color: T.accent }}>.</span>
             </h1>
-            <p style={{ color: T.text2, marginTop: 12, fontSize: 14 }}>
+            <p style={{ color: T.text2, marginTop: 16, fontSize: 16, fontWeight: 300, maxWidth: 600 }}>
               {isAdmin ? t('monitoringTeam', lang) : t('trackPersonal', lang)}
             </p>
           </div>

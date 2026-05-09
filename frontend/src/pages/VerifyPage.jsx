@@ -8,16 +8,17 @@ import SkeletonLoading from '../components/SkeletonCard';
 import Confetti from '../components/Confetti';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
+
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
 const VERDICT_CONFIG = (lang) => ({
-  'True':           { color: '#166534', bg: '#dcfce7', border: '#bbf7d0', icon: '✓', label: t('mostlyAccurate', lang),   short: t('trueShort', lang)    },
-  'False':          { color: '#991b1b', bg: '#fee2e2', border: '#fecaca', icon: '✕', label: t('mostlyInaccurate', lang),  short: t('falseShort', lang)   },
-  'Partially True': { color: '#92400e', bg: '#fef3c7', border: '#fde68a', icon: '~', label: t('mixedAccuracy', lang),  short: t('partialShort', lang) },
-  'Unverifiable':   { color: '#374151', bg: '#f3f4f6', border: '#e5e7eb', icon: '?', label: t('unverifiable', lang),    short: t('unclearShort', lang) },
-  'Pending':        { color: '#c9a96e', bg: 'rgba(201,169,110,0.08)', border: 'rgba(201,169,110,0.2)', icon: '◈', label: 'Processing...', short: '...' },
+  'True':           { color: '#31572c', bg: '#f1f8e9', border: '#dcedc8', icon: '✓', label: t('mostlyAccurate', lang),   short: t('trueShort', lang)    },
+  'False':          { color: '#7f1d1d', bg: '#fff1f1', border: '#fee2e2', icon: '✕', label: t('mostlyInaccurate', lang),  short: t('falseShort', lang)   },
+  'Partially True': { color: '#92400e', bg: '#fffbeb', border: '#fef3c7', icon: '~', label: t('mixedAccuracy', lang),  short: t('partialShort', lang) },
+  'Unverifiable':   { color: '#53433e', bg: '#f5f3ed', border: '#e8e5de', icon: '?', label: t('unverifiable', lang),    short: t('unclearShort', lang) },
+  'Pending':        { color: '#d48c70', bg: '#fdfcf9', border: 'rgba(212, 140, 112, 0.2)', icon: '◈', label: 'Processing...', short: '...' },
 });
 
 const STAGES = ['extracting', 'searching', 'verifying', 'done'];
@@ -34,14 +35,14 @@ const DARK = {
 };
 
 const LIGHT = {
-  bg: '#e8e5de', surface: '#f0ede6', surface2: '#ddd9d0',
-  border: 'rgba(0,0,0,0.12)', border2: 'rgba(0,0,0,0.06)',
-  text: '#0d0d0d', text2: '#2a2a2a', text3: '#555555',
-  topbar: 'rgba(232,229,222,0.95)', panelFooter: 'rgba(232,229,222,0.9)',
-  inputBg: '#f5f3ed', inputBorder: 'rgba(0,0,0,0.14)',
-  logBg: 'rgba(0,0,0,0.03)', emptyColor: 'rgba(30,30,30,0.25)',
-  cardBg: '#f0ede6', cardBorder: 'rgba(0,0,0,0.08)',
-  accent: '#5a421a', accentMuted: 'rgba(90,66,26,0.15)',
+  bg: '#fdfcf9', surface: '#fdfcf9', surface2: '#f5f3ed',
+  border: 'rgba(212, 140, 112, 0.15)', border2: 'rgba(212, 140, 112, 0.08)',
+  text: '#201a18', text2: '#53433e', text3: '#85736d',
+  topbar: 'rgba(253, 252, 249, 0.95)', panelFooter: 'rgba(253, 252, 249, 0.9)',
+  inputBg: '#ffffff', inputBorder: 'rgba(212, 140, 112, 0.2)',
+  logBg: 'rgba(212, 140, 112, 0.03)', emptyColor: '#85736d',
+  cardBg: '#ffffff', cardBorder: 'rgba(212, 140, 112, 0.15)',
+  accent: '#d48c70', accentMuted: 'rgba(212, 140, 112, 0.12)',
 };
 
 function ScoreBanner({ score, claims, lang }) {
@@ -794,7 +795,7 @@ export default function VerifyPage() {
 
         {/* LEFT PANEL */}
         <div className="left-panel" style={{ borderRight: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', height: '100vh', paddingTop: 'var(--nav-h)', overflow: 'hidden', background: T.surface, transition: 'all 0.3s' }}>
-
+      
           {/* Tabs */}
           <div style={{ padding: '12px 20px', borderBottom: `1px solid ${T.border}`, display: 'flex', gap: 4 }}>
             {[{ id: 'input', key: 'input' }, { id: 'history', key: 'history' }].map(tab => (

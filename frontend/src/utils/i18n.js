@@ -162,7 +162,7 @@ const en = {
   videoUrlPlaceholder: 'https://youtube.com/watch?v=...', uploadFileBtn: 'UPLOAD FILE', videoUrlBtn: 'VIDEO URL', analyzeBtn: 'ANALYZE',
   selectVideoFile: 'Select video file...', runningAudit: 'Running Temporal Audit...',
   deconstructingFrames: 'Deconstructing frames and analyzing biometric landmarks',
-  forensicReportOverview: 'Forensic Report Overview', 
+  forensicReportOverview: 'Forensic Report Overview',
   reportDesc1: 'Our AI model has completed a multi-pass temporal audit of the provided footage. The analysis detected',
   reportDesc2: 'critical anomalies within the biometric layer.',
   integrity: 'INTEGRITY', high: 'HIGH', compromised: 'COMPROMISED',
@@ -2249,7 +2249,7 @@ export function t(key, lang = 'en') {
   if (!key) return '';
   const normalizedLang = (lang || 'en').toLowerCase().split('-')[0];
   const dict = translations[normalizedLang] || translations.en;
-  
+
   if (dict[key]) return dict[key];
   if (translations.en[key]) return translations.en[key];
   return key;

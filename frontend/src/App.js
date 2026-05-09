@@ -13,9 +13,7 @@ import AccountPage from './pages/AccountPage';
 import { AuthProvider } from './context/AuthContext';
 import { LangProvider } from './context/LangContext';
 import DragDropOverlay from './components/DragDropOverlay';
-import SimpleCursor from './components/SimpleCursor';
 import ErrorBoundary from './components/ErrorBoundary';
-
 
 export default function App() {
   return (
@@ -23,7 +21,6 @@ export default function App() {
       <AuthProvider>
         <LangProvider>
           <Router>
-            <SimpleCursor />
             <DragDropOverlay>
               <Routes>
                 <Route path="/" element={<LandingPage />} />

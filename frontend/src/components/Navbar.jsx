@@ -38,18 +38,21 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
     return links;
   }, [lang, user]);
 
-  const textColor = darkMode ? '#ffffff' : '#000000';
-  const textMuted = darkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)';
-  const border = darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+  const textColor = darkMode ? '#f5f3ef' : '#201a18';
+  const textMuted = darkMode ? 'rgba(245,243,239,0.6)' : 'rgba(32, 26, 24, 0.6)';
+  const border = darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(212, 140, 112, 0.15)';
 
   const isTransparent = (location.pathname === '/' || location.pathname === '/index.html' || !location.pathname || location.pathname === '') && !scrolled;
   
   const bg = isTransparent 
     ? 'transparent' 
-    : (darkMode ? 'rgba(10,10,15,0.85)' : 'rgba(245,243,239,0.9)');
+    : (darkMode ? 'rgba(10,10,15,0.85)' : 'rgba(253, 252, 249, 0.9)');
   const backdrop = isTransparent ? 'none' : 'blur(20px)';
   const navBorder = isTransparent ? 'transparent' : border;
-  const T = { accent: '#c9a96e' };
+  const T = { 
+    accent: darkMode ? '#c9a96e' : '#d48c70',
+    logoBg: darkMode ? '#c9a96e' : '#d48c70'
+  };
 
   const currentLang = LANGUAGES.find(l => l.code === lang);
 
@@ -69,10 +72,21 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 40 }}>
             <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
               <div style={{ position: 'relative' }}>
-                <div style={{ width: 32, height: 32, borderRadius: 8, background: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#000', fontWeight: 900 }}>V</div>
-                <div style={{ position: 'absolute', bottom: -2, right: -2, width: 8, height: 8, borderRadius: '50%', background: '#4ade80', border: `2px solid ${darkMode ? '#0a0a0f' : '#fff'}` }} />
+                <div style={{ 
+                  width: 32, height: 32, borderRadius: 10, background: T.logoBg, 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                  fontSize: 16, color: darkMode ? '#0a0a0f' : '#fff', fontWeight: 900 
+                }}>V</div>
+                <div style={{ 
+                  position: 'absolute', bottom: -2, right: -2, width: 8, height: 8, 
+                  borderRadius: '50%', background: '#4ade80', 
+                  border: `2px solid ${darkMode ? '#0a0a0f' : '#fdfcf9'}` 
+                }} />
               </div>
-              <span style={{ fontSize: 20, fontWeight: 700, color: textColor, letterSpacing: -0.5 }}>VeriXa</span>
+              <span style={{ 
+                fontFamily: 'Cormorant Garamond, serif',
+                fontSize: 22, fontWeight: 300, color: textColor, letterSpacing: -0.5 
+              }}>VeriXa</span>
             </Link>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 24 }} className="hide-tablet">

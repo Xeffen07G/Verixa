@@ -13,13 +13,13 @@ export default function Footer({ darkMode = true }) {
     text3: 'rgba(255,255,255,0.2)',
     linkHover: '#c9a96e',
   } : {
-    bg: '#f5f3ed',
-    border: 'rgba(0,0,0,0.06)',
-    border2: 'rgba(0,0,0,0.04)',
-    text: '#0d0d0d',
-    text2: 'rgba(0,0,0,0.6)',
-    text3: 'rgba(0,0,0,0.3)',
-    linkHover: '#5a421a',
+    bg: '#fdfcf9',
+    border: 'rgba(212, 140, 112, 0.1)',
+    border2: 'rgba(212, 140, 112, 0.05)',
+    text: '#201a18',
+    text2: '#53433e',
+    text3: '#85736d',
+    linkHover: '#d48c70',
   };
 
   return (
