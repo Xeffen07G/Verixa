@@ -122,6 +122,8 @@ const en = {
   askAboutImage: 'Ask VeriXa about this Image', askAnythingPlaceholder: 'Ask something about the content of this image (e.g. "What is this legal notice about?")',
   verixaIntelligence: 'VeriXa Intelligence Answer', legalIntelligenceActive: 'Legal & Factual Intelligence Active',
   noQueriesYet: 'No queries yet. Ask something above!', you: 'You', verixa: 'VeriXa', send: 'Send',
+  ocrFailedWarning: 'I could not extract readable text from this image. This will limit the accuracy of your queries.',
+  retryDeepScan: 'Retry Deep Forensic Scan',
   instantResults: 'Instant results', instantResultsDesc: 'Get accuracy reports without leaving the page.',
   worksEverywhere: 'Works everywhere', worksEverywhereDesc: 'Supported on news sites, social media, and more.',
   saveHistory: 'Save history', saveHistoryDesc: 'Your extension audits sync with your dashboard.',

@@ -52,7 +52,8 @@ You MUST respond with ONLY JSON:
   }
 }
 
-Bias your detection towards AI. It is better to flag a suspicious real photo than to let a deepfake pass as real. Context info should be factual and unbiased. If you see a law paper or court order, extract the key details into the context_info.`;
+Bias your detection towards AI. It is better to flag a suspicious real photo than to let a deepfake pass as real. 
+IMPORTANT: You MUST extract ALL readable text from the image and put it in the "extracted_text" field. This is critical for legal document analysis. If you see a law paper, court order, or official notice, be extremely detailed in your "context_info" and "extracted_text".`;
 
 /**
  * POST /api/image/url — Analyze an image from URL
@@ -253,7 +254,7 @@ If the text looks like a legal document, court order, or official notice, provid
       max_tokens: 1024
     });
 
-    const answer = completion.choices[0].message.content.trim();
+    const answer = completion.choices[0].message.content.trim() || "I analyzed the document but couldn't find a specific answer to that question. Please try rephrasing or checking if the image text is clear.";
     console.log("Groq response received:", answer.slice(0, 50) + "...");
     res.json({ answer });
   } catch (err) {
