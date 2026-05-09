@@ -99,7 +99,7 @@ export default function LandingPage() {
   const [stat1, ref1] = useCountUp(25);
   const [stat2, ref2] = useCountUp(4);
   const [stat3, ref3] = useCountUp(4);
-  const [stat4, ref4] = useCountUp(1);
+  const [stat4, ref4] = useCountUp(12);
 
   const demoInput = t('demo1', lang) + ' ' + t('demo2', lang) + ' ' + t('demo3', lang);
 
@@ -188,7 +188,7 @@ export default function LandingPage() {
               { val: stat1, suffix: '+', label: t('inputFormats', lang), r: ref1 },
               { val: stat2, suffix: '', label: t('verdictTypes', lang), r: ref2 },
               { val: stat3, suffix: '', label: t('aiModels', lang), r: ref3 },
-              { val: stat4, suffix: '', label: t('verixaEngine', lang), r: ref4 },
+              { val: stat4, suffix: 's', label: t('avgResponse', lang), r: ref4 },
             ].map((s, i) => (
               <motion.div key={i} ref={s.r} whileHover={{ y: -8, borderColor: T.accent }} style={{ padding: '40px 24px', textAlign: 'center', background: T.statBg, border: `1px solid ${T.accent}33`, borderRadius: 16, backdropFilter: 'blur(10px)', transition: 'all 0.4s' }}>
                 <div style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 52, color: T.accent, lineHeight: 1 }}>{s.val}{s.suffix}</div>
