@@ -10,8 +10,9 @@ router.post("/", async (req, res) => {
   }
 
   res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Cache-Control", "no-cache, no-transform");
   res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.flushHeaders();
 
@@ -24,6 +25,11 @@ router.post("/", async (req, res) => {
     send("stage", { stage: "extracting", message: "Decomposing text & analyzing origin..." });
     
     // Run extraction and AI detection in parallel to save significant time
+    // Adding a 60-second timeout to prevent permanent hangs
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error("Verification timed out during extraction")), 60000)
+    );
+
     const extractPromise = extractClaims(text).then(claims => {
       send("log", { message: `Found ${claims.length} verifiable claims` });
       return claims;
@@ -42,7 +48,10 @@ router.post("/", async (req, res) => {
         });
     }
 
-    const [claims, aiDetection] = await Promise.all([extractPromise, aiDetectionPromise]);
+    const [claims, aiDetection] = await Promise.race([
+      Promise.all([extractPromise, aiDetectionPromise]),
+      timeoutPromise
+    ]);
 
     // Send extracted claims immediately to the frontend so they can see what's being checked
     send("claims_extracted", { claims });

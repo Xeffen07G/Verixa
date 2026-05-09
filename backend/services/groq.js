@@ -9,23 +9,26 @@ async function askGroq(prompt, jsonMode = false, model = "llama-3.1-8b-instant",
   const groq = getClient();
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      const completion = await groq.chat.completions.create({
+    const completion = await Promise.race([
+      groq.chat.completions.create({
         model: model,
-    messages: [
-      {
-        role: "system",
-        content: `You are VeriXa — the world's most precise AI fact-verification engine.
+        messages: [
+          {
+            role: "system",
+            content: `You are VeriXa — the world's most precise AI fact-verification engine.
 You are exceptionally thorough, accurate, and evidence-based.
 You NEVER guess. You ONLY make verdicts based on retrieved evidence.
 You always respond in valid JSON as instructed.
 MULTILINGUAL & CODE-SWITCHING SUPPORT: You are an expert at processing text in ANY global language (English, Spanish, French, Chinese, Arabic, Russian, Hindi, etc.). You can accurately understand and verify claims where languages are mixed (e.g., Hinglish, Spanglish) or scripts are mixed (Latin, Devanagari, Cyrillic, Arabic, etc.). When the user's input is in a non-English language or a mix, extract the claims faithfully in their original mixed format, but provide reasoning and verdicts in English for consistency.`,
-      },
-      { role: "user", content: prompt },
-    ],
-    temperature: jsonMode ? 0.1 : 0.2,
-    response_format: jsonMode ? { type: "json_object" } : undefined,
-    max_completion_tokens: 4096,
-  });
+          },
+          { role: "user", content: prompt },
+        ],
+        temperature: jsonMode ? 0.1 : 0.2,
+        response_format: jsonMode ? { type: "json_object" } : undefined,
+        max_completion_tokens: 4096,
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Groq API timeout")), 50000))
+    ]);
       return completion.choices[0].message.content.trim();
     } catch (err) {
       if (err.status === 429 && attempt < retries) {

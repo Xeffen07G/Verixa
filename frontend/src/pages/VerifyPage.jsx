@@ -317,7 +317,25 @@ export default function VerifyPage() {
         {/* MAIN AREA */}
         <div style={{ overflowY: 'auto', padding: '40px' }}>
           {isLoading ? (
-            <SkeletonLoading darkMode={darkMode} />
+            <div style={{ animation: 'fadeUp 0.5s ease forwards' }}>
+              <div style={{ marginBottom: 32, padding: '24px', borderRadius: 16, background: T.surface2, border: `1px solid ${T.accent}33`, position: 'relative', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+                  <div style={{ width: 12, height: 12, borderRadius: '50%', background: T.accent, animation: 'pulse 1.5s infinite' }} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: 2 }}>{t(stage || 'extracting', lang)}</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {logs.slice(-3).map((log, i) => (
+                    <div key={i} style={{ fontSize: 13, color: T.text2, display: 'flex', gap: 10, opacity: 1 - (logs.slice(-3).length - 1 - i) * 0.3 }}>
+                      <span style={{ color: T.text3 }}>[{new Date(log.ts).toLocaleTimeString()}]</span>
+                      <span>{log.msg}</span>
+                    </div>
+                  ))}
+                  {logs.length === 0 && <p style={{ margin: 0, fontSize: 13, color: T.text3 }}>{t('processingWait', lang)}</p>}
+                </div>
+                <div style={{ position: 'absolute', bottom: 0, left: 0, height: 2, background: T.accent, animation: 'loading-progress 15s linear forwards' }} />
+              </div>
+              <SkeletonLoading darkMode={darkMode} />
+            </div>
           ) : stage === 'done' ? (
             <div>
               <ScoreBanner score={overallScore} claims={claims} lang={lang} />
@@ -346,6 +364,7 @@ export default function VerifyPage() {
       <style>{`
         @keyframes loading-shimmer { 0% { left: -100%; } 100% { left: 200%; } }
         @keyframes loading-progress { 0% { width: 0%; } 100% { width: 90%; } }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
       `}</style>
     </div>
   );
