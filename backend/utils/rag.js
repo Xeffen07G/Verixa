@@ -99,8 +99,20 @@ async function retrieveContext(queryText, topK = 3) {
   }));
 }
 
+async function getKnowledgeBase() {
+  if (!fs.existsSync(DB_PATH)) return [];
+  const kb = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+  return kb.map(res => ({
+    id: res.id,
+    text: res.text,
+    metadata: res.metadata,
+    timestamp: res.timestamp || new Date().toISOString()
+  }));
+}
+
 module.exports = {
   generateEmbedding,
   addDocumentToRAG,
-  retrieveContext
+  retrieveContext,
+  getKnowledgeBase
 };

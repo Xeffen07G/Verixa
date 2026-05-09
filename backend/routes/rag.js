@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { addDocumentToRAG, retrieveContext } = require('../utils/rag');
+const { addDocumentToRAG, retrieveContext, getKnowledgeBase } = require('../utils/rag');
 
 // POST /api/rag/add
 // Send { "id": "fact1", "text": "The verified truth is...", "metadata": {"source": "Internal"} }
@@ -28,6 +28,16 @@ router.post('/query', async (req, res) => {
     res.json({ results });
   } catch (error) {
     res.status(500).json({ error: "Failed to search knowledge base" });
+  }
+});
+
+// GET /api/rag/documents
+router.get('/documents', async (req, res) => {
+  try {
+    const docs = await getKnowledgeBase();
+    res.json({ documents: docs });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch documents" });
   }
 });
 
