@@ -285,6 +285,60 @@ export default function LandingPage() {
         </div>
       </Section>
 
+      {/* ══════════ FEATURES SECTION ══════════ */}
+      <Section id="features" style={{ padding: '120px 40px' }}>
+        <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 80 }}>
+            <p style={{ fontSize: 12, color: T.accent, fontWeight: 800, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 20 }}>{t('features', lang)}</p>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(42px, 5vw, 64px)', color: T.text, fontWeight: 300, lineHeight: 1 }}>{t('landingFeaturesTitle', lang)}</h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+            {featuresList.map((f, i) => (
+              <StaggerCard key={i} index={i} style={{ 
+                padding: '48px 32px', borderRadius: 32, background: T.cardBg, 
+                border: `1px solid ${T.border}`, boxShadow: T.shadow,
+                display: 'flex', flexDirection: 'column', gap: 24
+              }}>
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: T.accentLight, color: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <f.Icon size={24} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 20, fontWeight: 700, color: T.text, marginBottom: 12 }}>{t(f.key, lang)}</h3>
+                  <p style={{ fontSize: 14, color: T.text2, lineHeight: 1.6, margin: 0 }}>{t(f.descKey, lang)}</p>
+                </div>
+              </StaggerCard>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ══════════ HOW IT WORKS SECTION ══════════ */}
+      <Section id="how-it-works" style={{ padding: '120px 40px', background: T.bg2 }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 80 }}>
+            <p style={{ fontSize: 12, color: T.accent, fontWeight: 800, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 20 }}>{t('process', lang)}</p>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(42px, 5vw, 64px)', color: T.text, fontWeight: 300, lineHeight: 1 }}>{t('howItWorks', lang)}</h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 60 }} className="capabilities-grid">
+            {[
+              { step: '01', key: 'surgicalExtraction', descKey: 'surgicalDesc' },
+              { step: '02', key: 'searchingEvidence', descKey: 'searchingDesc' },
+              { step: '03', key: 'verifyingClaims', descKey: 'verifyingDesc' }
+            ].map((step, i) => (
+              <div key={i} style={{ position: 'relative' }}>
+                <div style={{ fontSize: 80, fontWeight: 900, color: T.accent, opacity: 0.1, position: 'absolute', top: -40, left: -20, fontFamily: 'Inter, sans-serif' }}>{step.step}</div>
+                <div style={{ position: 'relative', zIndex: 2 }}>
+                  <h3 style={{ fontSize: 24, fontWeight: 700, color: T.text, marginBottom: 16 }}>{t(step.key, lang)}</h3>
+                  <p style={{ fontSize: 16, color: T.text2, lineHeight: 1.7, margin: 0 }}>{t(step.descKey, lang)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
       {/* ══════════ STATS SECTION ══════════ */}
       <Section style={{ padding: '40px 40px 120px' }}>
         <div style={{ maxWidth: 1400, margin: '0 auto' }}>
