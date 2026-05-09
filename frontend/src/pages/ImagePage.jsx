@@ -43,10 +43,6 @@ export default function ImagePage() {
   const fileRef = useRef(null);
   const chatEndRef = useRef(null);
 
-  React.useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatHistory, queryLoading]);
-
   const T_DARK = {
     bg: '#0a0a0f', bg2: 'rgba(16,16,23,0.9)', text: '#f5f3ef', text2: 'rgba(245,243,239,0.45)',
     text3: 'rgba(245,243,239,0.25)', border: 'rgba(255,255,255,0.06)', accent: '#c9a96e',
@@ -108,6 +104,10 @@ export default function ImagePage() {
   const [imageQuery, setImageQuery] = useState('');
   const [queryLoading, setQueryLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
+
+  React.useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatHistory, queryLoading]);
 
   async function handleQuery() {
     if (!imageQuery.trim() || !result) return;
