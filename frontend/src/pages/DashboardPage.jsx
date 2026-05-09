@@ -98,14 +98,14 @@ export default function DashboardPage() {
     bg: '#0a0a0f', text: '#f5f3ef',
     text2: 'rgba(245,243,239,0.65)', text3: 'rgba(245,243,239,0.35)',
     border: 'rgba(255,255,255,0.07)', cardBg: 'rgba(18,18,28,0.6)',
-    accent: '#c9a96e', shadow: '0 20px 60px rgba(0,0,0,0.5)',
+    accent: '#c9a96e', accentMuted: 'rgba(201,169,110,0.1)', shadow: '0 20px 60px rgba(0,0,0,0.5)',
   };
 
   const T_LIGHT = {
     bg: '#fdfcf9', text: '#201a18',
     text2: '#53433e', text3: '#85736d',
     border: 'rgba(212, 140, 112, 0.15)', cardBg: '#ffffff',
-    accent: '#d48c70', shadow: '0 20px 50px rgba(45, 45, 45, 0.05)',
+    accent: '#d48c70', accentMuted: 'rgba(212, 140, 112, 0.1)', shadow: '0 20px 50px rgba(45, 45, 45, 0.05)',
   };
 
   const T = darkMode ? T_DARK : T_LIGHT;
