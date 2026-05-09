@@ -33,11 +33,10 @@ export default function ImagePage() {
     localStorage.setItem('verixa-theme', newVal ? 'dark' : 'light');
   };
 
-  const [imageUrl, setImageUrl] = useState('');
-  const [preview, setPreview] = useState(null);
-  const [uploadFile, setUploadFile] = useState(null);
-  const [inputMode, setInputMode] = useState('url');
-  const [result, setResult] = useState(null);
+  const [files, setFiles] = useState([]);
+  const [previews, setPreviews] = useState([]);
+  const [results, setResults] = useState([]);
+  const [activeIdx, setActiveIdx] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const fileRef = useRef(null);
@@ -59,17 +58,20 @@ export default function ImagePage() {
 
   async function analyzeUrl() {
     if (!imageUrl.trim()) return;
-    setLoading(true); setError(null); setResult(null);
-    setPreview(imageUrl);
+    setLoading(true); setError(null);
+    const url = imageUrl.trim();
+    setPreviews(prev => [...prev, url]);
+    setImageUrl('');
     try {
       const res = await fetch(`${API_URL}/api/image/url`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: imageUrl.trim() }),
+        body: JSON.stringify({ imageUrl: url }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Analysis failed');
-      setResult(data);
+      setResults(prev => [...prev, { ...data, url }]);
+      setActiveIdx(prev => results.length); 
     } catch (e) {
       setError(e.message);
     } finally {
@@ -77,29 +79,35 @@ export default function ImagePage() {
     }
   }
 
-  async function analyzeUpload(file) {
-    setLoading(true); setError(null); setResult(null);
-    setUploadFile(file);
-    setPreview(URL.createObjectURL(file));
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const res = await fetch(`${API_URL}/api/image/upload`, {
-        method: 'POST',
-        headers: { 'Content-Type': file.type },
-        body: arrayBuffer,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Analysis failed');
-      setResult(data);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
+  async function analyzeUpload(fileList) {
+    setLoading(true); setError(null);
+    const newFiles = Array.from(fileList);
+    
+    for (const file of newFiles) {
+      const localPreview = URL.createObjectURL(file);
+      setPreviews(prev => [...prev, localPreview]);
+      
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const res = await fetch(`${API_URL}/api/image/upload`, {
+          method: 'POST',
+          headers: { 'Content-Type': file.type },
+          body: arrayBuffer,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Analysis failed');
+        setResults(prev => [...prev, { ...data, url: localPreview }]);
+      } catch (e) {
+        setError(e.message);
+      }
     }
+    setLoading(false);
+    setActiveIdx(prev => results.length);
   }
 
-  const cfg = result ? (VERDICT_CONFIG(lang)[result.verdict] || VERDICT_CONFIG(lang)['Uncertain']) : null;
-  const riskCfg = result ? (RISK_CONFIG(lang)[result.risk_level] || RISK_CONFIG(lang)['Medium']) : null;
+  const currentResult = results[activeIdx];
+  const cfg = currentResult ? (VERDICT_CONFIG(lang)[currentResult.verdict] || VERDICT_CONFIG(lang)['Uncertain']) : null;
+  const riskCfg = currentResult ? (RISK_CONFIG(lang)[currentResult.risk_level] || RISK_CONFIG(lang)['Medium']) : null;
 
   const [imageQuery, setImageQuery] = useState('');
   const [queryLoading, setQueryLoading] = useState(false);
@@ -110,38 +118,34 @@ export default function ImagePage() {
   }, [chatHistory, queryLoading]);
 
   async function handleQuery() {
-    if (!imageQuery.trim() || !result) return;
+    if (!imageQuery.trim() || results.length === 0) return;
     const currentQuery = imageQuery;
     setImageQuery('');
     setQueryLoading(true);
     
-    // Add user message to history
     setChatHistory(prev => [...prev, { role: 'user', content: currentQuery }]);
     
-    console.log("Image Query started:", currentQuery);
+    // Aggregate context from ALL images
+    const fullContext = results.map((r, i) => `[IMAGE ${i+1}]: ${r.extracted_text}`).join("\n\n");
+    const fullForensic = results.map((r, i) => `[IMAGE ${i+1} AUTH]: ${r.assessment}`).join("\n");
+
     try {
       const payload = { 
         query: currentQuery, 
-        context: result.extracted_text,
-        imageContext: result.assessment,
+        context: fullContext,
+        imageContext: fullForensic,
         history: chatHistory.slice(-4)
       };
-      console.log("Payload:", payload);
 
       const res = await fetch(`${API_URL}/api/image/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      
-      console.log("Response status:", res.status);
       const data = await res.json();
-      console.log("Data received:", data);
-
       if (!res.ok) throw new Error(data.error || 'Query failed');
       setChatHistory(prev => [...prev, { role: 'assistant', content: data.answer }]);
     } catch (e) {
-      console.error("Image Query Error:", e);
       setChatHistory(prev => [...prev, { role: 'assistant', content: "Error: " + e.message }]);
     } finally {
       setQueryLoading(false);
@@ -199,14 +203,14 @@ export default function ImagePage() {
             <div>
               <div style={{ border: `2px dashed ${T.accent}4d`, borderRadius: 10, padding: '40px 20px', textAlign: 'center', cursor: 'pointer', background: `${T.accent}05` }}
                 onDragOver={e => e.preventDefault()}
-                onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('image/')) analyzeUpload(f); }}
+                onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files; if (f.length > 0) analyzeUpload(f); }}
                 onClick={() => fileRef.current?.click()}>
                 <div style={{ fontSize: 36, marginBottom: 10, color: T.accent }}>◈</div>
                 <p style={{ fontSize: 14, color: T.text2, margin: 0 }}>{loading ? t('analyzing', lang) : t('clickDragImage', lang)}</p>
-                <p style={{ fontSize: 11, color: T.text3, marginTop: 6 }}>JPG, PNG, WEBP — {t('max10mb', lang)}</p>
+                <p style={{ fontSize: 11, color: T.text3, marginTop: 6 }}>{t('multiUploadActive', lang)} — JPG, PNG, WEBP</p>
               </div>
-              <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }}
-                onChange={e => { const f = e.target.files[0]; if (f) analyzeUpload(f); }} />
+              <input ref={fileRef} type="file" accept="image/*" multiple style={{ display: 'none' }}
+                onChange={e => { if (e.target.files.length > 0) analyzeUpload(e.target.files); }} />
             </div>
           )}
         </div>
@@ -225,16 +229,37 @@ export default function ImagePage() {
           </div>
         )}
 
-        {result && cfg && (
+        {/* RESULTS GALLERY */}
+        {results.length > 0 && (
+          <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 16, marginBottom: 24, scrollbarWidth: 'none' }}>
+            {results.map((r, i) => (
+              <div key={i} onClick={() => setActiveIdx(i)} style={{ 
+                minWidth: 100, height: 100, borderRadius: 12, overflow: 'hidden', cursor: 'pointer', 
+                border: activeIdx === i ? `3px solid ${T.accent}` : `1px solid ${T.border}`,
+                opacity: activeIdx === i ? 1 : 0.6, transition: '0.2s', position: 'relative'
+              }}>
+                <img src={r.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ position: 'absolute', bottom: 4, right: 4, background: VERDICT_CONFIG(lang)[r.verdict]?.color || T.accent, width: 12, height: 12, borderRadius: '50%', border: `2px solid ${T.bg}` }} />
+              </div>
+            ))}
+            {loading && (
+              <div style={{ minWidth: 100, height: 100, borderRadius: 12, background: `${T.accent}0a`, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px dashed ${T.accent}4d` }}>
+                <div style={{ width: 24, height: 24, border: `2px solid ${T.accent}26`, borderTop: `2px solid ${T.accent}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {currentResult && cfg && (
           <div style={{ animation: 'fadeUp 0.4s ease forwards' }}>
-            <div className="analysis-grid" style={{ display: 'grid', gridTemplateColumns: preview ? '1fr 1fr' : '1fr', gap: 20, marginBottom: 20 }}>
-              {preview && (
+            <div className="analysis-grid" style={{ display: 'grid', gridTemplateColumns: currentResult.url ? '1fr 1fr' : '1fr', gap: 20, marginBottom: 20 }}>
+              {currentResult.url && (
                 <div style={{ borderRadius: 12, overflow: 'hidden', border: `2px solid ${cfg.border}` }}>
-                  <img src={preview} alt="analyzed" style={{ width: '100%', height: 240, objectFit: 'cover', display: 'block' }} onError={e => e.target.style.display = 'none'} />
+                  <img src={currentResult.url} alt="analyzed" style={{ width: '100%', height: 240, objectFit: 'cover', display: 'block' }} onError={e => e.target.style.display = 'none'} />
                 </div>
               )}
               <div style={{ background: cfg.bg, border: `1px solid ${cfg.border}`, borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div style={{ fontSize: 48, fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, color: cfg.color, lineHeight: 1, marginBottom: 8 }}>{result.ai_probability}%</div>
+                <div style={{ fontSize: 48, fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, color: cfg.color, lineHeight: 1, marginBottom: 8 }}>{currentResult.ai_probability}%</div>
                 <div style={{ fontSize: 11, color: cfg.color, opacity: darkMode ? 0.7 : 0.9, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>{t('aiProbability', lang)}</div>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 999, background: cfg.bg, border: `1px solid ${cfg.border}`, marginBottom: 12, width: 'fit-content' }}>
                   <span style={{ fontSize: 14, color: cfg.color }}>{cfg.icon}</span>
@@ -242,14 +267,14 @@ export default function ImagePage() {
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 999, background: riskCfg.bg, color: riskCfg.color, fontWeight: 600 }}>{riskCfg.label} {t('risk', lang)}</span>
-                  <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 999, background: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', color: T.text3 }}>{result.confidence}% {t('confidence', lang)}</span>
+                  <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 999, background: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', color: T.text3 }}>{currentResult.confidence}% {t('confidence', lang)}</span>
                 </div>
               </div>
             </div>
 
             <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
               <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 16 }}>{t('probBreakdown', lang)}</p>
-              {[[t('aiGenerated', lang), result.ai_probability, '#f87171'], [t('authenticReal', lang), result.real_probability, '#4ade80']].map(([label, val, color]) => (
+              {[[t('aiGenerated', lang), currentResult.ai_probability, '#f87171'], [t('authenticReal', lang), currentResult.real_probability, '#4ade80']].map(([label, val, color]) => (
                 <div key={label} style={{ marginBottom: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                     <span style={{ fontSize: 13, color: T.text2 }}>{label}</span>
@@ -262,17 +287,17 @@ export default function ImagePage() {
               ))}
             </div>
 
-            {result.extracted_text ? (
+            {currentResult.extracted_text ? (
               <div style={{ background: T.cardBg, border: `1px solid ${T.accent}4d`, borderRadius: 12, padding: 20, marginBottom: 16, animation: 'fadeUp 0.4s ease' }}>
                 <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.accent, marginBottom: 12, fontWeight: 700 }}>{t('originalSentence', lang)}</p>
                 <div style={{ padding: '14px', background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', borderRadius: 8, border: `1px solid ${T.border}` }}>
-                  <p style={{ fontSize: 15, color: T.text, lineHeight: 1.6, margin: 0, fontWeight: 500 }}>"{result.extracted_text}"</p>
+                  <p style={{ fontSize: 15, color: T.text, lineHeight: 1.6, margin: 0, fontWeight: 500 }}>"{currentResult.extracted_text}"</p>
                 </div>
               </div>
             ) : (
               <div style={{ padding: 20, textAlign: 'center', background: 'rgba(251,191,36,0.05)', border: '1px dashed #fbbf24', borderRadius: 12, marginBottom: 16 }}>
                 <p style={{ fontSize: 13, color: '#fbbf24', margin: '0 0 12px' }}>{t('ocrFailedWarning', lang)}</p>
-                <button onClick={() => { setImageUrl(preview); setInputMode('url'); analyzeUrl(); }} style={{ padding: '8px 16px', borderRadius: 6, background: '#fbbf24', border: 'none', color: '#000', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                <button onClick={() => { setImageUrl(currentResult.url); setInputMode('url'); analyzeUrl(); }} style={{ padding: '8px 16px', borderRadius: 6, background: '#fbbf24', border: 'none', color: '#000', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
                   {t('retryDeepScan', lang)}
                 </button>
               </div>
@@ -280,36 +305,36 @@ export default function ImagePage() {
 
             <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
               <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12 }}>{t('analysis', lang)}</p>
-              <p style={{ fontSize: 14, color: T.text, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 1, fontWeight: 500 }}>{result.assessment}</p>
+              <p style={{ fontSize: 14, color: T.text, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 1, fontWeight: 500 }}>{currentResult.assessment}</p>
             </div>
 
-            {result.context_info && (
+            {currentResult.context_info && (
               <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16, animation: 'fadeUp 0.5s ease' }}>
                 <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.accent, marginBottom: 16, fontWeight: 700 }}>{t('imageContext', lang)}</p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  {result.context_info.subject && (
+                  {currentResult.context_info.subject && (
                     <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
                       <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px' }}>{t('subject', lang)}</p>
-                      <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{result.context_info.subject}</p>
+                      <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{currentResult.context_info.subject}</p>
                     </div>
                   )}
-                  {result.context_info.location && (
+                  {currentResult.context_info.location && (
                     <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
                       <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px' }}>{t('location', lang)}</p>
-                      <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{result.context_info.location}</p>
+                      <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{currentResult.context_info.location}</p>
                     </div>
                   )}
-                  {result.context_info.historical_context && (
+                  {currentResult.context_info.historical_context && (
                     <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8, gridColumn: 'span 2' }}>
                       <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px' }}>{t('factContext', lang)}</p>
-                      <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{result.context_info.historical_context}</p>
+                      <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{currentResult.context_info.historical_context}</p>
                     </div>
                   )}
-                  {result.context_info.entities?.length > 0 && (
+                  {currentResult.context_info.entities?.length > 0 && (
                     <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8, gridColumn: 'span 2' }}>
                       <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 8px' }}>{t('identifiedEntities', lang)}</p>
                       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                        {result.context_info.entities.map((e, idx) => (
+                        {currentResult.context_info.entities.map((e, idx) => (
                           <span key={idx} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 999, background: T.accentMuted || `${T.accent}1a`, color: T.accent, fontWeight: 600 }}>{e}</span>
                         ))}
                       </div>
@@ -319,11 +344,11 @@ export default function ImagePage() {
               </div>
             )}
 
-            {result.forensic_breakdown && (
+            {currentResult.forensic_breakdown && (
               <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16, animation: 'fadeUp 0.5s ease' }}>
                 <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 16 }}>{t('forensicBreakdown', lang)}</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  {Object.entries(result.forensic_breakdown).map(([key, value]) => (
+                  {Object.entries(currentResult.forensic_breakdown).map(([key, value]) => (
                     <div key={key} style={{ padding: '16px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8, borderLeft: `3px solid ${T.accent}` }}>
                       <p style={{ margin: '0 0 8px 0', fontSize: 12, textTransform: 'capitalize', fontWeight: 700, color: T.text, letterSpacing: 0.5 }}>
                         {key.replace(/_/g, ' ')}
@@ -335,17 +360,15 @@ export default function ImagePage() {
               </div>
             )}
 
-            {result.indicators?.length > 0 && (
-              <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
-                <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 14 }}>{t('detectionIndicators', lang)}</p>
-                {result.indicators.map((ind, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 10 }}>
-                    <span style={{ color: T.accent, fontSize: 10, marginTop: 4, flexShrink: 0 }}>◆</span>
-                    <p style={{ margin: 0, fontSize: 13, color: T.text2, lineHeight: 1.6 }}>{ind}</p>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
+              <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 14 }}>{t('detectionIndicators', lang)}</p>
+              {currentResult.indicators.map((ind, i) => (
+                <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 10 }}>
+                  <span style={{ color: T.accent, fontSize: 10, marginTop: 4, flexShrink: 0 }}>◆</span>
+                  <p style={{ margin: 0, fontSize: 13, color: T.text2, lineHeight: 1.6 }}>{ind}</p>
+                </div>
+              ))}
+            </div>
 
             {/* ASK VERIXA CHAT SECTION */}
             <div style={{ background: T.cardBg, border: `1.5px solid ${T.accent}`, borderRadius: 16, padding: 24, marginBottom: 28, boxShadow: `0 10px 40px ${T.accent}1a`, animation: 'fadeUp 0.6s ease' }}>
@@ -411,14 +434,14 @@ export default function ImagePage() {
               </div>
             </div>
 
-            <button onClick={() => { setResult(null); setPreview(null); setImageUrl(''); setUploadFile(null); }}
+            <button onClick={() => { setResults([]); setPreviews([]); setImageUrl(''); setActiveIdx(0); setChatHistory([]); }}
               style={{ width: '100%', padding: 12, borderRadius: 8, background: 'transparent', border: `1px solid ${T.border}`, color: T.text3, fontSize: 13, cursor: 'pointer', transition: 'all 0.2s' }}>
-              {t('analyzeAnother', lang)}
+              {t('clearAllDocuments', lang)}
             </button>
           </div>
         )}
 
-        {!result && !loading && (
+        {results.length === 0 && !loading && (
           <div style={{ marginTop: 16, padding: 20, background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12 }}>
             <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12 }}>{t('trySamples', lang)}</p>
             {[

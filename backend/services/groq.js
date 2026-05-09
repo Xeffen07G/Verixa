@@ -5,7 +5,7 @@ function getClient() {
   return new Groq({ apiKey: process.env.GROQ_API_KEY });
 }
 
-async function askGroq(prompt, jsonMode = false, model = "llama-3.1-8b-instant", retries = 3) {
+async function askGroq(prompt, jsonMode = false, model = "llama-3.3-70b-versatile", retries = 3) {
   const groq = getClient();
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
