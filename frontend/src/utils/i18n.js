@@ -119,6 +119,8 @@ const en = {
   learned: 'Learned', pending: 'Pending', error: 'Error',
   imageContext: 'Image Intelligence Context', subject: 'Identified Subject', location: 'Location / Setting',
   factContext: 'Historical / Factual Context', identifiedEntities: 'Identified Entities',
+  askAboutImage: 'Ask VeriXa about this Image', askAnythingPlaceholder: 'Ask something about the content of this image (e.g. "What is this legal notice about?")',
+  verixaIntelligence: 'VeriXa Intelligence Answer',
   instantResults: 'Instant results', instantResultsDesc: 'Get accuracy reports without leaving the page.',
   worksEverywhere: 'Works everywhere', worksEverywhereDesc: 'Supported on news sites, social media, and more.',
   saveHistory: 'Save history', saveHistoryDesc: 'Your extension audits sync with your dashboard.',

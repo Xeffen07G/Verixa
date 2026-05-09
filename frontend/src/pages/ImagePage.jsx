@@ -100,6 +100,33 @@ export default function ImagePage() {
   const cfg = result ? (VERDICT_CONFIG(lang)[result.verdict] || VERDICT_CONFIG(lang)['Uncertain']) : null;
   const riskCfg = result ? (RISK_CONFIG(lang)[result.risk_level] || RISK_CONFIG(lang)['Medium']) : null;
 
+  const [imageQuery, setImageQuery] = useState('');
+  const [queryLoading, setQueryLoading] = useState(false);
+  const [queryAnswer, setQueryAnswer] = useState(null);
+
+  async function handleQuery() {
+    if (!imageQuery.trim() || !result) return;
+    setQueryLoading(true); setQueryAnswer(null);
+    try {
+      const res = await fetch(`${API_URL}/api/image/query`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          query: imageQuery, 
+          context: result.extracted_text,
+          imageContext: result.assessment,
+          imageUrl: preview // Optional, if backend can re-see image
+        }),
+      });
+      const data = await res.json();
+      setQueryAnswer(data.answer);
+    } catch (e) {
+      setQueryAnswer("Error: " + e.message);
+    } finally {
+      setQueryLoading(false);
+    }
+  }
+
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text, paddingTop: 0, transition: 'background 0.3s, color 0.3s', fontFamily: 'DM Sans, sans-serif' }}>
       <style>{`
@@ -290,6 +317,35 @@ export default function ImagePage() {
                 ))}
               </div>
             )}
+
+            {/* ASK VERIXA SECTION */}
+            <div style={{ background: T.cardBg, border: `1.5px solid ${T.accent}`, borderRadius: 16, padding: 24, marginBottom: 28, boxShadow: `0 10px 40px ${T.accent}1a`, animation: 'fadeUp 0.6s ease' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: darkMode ? '#0a0a0f' : '#fff', fontSize: 14 }}>V</div>
+                <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{t('askAboutImage', lang)}</h3>
+              </div>
+              <div style={{ position: 'relative' }}>
+                <textarea 
+                  value={imageQuery} 
+                  onChange={e => setImageQuery(e.target.value)}
+                  placeholder={t('askAnythingPlaceholder', lang)}
+                  style={{ width: '100%', height: 100, background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', border: `1px solid ${T.border}`, borderRadius: 12, padding: '16px', color: T.text, outline: 'none', resize: 'none', fontSize: 14, fontFamily: 'inherit' }}
+                />
+                <button 
+                  onClick={handleQuery}
+                  disabled={queryLoading || !imageQuery.trim()}
+                  style={{ position: 'absolute', bottom: 12, right: 12, padding: '8px 20px', borderRadius: 8, background: T.accent, border: 'none', color: darkMode ? '#0a0a0f' : '#fff', fontWeight: 700, fontSize: 12, cursor: 'pointer', transition: '0.2s' }}
+                >
+                  {queryLoading ? '...' : t('askVault', lang)}
+                </button>
+              </div>
+              {queryAnswer && (
+                <div style={{ marginTop: 20, padding: '16px', background: `${T.accent}0a`, border: `1px solid ${T.accent}33`, borderRadius: 12, animation: 'fadeUp 0.3s ease' }}>
+                   <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.accent, marginBottom: 8, fontWeight: 700 }}>{t('verixaIntelligence', lang)}</p>
+                   <p style={{ fontSize: 14, color: T.text, lineHeight: 1.6, margin: 0 }}>{queryAnswer}</p>
+                </div>
+              )}
+            </div>
 
             <button onClick={() => { setResult(null); setPreview(null); setImageUrl(''); setUploadFile(null); }}
               style={{ width: '100%', padding: 12, borderRadius: 8, background: 'transparent', border: `1px solid ${T.border}`, color: T.text3, fontSize: 13, cursor: 'pointer', transition: 'all 0.2s' }}>

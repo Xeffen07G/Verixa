@@ -100,7 +100,7 @@ router.post("/url", async (req, res) => {
     }
 
     const base64 = buffer.toString("base64");
-    const dataUrl = `data:${contentType};base64,${base64}`;
+    const dataUrl = `data:${contentType};base64,base64`;
 
     const completion = await getGroq().chat.completions.create({
       model: "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -215,6 +215,37 @@ router.post("/upload", async (req, res) => {
   } catch (err) {
     console.error("Image upload analysis error:", err.message);
     res.status(500).json({ error: "Image analysis failed: " + err.message });
+  }
+});
+
+/**
+ * POST /api/image/query — Ask a question about the analyzed image
+ */
+router.post("/query", async (req, res) => {
+  const { query, context, imageContext, imageUrl } = req.body;
+  if (!query) return res.status(400).json({ error: "Query is required" });
+
+  try {
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const prompt = `You are VeriXa, a legal and factual intelligence assistant. 
+The user has provided an image with the following details:
+EXTRACTED TEXT: ${context || "None"}
+FORENSIC CONTEXT: ${imageContext || "Authenticity verified."}
+
+QUESTION: ${query}
+
+If the text looks like a legal document, court order, or official notice, provide a professional and helpful explanation of its meaning. If the question is about a specific detail (like dates, names, or property), extract it accurately. If you cannot answer based on the provided text, say so. Respond naturally and helpfully.`;
+
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.1-70b-versatile",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.2,
+    });
+
+    res.json({ answer: completion.choices[0].message.content.trim() });
+  } catch (err) {
+    console.error("Image query error:", err.message);
+    res.status(500).json({ error: "Query failed: " + err.message });
   }
 });
 
