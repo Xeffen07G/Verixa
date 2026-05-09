@@ -53,10 +53,10 @@ function Section({ children, id, style, className }) {
 }
 
 /* ─────────── Data Structures ─────────── */
-const demoClaims = [
-  { textKey: 'demo1', verdict: 'False', confidence: 97, color: '#f87171', Icon: XCircle },
-  { textKey: 'demo2', verdict: 'True', confidence: 99, color: '#4ade80', Icon: CheckCircle2 },
-  { textKey: 'demo3', verdict: 'Partially True', confidence: 72, color: '#fbbf24', Icon: MinusCircle },
+const demoClaims = (lang) => [
+  { textKey: 'demo1', verdictKey: 'falseShort', confidence: 97, color: '#f87171', Icon: XCircle },
+  { textKey: 'demo2', verdictKey: 'trueShort', confidence: 99, color: '#4ade80', Icon: CheckCircle2 },
+  { textKey: 'demo3', verdictKey: 'partialShort', confidence: 72, color: '#fbbf24', Icon: MinusCircle },
 ];
 
 const testimonialsList = (lang) => [
@@ -98,8 +98,8 @@ export default function LandingPage() {
 
   const [stat1, ref1] = useCountUp(25);
   const [stat2, ref2] = useCountUp(4);
-  const [stat3, ref3] = useCountUp(1);
-  const [stat4, ref4] = useCountUp(12);
+  const [stat3, ref3] = useCountUp(4);
+  const [stat4, ref4] = useCountUp(1);
 
   const demoInput = t('demo1', lang) + ' ' + t('demo2', lang) + ' ' + t('demo3', lang);
 
@@ -118,9 +118,9 @@ export default function LandingPage() {
   }, [demoStep, demoInput]);
 
   useEffect(() => {
-    if (demoStep < 1 || demoStep > 3) return;
+    if (demoStep < 1 || demoStep > 4) return;
     const timer = setTimeout(() => {
-      if (demoStep < 3) setDemoStep(demoStep + 1);
+      if (demoStep < 4) setDemoStep(demoStep + 1);
       else setTimeout(() => { setDemoStep(0); setTypedText(''); }, 4000);
     }, 1200);
     return () => clearTimeout(timer);
@@ -148,7 +148,7 @@ export default function LandingPage() {
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
       {/* ══════════ HERO SECTION ══════════ */}
-      <Section style={{ padding: 'calc(var(--nav-h) + 60px) 0 100px', textAlign: 'center', overflow: 'hidden' }}>
+      <Section style={{ padding: 'calc(var(--nav-h) + 60px) 0 140px', textAlign: 'center', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden' }}>
           <video autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: darkMode ? 0.45 : 0.35, filter: 'brightness(1.1) contrast(1.1)' }} src="/hero-bg.mp4" />
           <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 50% 50%, ${T.bg}00 0%, ${T.bg} ${darkMode ? '80%' : '95%'})` }} />
@@ -172,17 +172,23 @@ export default function LandingPage() {
             <a href="#how-it-works"><motion.button whileHover={{ scale: 1.04, borderColor: `${T.accent}66` }} whileTap={{ scale: 0.97 }} style={{ padding: '18px 44px', borderRadius: 12, fontSize: 15, fontWeight: 500, background: 'transparent', border: `1px solid ${T.border}`, color: T.text, cursor: 'pointer' }}>{t('landingSeeHow', lang)}</motion.button></a>
           </motion.div>
         </div>
+
+        {/* Scroll Indicator */}
+        <div style={{ position: 'absolute', bottom: 40, left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 10, letterSpacing: 3, color: T.text3, textTransform: 'uppercase' }}>{t('landingScroll', lang)}</span>
+          <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity }} style={{ width: 1, height: 40, background: `linear-gradient(to bottom, ${T.accent}, transparent)` }} />
+        </div>
       </Section>
 
       {/* ══════════ STATS SECTION ══════════ */}
-      <Section style={{ marginTop: -80 }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 40px' }}>
+      <Section style={{ position: 'relative', zIndex: 2 }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 80px' }}>
           <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
             {[
               { val: stat1, suffix: '+', label: t('inputFormats', lang), r: ref1 },
               { val: stat2, suffix: '', label: t('verdictTypes', lang), r: ref2 },
               { val: stat3, suffix: '', label: t('aiModels', lang), r: ref3 },
-              { val: stat4, suffix: 's', label: t('avgResponse', lang), r: ref4 },
+              { val: stat4, suffix: '', label: t('verixaEngine', lang), r: ref4 },
             ].map((s, i) => (
               <motion.div key={i} ref={s.r} whileHover={{ y: -8, borderColor: T.accent }} style={{ padding: '40px 24px', textAlign: 'center', background: T.statBg, border: `1px solid ${T.accent}33`, borderRadius: 16, backdropFilter: 'blur(10px)', transition: 'all 0.4s' }}>
                 <div style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 52, color: T.accent, lineHeight: 1 }}>{s.val}{s.suffix}</div>
@@ -190,6 +196,22 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </Section>
+
+      {/* ══════════ POWERED BY ══════════ */}
+      <Section style={{ padding: '40px 0 60px', overflow: 'hidden' }}>
+        <p style={{ textAlign: 'center', fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: T.text3, marginBottom: 24, fontWeight: 500 }}>
+          {t('poweredByLabel', lang)}
+        </p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 48, flexWrap: 'wrap', padding: '0 24px' }}>
+          {['Groq', 'LLaMA', 'Tavily', 'React'].map((name, i) => (
+            <span key={i} style={{
+              fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 400,
+              color: T.text3, whiteSpace: 'nowrap', transition: 'color 0.3s',
+              padding: '8px 0', borderBottom: `1px solid ${T.accent}33`,
+            }}>{name}</span>
+          ))}
         </div>
       </Section>
 
@@ -214,16 +236,16 @@ export default function LandingPage() {
             <AnimatePresence mode="wait">
               {demoStep > 0 && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {demoClaims.map((claim, i) => (
+                  {demoClaims(lang).map((claim, i) => (
                     <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={demoStep > i ? { opacity: 1, x: 0 } : { opacity: 0 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderRadius: 12, background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', border: `1px solid ${T.border}` }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         <claim.Icon size={18} color={claim.color} />
                         <span style={{ fontSize: 14, fontWeight: 500 }}>{t(claim.textKey, lang)}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: claim.color, letterSpacing: 1 }}>{claim.verdict.toUpperCase()}</span>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: claim.color, letterSpacing: 1 }}>{t(claim.verdictKey, lang).toUpperCase()}</span>
                         <div style={{ width: 100, height: 4, background: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: 2, overflow: 'hidden' }}>
-                          <motion.div initial={{ width: 0 }} animate={{ width: `${claim.confidence}%` }} transition={{ duration: 1, delay: 0.5 }} style={{ height: '100%', background: claim.color }} />
+                          <motion.div initial={{ width: 0 }} animate={demoStep > i ? { width: `${claim.confidence}%` } : { width: 0 }} transition={{ duration: 1, delay: 0.5 }} style={{ height: '100%', background: claim.color }} />
                         </div>
                       </div>
                     </motion.div>
