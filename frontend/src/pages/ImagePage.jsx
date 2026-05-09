@@ -227,6 +227,42 @@ export default function ImagePage() {
               <p style={{ fontSize: 14, color: T.text, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 1, fontWeight: 500 }}>{result.assessment}</p>
             </div>
 
+            {result.context_info && (
+              <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16, animation: 'fadeUp 0.5s ease' }}>
+                <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.accent, marginBottom: 16, fontWeight: 700 }}>{t('imageContext', lang)}</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  {result.context_info.subject && (
+                    <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
+                      <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px' }}>{t('subject', lang)}</p>
+                      <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{result.context_info.subject}</p>
+                    </div>
+                  )}
+                  {result.context_info.location && (
+                    <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
+                      <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px' }}>{t('location', lang)}</p>
+                      <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{result.context_info.location}</p>
+                    </div>
+                  )}
+                  {result.context_info.historical_context && (
+                    <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8, gridColumn: 'span 2' }}>
+                      <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px' }}>{t('factContext', lang)}</p>
+                      <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{result.context_info.historical_context}</p>
+                    </div>
+                  )}
+                  {result.context_info.entities?.length > 0 && (
+                    <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8, gridColumn: 'span 2' }}>
+                      <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 8px' }}>{t('identifiedEntities', lang)}</p>
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        {result.context_info.entities.map((e, idx) => (
+                          <span key={idx} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 999, background: T.accentMuted || `${T.accent}1a`, color: T.accent, fontWeight: 600 }}>{e}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {result.forensic_breakdown && (
               <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16, animation: 'fadeUp 0.5s ease' }}>
                 <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 16 }}>{t('forensicBreakdown', lang)}</p>

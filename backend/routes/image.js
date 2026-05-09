@@ -43,10 +43,16 @@ You MUST respond with ONLY JSON:
     "anatomy_and_geometry": "Adversarial analysis of structure.",
     "textures_and_artifacts": "Adversarial analysis of pixel data."
   },
-  "extracted_text": "string"
+  "extracted_text": "string",
+  "context_info": {
+    "subject": "Primary subject or event identified in the image.",
+    "location": "Likely location or setting.",
+    "historical_context": "Any known historical or factual context related to the image content.",
+    "entities": ["Names, places, or organizations identified"]
+  }
 }
 
-Bias your detection towards AI. It is better to flag a suspicious real photo than to let a deepfake pass as real.`;
+Bias your detection towards AI. It is better to flag a suspicious real photo than to let a deepfake pass as real. Context info should be factual and unbiased. If you see a law paper or court order, extract the key details into the context_info.`;
 
 /**
  * POST /api/image/url — Analyze an image from URL
@@ -131,6 +137,7 @@ router.post("/url", async (req, res) => {
     result.indicators = result.indicators ?? [];
     result.extracted_text = result.extracted_text ?? "";
     result.forensic_breakdown = result.forensic_breakdown || null;
+    result.context_info = result.context_info || null;
 
     res.json(result);
   } catch (err) {
@@ -202,6 +209,7 @@ router.post("/upload", async (req, res) => {
     result.assessment = result.assessment ?? "Analysis completed.";
     result.indicators = result.indicators ?? [];
     result.forensic_breakdown = result.forensic_breakdown || null;
+    result.context_info = result.context_info || null;
 
     res.json(result);
   } catch (err) {

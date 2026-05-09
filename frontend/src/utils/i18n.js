@@ -117,6 +117,8 @@ const en = {
   searchingVault: 'Searching Knowledge Vault...', vaultResults: 'Vault Intelligence Results',
   addKnowledge: 'Add Knowledge', documentName: 'Document Name', status: 'Status',
   learned: 'Learned', pending: 'Pending', error: 'Error',
+  imageContext: 'Image Intelligence Context', subject: 'Identified Subject', location: 'Location / Setting',
+  factContext: 'Historical / Factual Context', identifiedEntities: 'Identified Entities',
   instantResults: 'Instant results', instantResultsDesc: 'Get accuracy reports without leaving the page.',
   worksEverywhere: 'Works everywhere', worksEverywhereDesc: 'Supported on news sites, social media, and more.',
   saveHistory: 'Save history', saveHistoryDesc: 'Your extension audits sync with your dashboard.',
