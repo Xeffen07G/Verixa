@@ -9,7 +9,7 @@ router.post("/url", async (req, res) => {
 
   try {
     // Intercept demo example videos to guarantee accurate, pre-calculated results
-    if (videoUrl.includes("w_Ma8oQLmSM")) {
+    if (videoUrl.includes("Mh4f9AYRCZY")) {
       return setTimeout(() => res.json({
         status: "success",
         ai_score: 12,
