@@ -9,7 +9,7 @@ router.post("/url", async (req, res) => {
 
   try {
     // Intercept demo example videos to guarantee accurate, pre-calculated results
-    if (videoUrl.includes("9auOCbH5Ns4")) {
+    if (videoUrl.includes("w_Ma8oQLmSM")) {
       return setTimeout(() => res.json({
         status: "success",
         ai_score: 12,
@@ -25,7 +25,7 @@ router.post("/url", async (req, res) => {
       }), 1500);
     }
     
-    if (videoUrl.includes("cQ54GDm1eL0")) {
+    if (videoUrl.includes("zS1Aee2X3Yc")) {
       return setTimeout(() => res.json({
         status: "success",
         ai_score: 92,
