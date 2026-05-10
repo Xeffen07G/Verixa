@@ -38,6 +38,7 @@ export default function VideoPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [previewError, setPreviewError] = useState(false);
   const fileRef = useRef(null);
   const videoRef = useRef(null);
 
@@ -170,7 +171,7 @@ export default function VideoPage() {
 
           <div style={{ display: 'flex', gap: 12 }}>
             {inputMode === 'url' ? (
-              <input value={videoUrl} onChange={e => { setVideoUrl(e.target.value); setPreview(e.target.value); }}
+              <input value={videoUrl} onChange={e => { setVideoUrl(e.target.value); setPreview(e.target.value); setPreviewError(false); }}
                 placeholder={t('videoUrlPlaceholder', lang)}
                 style={{ flex: 1, padding: '14px 18px', background: 'rgba(0,0,0,0.2)', border: `1px solid ${T.border}`, borderRadius: 12, color: T.text, outline: 'none' }} />
             ) : (
@@ -192,7 +193,7 @@ export default function VideoPage() {
               { name: 'Deepfake AI', url: 'https://www.youtube.com/watch?v=zS1Aee2X3Yc' },
               { name: 'Authentic News', url: 'https://www.youtube.com/watch?v=Mh4f9AYRCZY' },
             ].map(s => (
-              <button key={s.name} onClick={() => { setVideoUrl(s.url); setPreview(s.url); setInputMode('url'); }}
+              <button key={s.name} onClick={() => { setVideoUrl(s.url); setPreview(s.url); setInputMode('url'); setPreviewError(false); }}
                 style={{ padding: '6px 12px', borderRadius: 6, background: 'rgba(255,255,255,0.05)', border: `1px solid ${T.border}`, color: T.text2, fontSize: 11, cursor: 'pointer', transition: '0.2s' }}
                 onMouseEnter={e => e.currentTarget.style.borderColor = T.accent} onMouseLeave={e => e.currentTarget.style.borderColor = T.border}>
                 {s.name}
@@ -209,6 +210,12 @@ export default function VideoPage() {
               <div style={{ borderRadius: 24, overflow: 'hidden', background: '#000', position: 'relative', border: `1px solid ${T.cardBorder}`, aspectRatio: '16/9', boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>
                 {ytEmbed ? (
                   <iframe src={ytEmbed} title="Video Preview" style={{ width: '100%', height: '100%', border: 'none' }} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                ) : previewError ? (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0a0a0f', color: '#888' }}>
+                    <Activity size={32} style={{ marginBottom: 12, opacity: 0.5 }} />
+                    <span style={{ fontSize: 13 }}>External Link Detected</span>
+                    <span style={{ fontSize: 11, opacity: 0.7, marginTop: 4 }}>Ready for forensic analysis.</span>
+                  </div>
                 ) : (
                   <video 
                     ref={videoRef} src={preview} playsInline autoPlay muted 
@@ -217,10 +224,7 @@ export default function VideoPage() {
                     onTimeUpdate={handleTimeUpdate}
                     onLoadedMetadata={handleLoadedMetadata}
                     onError={() => {
-                      if (!ytEmbed) {
-                        setError('The provided URL is not a direct video file. Please use a YouTube link or upload a file.');
-                        setPreview(null);
-                      }
+                      if (!ytEmbed) setPreviewError(true);
                     }}
                   />
                 )}
