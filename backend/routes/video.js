@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Groq = require("groq-sdk");
-
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 100 * 1024 * 1024 } }); // 100MB limit
 // POST /api/video/url
 router.post("/url", async (req, res) => {
   const { videoUrl } = req.body;
@@ -86,7 +87,8 @@ router.post("/url", async (req, res) => {
 });
 
 // POST /api/video/upload
-router.post("/upload", async (req, res) => {
+router.post("/upload", upload.single("video"), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "No video file provided" });
   // Similar logic for upload...
   // For now, return a convincing simulation since actual video processing is heavy
   setTimeout(() => {
