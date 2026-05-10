@@ -104,7 +104,7 @@ router.post("/url", async (req, res) => {
     const dataUrl = `data:${contentType};base64,${base64}`;
 
     const completion = await getGroq().chat.completions.create({
-      model: "llama-3.2-11b-vision-preview",
+      model: "meta-llama/llama-4-scout-17b-16e-instruct",
       messages: [
         {
           role: "user",
@@ -177,7 +177,7 @@ router.post("/upload", async (req, res) => {
     const dataUrl = `data:${contentType};base64,${base64}`;
 
     const completion = await getGroq().chat.completions.create({
-      model: "llama-3.2-11b-vision-preview",
+      model: "meta-llama/llama-4-scout-17b-16e-instruct",
       messages: [
         {
           role: "user",
