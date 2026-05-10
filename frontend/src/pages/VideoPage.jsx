@@ -190,7 +190,7 @@ export default function VideoPage() {
           <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 10, fontWeight: 800, color: T.text3, letterSpacing: 1 }}>{t('trySamples', lang)}</span>
             {[
-              { name: 'Deepfake AI', url: 'https://www.youtube.com/watch?v=zS1Aee2X3Yc' },
+              { name: 'Deepfake AI', url: 'https://www.youtube.com/watch?v=cQ54GDm1eL0' },
               { name: 'Authentic News', url: 'https://www.youtube.com/watch?v=Mh4f9AYRCZY' },
             ].map(s => (
               <button key={s.name} onClick={() => { setVideoUrl(s.url); setPreview(s.url); setInputMode('url'); setPreviewError(false); }}

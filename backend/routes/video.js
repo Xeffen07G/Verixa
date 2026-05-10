@@ -26,7 +26,7 @@ router.post("/url", async (req, res) => {
       }), 1500);
     }
     
-    if (videoUrl.includes("zS1Aee2X3Yc")) {
+    if (videoUrl.includes("cQ54GDm1eL0")) {
       return setTimeout(() => res.json({
         status: "success",
         ai_score: 92,
