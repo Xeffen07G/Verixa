@@ -98,11 +98,21 @@ export default function VideoPage() {
     // Logic for both URL and Upload
     try {
       const endpoint = inputMode === 'url' ? '/api/video/url' : '/api/video/upload';
-      const body = inputMode === 'url' ? JSON.stringify({ videoUrl }) : uploadFile;
+      let body;
+      let headers = {};
+
+      if (inputMode === 'url') {
+        body = JSON.stringify({ videoUrl });
+        headers['Content-Type'] = 'application/json';
+      } else {
+        body = new FormData();
+        body.append('video', uploadFile);
+        // Do not set Content-Type for FormData, browser will do it with boundary
+      }
       
       const res = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
-        headers: inputMode === 'url' ? { 'Content-Type': 'application/json' } : {},
+        headers: headers,
         body: body,
       });
 
@@ -174,6 +184,21 @@ export default function VideoPage() {
             </button>
           </div>
           <input type="file" ref={fileRef} onChange={handleFileUpload} accept="video/*" style={{ display: 'none' }} />
+
+          {/* Sample Videos */}
+          <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: T.text3, letterSpacing: 1 }}>{t('trySamples', lang)}</span>
+            {[
+              { name: 'Deepfake AI', url: 'https://www.youtube.com/watch?v=cQ54GDm1eL0' },
+              { name: 'Authentic News', url: 'https://www.youtube.com/watch?v=9auOCbH5Ns4' },
+            ].map(s => (
+              <button key={s.name} onClick={() => { setVideoUrl(s.url); setPreview(s.url); setInputMode('url'); }}
+                style={{ padding: '6px 12px', borderRadius: 6, background: 'rgba(255,255,255,0.05)', border: `1px solid ${T.border}`, color: T.text2, fontSize: 11, cursor: 'pointer', transition: '0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = T.accent} onMouseLeave={e => e.currentTarget.style.borderColor = T.border}>
+                {s.name}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Preview Area (Always visible if preview exists) */}

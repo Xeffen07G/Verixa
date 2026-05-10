@@ -66,13 +66,15 @@ const testimonialsList = (lang) => [
 ];
 
 const featuresList = [
-  { Icon: Zap, key: 'surgicalExtraction', descKey: 'surgicalDesc' },
-  { Icon: Search, key: 'searchingEvidence', descKey: 'searchingDesc' },
-  { Icon: ShieldCheck, key: 'verifyingClaims', descKey: 'verifyingDesc' },
-  { Icon: Brain, key: 'aiTextDetection', descKey: 'aiDetectDesc' },
-  { Icon: Video, key: 'videoForensic', descKey: 'videoForensicDesc' },
-  { Icon: Link2, key: 'urlAnalysis', descKey: 'deepScrapeDesc' },
-  { Icon: AlertTriangle, key: 'conflictIntel', descKey: 'conflictDesc' },
+  { Icon: Zap, key: 'surgicalExtraction', descKey: 'surgicalDesc', path: '/verify' },
+  { Icon: Search, key: 'searchingEvidence', descKey: 'searchingDesc', path: '/verify' },
+  { Icon: ShieldCheck, key: 'verifyingClaims', descKey: 'verifyingDesc', path: '/verify' },
+  { Icon: Brain, key: 'aiTextDetection', descKey: 'aiDetectDesc', path: '/verify?mode=text' },
+  { Icon: Shield, key: 'imageForensic', descKey: 'imageForensicDesc', path: '/image' },
+  { Icon: Video, key: 'videoForensic', descKey: 'videoForensicDesc', path: '/video' },
+  { Icon: Search, key: 'pdfForensic', descKey: 'pdfForensicDesc', path: '/pdf' },
+  { Icon: Link2, key: 'urlAnalysis', descKey: 'deepScrapeDesc', path: '/verify?mode=url' },
+  { Icon: AlertTriangle, key: 'conflictIntel', descKey: 'conflictDesc', path: '/verify?mode=conflict' },
 ];
 
 const plansList = (lang) => [
@@ -283,26 +285,30 @@ export default function LandingPage() {
 
             <div className="capabilities-sub-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               {featuresList.slice(0, 4).map((f, i) => (
-                <motion.div key={i} whileHover={{ y: -8, borderColor: T.accent }} style={{ padding: '24px', borderRadius: 20, background: T.cardBg, border: `1px solid ${T.border}`, transition: 'all 0.2s' }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: T.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-                    <f.Icon size={16} color={T.accent} />
-                  </div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 4 }}>{t(f.key, lang)}</h3>
-                  <p style={{ fontSize: 12, color: T.text3, lineHeight: 1.5, margin: 0 }}>{t(f.descKey, lang)}</p>
-                </motion.div>
+                <Link to={f.path} key={i} style={{ textDecoration: 'none' }}>
+                  <motion.div whileHover={{ y: -8, borderColor: T.accent }} style={{ padding: '24px', borderRadius: 20, background: T.cardBg, border: `1px solid ${T.border}`, transition: 'all 0.2s', height: '100%' }}>
+                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: T.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+                      <f.Icon size={16} color={T.accent} />
+                    </div>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 4 }}>{t(f.key, lang)}</h3>
+                    <p style={{ fontSize: 12, color: T.text3, lineHeight: 1.5, margin: 0 }}>{t(f.descKey, lang)}</p>
+                  </motion.div>
+                </Link>
               ))}
             </div>
           </div>
 
           <div className="extended-features-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 20, marginTop: 40 }}>
             {featuresList.slice(4).map((f, i) => (
-              <motion.div key={i} whileHover={{ scale: 1.01, borderColor: `${T.accent}4d` }} style={{ padding: '32px', borderRadius: 20, background: `linear-gradient(135deg, ${T.cardBg}, transparent)`, border: `1px solid ${T.border}`, display: 'flex', gap: 20, alignItems: 'flex-start', transition: 'all 0.2s' }}>
-                <div style={{ padding: 12, borderRadius: 12, background: T.accentLight, color: T.accent }}><f.Icon size={20} /></div>
-                <div>
-                  <h3 style={{ fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 6 }}>{t(f.key, lang)}</h3>
-                  <p style={{ fontSize: 13, color: T.text3, lineHeight: 1.6, margin: 0 }}>{t(f.descKey, lang)}</p>
-                </div>
-              </motion.div>
+              <Link to={f.path} key={i} style={{ textDecoration: 'none' }}>
+                <motion.div whileHover={{ scale: 1.01, borderColor: `${T.accent}4d` }} style={{ padding: '32px', borderRadius: 20, background: `linear-gradient(135deg, ${T.cardBg}, transparent)`, border: `1px solid ${T.border}`, display: 'flex', gap: 20, alignItems: 'flex-start', transition: 'all 0.2s', height: '100%' }}>
+                  <div style={{ padding: 12, borderRadius: 12, background: T.accentLight, color: T.accent }}><f.Icon size={20} /></div>
+                  <div>
+                    <h3 style={{ fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 6 }}>{t(f.key, lang)}</h3>
+                    <p style={{ fontSize: 13, color: T.text3, lineHeight: 1.6, margin: 0 }}>{t(f.descKey, lang)}</p>
+                  </div>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </div>

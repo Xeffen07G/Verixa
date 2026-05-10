@@ -192,7 +192,10 @@ export default function VerifyPage() {
   const { user } = useAuth();
   const [text, setText] = useState('');
   const [url, setUrl] = useState('');
-  const [inputMode, setInputMode] = useState('text');
+  const [inputMode, setInputMode] = useState(() => {
+    if (searchParams.get('mode') === 'pdf' || window.location.pathname === '/pdf') return 'pdf';
+    return 'text';
+  });
   const [detectAI, setDetectAI] = useState(false);
   const [fetchingUrl, setFetchingUrl] = useState(false);
   const [pdfInfo, setPdfInfo] = useState(null);

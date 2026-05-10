@@ -39,6 +39,8 @@ export default function ImagePage() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [inputMode, setInputMode] = useState('url');
+  const [imageUrl, setImageUrl] = useState('');
   const fileRef = useRef(null);
   const chatEndRef = useRef(null);
 

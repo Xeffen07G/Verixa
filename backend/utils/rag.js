@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const Knowledge = require('../models/Knowledge');
 
 // Dynamically import the transformers library
 let pipeline;
@@ -40,28 +41,34 @@ async function generateEmbedding(text) {
 }
 
 /**
- * 2. Add a new document to the local JSON vector store.
- * You can call this when a verified fact needs to be saved.
+ * 2. Add a new document to the RAG knowledge base.
  */
 async function addDocumentToRAG(id, text, metadata = {}) {
   try {
     const embedding = await generateEmbedding(text);
 
-    let kb = [];
-    if (fs.existsSync(DB_PATH)) {
-      const fileData = fs.readFileSync(DB_PATH, 'utf-8');
-      kb = JSON.parse(fileData);
+    // Try MongoDB first
+    try {
+      await Knowledge.findOneAndUpdate(
+        { id },
+        { id, text, metadata, embedding, timestamp: new Date() },
+        { upsert: true, new: true }
+      );
+      console.log(`Document [${id}] added to MongoDB RAG.`);
+    } catch (dbError) {
+      console.warn("MongoDB RAG failed, falling back to JSON:", dbError.message);
+      // Fallback to JSON
+      let kb = [];
+      if (fs.existsSync(DB_PATH)) {
+        const fileData = fs.readFileSync(DB_PATH, 'utf-8');
+        kb = JSON.parse(fileData);
+      }
+      const existingIdx = kb.findIndex(d => d.id === id);
+      if (existingIdx >= 0) kb[existingIdx] = { id, text, metadata, embedding };
+      else kb.push({ id, text, metadata, embedding });
+      fs.writeFileSync(DB_PATH, JSON.stringify(kb, null, 2));
     }
 
-    kb.push({
-      id,
-      text,
-      metadata,
-      embedding
-    });
-
-    fs.writeFileSync(DB_PATH, JSON.stringify(kb, null, 2));
-    console.log(`Document [${id}] added to RAG knowledge base.`);
     return true;
   } catch (error) {
     console.error("Error adding document to RAG:", error);
@@ -71,13 +78,27 @@ async function addDocumentToRAG(id, text, metadata = {}) {
 
 /**
  * 3. Search the knowledge base for context similar to the query.
- * Use this right before sending data to Groq.
  */
 async function retrieveContext(queryText, topK = 3) {
-  if (!fs.existsSync(DB_PATH)) return [];
+  let kb = [];
+  
+  // Try MongoDB first
+  try {
+    kb = await Knowledge.find({}).lean();
+    if (kb.length === 0) {
+      // If MongoDB is empty, check JSON fallback
+      if (fs.existsSync(DB_PATH)) {
+        kb = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+      }
+    }
+  } catch (dbError) {
+    console.warn("MongoDB retrieval failed, falling back to JSON:", dbError.message);
+    if (fs.existsSync(DB_PATH)) {
+      kb = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+    }
+  }
 
-  const kb = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
-  if (kb.length === 0) return [];
+  if (!kb || kb.length === 0) return [];
 
   const queryEmbedding = await generateEmbedding(queryText);
 
@@ -100,6 +121,13 @@ async function retrieveContext(queryText, topK = 3) {
 }
 
 async function getKnowledgeBase() {
+  try {
+    const docs = await Knowledge.find({}, { embedding: 0 }).lean();
+    if (docs.length > 0) return docs;
+  } catch (e) {
+    console.warn("MongoDB getKnowledgeBase failed:", e.message);
+  }
+
   if (!fs.existsSync(DB_PATH)) return [];
   const kb = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
   return kb.map(res => ({

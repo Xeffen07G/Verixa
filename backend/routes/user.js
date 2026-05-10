@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
+const User = process.env.MONGO_URI ? require('../models/User') : require('../utils/store').User;
 
 // Update profile — uses email as the lookup key (universal, avoids ObjectId issues)
 router.post('/profile', async (req, res) => {
