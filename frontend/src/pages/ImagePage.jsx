@@ -289,19 +289,12 @@ export default function ImagePage() {
               ))}
             </div>
 
-            {currentResult.extracted_text ? (
+            {currentResult.extracted_text && (
               <div style={{ background: T.cardBg, border: `1px solid ${T.accent}4d`, borderRadius: 12, padding: 20, marginBottom: 16, animation: 'fadeUp 0.4s ease' }}>
                 <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.accent, marginBottom: 12, fontWeight: 700 }}>{t('originalSentence', lang)}</p>
                 <div style={{ padding: '14px', background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', borderRadius: 8, border: `1px solid ${T.border}` }}>
                   <p style={{ fontSize: 15, color: T.text, lineHeight: 1.6, margin: 0, fontWeight: 500 }}>"{currentResult.extracted_text}"</p>
                 </div>
-              </div>
-            ) : (
-              <div style={{ padding: 20, textAlign: 'center', background: 'rgba(251,191,36,0.05)', border: '1px dashed #fbbf24', borderRadius: 12, marginBottom: 16 }}>
-                <p style={{ fontSize: 13, color: '#fbbf24', margin: '0 0 12px' }}>{t('ocrFailedWarning', lang)}</p>
-                <button onClick={() => { setImageUrl(currentResult.url); setInputMode('url'); analyzeUrl(); }} style={{ padding: '8px 16px', borderRadius: 6, background: '#fbbf24', border: 'none', color: '#000', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
-                  {t('retryDeepScan', lang)}
-                </button>
               </div>
             )}
 
