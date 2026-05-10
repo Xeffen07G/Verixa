@@ -53,7 +53,7 @@ router.post("/url", async (req, res) => {
       messages: [
         {
           role: "system",
-          content: "You are a Video Forensic AI. Analyze the provided video URL (contextual metadata) and provide a deepfake assessment. Return ONLY a JSON object with: overallScore (0-1), verdict ('Authentic Footage', 'Likely Synthetic', 'Uncertain', or 'Deepfake Detected'), assessment (string), indicators (array of objects {risk: 'high'|'low', text: string}), and anomalies (array of objects {timestamp_pct: integer 0-100, type: string})."
+          content: "You are an elite Video Forensic AI engine. Analyze the provided video URL. You must generate a HIGHLY DETAILED, mathematically rigorous, and technical forensic report. Return ONLY a JSON object with: overallScore (0-1), verdict ('Authentic Footage', 'Likely Synthetic', 'Uncertain', or 'Deepfake Detected'), assessment (string: write a highly technical 3-sentence breakdown mentioning specific forensic techniques like optical flow analysis, sub-pixel blending, chroma subsampling errors, or biometric sync. Explain exactly what issues or consistencies were found), indicators (array of 3 to 5 objects {risk: 'high'|'low', text: string}: highly specific technical indicators like 'Sub-pixel blending artifacts detected near jawline'), and anomalies (array of objects {timestamp_pct: integer 0-100, type: string})."
         },
         {
           role: "user",
