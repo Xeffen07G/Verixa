@@ -254,7 +254,7 @@ export default function ImagePage() {
 
         {currentResult && cfg && (
           <div style={{ animation: 'fadeUp 0.4s ease forwards' }}>
-            <div className="analysis-grid" style={{ display: 'grid', gridTemplateColumns: currentResult.url ? '1fr 1fr' : '1fr', gap: 20, marginBottom: 20 }}>
+            <div className="responsive-grid" style={{ marginBottom: 20 }}>
               {currentResult.url && (
                 <div style={{ borderRadius: 12, overflow: 'hidden', border: `2px solid ${cfg.border}` }}>
                   <img src={currentResult.url} alt="analyzed" style={{ width: '100%', height: 240, objectFit: 'cover', display: 'block' }} onError={e => e.target.style.display = 'none'} />
@@ -306,7 +306,7 @@ export default function ImagePage() {
             {currentResult.context_info && (
               <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16, animation: 'fadeUp 0.5s ease' }}>
                 <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.accent, marginBottom: 16, fontWeight: 700 }}>{t('imageContext', lang)}</p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div className="responsive-grid" style={{ gap: 16 }}>
                   {currentResult.context_info.subject && (
                     <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
                       <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px' }}>{t('subject', lang)}</p>

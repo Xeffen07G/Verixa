@@ -307,7 +307,7 @@ export default function VideoPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+              <div className="responsive-grid">
                 {/* Technical Details */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                   <div style={{ padding: 32, borderRadius: 24, background: cfg.bg, border: `1px solid ${cfg.border}`, textAlign: 'center' }}>

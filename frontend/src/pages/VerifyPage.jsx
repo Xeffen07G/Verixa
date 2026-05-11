@@ -271,9 +271,9 @@ export default function VerifyPage() {
       <Confetti trigger={showConfetti} />
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '380px 1fr', paddingTop: 'var(--nav-h)' }}>
+      <div className="verify-container">
         {/* SIDEBAR */}
-        <div style={{ borderRight: `1px solid ${T.border}`, background: T.surface, display: 'flex', flexDirection: 'column' }}>
+        <div className="verify-sidebar">
           <div style={{ padding: '16px', borderBottom: `1px solid ${T.border}`, display: 'flex', gap: 8 }}>
             <button onClick={() => setLeftTab('input')} style={{ flex: 1, padding: '10px', borderRadius: 8, border: 'none', background: leftTab === 'input' ? T.accentMuted : 'transparent', color: leftTab === 'input' ? T.accent : T.text3, fontWeight: 700, cursor: 'pointer' }}>{t('input', lang)}</button>
             <button onClick={() => setLeftTab('history')} style={{ flex: 1, padding: '10px', borderRadius: 8, border: 'none', background: leftTab === 'history' ? T.accentMuted : 'transparent', color: leftTab === 'history' ? T.accent : T.text3, fontWeight: 700, cursor: 'pointer' }}>{t('history', lang)}</button>
@@ -318,7 +318,7 @@ export default function VerifyPage() {
         </div>
 
         {/* MAIN AREA */}
-        <div style={{ overflowY: 'auto', padding: '40px' }}>
+        <div className="verify-results">
           {isLoading ? (
             <div style={{ animation: 'fadeUp 0.5s ease forwards' }}>
               <div style={{ marginBottom: 32, padding: '24px', borderRadius: 16, background: T.surface2, border: `1px solid ${T.accent}33`, position: 'relative', overflow: 'hidden' }}>

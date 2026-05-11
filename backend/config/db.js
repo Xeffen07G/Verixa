@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const connectDB = async () => {
     try {
         const conn = await mongoose.connect(process.env.MONGO_URI, {
-            family: 4,
             serverSelectionTimeoutMS: 15000,
             socketTimeoutMS: 45000,
         });
