@@ -11,50 +11,33 @@ function getGroq() {
   return _groq;
 }
 
-const SYSTEM_PROMPT = `You are the VeriXa Adversarial Image Analysis Engine. You operate using a Multi-Agent Forensic Protocol designed to detect even the most sophisticated modern AI (Midjourney v6, Flux, Stable Diffusion XL).
+const SYSTEM_PROMPT = `You are the VeriXa Forensic Engine. Detect AI-generated images (Midjourney v6, Flux, etc.).
 
-### PHASE 1: THE FORENSIC PROSECUTOR (Synthetic Fingerprints)
-Assume this image is 100% AI-generated. Find the "Uncanny Signatures":
-- **Micro-Hair Clumping**: Look for hair strands that merge into a single "blob" or "brush stroke" at the edges, especially against the background.
-- **Hyper-Smooth Skin (The Plasticity Effect)**: Identify skin areas that lack macro-pores, fine wrinkles, or natural blemishes. AI often over-optimizes for "perfect" skin.
-- **Non-Circular Pupil Geometry**: Zoom in on the iris. AI often fails to render a perfectly circular pupil or creates "scattered" light reflections that don't match the environment.
-- **Rimless Glass Artifacts**: For people wearing glasses, look for "halos" or slight warping where the lenses meet the skin or nose bridge.
-- **Symmetric Lighting**: AI often places light sources in mathematically perfect positions that don't exist in real physics.
+### ANALYSIS PHASES
+1. **PROSECUTOR (AI Detection)**: Find "Uncanny Signatures" like micro-hair clumping, unnatural skin smoothness (plasticity), non-circular pupils, or rimless glass artifacts.
+2. **DEFENDER (Real Verification)**: Search for chaotic sensor noise, micro-asymmetries, and natural subsurface light scattering.
+3. **JUDGE**: If any structural illogicality is found, the verdict MUST be "AI Generated". 
 
-### PHASE 2: THE FORENSIC DEFENDER (Natural Noise)
-Search for "Human Imperfections":
-- **Random Sensor Noise**: Real cameras have ISO noise that is chaotic and non-repetitive.
-- **Subsurface Scattering Errors**: Real skin allows light to penetrate and bounce back (reddish glow near edges). AI often renders skin as a solid, opaque material.
-- **Asymmetric Micro-Details**: Look for tiny scars, moles, or uneven eyelid folds.
-
-### PHASE 3: THE SUPREME JUDGE (Final Verdict)
-Weight the evidence. Modern AI is designed to look "better than real." If an image looks "too clean," "too perfect," or has even ONE structural illogicality (like a hair strand turning into skin), it MUST be flagged as AI Generated.
-Zero-Tolerance Policy: High resolution and sharpness are indicators of AI, not reality.
-
-You MUST respond with ONLY JSON:
+### OUTPUT SCHEMA (JSON ONLY)
+Be concise in your reasoning to ensure high-speed forensic delivery.
 {
   "verdict": "AI Generated" | "Likely AI Generated" | "Uncertain" | "Likely Real" | "Real",
-  "ai_probability": integer 0-100,
-  "real_probability": integer 0-100,
-  "confidence": integer 0-100,
+  "ai_probability": 0-100,
+  "real_probability": 0-100,
+  "confidence": 0-100,
   "risk_level": "High" | "Medium" | "Low",
-  "assessment": "Detailed multi-agent reasoning report.",
+  "assessment": "Concise multi-agent reasoning.",
   "indicators": ["Prosecutor's findings vs Defender's findings"],
   "forensic_breakdown": {
-    "lighting_and_shadows": "Adversarial analysis of light.",
-    "anatomy_and_geometry": "Adversarial analysis of structure.",
-    "textures_and_artifacts": "Adversarial analysis of pixel data (skin pores, hair strands)."
+    "lighting": "Brief analysis.",
+    "anatomy": "Brief analysis.",
+    "textures": "Brief analysis."
   },
-  "extracted_text": "string",
-  "context_info": {
-    "subject": "Primary subject identification.",
-    "location": "Likely setting.",
-    "historical_context": "Factual context.",
-    "entities": ["Names, places, or organizations"]
-  }
-}
+  "extracted_text": "string (ONLY if it's a document/contains text)",
+  "context_info": { "subject": "string", "location": "string", "entities": [] }
+}`;
 
-IMPORTANT: Bias your detection towards AI detection (False Positive for Real is better than False Negative for AI).`;
+
 
 
 /**
@@ -124,8 +107,9 @@ router.post("/url", async (req, res) => {
       ],
       response_format: { type: "json_object" },
       temperature: 0.0,
-      max_tokens: 1024,
+      max_tokens: 800,
     });
+
 
     const raw = completion.choices[0].message.content.trim();
     const cleaned = raw.replace(/```json|```/g, "").trim();
@@ -140,20 +124,23 @@ router.post("/url", async (req, res) => {
     result.indicators = result.indicators ?? [];
     result.extracted_text = result.extracted_text ?? "";
     result.forensic_breakdown = result.forensic_breakdown || null;
-    result.context_info = result.context_info || null;
-
     res.json(result);
   } catch (err) {
-    console.error("Image URL analysis error:", err.message);
-
-    if (err.message?.includes("Could not process image") || err.message?.includes("400")) {
-      return res.status(400).json({
-        error: "Could not process this image. The URL may be inaccessible or the image format is unsupported.",
-      });
+    console.error("Image analysis error:", err.message);
+    const msg = err.message || "Unknown error";
+    
+    if (msg.includes("fetch") || msg.includes("accessible") || msg.includes("format")) {
+       return res.status(400).json({ error: "Could not fetch image. The URL might be blocked or inaccessible." });
     }
-    res.status(500).json({ error: "Image analysis failed: " + err.message });
+    
+    if (msg.includes("400") || msg.includes("model") || msg.includes("content")) {
+       return res.status(400).json({ error: "AI engine could not process this image size or format. Try a smaller file." });
+    }
+
+    res.status(500).json({ error: "Forensic analysis failed: " + msg });
   }
 });
+
 
 /**
  * POST /api/image/upload — Analyze an uploaded image (raw binary body)
@@ -196,9 +183,10 @@ router.post("/upload", async (req, res) => {
         },
       ],
       response_format: { type: "json_object" },
-      temperature: 0.1,
-      max_tokens: 1024,
+      temperature: 0.0,
+      max_tokens: 800,
     });
+
 
     const raw = completion.choices[0].message.content.trim();
     const cleaned = raw.replace(/```json|```/g, "").trim();
@@ -217,9 +205,15 @@ router.post("/upload", async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error("Image upload analysis error:", err.message);
-    res.status(500).json({ error: "Image analysis failed: " + err.message });
+    const msg = err.message || "Unknown error";
+    
+    if (msg.includes("400") || msg.includes("model") || msg.includes("content")) {
+       return res.status(400).json({ error: "AI engine could not process this image size or format. Try a smaller file." });
+    }
+    res.status(500).json({ error: "Image analysis failed: " + msg });
   }
 });
+
 
 /**
  * POST /api/image/query — Ask a question about the analyzed image
