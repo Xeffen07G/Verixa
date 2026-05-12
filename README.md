@@ -1,159 +1,250 @@
-# 🌐 VeriXa: The Global Enterprise Identity & Truth Infrastructure
+# VeriXa 🛡️
 
-![VeriXa Header](https://raw.githubusercontent.com/Xeffen07G/verixa/main/frontend/public/logo192.png)
+<div align="center">
 
-> **"In the age of deepfakes and AI hallucinations, truth is the most valuable commodity. VeriXa is the engine that generates it."**
+### Truth is not negotiable.
 
-VeriXa is a cinematic, enterprise-grade verification platform engineered to combat misinformation through parallelized AI-powered deep-trace intelligence. It transforms raw data into high-fidelity, verified reports with surgical precision.
+AI-powered fact verification and misinformation intelligence platform designed to analyze claims, detect manipulated media, and generate contextual verification reports in real time.
 
----
+[![Live Demo](https://img.shields.io/badge/Live-Demo-gold?style=for-the-badge)](https://verixa-gamma.vercel.app)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=for-the-badge)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Public_Beta-success?style=for-the-badge)]()
 
-## 📐 I. Technical Methodology
-
-VeriXa operates on a proprietary three-stage "Intelligence Pipeline":
-
-### 1. Atomic Claim Extraction
-Using **Llama-3.1-8B-Instant**, the system performs semantic analysis on raw input (Text, PDF, or URL) to isolate "Atomic Claims"—the smallest individual units of verifiable information.
-
-### 2. Parallel Evidence Retrieval
-Instead of sequential searching, VeriXa triggers **asynchronous parallel search threads**. Each claim is assigned a dedicated thread that queries global news databases and authoritative sources simultaneously using the **Google Custom Search API**.
-
-### 3. Verification & Verdict Scoring
-The system cross-references retrieved evidence against the original claim using a specialized AI "Juror" prompt. It assigns a confidence score (0-100%) and a verdict based on the **VeriXa Truth Matrix**:
-- **Verified True:** Substantial corroborating evidence.
-- **Partially True:** Mixed evidence or missing context.
-- **Verified False:** Explicitly contradicted by reputable sources.
-- **Unverifiable:** Insufficient data or conflicting reports.
+</div>
 
 ---
 
-## 📊 II. System Architecture Flow
+# 🚀 Overview
 
-```mermaid
-graph TD
-    User([User Identity]) --> Input[Input Hub: Text/PDF/Voice/URL]
-    Input --> Engine{VeriXa Core Engine}
-    Engine --> Extraction[LLM Claim Extraction]
-    Extraction --> Search[[Parallel Search Matrix]]
-    Search --> Google[Google Search API]
-    Search --> News[Global News Archives]
-    Google --> Aggregator[Context Aggregator]
-    News --> Aggregator
-    Aggregator --> Juror[LLM Verdict Scoring]
-    Juror --> UI[Intelligence Dashboard]
-    UI --> PDF[Professional PDF Report]
-    UI --> Cert[Truth Certificate]
-    UI --> DB[(Cloud Identity Sync)]
-```
+VeriXa is an AI-powered verification ecosystem focused on combating misinformation, deepfakes, manipulated media, and false claims across digital platforms.
+
+The platform combines intelligent verification workflows, contextual analysis, media forensics, and real-time AI reasoning to help users evaluate the authenticity of information in seconds.
+
+Built with a cinematic modern UI and scalable AI-driven architecture, VeriXa aims to evolve into a next-generation trust and verification platform.
 
 ---
 
-## 📂 III. Comprehensive Project Structure
+# ✨ Core Features
+
+## 🧠 AI Fact Verification
+- Analyze textual claims using contextual reasoning
+- Generate intelligent verification reports
+- Detect misinformation patterns
+- Evidence-oriented verification workflows
+
+## 🖼️ AI Image Intelligence
+- Detect AI-generated imagery
+- Analyze image metadata and inconsistencies
+- Deepfake artifact inspection
+- Visual authenticity scoring
+
+## 🎥 Deepfake Video Detection
+- Temporal consistency analysis
+- Synthetic media detection
+- Biometric and motion artifact inspection
+- Video integrity workflows
+
+## 🌍 Global News Intelligence
+- Real-time misinformation monitoring
+- Verification confidence indicators
+- AI-powered credibility tracking
+- Trend and narrative analysis
+
+## 📄 Multi-Input Verification
+Supports:
+- Text
+- URLs
+- PDFs
+- Images
+- Videos
+
+---
+
+# 🛠️ Tech Stack
+
+## Frontend
+- React.js
+- Tailwind CSS
+- JavaScript
+- Framer Motion
+
+## AI / Verification Concepts
+- LLM-based reasoning
+- Contextual retrieval workflows
+- Media authenticity analysis
+- AI-generated content detection
+- Verification confidence systems
+
+## Deployment
+- Vercel
+
+---
+
+# 🌐 Live Demo
+
+🔗 https://verixa-gamma.vercel.app
+
+---
+
+# 📸 Screenshots
+
+## Landing Page
+
+![Landing Page](./screenshots/landing-page.png)
+
+---
+
+## Verification Dashboard
+
+![Verification Dashboard](./screenshots/verification-dashboard.png)
+
+---
+
+## AI Image Intelligence
+
+![Image Intelligence](./screenshots/image-intelligence.png)
+
+---
+
+## Deepfake Video Detection
+
+![Video Detection](./screenshots/video-detection.png)
+
+---
+
+## Global News Intelligence
+
+![News Intelligence](./screenshots/news-intelligence.png)
+
+---
+
+# 🧠 How VeriXa Works
 
 ```text
-verixa/
-├── backend/                        # High-Performance Node.js Environment
-│   ├── config/                     # Database & External Service Config
-│   │   └── db.js                   # MongoDB Atlas connection logic
-│   ├── middleware/                 # System Security & Validation
-│   │   └── validate.js             # API Key & JWT Authorization
-│   ├── models/                     # Mongoose Data Schemas
-│   │   ├── User.js                 # Professional Identity & Roles
-│   │   └── History.js              # Verification Audit Records
-│   ├── routes/                     # API Logic Layer
-│   │   ├── auth.js                 # Identity Access Management
-│   │   ├── verify.js               # Core Verification Engine
-│   │   ├── user.js                 # Profile & Personalization
-│   │   └── organization.js         # Enterprise Team Intelligence
-│   ├── services/                   # Intelligent Logic
-│   │   └── groq.js                 # Llama-3 + Groq API Integration
-│   └── server.js                   # Application Bootloader
-├── frontend/                       # Cinematic React Interface
-│   ├── src/
-│   │   ├── components/             # High-Fidelity UI Components
-│   │   │   ├── Navbar.jsx          # Dynamic Navigation
-│   │   │   ├── ScoreBanner.jsx     # Visual Accuracy Reporting
-│   │   │   └── ClaimCard.jsx       # Detailed Verdict Interaction
-│   │   ├── context/                # Global State Management
-│   │   │   └── AuthContext.jsx     # Enterprise Session Security
-│   │   ├── pages/                  # Full-Page Views
-│   │   │   ├── DashboardPage.jsx   # Master Audit Feed
-│   │   │   ├── AccountPage.jsx     # Professional Identity Hub
-│   │   │   └── VerifyPage.jsx      # High-Speed Analysis Terminal
-│   │   └── App.js                  # Client Route Manifest
-└── README.md                       # VeriXa Master Specification
+User Input
+   ↓
+Claim / Media Analysis
+   ↓
+Contextual AI Verification
+   ↓
+Evidence & Consistency Evaluation
+   ↓
+Authenticity Assessment
+   ↓
+Verification Report Generation
 ```
 
 ---
 
-## 📡 IV. Detailed API Specification
+# 🏗️ Architecture Overview
 
-### 1. Identity & Profile
-- **`PUT /api/user/profile`**
-  - **Description:** Updates the professional identity of the authenticated user.
-  - **Payload:** `{ userId, name, organization, bio, title, location, profilePic }`
-  - **Response:** `200 OK` with updated User Object.
-
-### 2. Verification Core
-- **`POST /api/verify`**
-  - **Description:** Triggers the atomic claim extraction and parallel search engine.
-  - **Payload:** `{ text, detectAI: boolean }`
-  - **Response:** `200 OK` with `claims[]` and `overallScore`.
-
-### 3. Enterprise Intelligence
-- **`GET /api/organization/:orgName/history`**
-  - **Description:** (Admin Only) Retrieves all audit logs for the specified organization.
-  - **Security:** Requires validated JWT with `admin` role.
-
----
-
-## 🛠️ V. Advanced Technical Stack
-
-| Category | Technology | Implementation Detail |
-| :--- | :--- | :--- |
-| **Logic** | Node.js / Express | Asynchronous parallel processing |
-| **Interface** | React 18+ | Glassmorphic design system |
-| **Intelligence** | Llama-3.1-8B | Hosted on Groq for sub-second inference |
-| **Database** | MongoDB Atlas | Real-time organization synchronization |
-| **Styles** | Vanilla CSS | Custom "Aura Noir" theme |
-| **Icons** | Lucide-React | Vector-based professional iconography |
-
----
-
-## 🚀 VI. Professional Setup Guide
-
-### 1. Prerequisite Environment
-Ensure you have Node.js 16+ and a MongoDB Atlas cluster ready.
-
-### 2. Environment Variables (.env)
-```env
-PORT=5000
-MONGO_URI=mongodb+srv://...
-GROQ_API_KEY=gsk_...
-GOOGLE_SEARCH_API_KEY=...
-GOOGLE_SEARCH_CX=...
-JWT_SECRET=...
+```text
+Frontend (React + Tailwind)
+        ↓
+Verification Layer
+        ↓
+AI Reasoning & Analysis Pipelines
+        ↓
+Contextual Verification Workflows
+        ↓
+Report & Confidence Generation
 ```
 
-### 3. Installation Flow
+---
+
+# ⚡ Installation
+
+Clone the repository:
+
 ```bash
-# Clone the repository
-git clone https://github.com/Xeffen07G/verixa.git
+git clone https://github.com/Xeffen07G/Verixa.git
+```
 
-# Install and launch in a single command
-npm install-all && npm run dev
+Navigate into the project:
+
+```bash
+cd Verixa
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
+
+```bash
+npm run dev
 ```
 
 ---
 
-## 📈 VII. Enterprise Roadmap
-- [x] **Core AI Fact-Checking Engine**
-- [x] **Enterprise Role-Based Access (Admin/Employee)**
-- [x] **Professional Identity Hub & Stats Tracking**
-- [ ] **Phase 4:** Browser Extension for Instant Social Verification
-- [ ] **Phase 5:** White-label API for Enterprise CMS Integration
+# 📂 Project Structure
+
+```bash
+Verixa/
+├── public/
+├── src/
+│   ├── assets/
+│   ├── components/
+│   ├── pages/
+│   ├── sections/
+│   ├── utils/
+│   └── App.jsx
+├── screenshots/
+├── package.json
+└── README.md
+```
 
 ---
 
-**Built with ⚖️ by the VeriXa Core Team.**
-*"Truth as Infrastructure."*
+# 🎯 Future Improvements
+
+- Real-time web evidence retrieval
+- Multi-source verification engine
+- Browser extension integration
+- API access for developers
+- Voice-based verification workflows
+- Advanced AI confidence scoring
+- Cross-platform synchronization
+- Multi-language support
+
+---
+
+# 🧩 Challenges Faced
+
+- Designing scalable AI verification workflows
+- Creating cinematic responsive UI interactions
+- Structuring multi-modal verification systems
+- Handling contextual ambiguity in misinformation
+- Building intuitive verification experiences
+
+---
+
+# 📌 Vision
+
+VeriXa is designed to evolve into a complete AI trust infrastructure capable of helping users identify misinformation, manipulated media, and synthetic content across the internet in real time.
+
+---
+
+# 🤝 Contributing
+
+Contributions, ideas, and improvements are welcome.
+
+Fork the repository and submit a pull request.
+
+---
+
+# 👨‍💻 Developer
+
+### Sayak Das
+
+- GitHub: https://github.com/Xeffen07G
+- LinkedIn: https://www.linkedin.com/in/sayak-das-460157287
+
+---
+
+# 📄 License
+
+Licensed under the Apache 2.0 License.
