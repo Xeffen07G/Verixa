@@ -32,14 +32,22 @@ const worker = new Worker('ingestion', async (job) => {
 
     if (!fs.existsSync(path)) throw new Error(`File not found: ${path}`);
     const buffer = fs.readFileSync(path);
-    const pages = await parsePDF(buffer);
-    const chunks = createChunks(pages);
+    let content = "";
+    let chunks = [];
+
+    if (filename.toLowerCase().endsWith('.pdf')) {
+      const pages = await parsePDF(buffer);
+      content = pages.map(p => p.text).join('\n\n');
+      chunks = createChunks(pages);
+    } else {
+      content = buffer.toString('utf-8');
+      chunks = [{ text: content, metadata: { page: 1 } }];
+    }
 
     for (let i = 0; i < chunks.length; i++) {
       const chunkId = `${documentId}_${i}`;
       
-      /*
-      // Disable RAG indexing for verification phase
+      // Index to RAG knowledge base
       await addChunkToRAG(chunkId, chunks[i].text, {
         ...metadata,
         documentId,
@@ -47,7 +55,6 @@ const worker = new Worker('ingestion', async (job) => {
         page: chunks[i].metadata.page,
         index: i
       });
-      */
       
       /* 
       // Build Intelligence Graph (Disabled temporarily for performance mitigation)
@@ -68,7 +75,7 @@ const worker = new Worker('ingestion', async (job) => {
       status: 'completed', 
       chunks: chunks.length, 
       documentId,
-      text: pages.map(p => p.text).join('\n\n')
+      text: content
     };
   } catch (err) {
     console.error(`[Worker] Failed: ${filename}`, err);

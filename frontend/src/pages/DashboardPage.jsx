@@ -119,48 +119,48 @@ export default function DashboardPage() {
     const file = e.target.files[0];
     if (!file) return;
     
-    setUploadStatus({ status: 'loading', message: t('processingDoc', lang) });
+    console.log(`[Dashboard] Upload started: ${file.name}`);
+    setUploadStatus({ status: 'loading', message: 'Uploading...' });
     
     try {
-      // 1. If PDF, use async ingestion
-      let content = "";
-      if (file.type === 'application/pdf') {
-        const formData = new FormData();
-        formData.append('pdf', file);
-        const res = await api.post('/api/pdf/ingest', formData);
-        const { jobId } = res.data;
+      const formData = new FormData();
+      formData.append('pdf', file);
+      
+      // 1. Submit to ultra-lean ingestion endpoint
+      const res = await api.post('/api/pdf/ingest', formData);
+      const { jobId } = res.data;
+      console.log(`[Dashboard] Upload accepted. JobId: ${jobId}`);
+      setUploadStatus({ status: 'loading', message: 'Queued...' });
 
-        // Poll for completion
-        let completed = false;
-        let attempts = 0;
-        while (!completed && attempts < 150) {
-          attempts++;
-          await new Promise(r => setTimeout(r, 2000));
-          const statusRes = await api.get(`/api/pdf/status/${jobId}`);
-          if (statusRes.data.status === 'completed') {
-            completed = true;
-            content = statusRes.data.result.text;
-          } else if (statusRes.data.status === 'failed') {
-            throw new Error('PDF extraction failed');
-          }
+      // 2. Poll for completion (Do not wait for text in the upload response)
+      console.log(`[Dashboard] Polling started`);
+      let completed = false;
+      let attempts = 0;
+      while (!completed && attempts < 150) { // 5 minute limit
+        attempts++;
+        await new Promise(r => setTimeout(r, 2000));
+        
+        const statusRes = await api.get(`/api/pdf/status/${jobId}`);
+        const { status, progress } = statusRes.data;
+        
+        if (status === 'completed') {
+          completed = true;
+          console.log(`[Dashboard] Job completed: ${jobId}`);
+          setUploadStatus({ status: 'success', message: `${file.name} processed and indexed!` });
+          fetchVault();
+        } else if (status === 'failed') {
+          throw new Error(statusRes.data.error || 'Ingestion failed');
+        } else {
+          setUploadStatus({ status: 'loading', message: `Processing... ${progress || 0}%` });
         }
-        if (!completed) throw new Error('Timeout');
-      } else {
-        content = await file.text();
       }
-
-      // 2. Add to RAG
-      await api.post('/api/rag/add', {
-        id: file.name,
-        text: content,
-        metadata: { source: file.name, type: file.type, size: file.size }
-      });
-
-      setUploadStatus({ status: 'success', message: `${file.name} learned!` });
-      fetchVault();
+      
+      if (!completed) throw new Error('Processing timed out');
+      
       setTimeout(() => setUploadStatus(null), 3000);
     } catch (err) {
-      setUploadStatus({ status: 'error', message: 'Upload failed: ' + err.message });
+      console.error("[Dashboard] Upload failed:", err.response || err);
+      setUploadStatus({ status: 'error', message: 'Upload failed: ' + (err.response?.data?.error || err.message) });
     }
   };
 
