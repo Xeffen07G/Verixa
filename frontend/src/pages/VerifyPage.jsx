@@ -11,7 +11,7 @@ import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
 import api from '../utils/api';
 
-const API_URL = process.env.REACT_APP_API_URL || '';
+
 
 const VERDICT_CONFIG = (lang) => ({
   'True':           { color: '#31572c', bg: '#f1f8e9', border: '#dcedc8', icon: '✓', label: t('mostlyAccurate', lang),   short: t('trueShort', lang)    },

@@ -7,7 +7,7 @@ import { useLang } from '../context/LangContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, Activity, Globe, Share2, Link as LinkIcon, Shield, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_API_URL || '';
+import api from '../utils/api';
 
 const VERDICT_CONFIG = (lang) => ({
   'False':          { color: '#f87171', bg: 'rgba(248,113,113,0.1)', border: 'rgba(248,113,113,0.3)', icon: <AlertTriangle size={12} />, label: t('mostlyInaccurate', lang) },
@@ -73,8 +73,8 @@ export default function TrendingPage() {
 
   const fetchTrending = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/trending`);
-      const data = await res.json();
+      const res = await api.get('/api/trending');
+      const data = res.data;
       setTrending(data.trending || []);
       setTotalTracked(data.totalTracked || 0);
       setLastUpdated(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
