@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = process.env.REACT_APP_API_URL || '';
+import api from '../utils/api';
 
 /**
  * Global Drag & Drop overlay — works on every page
@@ -49,9 +49,8 @@ export default function DragDropOverlay({ children }) {
       try {
         const formData = new FormData();
         formData.append('pdf', file);
-        const res = await fetch(`${API_URL}/api/pdf`, { method: 'POST', body: formData });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'PDF upload failed');
+        const res = await api.post('/api/pdf', formData);
+        const data = res.data;
         // Store extracted text and navigate
         sessionStorage.setItem('verixa-dragdrop-text', data.text);
         navigate('/verify?source=dragdrop');
@@ -70,13 +69,10 @@ export default function DragDropOverlay({ children }) {
       setProcessingMsg('Preparing image for analysis...');
       try {
         const arrayBuffer = await file.arrayBuffer();
-        const res = await fetch(`${API_URL}/api/image/upload`, {
-          method: 'POST',
-          headers: { 'Content-Type': file.type },
-          body: arrayBuffer,
+        const res = await api.post('/api/image/upload', arrayBuffer, {
+          headers: { 'Content-Type': file.type }
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Image analysis failed');
+        const data = res.data;
         sessionStorage.setItem('verixa-dragdrop-image-result', JSON.stringify(data));
         sessionStorage.setItem('verixa-dragdrop-image-preview', URL.createObjectURL(file));
         navigate('/image?source=dragdrop');
