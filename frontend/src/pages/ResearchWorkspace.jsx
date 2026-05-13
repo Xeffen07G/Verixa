@@ -37,25 +37,37 @@ const ResearchWorkspace = () => {
   };
 
   const pollStatus = async (jobId) => {
-    const interval = setInterval(async () => {
-      try {
+    try {
+      let completed = false;
+      let attempts = 0;
+      
+      while (!completed && attempts < 150) { // 5 minute limit
+        attempts++;
+        await new Promise(r => setTimeout(r, 2000));
+        
         const { data } = await api.get(`/api/pdf/status/${jobId}`);
         setProgress(data.progress || 0);
+        
         if (data.status === 'completed') {
+          completed = true;
           setJobStatus('completed');
           // Fetch initial summary
           const summaryRes = await api.post('/api/pdf/summary', { documentId: data.result.documentId });
           setDocumentData({ ...data.result, ...summaryRes.data });
-          clearInterval(interval);
         } else if (data.status === 'failed') {
           setJobStatus('failed');
-          clearInterval(interval);
+          completed = true;
         }
-      } catch (e) {
-        console.error("[ResearchWorkspace] Poll Error:", e);
-        clearInterval(interval);
       }
-    }, 2000);
+      
+      if (!completed) {
+        setJobStatus('failed');
+        console.error("Polling timed out");
+      }
+    } catch (e) {
+      console.error("[ResearchWorkspace] Poll Error:", e);
+      setJobStatus('failed');
+    }
   };
 
   const runAnalysis = async (type) => {

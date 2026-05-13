@@ -51,9 +51,10 @@ export default function DragDropOverlay({ children }) {
         formData.append('pdf', file);
         
         // 1. Start Ingestion
-        setProcessingMsg('Uploading to Intelligence Engine...');
+        setProcessingMsg('Uploading...');
         const res = await api.post('/api/pdf/ingest', formData);
         const { jobId } = res.data;
+        setProcessingMsg('Queued...');
 
         // 2. Poll for results
         let completed = false;
@@ -63,20 +64,21 @@ export default function DragDropOverlay({ children }) {
           await new Promise(r => setTimeout(r, 2000)); // Poll every 2s
           
           const statusRes = await api.get(`/api/pdf/status/${jobId}`);
-          const status = statusRes.data;
+          const { status, progress, result } = statusRes.data;
           
-          setProcessingMsg(`Analyzing Document... ${status.progress || 0}%`);
-          
-          if (status.status === 'completed') {
+          if (status === 'completed') {
             completed = true;
-            sessionStorage.setItem('verixa-dragdrop-text', status.result.text);
+            setProcessingMsg('Completed');
+            sessionStorage.setItem('verixa-dragdrop-text', result.text);
             navigate('/verify?source=dragdrop');
-          } else if (status.status === 'failed') {
-            throw new Error(status.error || 'Ingestion failed');
+          } else if (status === 'failed') {
+            throw new Error(statusRes.data.error || 'Ingestion failed');
+          } else {
+            setProcessingMsg(`Analyzing Document... ${progress || 0}%`);
           }
         }
         
-        if (!completed) throw new Error('Processing timed out. Try again with a smaller file.');
+        if (!completed) throw new Error('Processing timed out. Please try again.');
       } catch (e) {
         alert('PDF Intelligence Error: ' + e.message);
       } finally {

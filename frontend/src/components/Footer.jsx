@@ -71,7 +71,10 @@ export default function Footer({ darkMode = true }) {
         {/* Bottom row */}
         <div style={{ paddingTop: 24, borderTop: `1px solid ${T.border2}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <span style={{ fontSize: 11, color: T.text3 }}>2025 VeriXa. {t('rights', lang)}</span>
-          <span style={{ fontSize: 10, color: '#c9a96e', background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)', padding: '4px 12px', borderRadius: 999, letterSpacing: 1, textTransform: 'uppercase' }}>{t('landingBeta', lang)}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <span style={{ fontSize: 10, color: T.text3, letterSpacing: 0.5, opacity: 0.8 }}>Build: {window.__VERIXA_BUILD__ || 'local'}</span>
+            <span style={{ fontSize: 10, color: '#c9a96e', background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)', padding: '4px 12px', borderRadius: 999, letterSpacing: 1, textTransform: 'uppercase' }}>{t('landingBeta', lang)}</span>
+          </div>
         </div>
       </div>
 

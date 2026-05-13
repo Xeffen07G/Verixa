@@ -200,6 +200,7 @@ export default function VerifyPage() {
   const [fetchingUrl, setFetchingUrl] = useState(false);
   const [pdfInfo, setPdfInfo] = useState(null);
   const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [pdfStatus, setPdfStatus] = useState(''); // Uploading, Queued, Processing, etc.
   const [isScannedPdf, setIsScannedPdf] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [leftTab, setLeftTab] = useState('input');
@@ -255,17 +256,50 @@ export default function VerifyPage() {
   };
 
   const handlePdfUpload = async (file) => {
-    setUploadingPdf(true); setIsScannedPdf(false);
+    if (!file) return;
+    setUploadingPdf(true);
+    setPdfStatus('Uploading...');
+    setIsScannedPdf(false);
     try {
-      const formData = new FormData(); formData.append('pdf', file);
+      const formData = new FormData();
+      formData.append('pdf', file);
+      
+      // 1. Submit to queue (Instantly returns 202)
       const res = await api.post('/api/pdf/ingest', formData);
-      setText(res.data.text); setInputMode('text');
+      const { jobId } = res.data;
+      setPdfStatus('Queued...');
+
+      // 2. Poll for extraction completion
+      let completed = false;
+      let attempts = 0;
+      while (!completed && attempts < 150) {
+        attempts++;
+        await new Promise(r => setTimeout(r, 2000));
+        
+        const statusRes = await api.get(`/api/pdf/status/${jobId}`);
+        const { status, progress, result } = statusRes.data;
+        
+        if (status === 'completed') {
+          completed = true;
+          setPdfStatus('Completed');
+          setText(result.text);
+          setInputMode('text');
+        } else if (status === 'failed') {
+          throw new Error(statusRes.data.error || 'Ingestion failed');
+        } else {
+          setPdfStatus(`Processing... ${progress || 0}%`);
+        }
+      }
+      
+      if (!completed) throw new Error('Processing timed out');
     } catch (e) { 
       console.error("[VerifyPage] PDF Upload Error:", e.response || e);
-      if (e.response?.data?.error?.includes('scanned')) setIsScannedPdf(true);
-      else alert(e.response?.data?.error || e.message); 
+      alert('PDF Error: ' + (e.response?.data?.error || e.message)); 
     }
-    finally { setUploadingPdf(false); }
+    finally { 
+      setUploadingPdf(false);
+      setPdfStatus('');
+    }
   };
 
   return (
@@ -306,7 +340,7 @@ export default function VerifyPage() {
                 {inputMode === 'pdf' && (
                   <div onClick={() => document.getElementById('pdf-in').click()} style={{ padding: '40px 20px', border: `2px dashed ${T.border}`, borderRadius: 12, textAlign: 'center', cursor: 'pointer' }}>
                     <FileText size={32} color={T.accent} style={{ marginBottom: 12 }} />
-                    <p style={{ fontSize: 13, color: T.text3 }}>{uploadingPdf ? t('extractingPdf', lang) : t('clickDragPdf', lang)}</p>
+                    <p style={{ fontSize: 13, color: T.text3 }}>{uploadingPdf ? pdfStatus : t('clickDragPdf', lang)}</p>
                     <input id="pdf-in" type="file" accept=".pdf" style={{ display: 'none' }} onChange={e => handlePdfUpload(e.target.files[0])} />
                   </div>
                 )}

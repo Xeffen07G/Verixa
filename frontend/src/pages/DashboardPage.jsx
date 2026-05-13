@@ -122,13 +122,29 @@ export default function DashboardPage() {
     setUploadStatus({ status: 'loading', message: t('processingDoc', lang) });
     
     try {
-      // 1. If PDF, extract text first
+      // 1. If PDF, use async ingestion
       let content = "";
       if (file.type === 'application/pdf') {
         const formData = new FormData();
         formData.append('pdf', file);
-        const ocrRes = await api.post('/api/pdf/ingest', formData); // Standardized to /ingest
-        content = ocrRes.data.text;
+        const res = await api.post('/api/pdf/ingest', formData);
+        const { jobId } = res.data;
+
+        // Poll for completion
+        let completed = false;
+        let attempts = 0;
+        while (!completed && attempts < 150) {
+          attempts++;
+          await new Promise(r => setTimeout(r, 2000));
+          const statusRes = await api.get(`/api/pdf/status/${jobId}`);
+          if (statusRes.data.status === 'completed') {
+            completed = true;
+            content = statusRes.data.result.text;
+          } else if (statusRes.data.status === 'failed') {
+            throw new Error('PDF extraction failed');
+          }
+        }
+        if (!completed) throw new Error('Timeout');
       } else {
         content = await file.text();
       }
