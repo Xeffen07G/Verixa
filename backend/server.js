@@ -27,7 +27,6 @@ const PROCESS_TYPE = process.env.PROCESS_TYPE || "api";
 ==================================================
 ULTRA-EARLY DIAGNOSTIC ROUTE
 ==================================================
-THIS MUST STAY AT THE TOP
 */
 app.get("/ping", (req, res) => {
   console.log("[PING] Route hit");
@@ -98,14 +97,18 @@ BODY PARSERS
 */
 app.use(morgan("dev"));
 
-app.use(express.json({
-  limit: "50mb",
-}));
+app.use(
+  express.json({
+    limit: "50mb",
+  })
+);
 
-app.use(express.urlencoded({
-  limit: "50mb",
-  extended: true,
-}));
+app.use(
+  express.urlencoded({
+    limit: "50mb",
+    extended: true,
+  })
+);
 
 /*
 ==================================================
@@ -115,14 +118,51 @@ SAFE MODE MOCK ROUTES
 if (SAFE_MODE) {
   console.log("⚠️ BACKEND RUNNING IN SAFE_MODE");
 
+  /*
+  ==========================
+  MOCK PDF INGEST
+  ==========================
+  */
   app.use("/api/pdf/ingest", (req, res) => {
+    console.log("[SAFE_MODE] Mock ingest hit");
+
     return res.status(202).json({
+      success: true,
       mock: true,
       jobId: "safe_job",
       mode: "SAFE_MODE",
     });
   });
 
+  /*
+  ==========================
+  MOCK PDF STATUS
+  THIS FIXES YOUR 404 ERROR
+  ==========================
+  */
+  app.get("/api/pdf/status/:jobId", (req, res) => {
+    console.log(
+      `[SAFE_MODE] Status requested for ${req.params.jobId}`
+    );
+
+    return res.json({
+      success: true,
+      mock: true,
+      jobId: req.params.jobId,
+      state: "completed",
+      progress: 100,
+      mode: "SAFE_MODE",
+      result: {
+        text: "SAFE_MODE mock extraction completed successfully.",
+      },
+    });
+  });
+
+  /*
+  ==========================
+  MOCK RAG DOCS
+  ==========================
+  */
   app.use("/api/rag/documents", (req, res) => {
     return res.json({
       mock: true,
@@ -131,6 +171,11 @@ if (SAFE_MODE) {
     });
   });
 
+  /*
+  ==========================
+  MOCK ORGANIZATION
+  ==========================
+  */
   app.use("/api/organization", (req, res) => {
     return res.json({
       mock: true,
