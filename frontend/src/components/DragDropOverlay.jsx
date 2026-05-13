@@ -49,13 +49,36 @@ export default function DragDropOverlay({ children }) {
       try {
         const formData = new FormData();
         formData.append('pdf', file);
-        const res = await api.post('/api/pdf', formData);
-        const data = res.data;
-        // Store extracted text and navigate
-        sessionStorage.setItem('verixa-dragdrop-text', data.text);
-        navigate('/verify?source=dragdrop');
+        
+        // 1. Start Ingestion
+        setProcessingMsg('Uploading to Intelligence Engine...');
+        const res = await api.post('/api/pdf/ingest', formData);
+        const { jobId } = res.data;
+
+        // 2. Poll for results
+        let completed = false;
+        let attempts = 0;
+        while (!completed && attempts < 150) { // 5 minute timeout
+          attempts++;
+          await new Promise(r => setTimeout(r, 2000)); // Poll every 2s
+          
+          const statusRes = await api.get(`/api/pdf/status/${jobId}`);
+          const status = statusRes.data;
+          
+          setProcessingMsg(`Analyzing Document... ${status.progress || 0}%`);
+          
+          if (status.status === 'completed') {
+            completed = true;
+            sessionStorage.setItem('verixa-dragdrop-text', status.result.text);
+            navigate('/verify?source=dragdrop');
+          } else if (status.status === 'failed') {
+            throw new Error(status.error || 'Ingestion failed');
+          }
+        }
+        
+        if (!completed) throw new Error('Processing timed out. Try again with a smaller file.');
       } catch (e) {
-        alert('PDF Error: ' + e.message);
+        alert('PDF Intelligence Error: ' + e.message);
       } finally {
         setProcessing(false);
         setProcessingMsg('');

@@ -5,13 +5,22 @@ const { addChunkToRAG } = require('../utils/rag');
 const graphService = require('./graph');
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-const connection = new IORedis(REDIS_URL, { maxRetriesPerRequest: null });
+console.log(`[Redis] Attempting connection to: ${REDIS_URL.split('@')[1] || 'localhost'}`);
+
+const connection = new IORedis(REDIS_URL, { 
+  maxRetriesPerRequest: null,
+  retryStrategy: (times) => Math.min(times * 50, 2000)
+});
+
+connection.on('connect', () => console.log('[Redis] Connected successfully'));
+connection.on('error', (err) => console.error('[Redis] Connection Error:', err.message));
 
 // 1. Define Ingestion Queue
 const ingestionQueue = new Queue('ingestion', { connection });
 
 // 2. Define Worker
 const worker = new Worker('ingestion', async (job) => {
+  console.log(`[Worker] Job Started: ${job.id} (${job.data.filename})`);
   const { documentId, filename, buffer, metadata } = job.data;
   console.log(`[Worker] Processing document: ${filename} (${documentId})`);
 
@@ -29,8 +38,10 @@ const worker = new Worker('ingestion', async (job) => {
         index: i
       });
       
-      // Build Intelligence Graph (Don't await to keep ingestion fast, but for now we do for reliability)
+      /* 
+      // Build Intelligence Graph (Disabled temporarily for performance mitigation)
       await graphService.extractIntelligence(chunkId, chunks[i].text, documentId);
+      */
 
       // Update progress
       await job.updateProgress(Math.round((i / chunks.length) * 100));
@@ -38,7 +49,12 @@ const worker = new Worker('ingestion', async (job) => {
 
 
     console.log(`[Worker] Completed: ${filename}`);
-    return { status: 'completed', chunks: chunks.length, documentId };
+    return { 
+      status: 'completed', 
+      chunks: chunks.length, 
+      documentId,
+      text: pages.map(p => p.text).join('\n\n')
+    };
   } catch (err) {
     console.error(`[Worker] Failed: ${filename}`, err);
     throw err;
