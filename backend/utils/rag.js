@@ -5,23 +5,22 @@ const Knowledge = require('../models/Knowledge');
 // Dynamically import the transformers library
 let pipeline;
 async function getPipeline() {
+  /*
   if (!pipeline) {
     const transformers = await import('@xenova/transformers');
-    // Using a very small, fast, and free embedding model that runs 100% locally on CPU
     pipeline = await transformers.pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
   }
   return pipeline;
+  */
+  return null;
 }
-
-const DB_PATH = path.join(__dirname, '..', 'knowledge_base.json');
 
 /**
  * Generate an embedding vector for a given text.
  */
 async function generateEmbedding(text) {
-  const extractor = await getPipeline();
-  const output = await extractor(text, { pooling: 'mean', normalize: true });
-  return Array.from(output.data);
+  // Mock embedding for stability during diagnosis
+  return new Array(384).fill(0);
 }
 
 /**

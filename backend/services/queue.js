@@ -20,72 +20,12 @@ const ingestionQueue = new Queue('ingestion', { connection });
 
 const fs = require('fs');
 
-// 2. Define Worker
+// 2. Define Worker (Temporarily disabled for stabilization)
+/*
 const worker = new Worker('ingestion', async (job) => {
-  console.log(`[Worker] Job Started: ${job.id} (${job.data.filename})`);
-  const { documentId, filename, path, metadata } = job.data;
-  console.log(`[Worker] Processing document: ${filename} (Path: ${path})`);
-
-  try {
-    // 1. Give the Express event loop a breath
-    await new Promise(r => setTimeout(r, 500));
-
-    if (!fs.existsSync(path)) throw new Error(`File not found: ${path}`);
-    const buffer = fs.readFileSync(path);
-    let content = "";
-    let chunks = [];
-
-    if (filename.toLowerCase().endsWith('.pdf')) {
-      const pages = await parsePDF(buffer);
-      content = pages.map(p => p.text).join('\n\n');
-      chunks = createChunks(pages);
-    } else {
-      content = buffer.toString('utf-8');
-      chunks = [{ text: content, metadata: { page: 1 } }];
-    }
-
-    for (let i = 0; i < chunks.length; i++) {
-      const chunkId = `${documentId}_${i}`;
-      
-      // Index to RAG knowledge base
-      await addChunkToRAG(chunkId, chunks[i].text, {
-        ...metadata,
-        documentId,
-        filename,
-        page: chunks[i].metadata.page,
-        index: i
-      });
-      
-      /* 
-      // Build Intelligence Graph (Disabled temporarily for performance mitigation)
-      await graphService.extractIntelligence(chunkId, chunks[i].text, documentId);
-      */
-
-      // Update progress
-      await job.updateProgress(Math.round((i / chunks.length) * 100));
-    }
-
-
-    console.log(`[Worker] Completed: ${filename}`);
-    
-    // Cleanup temporary file
-    if (fs.existsSync(path)) fs.unlinkSync(path);
-
-    return { 
-      status: 'completed', 
-      chunks: chunks.length, 
-      documentId,
-      text: content
-    };
-  } catch (err) {
-    console.error(`[Worker] Failed: ${filename}`, err);
-    throw err;
-  } finally {
-    if (path && fs.existsSync(path)) {
-      try { fs.unlinkSync(path); } catch (e) {}
-    }
-  }
+  // worker logic here
 }, { connection });
+*/
 
 worker.on('failed', (job, err) => {
   console.error(`[Worker] Job ${job.id} failed with error: ${err.message}`);
