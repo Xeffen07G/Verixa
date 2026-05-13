@@ -25,28 +25,39 @@ if (process.env.MONGO_URI) {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// 1. Diagnostic Logging (Top-most)
+app.use((req, res, next) => {
+  console.log(`[CORS DEBUG] ${req.method} ${req.path} - Origin: ${req.headers.origin}`);
+  next();
+});
 
-// 1. Preflight handling
-app.options("*", cors());
+// 2. Brute-force Manual CORS Headers
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://verixa-gamma.vercel.app");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Headers", "*");
+  res.header("Access-Control-Allow-Methods", "*");
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
 
-// 2. Strict CORS policy
-app.use(cors({
-  origin: [
-    "https://verixa-gamma.vercel.app",
-    "http://localhost:3000"
-  ],
+// 3. Official CORS Middleware
+const corsOptions = {
+  origin: ["https://verixa-gamma.vercel.app", "http://localhost:3000"],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "x-api-key"]
-}));
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
-// Security & middleware
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
+// 4. Body Parsers
 app.use(morgan("dev"));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+// 5. Helmet (Temporarily disabled for CORS troubleshooting)
+// app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
 // Root health check for Render/LB
 app.get("/health", (req, res) => res.json({ status: "ok", timestamp: new Date().toISOString() }));
