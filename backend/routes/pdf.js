@@ -5,50 +5,52 @@ const { parsePDF, createChunks } = require("../services/ingestion");
 const { addChunkToRAG } = require("../utils/rag");
 const { askGroq } = require("../services/groq");
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
+});
+
 const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 25 * 1024 * 1024 }, // Increased to 25MB for research papers
+  storage: storage,
+  limits: { fileSize: 25 * 1024 * 1024 },
 });
 
 const { ingestionQueue } = require("../services/queue");
-
 
 /**
  * POST /api/pdf/ingest
  * Adds a document to the background ingestion queue.
  */
 router.post("/ingest", upload.single("pdf"), async (req, res) => {
-  console.log('[API] PDF INGEST ROUTE HIT');
-  console.log('  - Fieldname Expected: pdf');
-  console.log('  - File received:', req.file ? `${req.file.originalname} (${req.file.size} bytes)` : 'NONE');
+  const tStart = Date.now();
+  console.log(`[API] Ingest entry: ${new Date().toISOString()}`);
 
-  if (!req.file) {
-    console.warn('  - [400] No file found in request.');
-    return res.status(400).json({ error: "No PDF file uploaded. Field 'pdf' is required." });
-  }
+  if (!req.file) return res.status(400).json({ error: "No PDF uploaded" });
 
   try {
+    const tQueueStart = Date.now();
     const documentId = `doc_${Date.now()}`;
-    const filename = req.file.originalname;
-
-    // Add to BullMQ
+    
+    // Add to BullMQ - passing path instead of buffer to keep Redis/Memory light
     const job = await ingestionQueue.add('process-pdf', {
       documentId,
-      filename,
-      buffer: req.file.buffer,
+      filename: req.file.originalname,
+      path: req.file.path,
       metadata: { uploadedAt: new Date() }
     });
 
-    console.log(`[API] Job Created: ${job.id} for ${filename}`);
+    console.log(`[API] Enqueued: ${Date.now() - tQueueStart}ms`);
 
-    res.json({
-      message: "Ingestion started in background",
-      documentId,
-      jobId: job.id
+    res.status(202).json({
+      success: true,
+      jobId: job.id,
+      documentId
     });
+
+    console.log(`[API] Response sent: ${Date.now() - tStart}ms`);
   } catch (err) {
-    console.error("Queue error:", err);
-    res.status(500).json({ error: "Failed to queue document: " + err.message });
+    console.error("[API] Queue error:", err);
+    res.status(500).json({ error: "Queue failure" });
   }
 });
 

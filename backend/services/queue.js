@@ -18,18 +18,28 @@ connection.on('error', (err) => console.error('[Redis] Connection Error:', err.m
 // 1. Define Ingestion Queue
 const ingestionQueue = new Queue('ingestion', { connection });
 
+const fs = require('fs');
+
 // 2. Define Worker
 const worker = new Worker('ingestion', async (job) => {
   console.log(`[Worker] Job Started: ${job.id} (${job.data.filename})`);
-  const { documentId, filename, buffer, metadata } = job.data;
-  console.log(`[Worker] Processing document: ${filename} (${documentId})`);
+  const { documentId, filename, path, metadata } = job.data;
+  console.log(`[Worker] Processing document: ${filename} (Path: ${path})`);
 
   try {
-    const pages = await parsePDF(Buffer.from(buffer));
+    // 1. Give the Express event loop a breath
+    await new Promise(r => setTimeout(r, 500));
+
+    if (!fs.existsSync(path)) throw new Error(`File not found: ${path}`);
+    const buffer = fs.readFileSync(path);
+    const pages = await parsePDF(buffer);
     const chunks = createChunks(pages);
 
     for (let i = 0; i < chunks.length; i++) {
       const chunkId = `${documentId}_${i}`;
+      
+      /*
+      // Disable RAG indexing for verification phase
       await addChunkToRAG(chunkId, chunks[i].text, {
         ...metadata,
         documentId,
@@ -37,6 +47,7 @@ const worker = new Worker('ingestion', async (job) => {
         page: chunks[i].metadata.page,
         index: i
       });
+      */
       
       /* 
       // Build Intelligence Graph (Disabled temporarily for performance mitigation)
@@ -49,6 +60,10 @@ const worker = new Worker('ingestion', async (job) => {
 
 
     console.log(`[Worker] Completed: ${filename}`);
+    
+    // Cleanup temporary file
+    if (fs.existsSync(path)) fs.unlinkSync(path);
+
     return { 
       status: 'completed', 
       chunks: chunks.length, 
@@ -58,6 +73,10 @@ const worker = new Worker('ingestion', async (job) => {
   } catch (err) {
     console.error(`[Worker] Failed: ${filename}`, err);
     throw err;
+  } finally {
+    if (path && fs.existsSync(path)) {
+      try { fs.unlinkSync(path); } catch (e) {}
+    }
   }
 }, { connection });
 
