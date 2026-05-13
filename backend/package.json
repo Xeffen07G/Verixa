@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "worker": "PROCESS_TYPE=worker node services/queue.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {

@@ -70,11 +70,13 @@ const limiter = rateLimit({
 });
 app.use("/api/", limiter);
 
+const SAFE_MODE = process.env.SAFE_MODE === 'true';
+const PROCESS_TYPE = process.env.PROCESS_TYPE || 'api';
+
 // 6. Request Lifecycle Instrumentation
 app.use((req, res, next) => {
   const start = Date.now();
   console.log(`[REQ START] ${req.method} ${req.originalUrl}`);
-  
   res.on("finish", () => {
     const duration = Date.now() - start;
     console.log(`[REQ END] ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms)`);
@@ -82,26 +84,33 @@ app.use((req, res, next) => {
   next();
 });
 
-// 7. Temporary Mock Diagnostics (Uncomment to isolate)
-app.use("/api/pdf/ingest", (req, res) => res.status(202).json({ mock: true, jobId: "mock_job" }));
-app.use("/api/rag/documents", (req, res) => res.json({ mock: true, documents: [] }));
-app.use("/api/organization", (req, res) => res.json({ mock: true, members: [] }));
+// 7. SAFE_MODE Mocks
+if (SAFE_MODE) {
+  console.log('!!! BACKEND RUNNING IN SAFE_MODE !!!');
+  app.use("/api/pdf/ingest", (req, res) => res.status(202).json({ mock: true, jobId: "safe_job", mode: "SAFE_MODE" }));
+  app.use("/api/rag/documents", (req, res) => res.json({ mock: true, documents: [], mode: "SAFE_MODE" }));
+  app.use("/api/organization", (req, res) => res.json({ mock: true, members: [], mode: "SAFE_MODE" }));
+}
 
 // Routes
 app.use("/api/verify", requireApiKey, verifyRoutes);
 app.use("/api/url", requireApiKey, urlRoutes);
-// app.use("/api/pdf", requireApiKey, require("./routes/pdf"));
-// app.use("/api/image", requireApiKey, require("./routes/image"));
-// app.use("/api/video", requireApiKey, require("./routes/video"));
 app.use("/api/health", healthRoutes);
 app.use("/api/trending", trendingRoutes);
 app.use('/api/organization', require('./routes/organization'));
 app.use('/api/user', require('./routes/user'));
 app.use("/api/auth", require("./routes/auth"));
-// app.use("/api/rag", require("./routes/rag"));
 
-// Static Mock for RAG documents to confirm stability
-app.get("/api/rag/documents", (req, res) => res.json({ mock: true, documents: [], stability: "high" }));
+// Conditional route loading
+if (!SAFE_MODE && PROCESS_TYPE === 'api') {
+  app.use("/api/pdf", requireApiKey, require("./routes/pdf"));
+  app.use("/api/image", requireApiKey, require("./routes/image"));
+  app.use("/api/video", requireApiKey, require("./routes/video"));
+  app.use("/api/rag", require("./routes/rag"));
+} else if (!SAFE_MODE) {
+  // Catch-all for worker mode
+  app.get("/api/rag/documents", (req, res) => res.json({ mock: true, info: "worker_mode" }));
+}
 
 // 404 handler
 app.use((req, res) => {
