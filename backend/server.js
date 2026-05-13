@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 5000;
 
 
 // Security & middleware
-// app.use(helmet());
+app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));

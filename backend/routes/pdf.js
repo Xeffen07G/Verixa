@@ -1,108 +1,128 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const { PdfReader } = require("pdfreader");
-const Groq = require("groq-sdk");
+const { parsePDF, createChunks } = require("../services/ingestion");
+const { addChunkToRAG } = require("../utils/rag");
+const { askGroq } = require("../services/groq");
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype === "application/pdf") cb(null, true);
-    else cb(new Error("Only PDF files are allowed"));
-  },
+  limits: { fileSize: 25 * 1024 * 1024 }, // Increased to 25MB for research papers
 });
 
-function parsePdfBuffer(buffer) {
-  return new Promise((resolve, reject) => {
-    const rows = {};
-    let currentPage = 0;
+const { ingestionQueue } = require("../services/queue");
 
-    new PdfReader().parseBuffer(buffer, (err, item) => {
-      if (err) {
-        reject(new Error(err.message || "PDF parse error"));
-        return;
-      }
+/**
+ * POST /api/pdf/ingest
+ * Adds a document to the background ingestion queue.
+ */
+router.post("/ingest", upload.single("pdf"), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "No PDF file uploaded." });
 
-      if (!item) {
-        // End of file — assemble text
-        const text = Object.keys(rows)
-          .sort((a, b) => Number(a) - Number(b))
-          .map((k) => rows[k].join(" "))
-          .join("\n");
-        resolve({ text, numpages: currentPage });
-        return;
-      }
-
-      if (item.page) {
-        currentPage = item.page;
-        rows[currentPage] = rows[currentPage] || [];
-      }
-
-      if (item.text) {
-        if (!rows[currentPage]) rows[currentPage] = [];
-        rows[currentPage].push(item.text);
-      }
-    });
-  });
-}
-
-router.post("/", upload.single("pdf"), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No PDF file uploaded." });
-  }
   try {
-    const { text, numpages } = await parsePdfBuffer(req.file.buffer);
-    const cleaned = text.replace(/\s+/g, " ").trim().slice(0, 10000);
-    if (!cleaned || cleaned.length < 5) {
-      return res.status(400).json({
-        error: "Could not extract text from this PDF. Please use a text-based PDF, not a scanned image.",
-      });
-    }
+    const documentId = `doc_${Date.now()}`;
+    const filename = req.file.originalname;
+
+    // Add to BullMQ
+    const job = await ingestionQueue.add('process-pdf', {
+      documentId,
+      filename,
+      buffer: req.file.buffer, // Buffer is serialized automatically by BullMQ
+      metadata: { uploadedAt: new Date() }
+    });
+
     res.json({
-      text: cleaned,
-      pages: numpages,
-      filename: req.file.originalname,
-      characters: cleaned.length,
+      message: "Ingestion started in background",
+      documentId,
+      jobId: job.id
     });
   } catch (err) {
-    console.error("PDF error:", err.message);
-    res.status(500).json({ error: "Failed to parse PDF: " + err.message });
+    console.error("Queue error:", err);
+    res.status(500).json({ error: "Failed to queue document: " + err.message });
   }
 });
 
-router.post("/ocr", async (req, res) => {
-  const { image } = req.body;
-  if (!image) return res.status(400).json({ error: "Image data required" });
-
+/**
+ * GET /api/pdf/status/:jobId
+ * Check the status of a background ingestion job.
+ */
+router.get("/status/:jobId", async (req, res) => {
   try {
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    const completion = await groq.chat.completions.create({
-      model: "meta-llama/llama-4-scout-17b-16e-instruct",
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: "You are an expert OCR engine. Extract EVERY word and sentence from this document image. Return ONLY the raw text found. Do not add any commentary or labels.",
-            },
-            {
-              type: "image_url",
-              image_url: { url: image },
-            },
-          ],
-        },
-      ],
-      temperature: 0.1,
-    });
+    const job = await ingestionQueue.getJob(req.params.jobId);
+    if (!job) return res.status(404).json({ error: "Job not found" });
 
-    const text = completion.choices[0].message.content.trim();
-    res.json({ text });
+    const status = await job.getState();
+    const progress = job.progress;
+    const result = job.returnvalue;
+
+    res.json({ status, progress, result });
   } catch (err) {
-    console.error("Deep Scan OCR error:", err.message);
-    res.status(500).json({ error: "Deep Scan failed: " + err.message });
+    res.status(500).json({ error: "Failed to fetch status" });
   }
 });
 
-module.exports = router;
+const researchAnalysis = require("../services/ResearchAnalysis");
+
+/**
+ * POST /api/pdf/summary
+ * Generates an executive research summary.
+ */
+router.post("/summary", async (req, res) => {
+  const { documentId, mode } = req.body;
+  if (!documentId) return res.status(400).json({ error: "Document ID required" });
+  try {
+    const summary = await researchAnalysis.generateExecutiveSummary(documentId, mode);
+    res.json(summary);
+  } catch (err) {
+    res.status(500).json({ error: "Summary generation failed" });
+  }
+});
+
+/**
+ * POST /api/pdf/sections
+ * Performs section-wise synthesis of the document.
+ */
+router.post("/sections", async (req, res) => {
+  const { documentId } = req.body;
+  if (!documentId) return res.status(400).json({ error: "Document ID required" });
+  try {
+    const sections = await researchAnalysis.synthesizeSections(documentId);
+    res.json(sections);
+  } catch (err) {
+    res.status(500).json({ error: "Section synthesis failed" });
+  }
+});
+
+/**
+ * POST /api/pdf/gaps
+ * Detects research gaps and identifies weaknesses.
+ */
+router.post("/gaps", async (req, res) => {
+  const { documentId } = req.body;
+  if (!documentId) return res.status(400).json({ error: "Document ID required" });
+  try {
+    const gaps = await researchAnalysis.detectResearchGaps(documentId);
+    res.json(gaps);
+  } catch (err) {
+    res.status(500).json({ error: "Gap detection failed" });
+  }
+});
+
+/**
+ * POST /api/pdf/methodology
+ * Explains methodology and terminology.
+ */
+router.post("/methodology", async (req, res) => {
+  const { documentId } = req.body;
+  if (!documentId) return res.status(400).json({ error: "Document ID required" });
+  try {
+    const methodology = await researchAnalysis.explainMethodology(documentId);
+    res.json(methodology);
+  } catch (err) {
+    res.status(500).json({ error: "Methodology explainer failed" });
+  }
+});
+
+
+
+module.exports = router;

@@ -38,3 +38,14 @@ scratch/
 coverage/
 data/
 backend/data/
+uploads/
+backend/uploads/
+temp/
+backend/temp/
+.venv/
+venv/
+ENV/
+env/
+.python-version
+*.pyc
+__pycache__/

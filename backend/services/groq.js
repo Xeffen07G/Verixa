@@ -173,8 +173,8 @@ Return ONLY this JSON format:
 Claims to verify:
 ${formatted}`;
 
-  // Using 8b model for final verification (faster, higher limits)
-  const raw = await askGroq(prompt, true, "llama-3.1-8b-instant");
+  // Using 70b model for final verification (high reasoning quality)
+  const raw = await askGroq(prompt, true, "llama-3.3-70b-versatile");
   const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
   const verified = parsed.results || parsed;
 
@@ -214,8 +214,8 @@ Return ONLY this JSON format:
 Text to analyze:
 ${text.slice(0, 3000)}`;
 
-  // Using 8b for AI detection (fast)
-  const raw = await askGroq(prompt, true, "llama-3.1-8b-instant");
+  // Using 70b for AI detection (high accuracy)
+  const raw = await askGroq(prompt, true, "llama-3.3-70b-versatile");
   return JSON.parse(raw.replace(/```json|```/g, "").trim());
 }
 

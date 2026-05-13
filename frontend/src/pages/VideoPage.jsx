@@ -9,10 +9,10 @@ import { Video, Activity, Search, Upload, Play, Pause, RefreshCw, AlertCircle, C
 const API_URL = process.env.REACT_APP_API_URL || '';
 
 const VERDICT_CONFIG = (lang) => ({
-  'Deepfake Detected':   { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', icon: '✗', label: t('deepfakeDetected', lang) },
-  'Likely Synthetic':    { color: '#fb923c', bg: 'rgba(251,146,60,0.08)',  border: 'rgba(251,146,60,0.25)',  icon: '~', label: t('likelySynthetic', lang) },
-  'Uncertain':           { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.25)',  icon: '?', label: t('uncertain', lang) },
-  'Authentic Footage':   { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: t('authenticFootage', lang) },
+  'High Probability of Synthetic Origin': { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', icon: '✗', label: t('deepfakeDetected', lang) },
+  'Probable Synthetic Indicators':      { color: '#fb923c', bg: 'rgba(251,146,60,0.08)',  border: 'rgba(251,146,60,0.25)',  icon: '~', label: t('likelySynthetic', lang) },
+  'Uncertain':                          { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.25)',  icon: '?', label: t('uncertain', lang) },
+  'Authentic Footprint Estimated':      { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: t('authenticFootage', lang) },
 });
 
 export default function VideoPage() {

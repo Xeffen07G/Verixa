@@ -255,7 +255,7 @@ export default function VerifyPage() {
     setUploadingPdf(true); setIsScannedPdf(false);
     try {
       const formData = new FormData(); formData.append('pdf', file);
-      const res = await fetch(`${API_URL}/api/pdf`, { method: 'POST', body: formData });
+      const res = await fetch(`${API_URL}/api/pdf/ingest`, { method: 'POST', body: formData });
       const data = await res.json();
       if (!res.ok) {
         if (data.error?.includes('scanned')) setIsScannedPdf(true);

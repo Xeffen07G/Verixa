@@ -13,7 +13,6 @@ router.post("/", async (req, res) => {
   res.setHeader("Cache-Control", "no-cache, no-transform");
   res.setHeader("Connection", "keep-alive");
   res.setHeader("X-Accel-Buffering", "no");
-  res.setHeader("Access-Control-Allow-Origin", "*");
   res.flushHeaders();
 
   const send = (event, data) => {

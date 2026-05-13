@@ -15,35 +15,19 @@ async function getPipeline() {
 
 const DB_PATH = path.join(__dirname, '..', 'knowledge_base.json');
 
-// Helper function to calculate cosine similarity between two vectors
-function cosineSimilarity(vecA, vecB) {
-  let dotProduct = 0;
-  let normA = 0;
-  let normB = 0;
-  for (let i = 0; i < vecA.length; i++) {
-    dotProduct += vecA[i] * vecB[i];
-    normA += vecA[i] * vecA[i];
-    normB += vecB[i] * vecB[i];
-  }
-  if (normA === 0 || normB === 0) return 0;
-  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-}
-
 /**
- * 1. Generate an embedding vector for a given text.
+ * Generate an embedding vector for a given text.
  */
 async function generateEmbedding(text) {
   const extractor = await getPipeline();
-  // Generate embeddings. Pooling 'mean' gives a single sentence embedding.
   const output = await extractor(text, { pooling: 'mean', normalize: true });
-  // Convert Float32Array to standard JS Array
   return Array.from(output.data);
 }
 
 /**
- * 2. Add a new document to the RAG knowledge base.
+ * Add a new document chunk to the RAG knowledge base.
  */
-async function addDocumentToRAG(id, text, metadata = {}) {
+async function addChunkToRAG(id, text, metadata = {}) {
   try {
     const embedding = await generateEmbedding(text);
 
@@ -54,14 +38,11 @@ async function addDocumentToRAG(id, text, metadata = {}) {
         { id, text, metadata, embedding, timestamp: new Date() },
         { upsert: true, new: true }
       );
-      console.log(`Document [${id}] added to MongoDB RAG.`);
     } catch (dbError) {
       console.warn("MongoDB RAG failed, falling back to JSON:", dbError.message);
-      // Fallback to JSON
       let kb = [];
       if (fs.existsSync(DB_PATH)) {
-        const fileData = fs.readFileSync(DB_PATH, 'utf-8');
-        kb = JSON.parse(fileData);
+        kb = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
       }
       const existingIdx = kb.findIndex(d => d.id === id);
       if (existingIdx >= 0) kb[existingIdx] = { id, text, metadata, embedding };
@@ -77,70 +58,91 @@ async function addDocumentToRAG(id, text, metadata = {}) {
 }
 
 /**
- * 3. Search the knowledge base for context similar to the query.
+ * Cosine Similarity calculation.
  */
-async function retrieveContext(queryText, topK = 3) {
-  let kb = [];
-  
-  // Try MongoDB first
-  try {
-    kb = await Knowledge.find({}).lean();
-    if (kb.length === 0) {
-      // If MongoDB is empty, check JSON fallback
-      if (fs.existsSync(DB_PATH)) {
-        kb = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+function cosineSimilarity(vecA, vecB) {
+  let dotProduct = 0, normA = 0, normB = 0;
+  for (let i = 0; i < vecA.length; i++) {
+    dotProduct += vecA[i] * vecB[i];
+    normA += vecA[i] * vecA[i];
+    normB += vecB[i] * vecB[i];
+  }
+  return normA === 0 || normB === 0 ? 0 : dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+/**
+ * Reciprocal Rank Fusion (RRF) to combine multiple search results.
+ */
+function rrf(resultsSets, k = 60) {
+  const scores = new Map();
+  resultsSets.forEach(results => {
+    results.forEach((res, rank) => {
+      const id = res.id;
+      const score = 1 / (rank + k);
+      if (scores.has(id)) {
+        scores.set(id, { ...res, rrfScore: scores.get(id).rrfScore + score });
+      } else {
+        scores.set(id, { ...res, rrfScore: score });
       }
-    }
-  } catch (dbError) {
-    console.warn("MongoDB retrieval failed, falling back to JSON:", dbError.message);
-    if (fs.existsSync(DB_PATH)) {
-      kb = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
-    }
-  }
-
-  if (!kb || kb.length === 0) return [];
-
-  const queryEmbedding = await generateEmbedding(queryText);
-
-  // Calculate similarity for all stored documents
-  const results = kb.map(doc => {
-    const score = cosineSimilarity(queryEmbedding, doc.embedding);
-    return { ...doc, score };
+    });
   });
-
-  // Sort by highest similarity
-  results.sort((a, b) => b.score - a.score);
-
-  // Return the top K matches without the heavy embedding arrays
-  return results.slice(0, topK).map(res => ({
-    id: res.id,
-    text: res.text,
-    metadata: res.metadata,
-    score: res.score
-  }));
+  return Array.from(scores.values()).sort((a, b) => b.rrfScore - a.rrfScore);
 }
 
-async function getKnowledgeBase() {
+/**
+ * Retrieve similar context using Hybrid Search (Vector + Keyword).
+ */
+async function retrieveContext(queryText, topK = 10, filter = {}) {
+  const queryEmbedding = await generateEmbedding(queryText);
+  
+  // 1. Vector Search (using cosine similarity fallback or Atlas)
+  let vectorResults = [];
   try {
-    const docs = await Knowledge.find({}, { embedding: 0 }).lean();
-    if (docs.length > 0) return docs;
+    const kb = await Knowledge.find(filter).lean();
+    vectorResults = kb.map(doc => ({
+      ...doc,
+      vectorScore: cosineSimilarity(queryEmbedding, doc.embedding)
+    }))
+    .sort((a, b) => b.vectorScore - a.vectorScore)
+    .slice(0, 50);
   } catch (e) {
-    console.warn("MongoDB getKnowledgeBase failed:", e.message);
+    console.warn("Vector search failed:", e.message);
   }
 
-  if (!fs.existsSync(DB_PATH)) return [];
-  const kb = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
-  return kb.map(res => ({
+  // 2. Keyword Search (using MongoDB Text Index)
+  let keywordResults = [];
+  try {
+    keywordResults = await Knowledge.find({
+      ...filter,
+      $text: { $search: queryText }
+    })
+    .select({ score: { $meta: "textScore" } })
+    .sort({ score: { $meta: "textScore" } })
+    .limit(50)
+    .lean();
+  } catch (e) {
+    console.warn("Keyword search failed:", e.message);
+  }
+
+  // 3. Fusion (RRF)
+  const fused = rrf([vectorResults, keywordResults]);
+
+  return fused.slice(0, topK).map(res => ({
     id: res.id,
     text: res.text,
     metadata: res.metadata,
-    timestamp: res.timestamp || new Date().toISOString()
+    scores: {
+      vector: res.vectorScore || 0,
+      keyword: res.score || 0,
+      fused: res.rrfScore
+    }
   }));
 }
+
 
 module.exports = {
   generateEmbedding,
-  addDocumentToRAG,
-  retrieveContext,
-  getKnowledgeBase
+  addChunkToRAG,
+  retrieveContext
 };
+

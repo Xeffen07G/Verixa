@@ -9,56 +9,23 @@ router.post("/url", async (req, res) => {
   if (!videoUrl) return res.status(400).json({ error: "URL is required" });
 
   try {
-    // Intercept demo example videos to guarantee accurate, pre-calculated results
-    if (videoUrl.includes("Mh4f9AYRCZY")) {
-      return setTimeout(() => res.json({
-        status: "success",
-        ai_score: 12,
-        verdict: "Authentic Footage",
-        assessment: "No temporal artifacts or biometric inconsistencies detected. The motion vectors align with standard optical flow expectations.",
-        anomalies: [],
-        indicators: [
-          { risk: "low", text: "Natural facial muscle tension" },
-          { risk: "low", text: "Consistent lighting and shadows" },
-          { risk: "low", text: "Audio-visual sync is perfectly aligned" }
-        ],
-        metadata: { resolution: "1920x1080", frameRate: "30fps", duration: "Variable" }
-      }), 1500);
-    }
-    
-    if (videoUrl.includes("cQ54GDm1eL0")) {
-      return setTimeout(() => res.json({
-        status: "success",
-        ai_score: 92,
-        verdict: "Deepfake Detected",
-        assessment: "Critical inconsistencies found in facial blending boundaries and eye-blinking temporal rate. Motion vectors contradict physical lighting physics.",
-        anomalies: [
-          { timestamp_pct: 14, type: "Facial Blending Boundary" },
-          { timestamp_pct: 45, type: "Unnatural Eye Movement" },
-          { timestamp_pct: 78, type: "Audio Desync" }
-        ],
-        indicators: [
-          { risk: "high", text: "Facial replacement artifacts detected" },
-          { risk: "high", text: "Inconsistent frame-by-frame rendering" },
-          { risk: "high", text: "Micro-expressions do not match speech audio" }
-        ],
-        metadata: { resolution: "1920x1080", frameRate: "29.97fps", duration: "Variable" }
-      }), 1500);
-    }
+    // Demo example videos now use the same production inference pipeline as all other content.
+    // This ensures technical integrity and prevents fake capability perception.
+
 
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
     
-    // Simulate multi-pass temporal audit
+    // Contextual & Metadata Inference for URLs
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [
         {
           role: "system",
-          content: "You are an elite Video Forensic AI engine. Analyze the provided video URL. You must generate a HIGHLY DETAILED, mathematically rigorous, and technical forensic report. Return ONLY a JSON object with: overallScore (0-1), verdict ('Authentic Footage', 'Likely Synthetic', 'Uncertain', or 'Deepfake Detected'), assessment (string: write a highly technical 3-sentence breakdown mentioning specific forensic techniques like optical flow analysis, sub-pixel blending, chroma subsampling errors, or biometric sync. Explain exactly what issues or consistencies were found), indicators (array of 3 to 5 objects {risk: 'high'|'low', text: string}: highly specific technical indicators like 'Sub-pixel blending artifacts detected near jawline'), and anomalies (array of objects {timestamp_pct: integer 0-100, type: string})."
+          content: "You are an elite Video Intelligence Engine. Analyze the provided video URL/metadata. You must generate a probabilistic technical inference report. Return ONLY a JSON object with: overallScore (0-1), verdict ('Authentic Footprint Estimated', 'Probable Synthetic Indicators', 'Uncertain', or 'High Probability of Synthetic Origin'), assessment (string: write a technical 3-sentence breakdown mentioning inferred indicators based on metadata or source context), indicators (array of 3 objects {risk: 'high'|'low', text: string}), and anomalies (array of objects {timestamp_pct, type})."
         },
         {
           role: "user",
-          content: `Analyze this video: ${videoUrl}`
+          content: `Perform a contextual assessment on this video URL: ${videoUrl}`
         }
       ],
       response_format: { type: "json_object" },
@@ -86,49 +53,86 @@ router.post("/url", async (req, res) => {
   }
 });
 
+const { analyzeMediaMetadata, extractKeyFrames } = require("../services/media");
+const path = require("path");
+const fs = require("fs");
+
 // POST /api/video/upload
 router.post("/upload", upload.single("video"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No video file provided" });
+  
+  const tempPath = path.join(__dirname, "../../temp", `${Date.now()}_${req.file.originalname}`);
+  if (!fs.existsSync(path.dirname(tempPath))) fs.mkdirSync(path.dirname(tempPath), { recursive: true });
+  
   try {
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    // 1. Save temp file for processing
+    fs.writeFileSync(tempPath, req.file.buffer);
+
+    // 2. Real Metadata Analysis
+    const metadata = await analyzeMediaMetadata(tempPath);
     
-    // Pass filename and size to AI to generate a unique simulation
-    const fileInfo = `File Name: ${req.file.originalname}, Size: ${(req.file.size / 1024 / 1024).toFixed(2)} MB`;
+    // 3. Keyframe Extraction
+    const frameDir = path.join(__dirname, "../../temp/frames", `${Date.now()}`);
+    const frames = await extractKeyFrames(tempPath, frameDir);
 
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        {
-          role: "system",
-          content: "You are an elite Video Forensic AI engine. Analyze the provided video file metadata. Unless the filename explicitly contains words like 'fake', 'deepfake', 'synth', or 'ai', you MUST strongly bias your analysis to conclude this is a standard, 100% authentic user-recorded video. For authentic videos, generate a mathematically rigorous forensic report returning an overallScore between 0.01 and 0.15, verdict 'Authentic Footage', and explain in the assessment how consistent the natural motion vectors, lighting physics, and audio sync are. Provide 3 to 5 'low' risk indicators. If the filename implies it is fake, generate a 'Deepfake Detected' report. Return ONLY a JSON object with: overallScore (0-1), verdict, assessment, indicators ({risk: 'high'|'low', text}), and anomalies ({timestamp_pct, type})."
-        },
-        {
-          role: "user",
-          content: `Analyze this uploaded video: ${fileInfo}`
-        }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.3
-    });
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const fileInfo = `File Name: ${req.file.originalname}, Size: ${(req.file.size / 1024 / 1024).toFixed(2)} MB, Duration: ${metadata.duration}s, Streams: ${metadata.streams.length}`;
 
-    const analysis = JSON.parse(completion.choices[0].message.content);
+    // 4. Vision Inference on Keyframes
+    let visionResult = { overallScore: 0.1, verdict: "Uncertain", assessment: "Analysis completed.", indicators: [], anomalies: [] };
+    
+    if (frames.length > 0) {
+      const frameBuffer = fs.readFileSync(frames[0]);
+      const frameBase64 = frameBuffer.toString("base64");
+      const frameDataUrl = `data:image/jpeg;base64,${frameBase64}`;
+
+      const visionCompletion = await groq.chat.completions.create({
+        model: "llama-3.2-11b-vision-preview",
+        messages: [
+          {
+            role: "system",
+            content: "You are the VeriXa Video Forensic Engine. Analyze the provided keyframe for synthetic manipulation artifacts (blending, temporal jitter, biometric anomalies). Return ONLY a JSON object with: overallScore (0-1), verdict, assessment, indicators ({risk: 'high'|'low', text}), and anomalies ({timestamp_pct, type})."
+          },
+          {
+            role: "user",
+            content: [
+              { type: "text", text: `Metadata: ${fileInfo}. Analyze this keyframe for authenticity.` },
+              { type: "image_url", image_url: { url: frameDataUrl } }
+            ]
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.1
+      });
+      visionResult = JSON.parse(visionCompletion.choices[0].message.content);
+    }
+
+    // Cleanup files
+    try {
+      if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+      frames.forEach(f => { if (fs.existsSync(f)) fs.unlinkSync(f); });
+      if (fs.existsSync(frameDir)) fs.rmdirSync(frameDir, { recursive: true });
+    } catch (cleanupErr) {
+      console.warn("Cleanup error:", cleanupErr.message);
+    }
 
     res.json({
       status: "success",
-      ai_score: Math.round(analysis.overallScore * 100),
-      verdict: analysis.verdict,
-      assessment: analysis.assessment,
-      anomalies: analysis.anomalies || [],
-      indicators: analysis.indicators || [],
+      ai_score: Math.round(visionResult.overallScore * 100),
+      verdict: visionResult.verdict,
+      assessment: visionResult.assessment,
+      anomalies: visionResult.anomalies || [],
+      indicators: visionResult.indicators || [],
       metadata: {
-        resolution: "1920x1080",
-        frameRate: "30fps",
-        duration: "Variable"
+        resolution: `${metadata.streams[0].width}x${metadata.streams[0].height}`,
+        frameRate: metadata.streams[0].avg_frame_rate,
+        duration: `${metadata.duration.toFixed(2)}s`
       }
     });
   } catch (err) {
-    console.error("Upload video analysis error:", err.message);
-    res.status(500).json({ error: "Forensic analysis failed: " + err.message });
+    console.error("Upload video processing error:", err.message);
+    if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+    res.status(500).json({ error: "Media processing failed: " + err.message });
   }
 });
 

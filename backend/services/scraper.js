@@ -1,68 +1,51 @@
-const fetch = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
+const fetch = require("node-fetch");
 const cheerio = require("cheerio");
 
 /**
- * Fetch and extract readable text content from a URL
+ * Robust URL scraper for VeriXa Intelligence
+ * Extracts core text, titles, and metadata while filtering junk.
  */
 async function scrapeUrl(url) {
-  const response = await fetch(url, {
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (compatible; VeriXa/1.0; +https://verixa.ai/bot)",
-      Accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    },
-    timeout: 15000,
-  });
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+      },
+      timeout: 10000,
+    });
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch URL: HTTP ${response.status}`);
-  }
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const html = await response.text();
+    const $ = cheerio.load(html);
 
-  const html = await response.text();
-  const $ = cheerio.load(html);
+    // Remove scripts, styles, and ads
+    $("script, style, nav, footer, header, ads, .ads, #ads").remove();
 
-  // Remove noise elements
-  $("script, style, nav, footer, header, aside, .ad, .advertisement, .cookie-banner").remove();
+    const title = $("title").text().trim() || $("h1").first().text().trim();
+    
+    // Extract main text content
+    let text = "";
+    $("p, h1, h2, h3, li").each((_, el) => {
+      const line = $(el).text().trim();
+      if (line.length > 20) text += line + "\n\n";
+    });
 
-  // Extract title
-  const title =
-    $("h1").first().text().trim() ||
-    $("title").text().trim() ||
-    "Untitled Article";
-
-  // Try article-specific selectors first
-  let content = "";
-  const articleSelectors = [
-    "article",
-    '[role="main"]',
-    ".article-body",
-    ".post-content",
-    ".entry-content",
-    ".story-body",
-    "main",
-  ];
-
-  for (const selector of articleSelectors) {
-    const el = $(selector);
-    if (el.length && el.text().trim().length > 200) {
-      content = el.text().trim();
-      break;
+    if (text.length < 100) {
+      // Fallback for non-standard structures
+      text = $("body").text().replace(/\s+/g, " ").trim();
     }
+
+    return {
+      title,
+      text: text.slice(0, 10000), // Cap for performance
+      url,
+      timestamp: new Date().toISOString()
+    };
+  } catch (err) {
+    console.error(`Scrape failed for ${url}:`, err.message);
+    throw new Error("Could not extract content from the provided URL. The site may be blocking automated access.");
   }
-
-  // Fallback to body
-  if (!content) {
-    content = $("body").text().trim();
-  }
-
-  // Clean whitespace
-  content = content.replace(/\s+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
-
-  // Limit to ~6000 chars
-  const truncated = content.length > 6000 ? content.slice(0, 6000) + "..." : content;
-
-  return { title, content: truncated, url };
 }
 
 module.exports = { scrapeUrl };

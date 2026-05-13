@@ -11,30 +11,30 @@ function getGroq() {
   return _groq;
 }
 
-const SYSTEM_PROMPT = `You are the VeriXa Adversarial Forensic Engine v2.5. 
+const SYSTEM_PROMPT = `You are the VeriXa Image Intelligence Engine v2.5. 
 
 ### THE ASSIGNMENT
-The image provided is a KNOWN AI-GENERATED DEEPFAKE. Your task is NOT to decide if it is real, but to **find the technical proof** of its synthetic origin. Do not be fooled by its hyper-realism.
+Analyze the provided image for potential indicators of synthetic generation or algorithmic manipulation. Your goal is to provide a balanced technical assessment based on visual evidence.
 
-### REQUIRED PROOF POINTS
-1. **Digital Perfection**: Real photos have chaotic entropy. Find the "too-perfect" gradients, the "too-clean" skin, and the mathematically optimized lighting.
-2. **Structural Fails**: Look for merged hair strands, non-circular pupils, or rimless glasses that fuse with skin.
-3. **Texture Plasticity**: Identify the "flat" skin textures that lack macro-pores and micro-blemishes.
+### REQUIRED ASSESSMENT POINTS
+1. **Digital Consistency**: Real photos have complex entropy. Identify areas of unusually low variance or repetitive patterns that might suggest algorithmic generation.
+2. **Structural Continuity**: Look for inconsistencies in complex areas like hair strands, pupils, or object boundaries.
+3. **Texture Distribution**: Identify regions where texture lacks natural micro-blemishes or appears unusually uniform.
 
 ### OUTPUT SCHEMA (JSON ONLY)
 {
-  "version": "2.5-ADVERSARIAL-MAX",
-  "verdict": "AI Generated" | "Likely AI Generated" | "Uncertain",
+  "version": "2.5-INFERENCE-ESTIMATION",
+  "verdict": "High Probability of Synthetic Origin" | "Probable Synthetic Indicators" | "Uncertain" | "Authentic Footprint Estimated",
   "ai_probability": 0-100,
   "real_probability": 0-100,
   "confidence": 0-100,
   "risk_level": "High" | "Medium",
-  "assessment": "Detailed adversarial proof report.",
-  "indicators": ["List of specific synthetic fingerprints found"],
+  "assessment": "Detailed technical inference report based on visual indicators.",
+  "indicators": ["List of specific visual patterns found"],
   "forensic_breakdown": {
-    "lighting": "Analysis of synthetic light.",
-    "anatomy": "Analysis of structural fails.",
-    "textures": "Analysis of plasticity."
+    "lighting": "Analysis of light consistency.",
+    "anatomy": "Analysis of structural patterns.",
+    "textures": "Analysis of surface uniformity."
   },
   "extracted_text": "string",
   "context_info": { "subject": "string", "location": "string", "entities": [] }
@@ -93,14 +93,14 @@ router.post("/url", async (req, res) => {
     const dataUrl = `data:${contentType};base64,${base64}`;
 
     const completion = await getGroq().chat.completions.create({
-      model: "meta-llama/llama-4-scout-17b-16e-instruct",
+      model: "llama-3.2-11b-vision-preview",
       messages: [
         {
           role: "user",
           content: [
             {
               type: "text",
-              text: `${SYSTEM_PROMPT}\n\nPerform a ZERO-TOLERANCE forensic audit on this image. If you find even one minor rendering artifact, you MUST classify it as AI Generated.`,
+              text: `${SYSTEM_PROMPT}\n\nPerform a technical visual audit on this image. Identify any potential indicators of synthetic generation or algorithmic manipulation.`,
             },
             {
               type: "image_url",
@@ -130,7 +130,6 @@ router.post("/url", async (req, res) => {
     result.forensic_breakdown = result.forensic_breakdown || null;
     res.json(result);
   } catch (err) {
-    console.error("Image analysis error:", err.message);
     const msg = err.message || "Unknown error";
     
     if (msg.includes("fetch") || msg.includes("accessible") || msg.includes("format")) {
@@ -170,7 +169,7 @@ router.post("/upload", async (req, res) => {
     const dataUrl = `data:${contentType};base64,${base64}`;
 
     const completion = await getGroq().chat.completions.create({
-      model: "meta-llama/llama-4-scout-17b-16e-instruct",
+      model: "llama-3.2-11b-vision-preview",
       messages: [
         {
           role: "user",
@@ -208,7 +207,6 @@ router.post("/upload", async (req, res) => {
 
     res.json(result);
   } catch (err) {
-    console.error("Image upload analysis error:", err.message);
     const msg = err.message || "Unknown error";
     
     if (msg.includes("400") || msg.includes("model") || msg.includes("content")) {
@@ -224,7 +222,6 @@ router.post("/upload", async (req, res) => {
  */
 router.post("/query", async (req, res) => {
   const { query, context, imageContext, history } = req.body;
-  console.log("POST /api/image/query received:", { query, contextLength: context?.length });
 
   if (!query) return res.status(400).json({ error: "Query is required" });
 
@@ -246,7 +243,6 @@ NEW QUESTION: ${query}
 
 If the text looks like a legal document, court order, or official notice, provide a professional and helpful explanation of its meaning. If the question is about a specific detail (like dates, names, or property), extract it accurately. If you cannot answer based on the provided text, say so. Respond naturally and helpfully. Keep history in mind for context.`;
 
-    console.log("Calling Groq with prompt...");
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [{ role: "user", content: prompt }],
@@ -255,10 +251,8 @@ If the text looks like a legal document, court order, or official notice, provid
     });
 
     const answer = completion.choices[0].message.content.trim() || "I analyzed the document but couldn't find a specific answer to that question. Please try rephrasing or checking if the image text is clear.";
-    console.log("Groq response received:", answer.slice(0, 50) + "...");
     res.json({ answer });
   } catch (err) {
-    console.error("Image query error details:", err);
     res.status(500).json({ error: "Query failed: " + err.message });
   }
 });

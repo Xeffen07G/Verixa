@@ -1,68 +1,93 @@
 const express = require('express');
 const router = express.Router();
-const { addDocumentToRAG, retrieveContext, getKnowledgeBase } = require('../utils/rag');
-const Groq = require('groq-sdk');
+const { addChunkToRAG } = require('../utils/rag');
+const { queryIntelligence } = require('../services/intelligence');
 
-// POST /api/rag/add
+/**
+ * POST /api/rag/add
+ * Manually add a fact to RAG.
+ */
 router.post('/add', async (req, res) => {
   const { id, text, metadata } = req.body;
   if (!text) return res.status(400).json({ error: "Text is required" });
 
-  const success = await addDocumentToRAG(id || Date.now().toString(), text, metadata || {});
+  const success = await addChunkToRAG(id || `manual_${Date.now()}`, text, metadata || {});
   
   if (success) {
-    res.json({ message: "Fact added to RAG knowledge base successfully!" });
+    res.json({ message: "Evidence added to VeriXa intelligence successfully!" });
   } else {
-    res.status(500).json({ error: "Failed to add fact to knowledge base" });
+    res.status(500).json({ error: "Failed to add evidence" });
   }
 });
 
-// POST /api/rag/query
+/**
+ * POST /api/rag/query
+ * Perform a grounded intelligence query.
+ */
 router.post('/query', async (req, res) => {
-  const { query, context: inputContext, topK = 3 } = req.body;
+  const { query, documentId } = req.body;
   if (!query) return res.status(400).json({ error: "Query is required" });
 
   try {
-    const results = await retrieveContext(query, topK);
-    const retrievedText = results.map(r => r.text).join('\n\n');
-    
-    // Combine manual context (from the image/pdf) and retrieved context
-    const finalContext = `Manual Context: ${inputContext || 'None'}\n\nRetrieved Knowledge: ${retrievedText || 'None'}`;
-
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        {
-          role: "system",
-          content: "You are VeriXa Intelligence, a factual forensic assistant. Use the provided context to answer the user's query accurately. If the context doesn't contain the answer, say you don't know based on the current knowledge base. Keep it professional and concise."
-        },
-        {
-          role: "user",
-          content: `Context:\n${finalContext}\n\nQuery: ${query}`
-        }
-      ],
-      temperature: 0.2
-    });
-
-    res.json({ 
-      answer: completion.choices[0].message.content,
-      results 
-    });
+    const result = await queryIntelligence(query, documentId);
+    res.json(result);
   } catch (error) {
-    console.error("RAG Query Error:", error);
+    console.error("Intelligence Query Error:", error);
     res.status(500).json({ error: "Failed to process intelligence query" });
   }
 });
 
-// GET /api/rag/documents
-router.get('/documents', async (req, res) => {
+const orchestrator = require('../services/ResearchOrchestrator');
+const consensusEngine = require('../services/ConsensusEngine');
+const graphService = require('../services/graph');
+
+/**
+ * POST /api/rag/synthesis
+ * Perform multi-agent evidence synthesis.
+ */
+router.post('/synthesis', async (req, res) => {
+  const { query, documentIds } = req.body;
+  if (!query) return res.status(400).json({ error: "Query is required" });
+
   try {
-    const docs = await getKnowledgeBase();
-    res.json({ documents: docs });
+    const result = await orchestrator.performSynthesis(query, documentIds || []);
+    res.json(result);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch documents" });
+    console.error("Synthesis Error:", error);
+    res.status(500).json({ error: "Multi-agent synthesis failed" });
   }
 });
+
+/**
+ * POST /api/rag/consensus
+ * Analyze consensus and contradictions for a claim.
+ */
+router.post('/consensus', async (req, res) => {
+  const { query, documentIds } = req.body;
+  if (!query) return res.status(400).json({ error: "Query is required" });
+
+  try {
+    const result = await consensusEngine.analyzeConsensus(query, documentIds || []);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Consensus analysis failed" });
+  }
+});
+
+/**
+ * GET /api/rag/graph/:nodeId
+ * Retrieve influence graph for a concept or entity.
+ */
+router.get('/graph/:nodeId', async (req, res) => {
+  try {
+    const graph = await graphService.getInfluenceGraph(req.params.nodeId);
+    res.json(graph);
+  } catch (error) {
+    res.status(500).json({ error: "Graph retrieval failed" });
+  }
+});
+
+
+
 
 module.exports = router;

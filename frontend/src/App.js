@@ -10,6 +10,7 @@ import TrendingPage from './pages/TrendingPage';
 import DashboardPage from './pages/DashboardPage';
 import ExtensionPage from './pages/ExtensionPage';
 import AccountPage from './pages/AccountPage';
+import ResearchWorkspace from './pages/ResearchWorkspace';
 import { AuthProvider } from './context/AuthContext';
 import { LangProvider } from './context/LangContext';
 import DragDropOverlay from './components/DragDropOverlay';
@@ -33,6 +34,7 @@ export default function App() {
                 <Route path="/trending" element={<TrendingPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/extension" element={<ExtensionPage />} />
+                <Route path="/research" element={<ResearchWorkspace />} />
                 <Route path="/account" element={<AccountPage />} />
               </Routes>
             </DragDropOverlay>

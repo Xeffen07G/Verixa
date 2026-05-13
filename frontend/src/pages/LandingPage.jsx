@@ -271,8 +271,8 @@ export default function LandingPage() {
               </div>
               <div style={{ display: 'flex', gap: 40, marginTop: 48, flexWrap: 'wrap' }}>
                 {[
-                  { label: t('calibration', lang), val: '99.9%', color: '#4ade80' },
-                  { label: t('latency', lang), val: '< 800ms', color: T.accent },
+                  { label: t('calibration', lang), val: 'Benchmarked', color: '#4ade80' },
+                  { label: t('latency', lang), val: 'Optimized', color: T.accent },
                   { label: t('integrityLabel', lang), val: t('secureLabel', lang), color: '#60a5fa' }
                 ].map((h, i) => (
                   <div key={i} style={{ minWidth: 100 }}>

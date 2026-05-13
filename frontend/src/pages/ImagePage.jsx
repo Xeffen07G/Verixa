@@ -7,11 +7,10 @@ import { useLang } from '../context/LangContext';
 const API_URL = process.env.REACT_APP_API_URL || '';
 
 const VERDICT_CONFIG = (lang) => ({
-  'AI Generated':        { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', icon: '✗', label: t('aiGenerated', lang) },
-  'Likely AI Generated': { color: '#fb923c', bg: 'rgba(251,146,60,0.08)',  border: 'rgba(251,146,60,0.25)',  icon: '~', label: t('likelyAI', lang) },
-  'Uncertain':           { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.25)',  icon: '?', label: t('uncertain', lang) },
-  'Likely Real':         { color: '#a3e635', bg: 'rgba(163,230,53,0.08)',  border: 'rgba(163,230,53,0.25)',  icon: '~', label: t('likelyReal', lang) },
-  'Real':                { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: t('real', lang) },
+  'High Probability of Synthetic Origin': { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', icon: '✗', label: t('aiGenerated', lang) },
+  'Probable Synthetic Indicators':      { color: '#fb923c', bg: 'rgba(251,146,60,0.08)',  border: 'rgba(251,146,60,0.25)',  icon: '~', label: t('likelyAI', lang) },
+  'Uncertain':                          { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.25)',  icon: '?', label: t('uncertain', lang) },
+  'Authentic Footprint Estimated':      { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: t('real', lang) },
 });
 
 const RISK_CONFIG = (lang) => ({
