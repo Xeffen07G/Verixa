@@ -4,6 +4,7 @@ const fs = require("fs");
 const multer = require("multer");
 const { parsePDF, createChunks } = require("../services/ingestion");
 const { addChunkToRAG } = require("../utils/rag");
+const IngestionJob = require("../models/IngestionJob");
 const { askGroq } = require("../services/groq");
 
 const storage = multer.diskStorage({
@@ -24,62 +25,74 @@ const { ingestionQueue } = require("../services/queue");
  */
 router.post("/ingest", upload.single("pdf"), async (req, res) => {
   const tStart = Date.now();
-  console.log(`[API] Ingest entry: ${new Date().toISOString()}`);
-
   if (!req.file) return res.status(400).json({ error: "No PDF uploaded" });
 
   try {
-    const tQueueStart = Date.now();
     const documentId = `doc_${Date.now()}`;
     
-    // Proactive size enforcement
-    if (req.file.size > 25 * 1024 * 1024) {
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-      return res.status(413).json({ error: "File too large. Max 25MB." });
-    }
-
-    // Add to BullMQ with strict cleanup policies
-    const job = await ingestionQueue.add('process-pdf', {
+    // 1. Create persistent job record
+    const ingestionJob = await IngestionJob.create({
       documentId,
       filename: req.file.originalname,
       path: req.file.path,
+      status: 'pending',
       metadata: { uploadedAt: new Date(), size: req.file.size }
+    });
+
+    // 2. Add to first stage of the pipeline
+    const job = await ingestionQueue.add('extract', {
+      documentId,
+      filename: req.file.originalname,
+      path: req.file.path
     }, {
-      removeOnComplete: { age: 3600, count: 100 }, // Keep last 100 or 1 hour
-      removeOnFail: { age: 24 * 3600, count: 500 }, // Keep failures for 24h
+      removeOnComplete: true,
       attempts: 3,
       backoff: { type: 'exponential', delay: 5000 }
     });
 
-    console.log(`[API] Enqueued: ${Date.now() - tQueueStart}ms`);
+    // 3. Link BullMQ job ID for tracking
+    ingestionJob.jobId = job.id;
+    await ingestionJob.save();
 
     res.status(202).json({
       success: true,
       jobId: job.id,
       documentId
     });
-
-    console.log(`[API] Response sent: ${Date.now() - tStart}ms`);
   } catch (err) {
-    console.error("[API] Queue error:", err);
-    res.status(500).json({ error: "Queue failure" });
+    console.error("[API] Ingestion Error:", err);
+    res.status(500).json({ error: "Ingestion pipeline failure" });
   }
 });
 
 /**
  * GET /api/pdf/status/:jobId
- * Check the status of a background ingestion job.
+ * Check status using IngestionJob record (Persistent Source of Truth)
  */
 router.get("/status/:jobId", async (req, res) => {
+  const { jobId } = req.params;
+  const { documentId } = req.query; // Fallback to documentId for lookup
+  
   try {
-    const job = await ingestionQueue.getJob(req.params.jobId);
-    if (!job) return res.status(404).json({ error: "Job not found" });
+    // Priority: Lookup by documentId if provided, otherwise jobId
+    const query = documentId ? { documentId } : { jobId };
+    const ingestionJob = await IngestionJob.findOne(query);
+    
+    if (!ingestionJob) {
+      // Fallback to BullMQ check if DB record missing (legacy)
+      const job = await ingestionQueue.getJob(jobId);
+      if (!job) return res.status(404).json({ error: "Job not found" });
+      return res.json({ status: await job.getState(), progress: job.progress });
+    }
 
-    const status = await job.getState();
-    const progress = job.progress;
-    const result = job.returnvalue;
-
-    res.json({ status, progress, result });
+    res.json({
+      status: ingestionJob.status,
+      progress: ingestionJob.progress,
+      stage: ingestionJob.stage,
+      chunks: ingestionJob.chunksCount,
+      timing: ingestionJob.timing,
+      error: ingestionJob.error
+    });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch status" });
   }
