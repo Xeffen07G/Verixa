@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 import { Mail, Shield, Building, Calendar, Settings, Camera, Save, X, MapPin, Quote, TrendingUp, Award, Zap, Activity, CheckCircle2, ChevronRight, Edit3 } from 'lucide-react';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
@@ -145,9 +145,8 @@ export default function AccountPage() {
 
     // Async server update with timeout
     try {
-      const API = process.env.REACT_APP_API_URL || '';
       // We don't wait indefinitely for the server; 6s is enough
-      await axios.post(`${API}/api/user/profile`, 
+      await api.post('/api/user/profile', 
         { email: user?.email, ...editData },
         { timeout: 6000 }
       );
@@ -166,14 +165,13 @@ export default function AccountPage() {
 
   useEffect(() => {
     if (isAdmin && user?.organization) {
-      const API = process.env.REACT_APP_API_URL || '';
       // Fetch organization members
-      axios.get(`${API}/api/organization/${encodeURIComponent(user.organization)}/members`)
+      api.get(`/api/organization/${encodeURIComponent(user.organization)}/members`)
         .then(res => setTeamMembers(res.data))
         .catch(console.error);
         
       // Fetch organization history to calculate stats
-      axios.get(`${API}/api/organization/${encodeURIComponent(user.organization)}/history`)
+      api.get(`/api/organization/${encodeURIComponent(user.organization)}/history`)
         .then(res => setOrgHistory(res.data))
         .catch(console.error);
     }

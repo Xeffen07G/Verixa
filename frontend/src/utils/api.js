@@ -24,4 +24,5 @@ export async function healthCheck() {
   return res.data;
 }
 
+export { BASE };
 export default api;

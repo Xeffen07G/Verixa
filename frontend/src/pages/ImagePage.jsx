@@ -4,7 +4,7 @@ import Footer from '../components/Footer';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
 
-const API_URL = process.env.REACT_APP_API_URL || '';
+import api from '../utils/api';
 
 const VERDICT_CONFIG = (lang) => ({
   'High Probability of Synthetic Origin': { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', icon: '✗', label: t('aiGenerated', lang) },
@@ -64,17 +64,12 @@ export default function ImagePage() {
     setPreviews(prev => [...prev, url]);
     setImageUrl('');
     try {
-      const res = await fetch(`${API_URL}/api/image/url`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: url }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Analysis failed');
-      setResults(prev => [...prev, { ...data, url }]);
+      const res = await api.post('/api/image/url', { imageUrl: url });
+      setResults(prev => [...prev, { ...res.data, url }]);
       setActiveIdx(prev => results.length); 
     } catch (e) {
-      setError(e.message);
+      console.error("[ImagePage] URL Analysis Error:", e.response || e);
+      setError(e.response?.data?.error || e.message);
     } finally {
       setLoading(false);
     }
@@ -90,16 +85,13 @@ export default function ImagePage() {
       
       try {
         const arrayBuffer = await file.arrayBuffer();
-        const res = await fetch(`${API_URL}/api/image/upload`, {
-          method: 'POST',
-          headers: { 'Content-Type': file.type },
-          body: arrayBuffer,
+        const res = await api.post('/api/image/upload', arrayBuffer, {
+          headers: { 'Content-Type': file.type }
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Analysis failed');
-        setResults(prev => [...prev, { ...data, url: localPreview }]);
+        setResults(prev => [...prev, { ...res.data, url: localPreview }]);
       } catch (e) {
-        setError(e.message);
+        console.error("[ImagePage] Upload Analysis Error:", e.response || e);
+        setError(e.response?.data?.error || e.message);
       }
     }
     setLoading(false);
@@ -138,16 +130,11 @@ export default function ImagePage() {
         history: chatHistory.slice(-4)
       };
 
-      const res = await fetch(`${API_URL}/api/image/query`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Query failed');
-      setChatHistory(prev => [...prev, { role: 'assistant', content: data.answer }]);
+      const res = await api.post('/api/image/query', payload);
+      setChatHistory(prev => [...prev, { role: 'assistant', content: res.data.answer }]);
     } catch (e) {
-      setChatHistory(prev => [...prev, { role: 'assistant', content: "Error: " + e.message }]);
+      console.error("[ImagePage] Query Error:", e.response || e);
+      setChatHistory(prev => [...prev, { role: 'assistant', content: "Error: " + (e.response?.data?.error || e.message) }]);
     } finally {
       setQueryLoading(false);
     }

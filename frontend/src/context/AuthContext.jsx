@@ -1,8 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const AuthContext = createContext();
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -19,7 +18,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            const res = await axios.post(`${API_URL}/api/auth/login`, { email, password });
+            const res = await api.post('/api/auth/login', { email, password });
             const data = res.data;
             setUser(data);
             localStorage.setItem('verixa_user', JSON.stringify(data));
@@ -31,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (email, password, name, organization, role, designation) => {
         try {
-            const res = await axios.post(`${API_URL}/api/auth/register`, { 
+            const res = await api.post('/api/auth/register', { 
               email, password, name, organization, role, designation 
             });
             const data = res.data;

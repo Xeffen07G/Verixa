@@ -6,7 +6,7 @@ import { useLang } from '../context/LangContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Video, Activity, Search, Upload, Play, Pause, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_API_URL || '';
+import api from '../utils/api';
 
 const VERDICT_CONFIG = (lang) => ({
   'High Probability of Synthetic Origin': { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', icon: '✗', label: t('deepfakeDetected', lang) },
@@ -111,17 +111,11 @@ export default function VideoPage() {
         // Do not set Content-Type for FormData, browser will do it with boundary
       }
       
-      const res = await fetch(`${API_URL}${endpoint}`, {
-        method: 'POST',
-        headers: headers,
-        body: body,
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Video analysis failed');
-      setResult(data);
+      const res = await api.post(endpoint, body, { headers });
+      setResult(res.data);
     } catch (e) {
-      setError(e.message);
+      console.error("[VideoPage] Analysis Error:", e.response || e);
+      setError(e.response?.data?.error || e.message);
     } finally {
       setLoading(false);
     }

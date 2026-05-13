@@ -5,10 +5,8 @@ import { useLang } from '../context/LangContext';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import axios from 'axios';
+import api from '../utils/api';
 import { useNavigate } from 'react-router-dom';
-
-const API_URL = process.env.REACT_APP_API_URL || '';
 
 function StatCard({ icon: Icon, value, label, theme, color = '#d48c70' }) {
   return (
@@ -86,13 +84,13 @@ export default function DashboardPage() {
 
     if (user?.organization) {
       setLoading(true);
-      axios.get(`${API_URL}/api/organization/${user.organization}/members`)
+      api.get(`/api/organization/${user.organization}/members`)
         .then(res => setMembers(res.data))
         .catch(err => console.error('Failed to sync members', err))
         .finally(() => setLoading(false));
 
       if (isAdmin) {
-        axios.get(`${API_URL}/api/organization/${user.organization}/history`)
+        api.get(`/api/organization/${user.organization}/history`)
           .then(res => setOrgHistory(res.data))
           .catch(err => console.error('Failed to sync history', err));
       }
@@ -108,7 +106,7 @@ export default function DashboardPage() {
   const fetchVault = async () => {
     setVaultLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/api/rag/documents`);
+      const res = await api.get('/api/rag/documents');
       setVaultDocs(res.data.documents || []);
     } catch (err) {
       console.error('Failed to fetch vault docs', err);
@@ -129,14 +127,14 @@ export default function DashboardPage() {
       if (file.type === 'application/pdf') {
         const formData = new FormData();
         formData.append('pdf', file);
-        const ocrRes = await axios.post(`${API_URL}/api/pdf`, formData);
+        const ocrRes = await api.post('/api/pdf/ingest', formData); // Standardized to /ingest
         content = ocrRes.data.text;
       } else {
         content = await file.text();
       }
 
       // 2. Add to RAG
-      await axios.post(`${API_URL}/api/rag/add`, {
+      await api.post('/api/rag/add', {
         id: file.name,
         text: content,
         metadata: { source: file.name, type: file.type, size: file.size }
@@ -155,7 +153,7 @@ export default function DashboardPage() {
     setQueryLoading(true);
     setQueryResult(null);
     try {
-      const res = await axios.post(`${API_URL}/api/rag/query`, { query });
+      const res = await api.post('/api/rag/query', { query });
       setQueryResult(res.data.results);
     } catch (err) {
       console.error('Query failed', err);

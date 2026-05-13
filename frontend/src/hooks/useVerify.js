@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 
-const API_URL = process.env.REACT_APP_API_URL || '';
+import { BASE } from '../utils/api';
 
 export function useVerify() {
   const [stage, setStage] = useState(null);
@@ -26,7 +26,7 @@ export function useVerify() {
     abortRef.current = new AbortController();
 
     try {
-      const response = await fetch(`${API_URL}/api/verify`, {
+      const response = await fetch(`${BASE}/api/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, detectAI }),

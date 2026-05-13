@@ -38,7 +38,7 @@ const worker = new Worker('ingestion', async (job) => {
 
 
     console.log(`[Worker] Completed: ${filename}`);
-    return { status: 'completed', chunks: chunks.length };
+    return { status: 'completed', chunks: chunks.length, documentId };
   } catch (err) {
     console.error(`[Worker] Failed: ${filename}`, err);
     throw err;

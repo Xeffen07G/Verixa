@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import TrustDashboard from '../components/TrustDashboard';
-import { Upload, Search, FileText, BarChart2, BookOpen, MessageSquare } from 'lucide-react';
-import axios from 'axios';
+import { Upload, Search, FileText, BarChart2, BookOpen, MessageSquare, ShieldAlert } from 'lucide-react';
+import api from '../utils/api';
 
 const ResearchWorkspace = () => {
   const [file, setFile] = useState(null);
@@ -17,15 +17,34 @@ const ResearchWorkspace = () => {
   const [analysisData, setAnalysisData] = useState({});
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
 
+  const handleQuery = async () => {
+    if (!query.trim() || !documentData) return;
+    setAnswering(true);
+    try {
+      console.log(`[ResearchWorkspace] Querying intelligence for doc: ${documentData.documentId}`);
+      const { data } = await api.post('/api/rag/query', { 
+        query: query.trim(), 
+        documentId: documentData.documentId 
+      });
+      setIntelligence({ data });
+      setQuery('');
+    } catch (err) {
+      console.error("[ResearchWorkspace] Intelligence Query Error:", err.response || err);
+      alert(`Intelligence query failed: ${err.response?.data?.error || err.message}`);
+    } finally {
+      setAnswering(false);
+    }
+  };
+
   const pollStatus = async (jobId) => {
     const interval = setInterval(async () => {
       try {
-        const { data } = await axios.get(`/api/pdf/status/${jobId}`);
+        const { data } = await api.get(`/api/pdf/status/${jobId}`);
         setProgress(data.progress || 0);
         if (data.status === 'completed') {
           setJobStatus('completed');
           // Fetch initial summary
-          const summaryRes = await axios.post('/api/pdf/summary', { documentId: data.result.documentId });
+          const summaryRes = await api.post('/api/pdf/summary', { documentId: data.result.documentId });
           setDocumentData({ ...data.result, ...summaryRes.data });
           clearInterval(interval);
         } else if (data.status === 'failed') {
@@ -33,6 +52,7 @@ const ResearchWorkspace = () => {
           clearInterval(interval);
         }
       } catch (e) {
+        console.error("[ResearchWorkspace] Poll Error:", e);
         clearInterval(interval);
       }
     }, 2000);
@@ -46,10 +66,11 @@ const ResearchWorkspace = () => {
     setLoadingAnalysis(true);
     setActiveTab(type);
     try {
-      const { data } = await axios.post(`/api/pdf/${type}`, { documentId: documentData.documentId });
+      const { data } = await api.post(`/api/pdf/${type}`, { documentId: documentData.documentId });
       setAnalysisData(prev => ({ ...prev, [type]: data }));
     } catch (err) {
-      alert(`Analysis failed: ${err.message}`);
+      console.error(`[ResearchWorkspace] Analysis Error (${type}):`, err.response || err);
+      alert(`Analysis failed: ${err.response?.data?.error || err.message}`);
     } finally {
       setLoadingAnalysis(false);
     }
@@ -65,11 +86,12 @@ const ResearchWorkspace = () => {
     formData.append('pdf', uploadedFile);
 
     try {
-      const { data } = await axios.post('/api/pdf/ingest', formData);
+      const { data } = await api.post('/api/pdf/ingest', formData);
       setJobStatus('indexing');
       pollStatus(data.jobId);
     } catch (err) {
-      alert("Upload failed: " + err.message);
+      console.error("[ResearchWorkspace] Upload Error:", err.response || err);
+      alert("Upload failed: " + (err.response?.data?.error || err.message));
       setJobStatus('idle');
     }
   };

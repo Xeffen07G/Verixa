@@ -9,7 +9,7 @@ import SkeletonLoading from '../components/SkeletonCard';
 import Confetti from '../components/Confetti';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
-import axios from 'axios';
+import api from '../utils/api';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
@@ -245,9 +245,12 @@ export default function VerifyPage() {
     if (!url.trim()) return;
     setFetchingUrl(true);
     try {
-      const res = await axios.post(`${API_URL}/api/url`, { url: url.trim() });
+      const res = await api.post('/api/url', { url: url.trim() });
       setText(res.data.content); setInputMode('text');
-    } catch (e) { alert('URL Error: ' + e.message); }
+    } catch (e) { 
+      console.error("[VerifyPage] URL Fetch Error:", e.response || e);
+      alert('URL Error: ' + (e.response?.data?.error || e.message)); 
+    }
     finally { setFetchingUrl(false); }
   };
 
@@ -255,14 +258,13 @@ export default function VerifyPage() {
     setUploadingPdf(true); setIsScannedPdf(false);
     try {
       const formData = new FormData(); formData.append('pdf', file);
-      const res = await fetch(`${API_URL}/api/pdf/ingest`, { method: 'POST', body: formData });
-      const data = await res.json();
-      if (!res.ok) {
-        if (data.error?.includes('scanned')) setIsScannedPdf(true);
-        throw new Error(data.error || 'Upload failed');
-      }
-      setText(data.text); setInputMode('text');
-    } catch (e) { if (!isScannedPdf) alert(e.message); }
+      const res = await api.post('/api/pdf/ingest', formData);
+      setText(res.data.text); setInputMode('text');
+    } catch (e) { 
+      console.error("[VerifyPage] PDF Upload Error:", e.response || e);
+      if (e.response?.data?.error?.includes('scanned')) setIsScannedPdf(true);
+      else alert(e.response?.data?.error || e.message); 
+    }
     finally { setUploadingPdf(false); }
   };
 

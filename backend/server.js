@@ -62,7 +62,13 @@ app.use("/api/rag", require("./routes/rag"));
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ error: "Route not found" });
+  console.warn(`[404] Route not found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ 
+    error: "Route not found",
+    method: req.method,
+    path: req.originalUrl,
+    hint: "Verify if the API path is correctly prefixed with /api/"
+  });
 });
 
 // Error handler
