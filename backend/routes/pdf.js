@@ -18,7 +18,14 @@ const { ingestionQueue } = require("../services/queue");
  */
 router.post("/", upload.single("pdf"), async (req, res) => {
   console.log('[API] PDF SYNC EXTRACTION HIT');
-  if (!req.file) return res.status(400).json({ error: "No PDF file uploaded." });
+  console.log('  - Fieldname Expected: pdf');
+  console.log('  - File received:', req.file ? `${req.file.originalname} (${req.file.size} bytes)` : 'NONE');
+  console.log('  - Content-Type:', req.headers['content-type']);
+
+  if (!req.file) {
+    console.warn('  - [400] No file found in request. Possible fieldname mismatch or empty payload.');
+    return res.status(400).json({ error: "No PDF file uploaded. Please ensure the field name is 'pdf'." });
+  }
   try {
     const pages = await parsePDF(req.file.buffer);
     const text = pages.map(p => p.text).join("\n\n");
@@ -34,7 +41,13 @@ router.post("/", upload.single("pdf"), async (req, res) => {
  */
 router.post("/ingest", upload.single("pdf"), async (req, res) => {
   console.log('[API] PDF INGEST ROUTE HIT');
-  if (!req.file) return res.status(400).json({ error: "No PDF file uploaded." });
+  console.log('  - Fieldname Expected: pdf');
+  console.log('  - File received:', req.file ? `${req.file.originalname} (${req.file.size} bytes)` : 'NONE');
+
+  if (!req.file) {
+    console.warn('  - [400] No file found in request.');
+    return res.status(400).json({ error: "No PDF file uploaded. Field 'pdf' is required." });
+  }
 
   try {
     const documentId = `doc_${Date.now()}`;
