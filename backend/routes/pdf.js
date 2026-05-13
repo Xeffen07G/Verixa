@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const fs = require("fs");
 const multer = require("multer");
 const { parsePDF, createChunks } = require("../services/ingestion");
 const { addChunkToRAG } = require("../utils/rag");
@@ -31,12 +32,23 @@ router.post("/ingest", upload.single("pdf"), async (req, res) => {
     const tQueueStart = Date.now();
     const documentId = `doc_${Date.now()}`;
     
-    // Add to BullMQ - passing path instead of buffer to keep Redis/Memory light
+    // Proactive size enforcement
+    if (req.file.size > 25 * 1024 * 1024) {
+      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      return res.status(413).json({ error: "File too large. Max 25MB." });
+    }
+
+    // Add to BullMQ with strict cleanup policies
     const job = await ingestionQueue.add('process-pdf', {
       documentId,
       filename: req.file.originalname,
       path: req.file.path,
-      metadata: { uploadedAt: new Date() }
+      metadata: { uploadedAt: new Date(), size: req.file.size }
+    }, {
+      removeOnComplete: { age: 3600, count: 100 }, // Keep last 100 or 1 hour
+      removeOnFail: { age: 24 * 3600, count: 500 }, // Keep failures for 24h
+      attempts: 3,
+      backoff: { type: 'exponential', delay: 5000 }
     });
 
     console.log(`[API] Enqueued: ${Date.now() - tQueueStart}ms`);

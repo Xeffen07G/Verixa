@@ -22,24 +22,39 @@ if (PROCESS_TYPE === 'worker') {
   
   const worker = new Worker('ingestion', async (job) => {
     const { documentId, filename, path, metadata } = job.data;
-    console.log(`[Worker] Processing: ${filename}`);
+    const tStart = Date.now();
+    const memStart = process.memoryUsage();
+    
+    console.log(`[Worker] JOB START: ${filename} (ID: ${job.id})`);
+    console.log(`[Worker] Memory Start: RSS=${Math.round(memStart.rss/1024/1024)}MB, Heap=${Math.round(memStart.heapUsed/1024/1024)}MB`);
 
     try {
       if (!fs.existsSync(path)) throw new Error(`File not found: ${path}`);
       const buffer = fs.readFileSync(path);
       
+      // Stage 1: Extraction
+      const tExtract = Date.now();
+      await job.updateProgress(10);
       let content = "";
       let chunks = [];
 
       if (filename.toLowerCase().endsWith('.pdf')) {
         const pages = await parsePDF(buffer);
         content = pages.map(p => p.text).join('\n\n');
+        
+        // Stage 2: Chunking
+        await job.updateProgress(30);
         chunks = createChunks(pages);
       } else {
         content = buffer.toString('utf-8');
         chunks = [{ text: content, metadata: { page: 1 } }];
+        await job.updateProgress(30);
       }
+      const dExtract = Date.now() - tExtract;
+      console.log(`[Worker] Extraction & Chunking complete (${dExtract}ms)`);
 
+      // Stage 3: Embedding & Indexing
+      const tIndex = Date.now();
       for (let i = 0; i < chunks.length; i++) {
         await addChunkToRAG(`${documentId}_${i}`, chunks[i].text, {
           ...metadata,
@@ -48,22 +63,33 @@ if (PROCESS_TYPE === 'worker') {
           page: chunks[i].metadata.page,
           index: i
         });
-        await job.updateProgress(Math.round((i / chunks.length) * 100));
+        
+        const prog = Math.min(30 + Math.round((i / chunks.length) * 70), 99);
+        await job.updateProgress(prog);
       }
+      const dIndex = Date.now() - tIndex;
+      console.log(`[Worker] Indexing complete (${dIndex}ms) for ${chunks.length} chunks`);
 
-      console.log(`[Worker] Completed: ${filename}`);
+      const totalTime = Date.now() - tStart;
+      const memEnd = process.memoryUsage();
+      console.log(`[Worker] JOB COMPLETE: ${filename} in ${totalTime}ms`);
+      console.log(`[Worker] Memory Change: RSS=${Math.round((memEnd.rss - memStart.rss)/1024/1024)}MB`);
+
       if (fs.existsSync(path)) fs.unlinkSync(path);
-
-      return { status: 'completed', documentId, text: content };
+      return { status: 'completed', documentId, chunks: chunks.length, time: totalTime };
     } catch (err) {
-      console.error(`[Worker] Failed: ${filename}`, err);
-      if (path && fs.existsSync(path)) fs.unlinkSync(path);
+      console.error(`[Worker] JOB FAILED: ${filename}`, err);
+      if (path && fs.existsSync(path)) try { fs.unlinkSync(path); } catch(e) {}
       throw err;
     }
-  }, { connection, concurrency: 1 });
+  }, { 
+    connection, 
+    concurrency: 1,
+    lockDuration: 300000, // 5 min timeout for heavy PDFs
+  });
 
   worker.on('failed', (job, err) => console.error(`[Worker] Job ${job?.id} failed:`, err.message));
-  worker.on('completed', (job) => console.log(`[Worker] Job ${job.id} completed successfully`));
+  worker.on('completed', (job) => console.log(`[Worker] Job ${job.id} finalized.`));
 }
 
 module.exports = { ingestionQueue };
