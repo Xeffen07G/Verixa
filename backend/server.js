@@ -123,13 +123,24 @@ if (SAFE_MODE) {
   MOCK PDF INGEST
   ==========================
   */
-  app.use("/api/pdf/ingest", (req, res) => {
+  app.post("/api/pdf/ingest", (req, res) => {
     console.log("[SAFE_MODE] Mock ingest hit");
 
     return res.status(202).json({
       success: true,
+      accepted: true,
       mock: true,
+      queued: true,
+
       jobId: "safe_job",
+
+      status: "queued",
+      state: "queued",
+
+      progress: 5,
+
+      message: "Document queued successfully.",
+
       mode: "SAFE_MODE",
     });
   });
@@ -137,7 +148,6 @@ if (SAFE_MODE) {
   /*
   ==========================
   MOCK PDF STATUS
-  THIS FIXES YOUR 404 ERROR
   ==========================
   */
   app.get("/api/pdf/status/:jobId", (req, res) => {
@@ -147,14 +157,27 @@ if (SAFE_MODE) {
 
     return res.json({
       success: true,
-      mock: true,
+
       jobId: req.params.jobId,
+
+      status: "completed",
       state: "completed",
+
       progress: 100,
+
+      completed: true,
+
+      mock: true,
       mode: "SAFE_MODE",
+
+      stage: "completed",
+
       result: {
         text: "SAFE_MODE mock extraction completed successfully.",
       },
+
+      extractedText:
+        "SAFE_MODE mock extraction completed successfully.",
     });
   });
 
@@ -163,8 +186,9 @@ if (SAFE_MODE) {
   MOCK RAG DOCS
   ==========================
   */
-  app.use("/api/rag/documents", (req, res) => {
+  app.get("/api/rag/documents", (req, res) => {
     return res.json({
+      success: true,
       mock: true,
       documents: [],
       mode: "SAFE_MODE",
@@ -176,8 +200,9 @@ if (SAFE_MODE) {
   MOCK ORGANIZATION
   ==========================
   */
-  app.use("/api/organization", (req, res) => {
+  app.get("/api/organization/:orgId/members", (req, res) => {
     return res.json({
+      success: true,
       mock: true,
       members: [],
       mode: "SAFE_MODE",
@@ -189,7 +214,6 @@ if (SAFE_MODE) {
 ==================================================
 DATABASE CONNECTION
 ==================================================
-ONLY CONNECT AFTER EXPRESS IS READY
 */
 if (!SAFE_MODE && process.env.MONGO_URI) {
   console.log("[DB] Connecting MongoDB...");
