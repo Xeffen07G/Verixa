@@ -1,31 +1,42 @@
-const { Queue, Worker } = require('bullmq');
-const IORedis = require('ioredis');
-const fs = require('fs');
-const IngestionJob = require('../models/IngestionJob');
-const IngestionChunk = require('../models/IngestionChunk');
+let ingestionQueue = null;
+let queues = {};
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const REDIS_URL = process.env.REDIS_URL;
 const PROCESS_TYPE = process.env.PROCESS_TYPE || 'api';
+const SAFE_MODE = process.env.SAFE_MODE === 'true';
 
-const connection = new IORedis(REDIS_URL, { 
-  maxRetriesPerRequest: null,
-  retryStrategy: (times) => Math.min(times * 50, 2000)
-});
+// 1. Lazy-loaded Redis & Queues
+if (!SAFE_MODE && REDIS_URL) {
+  try {
+    const { Queue } = require('bullmq');
+    const IORedis = require('ioredis');
+    const connection = new IORedis(REDIS_URL, { 
+      maxRetriesPerRequest: null,
+      retryStrategy: (times) => Math.min(times * 50, 2000)
+    });
 
-// 1. Define Standard Queues & DLQs
-const queues = {
-  extract: new Queue('extract', { connection }),
-  chunk: new Queue('chunk', { connection }),
-  embed: new Queue('embed', { connection }),
-  index: new Queue('index', { connection }),
-  // Dead Letter Queues
-  extractDLQ: new Queue('extractDLQ', { connection }),
-  chunkDLQ: new Queue('chunkDLQ', { connection }),
-  embedDLQ: new Queue('embedDLQ', { connection }),
-  indexDLQ: new Queue('indexDLQ', { connection })
-};
-
-const ingestionQueue = queues.extract;
+    queues = {
+      extract: new Queue('extract', { connection }),
+      chunk: new Queue('chunk', { connection }),
+      embed: new Queue('embed', { connection }),
+      index: new Queue('index', { connection }),
+      extractDLQ: new Queue('extractDLQ', { connection }),
+      chunkDLQ: new Queue('chunkDLQ', { connection }),
+      embedDLQ: new Queue('embedDLQ', { connection }),
+      indexDLQ: new Queue('indexDLQ', { connection })
+    };
+    ingestionQueue = queues.extract;
+    console.log('[Queue] Redis connection established.');
+  } catch (err) {
+    console.error('[Queue] Critical Redis/BullMQ failure:', err.message);
+  }
+} else {
+  console.log(`[Queue] Running in ${SAFE_MODE ? 'SAFE_MODE' : 'NO_REDIS'} mode. Enqueue is MOCKED.`);
+  // Minimal mock for API stability
+  ingestionQueue = {
+    add: async () => ({ id: 'mock_job_' + Date.now() })
+  };
+}
 
 /**
  * Orchestrator: Transitions job to next stage via DB state update and queue enqueuing.
@@ -60,8 +71,19 @@ async function moveToDLQ(stage, job, err) {
   await queues[`${stage}DLQ`].add(stage, { ...job.data, error: err.message, failedAt: new Date() });
 }
 
-// 2. Staged Pipeline Workers
-if (PROCESS_TYPE === 'worker') {
+// 2. Multi-Stage Pipeline Workers
+if (PROCESS_TYPE === 'worker' && !SAFE_MODE && REDIS_URL) {
+  const fs = require('fs');
+  const IngestionJob = require('../models/IngestionJob');
+  const IngestionChunk = require('../models/IngestionChunk');
+  const { Worker } = require('bullmq');
+  const IORedis = require('ioredis');
+
+  const connection = new IORedis(REDIS_URL, { 
+    maxRetriesPerRequest: null,
+    retryStrategy: (times) => Math.min(times * 50, 2000)
+  });
+
   const { parsePDF, createChunks } = require('./ingestion');
   const { generateEmbedding } = require('../utils/rag');
 
@@ -164,7 +186,7 @@ if (PROCESS_TYPE === 'worker') {
   // Error handling for DLQ routing
   [extractWorker, chunkWorker, embedWorker, indexWorker].forEach(worker => {
     worker.on('failed', (job, err) => {
-      if (job.attemptsMade >= job.opts.attempts) {
+      if (job && job.attemptsMade >= (job.opts?.attempts || 1)) {
         moveToDLQ(worker.name, job, err);
       }
     });
@@ -189,7 +211,12 @@ if (PROCESS_TYPE === 'worker') {
   // Graceful Shutdown
   const shutdown = async () => {
     console.log('[Worker] Shutdown...');
-    await Promise.all([extractWorker.close(), chunkWorker.close(), embedWorker.close(), indexWorker.close()]);
+    await Promise.all([
+      extractWorker.close(), 
+      chunkWorker.close(), 
+      embedWorker.close(), 
+      indexWorker.close()
+    ]).catch(e => console.error('[Worker] Shutdown Error:', e));
     await connection.quit();
     process.exit(0);
   };

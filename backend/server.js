@@ -1,25 +1,22 @@
+process.on("uncaughtException", (err) => {
+  console.error("[FATAL] Uncaught Exception:", err);
+});
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("[FATAL] Unhandled Rejection at:", promise, "reason:", reason);
+});
+
 require("dotenv").config();
 const fs = require("fs");
 if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
 const express = require("express");
 const cors = require("cors");
-const helmet = require("helmet");
-const morgan = require("morgan");
-const rateLimit = require("express-rate-limit");
 
-const verifyRoutes = require("./routes/verify");
-const urlRoutes = require("./routes/url");
-const healthRoutes = require("./routes/health");
-const trendingRoutes = require("./routes/trending");
-const { requireApiKey, requestLogger } = require("./middleware/validate");
-const connectDB = require("./config/db");
-
-// Connect to Database
+// Connect to Database (Lightweight check)
 if (process.env.MONGO_URI) {
   console.log('MONGO_URI found. Initializing connection...');
-  connectDB();
+  require("./config/db")();
 } else {
-  console.error('CRITICAL: MONGO_URI is missing from environment variables!');
+  console.error('CRITICAL: MONGO_URI is missing!');
 }
 
 const app = express();
@@ -59,19 +56,15 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 // 5. Helmet (Temporarily disabled for CORS troubleshooting)
 // app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
-// Root health check for Render/LB
-app.get("/health", (req, res) => res.json({ status: "ok", timestamp: new Date().toISOString() }));
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 30,
-  message: { error: "Too many requests. Please wait before trying again." },
-});
-app.use("/api/", limiter);
-
 const SAFE_MODE = process.env.SAFE_MODE === 'true';
 const PROCESS_TYPE = process.env.PROCESS_TYPE || 'api';
+
+// 5. Helmet & Logging
+const morgan = require("morgan");
+app.use(morgan("dev"));
+
+// Root health check (Zero dependency)
+app.get("/health", (req, res) => res.json({ status: "ok", mode: SAFE_MODE ? "SAFE" : "NORMAL", process: PROCESS_TYPE }));
 
 // 6. Request Lifecycle Instrumentation
 app.use((req, res, next) => {
@@ -92,24 +85,32 @@ if (SAFE_MODE) {
   app.use("/api/organization", (req, res) => res.json({ mock: true, members: [], mode: "SAFE_MODE" }));
 }
 
-// Routes
-app.use("/api/verify", requireApiKey, verifyRoutes);
-app.use("/api/url", requireApiKey, urlRoutes);
-app.use("/api/health", healthRoutes);
-app.use("/api/trending", trendingRoutes);
-app.use('/api/organization', require('./routes/organization'));
-app.use('/api/user', require('./routes/user'));
-app.use("/api/auth", require("./routes/auth"));
-
-// Conditional route loading
+// 8. Deferred Route Loading
 if (!SAFE_MODE && PROCESS_TYPE === 'api') {
+  const { requireApiKey } = require("./middleware/validate");
+  const rateLimit = require("express-rate-limit");
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: { error: "Too many requests." },
+  });
+  app.use("/api/", limiter);
+
+  app.use("/api/verify", requireApiKey, require("./routes/verify"));
+  app.use("/api/url", requireApiKey, require("./routes/url"));
+  app.use("/api/health", require("./routes/health"));
+  app.use("/api/trending", require("./routes/trending"));
+  app.use('/api/organization', require('./routes/organization'));
+  app.use('/api/user', require('./routes/user'));
+  app.use("/api/auth", require("./routes/auth"));
   app.use("/api/pdf", requireApiKey, require("./routes/pdf"));
   app.use("/api/image", requireApiKey, require("./routes/image"));
   app.use("/api/video", requireApiKey, require("./routes/video"));
   app.use("/api/rag", require("./routes/rag"));
-} else if (!SAFE_MODE) {
-  // Catch-all for worker mode
-  app.get("/api/rag/documents", (req, res) => res.json({ mock: true, info: "worker_mode" }));
+} else if (PROCESS_TYPE === 'api') {
+  // Minimal routes for SAFE_MODE
+  app.use("/api/auth", require("./routes/auth"));
+  app.use("/api/health", (req, res) => res.json({ status: "safe" }));
 }
 
 // 404 handler
