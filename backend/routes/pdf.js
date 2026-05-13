@@ -13,10 +13,27 @@ const upload = multer({
 const { ingestionQueue } = require("../services/queue");
 
 /**
+ * POST /api/pdf
+ * Synchronous text extraction for quick verification.
+ */
+router.post("/", upload.single("pdf"), async (req, res) => {
+  console.log('[API] PDF SYNC EXTRACTION HIT');
+  if (!req.file) return res.status(400).json({ error: "No PDF file uploaded." });
+  try {
+    const pages = await parsePDF(req.file.buffer);
+    const text = pages.map(p => p.text).join("\n\n");
+    res.json({ text, filename: req.file.originalname });
+  } catch (err) {
+    res.status(500).json({ error: "Extraction failed: " + err.message });
+  }
+});
+
+/**
  * POST /api/pdf/ingest
  * Adds a document to the background ingestion queue.
  */
 router.post("/ingest", upload.single("pdf"), async (req, res) => {
+  console.log('[API] PDF INGEST ROUTE HIT');
   if (!req.file) return res.status(400).json({ error: "No PDF file uploaded." });
 
   try {
