@@ -54,10 +54,15 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [vaultLoading, setVaultLoading] = useState(false);
   const [query, setQuery] = useState('');
-  const [queryResult, setQueryResult] = useState(null);
-  const [vaultAnswer, setVaultAnswer] = useState('');
+  const [messages, setMessages] = useState([]);
   const [queryLoading, setQueryLoading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState(null); // { status: 'idle', message: '' }
+  const [uploadStatus, setUploadStatus] = useState(null);
+  const sessionId = useMemo(() => `session_${Math.random().toString(36).substr(2, 9)}`, []);
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
   const fileInputRef = useRef(null);
 
   const isAdmin = user?.role === 'head' || user?.role === 'admin' || user?.email?.includes('admin');
@@ -171,18 +176,35 @@ export default function DashboardPage() {
     }
   };
 
-  const handleQuery = async () => {
+  const handleQuery = async (e) => {
+    if (e) e.preventDefault();
     if (!query.trim()) return;
+
+    const userMsg = { role: 'user', content: query, timestamp: new Date() };
+    setMessages(prev => [...prev, userMsg]);
+    setQuery('');
     setQueryLoading(true);
-    setQueryResult(null);
-    setVaultAnswer('');
+
     try {
-      const { data } = await api.post('/api/rag/query', { query });
-      console.log("RAG RESPONSE:", data);
-      setVaultAnswer(data.answer);
-      setQueryResult(data.results || data.sources || []);
+      const res = await api.post('/api/rag/query', { query, sessionId });
+      console.log("RAG RESPONSE:", res.data);
+      
+      const aiMsg = { 
+        role: 'ai', 
+        content: res.data.answer, 
+        sources: res.data.sources || [],
+        confidence: res.data.confidence,
+        timestamp: new Date() 
+      };
+      
+      setMessages(prev => [...prev, aiMsg]);
     } catch (err) {
-      console.error('Query failed', err);
+      console.error("[Dashboard] Query failed:", err);
+      setMessages(prev => [...prev, { 
+        role: 'ai', 
+        content: "Error: I encountered a problem processing your research query. Please try again.", 
+        isError: true 
+      }]);
     } finally {
       setQueryLoading(false);
     }
@@ -283,109 +305,144 @@ export default function DashboardPage() {
             </div>
           </>
         ) : (
-          <div className="vault-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 40 }}>
-            {/* Left: Upload & Query */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-              
+          <div className="vault-grid" style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 24, height: '70vh' }}>
+            {/* Left Column: Management */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20, overflowY: 'auto', paddingRight: 8 }}>
               {/* Upload Card */}
-              <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderRadius: 24, padding: 32 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Upload size={20} color={T.accent} /> {t('uploadDocs', lang)}
+              <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderRadius: 20, padding: 24 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', letterSpacing: 1, color: T.text }}>
+                  <Upload size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} /> {t('uploadDocs', lang)}
                 </h3>
-                <div onClick={() => fileInputRef.current.click()} style={{ padding: '40px 20px', border: `2px dashed ${T.border}`, borderRadius: 16, textAlign: 'center', cursor: 'pointer', background: `${T.accent}05`, transition: '0.3s' }} onMouseEnter={e => e.currentTarget.style.borderColor = T.accent}>
-                  <FileText size={40} color={T.accent} style={{ marginBottom: 16, opacity: 0.6 }} />
-                  <p style={{ fontSize: 14, color: T.text2, margin: 0 }}>{t('dropFiles', lang)}</p>
-                  <p style={{ fontSize: 11, color: T.text3, marginTop: 8 }}>PDF, TXT (Max 20MB)</p>
+                <div onClick={() => fileInputRef.current.click()} style={{ padding: '24px 12px', border: `2px dashed ${T.border}`, borderRadius: 12, textAlign: 'center', cursor: 'pointer', background: `${T.accent}05` }}>
+                  <FileText size={24} color={T.accent} style={{ marginBottom: 8, opacity: 0.6 }} />
+                  <p style={{ fontSize: 12, color: T.text3, margin: 0 }}>Click to upload research</p>
                   <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".pdf,.txt" style={{ display: 'none' }} />
                 </div>
                 {uploadStatus && (
-                  <div style={{ marginTop: 16, padding: '12px 16px', borderRadius: 10, background: uploadStatus.status === 'error' ? '#f871711a' : `${T.accent}1a`, border: `1px solid ${uploadStatus.status === 'error' ? '#f8717133' : `${T.accent}33`}`, color: uploadStatus.status === 'error' ? '#f87171' : T.accent, fontSize: 13, display: 'flex', alignItems: 'center', gap: 10 }}>
-                    {uploadStatus.status === 'loading' && <RefreshCw size={14} className="spin" />}
-                    {uploadStatus.status === 'success' && <CheckCircle2 size={14} />}
+                  <div style={{ marginTop: 12, fontSize: 11, color: T.accent, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {uploadStatus.status === 'loading' && <RefreshCw size={12} className="spin" />}
                     {uploadStatus.message}
                   </div>
                 )}
               </div>
 
-              {/* Query Card */}
-              <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderRadius: 24, padding: 32 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <MessageSquare size={20} color={T.accent} /> {t('queryVault', lang)}
+              {/* Documents Card */}
+              <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderRadius: 20, padding: 24, flex: 1 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', letterSpacing: 1, color: T.text }}>
+                  <BookOpen size={16} style={{ marginRight: 8, verticalAlign: 'middle' }} /> {t('docsLearned', lang)}
                 </h3>
-                <div style={{ position: 'relative', marginBottom: 16 }}>
-                  <textarea value={query} onChange={e => setQuery(e.target.value)} placeholder={t('queryPlaceholder', lang)} style={{ width: '100%', height: 120, background: 'rgba(0,0,0,0.2)', border: `1px solid ${T.border}`, borderRadius: 14, padding: '16px', color: T.text, outline: 'none', resize: 'none', fontSize: 14 }} />
-                  <button onClick={handleQuery} disabled={queryLoading || !query.trim()} style={{ position: 'absolute', bottom: 12, right: 12, padding: '8px 20px', borderRadius: 8, background: T.accent, border: 'none', color: '#000', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
-                    {queryLoading ? '...' : t('askVault', lang)}
-                  </button>
-                </div>
-                {vaultAnswer && (
-                  <div className="research-report" style={{ marginBottom: 32, padding: '32px', background: `${T.cardBg}`, border: `1px solid ${T.border}`, borderRadius: 24, boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
-                    <h4 style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: T.accent, fontWeight: 900, marginBottom: 20 }}>{t('verixaIntelligence', lang)}</h4>
-                    <div style={{ fontSize: 15, color: T.text, lineHeight: 1.8, margin: 0, fontWeight: 400 }}>
-                      <ReactMarkdown components={{
-                        p: ({node, ...props}) => <p style={{marginBottom: '16px'}} {...props} />,
-                        h1: ({node, ...props}) => <h1 style={{color: T.accent, fontSize: '20px', marginTop: '24px', marginBottom: '12px'}} {...props} />,
-                        h2: ({node, ...props}) => <h2 style={{color: T.accent, fontSize: '18px', marginTop: '20px', marginBottom: '10px'}} {...props} />,
-                        h3: ({node, ...props}) => <h3 style={{color: T.text, fontSize: '16px', marginTop: '16px', marginBottom: '8px', fontWeight: 700}} {...props} />,
-                        ul: ({node, ...props}) => <ul style={{paddingLeft: '20px', marginBottom: '16px'}} {...props} />,
-                        li: ({node, ...props}) => <li style={{marginBottom: '8px'}} {...props} />,
-                        code: ({node, ...props}) => <code style={{background: `${T.accent}22`, padding: '2px 6px', borderRadius: '4px', color: T.accent}} {...props} />
-                      }}>
-                        {vaultAnswer}
-                      </ReactMarkdown>
-                    </div>
-                  </div>
-                )}
-                {queryResult && queryResult.length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    <h4 style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3 }}>{t('groundingSources', lang)}</h4>
-                    {queryResult.map((res, i) => (
-                      <div key={i} style={{ padding: '20px', background: `${T.accent}05`, border: `1px solid ${T.border}`, borderRadius: 16 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                          <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <span style={{ fontSize: 10, color: T.accent, fontWeight: 900, textTransform: 'uppercase' }}>{res.metadata?.source || 'Document'}</span>
-                            <span style={{ fontSize: 12, color: T.text, fontWeight: 700 }}>Page {res.metadata?.page || 'N/A'} — {res.metadata?.section || 'General'}</span>
-                          </div>
-                          <span style={{ fontSize: 10, color: T.text3, background: `${T.border}`, padding: '4px 8px', borderRadius: '6px' }}>{Math.round((res.score || 0) * 100)}% Match</span>
+                {vaultDocs.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {vaultDocs.map((doc, i) => (
+                      <div key={i} style={{ padding: '12px', borderRadius: 10, background: `${T.accent}0a`, border: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <FileText size={16} color={T.accent} />
+                        <div style={{ overflow: 'hidden' }}>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: T.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{doc.filename}</div>
+                          <div style={{ fontSize: 10, color: T.text3 }}>{new Date(doc.uploadedAt).toLocaleDateString()}</div>
                         </div>
-                        <p style={{ fontSize: 13, color: T.text3, margin: 0, fontStyle: 'italic', lineHeight: 1.6 }}>"{res.text}"</p>
-                        <div style={{ marginTop: 12, fontSize: 9, color: T.text3, opacity: 0.6 }}>CHUNK ID: {res.id}</div>
                       </div>
                     ))}
                   </div>
+                ) : (
+                  <p style={{ fontSize: 12, color: T.text3, textAlign: 'center' }}>No documents uploaded.</p>
                 )}
               </div>
             </div>
 
-            {/* Right: Docs List */}
-            <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderRadius: 24, padding: 32 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <BookOpen size={20} color={T.accent} /> {t('docsLearned', lang)}
-              </h3>
-              {vaultLoading ? (
-                <div style={{ textAlign: 'center', padding: '40px' }}><RefreshCw className="spin" size={24} color={T.text3} /></div>
-              ) : vaultDocs.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {vaultDocs.map((doc, i) => (
-                    <div key={i} style={{ padding: '16px 20px', borderRadius: 14, background: T.cardBg, border: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-                        <div style={{ width: 40, height: 40, borderRadius: 8, background: `${T.accent}14`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <FileText size={18} color={T.accent} />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{doc.filename || doc.id}</div>
-                          <div style={{ fontSize: 11, color: T.text3 }}>{new Date(doc.uploadedAt || doc.timestamp).toLocaleDateString()} • {t('learned', lang)}</div>
-                        </div>
+            {/* Right Column: Conversational Chat */}
+            <div style={{ display: 'flex', flexDirection: 'column', background: T.cardBg, border: `1px solid ${T.border}`, borderRadius: 24, overflow: 'hidden', boxShadow: T.shadow }}>
+              {/* Chat Messages */}
+              <div style={{ flex: 1, overflowY: 'auto', padding: '32px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+                {messages.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 20px', color: T.text3 }}>
+                    <MessageSquare size={48} style={{ margin: '0 auto 16px', opacity: 0.1 }} />
+                    <p style={{ fontSize: 16, fontWeight: 500 }}>VeriXa Research Copilot</p>
+                    <p style={{ fontSize: 13, opacity: 0.6 }}>Ask follow-up questions naturally. I'll maintain research context.</p>
+                  </div>
+                ) : (
+                  messages.map((msg, idx) => (
+                    <div key={idx} style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                      gap: 8
+                    }}>
+                      <div style={{ 
+                        maxWidth: '85%',
+                        padding: msg.role === 'user' ? '12px 20px' : '0px',
+                        background: msg.role === 'user' ? `${T.accent}1a` : 'transparent',
+                        borderRadius: msg.role === 'user' ? '18px 18px 4px 18px' : '0px',
+                        border: msg.role === 'user' ? `1px solid ${T.accent}33` : 'none',
+                        color: T.text
+                      }}>
+                        {msg.role === 'user' ? (
+                          <p style={{ margin: 0, fontSize: 15, fontWeight: 500 }}>{msg.content}</p>
+                        ) : (
+                          <div className="research-report" style={{ padding: '24px', background: `${T.accent}05`, border: `1px solid ${T.border}`, borderRadius: 20 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                              <span style={{ fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase', color: T.accent, fontWeight: 900 }}>AI Intelligence</span>
+                              {msg.confidence && <span style={{ fontSize: 9, color: T.text3 }}>Confidence: {Math.round(msg.confidence * 100)}%</span>}
+                            </div>
+                            <div style={{ fontSize: 15, color: T.text, lineHeight: 1.8 }}>
+                              <ReactMarkdown components={{
+                                p: ({node, ...props}) => <p style={{marginBottom: '12px'}} {...props} />,
+                                h1: ({node, ...props}) => <h1 style={{color: T.accent, fontSize: '18px', marginTop: '20px', marginBottom: '10px'}} {...props} />,
+                                h2: ({node, ...props}) => <h2 style={{color: T.accent, fontSize: '16px', marginTop: '16px', marginBottom: '8px'}} {...props} />,
+                                ul: ({node, ...props}) => <ul style={{paddingLeft: '20px', marginBottom: '12px'}} {...props} />,
+                                code: ({node, ...props}) => <code style={{background: `${T.accent}15`, padding: '2px 4px', borderRadius: 4, color: T.accent, fontSize: '0.9em'}} {...props} />
+                              }}>
+                                {msg.content}
+                              </ReactMarkdown>
+                            </div>
+                            
+                            {msg.sources && msg.sources.length > 0 && (
+                              <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${T.border}` }}>
+                                <span style={{ fontSize: 10, color: T.text3, fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: 12 }}>Supporting Evidence</span>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                  {msg.sources.map((s, si) => (
+                                    <div key={si} style={{ padding: '10px 14px', background: T.cardBg, borderRadius: 12, border: `1px solid ${T.border}` }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, marginBottom: 4 }}>
+                                        <span style={{ color: T.accent, fontWeight: 800 }}>{s.metadata?.source}</span>
+                                        <span style={{ color: T.text3 }}>P. {s.metadata?.page} — {s.metadata?.section}</span>
+                                      </div>
+                                      <p style={{ fontSize: 12, color: T.text3, margin: 0, fontStyle: 'italic', opacity: 0.8 }}>"{s.text.slice(0, 150)}..."</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      <CheckCircle2 size={16} color="#4ade80" />
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div style={{ padding: '60px', textAlign: 'center', border: `1px dashed ${T.border}`, borderRadius: 16 }}>
-                  <p style={{ color: T.text3, fontSize: 14 }}>{t('noDocs', lang)}</p>
-                </div>
-              )}
+                  ))
+                )}
+                {queryLoading && (
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center', color: T.text3 }}>
+                    <RefreshCw className="spin" size={16} />
+                    <span style={{ fontSize: 13 }}>Analyzing across context...</span>
+                  </div>
+                )}
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Chat Input */}
+              <form onSubmit={handleQuery} style={{ padding: '20px', borderTop: `1px solid ${T.border}`, display: 'flex', gap: 12, background: `${T.accent}02` }}>
+                <input 
+                  type="text" 
+                  value={query} 
+                  onChange={e => setQuery(e.target.value)}
+                  placeholder="Ask a follow-up or research question..."
+                  style={{ flex: 1, background: T.cardBg, border: `1px solid ${T.border}`, borderRadius: 14, padding: '14px 20px', color: T.text, outline: 'none' }}
+                />
+                <button 
+                  type="submit" 
+                  disabled={queryLoading || !query.trim()}
+                  style={{ width: 48, height: 48, background: T.accent, border: 'none', borderRadius: 14, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                >
+                  {queryLoading ? <RefreshCw size={20} className="spin" /> : <Search size={20} />}
+                </button>
+              </form>
             </div>
           </div>
         )}

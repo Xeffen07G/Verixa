@@ -41,7 +41,18 @@ const PROCESS_TYPE = process.env.PROCESS_TYPE || "api";
 
 const SAFE_DOCS = [];
 const SAFE_CHUNKS = []; // In-memory vector store for SAFE_MODE
-const INGESTION_STATUS = {}; // Track async processing { id: { status, total, current } }
+const INGESTION_STATUS = {}; // Track async processing
+const CONVERSATION_SESSIONS = {}; // { sessionId: { history: [], lastActive } }
+
+// Session Cleanup (30 mins)
+setInterval(() => {
+  const now = Date.now();
+  Object.keys(CONVERSATION_SESSIONS).forEach(id => {
+    if (now - CONVERSATION_SESSIONS[id].lastActive > 30 * 60 * 1000) {
+      delete CONVERSATION_SESSIONS[id];
+    }
+  });
+}, 5 * 60 * 1000);
 
 let extractor = null;
 async function getExtractor() {
@@ -333,10 +344,17 @@ if (SAFE_MODE) {
   ==========================
   */
   app.post("/api/rag/query", async (req, res) => {
-    const { query, documentId } = req.body;
+    const { query, sessionId = "default" } = req.body;
     if (!query) return res.status(400).json({ error: "Query is required" });
 
-    console.log(`[SAFE_MODE] Semantic Research query: "${query}"`);
+    // Initialize or refresh session
+    if (!CONVERSATION_SESSIONS[sessionId]) {
+      CONVERSATION_SESSIONS[sessionId] = { history: [], lastActive: Date.now() };
+    }
+    const session = CONVERSATION_SESSIONS[sessionId];
+    session.lastActive = Date.now();
+
+    console.log(`[SAFE_MODE] Conversational query (Session: ${sessionId}): "${query}"`);
 
     try {
       if (SAFE_CHUNKS.length === 0) {
@@ -346,97 +364,102 @@ if (SAFE_MODE) {
         });
       }
 
-      // 1. Embed query
-      const embed = await getExtractor();
-      const queryOutput = await embed(query, { pooling: 'mean', normalize: true });
-      const queryEmbedding = Array.from(queryOutput.data);
-      const queryTerms = query.toLowerCase().split(/\W+/).filter(t => t.length > 3);
+      // 1. Query Rewriting (Contextualization)
+      let effectiveQuery = query;
+      if (session.history.length > 0) {
+        const historyText = session.history.slice(-2).map(h => `User: ${h.query}\nAI: ${h.answer.slice(0, 300)}...`).join("\n");
+        const rewritePrompt = `Rewrite the following user follow-up question into a standalone, detailed research query based on the conversation history.
+        HISTORY:
+        ${historyText}
+        FOLLOW-UP: "${query}"
+        Standalone query:`;
+        
+        const rewritten = await askGroq(rewritePrompt, false, "llama-3.1-8b-instant");
+        effectiveQuery = rewritten || query;
+        console.log(`[SAFE_MODE] Rewritten Query: "${effectiveQuery}"`);
+      }
 
-      // 2. Hybrid Semantic + Keyword Search
+      // 2. Embed effective query
+      const embed = await getExtractor();
+      const queryOutput = await embed(effectiveQuery, { pooling: 'mean', normalize: true });
+      const queryEmbedding = Array.from(queryOutput.data);
+      const queryTerms = effectiveQuery.toLowerCase().split(/\W+/).filter(t => t.length > 3);
+
+      // 3. Hybrid Search
       const scoredChunks = SAFE_CHUNKS.map(chunk => {
         const semanticScore = cosineSimilarity(queryEmbedding, chunk.embedding);
-        
-        // Keyword overlap
         const chunkTextLower = chunk.text.toLowerCase();
         let keywordHits = 0;
-        queryTerms.forEach(term => {
-          if (chunkTextLower.includes(term)) keywordHits++;
-        });
+        queryTerms.forEach(term => { if (chunkTextLower.includes(term)) keywordHits++; });
         const keywordScore = queryTerms.length > 0 ? (keywordHits / queryTerms.length) : 0;
-        
-        // Hybrid score (70% semantic, 30% keyword)
         const finalScore = (semanticScore * 0.7) + (keywordScore * 0.3);
-        
-        return { ...chunk, score: finalScore, semanticScore, keywordScore };
+        return { ...chunk, score: finalScore };
       })
       .sort((a, b) => b.score - a.score)
       .slice(0, 5); 
 
-      // 3. Evidence Thresholding
       const topScore = scoredChunks[0]?.score || 0;
-      console.log(`[SAFE_MODE] Query: "${query}" | Top Hybrid Score: ${topScore.toFixed(3)}`);
-      
-      if (topScore < 0.35) { // Threshold for "no evidence"
-        console.warn(`[SAFE_MODE] Low confidence retrieval for "${query}". Denying grounding.`);
+      if (topScore < 0.35) {
         return res.json({
-          answer: `I could not find any evidence or specific mention regarding **"${query}"** in the provided document segments. My retrieval engine returned low-confidence matches that do not meet the integrity threshold for a grounded response.`,
+          answer: `No evidence found in the document regarding "${query}".`,
           confidence: 0,
           sources: [],
           found_evidence: false
         });
       }
 
-      // 4. Build Context & Prompt
+      // 4. Build Grounded Prompt
       const context = scoredChunks.map(c => 
         `[CHUNK ID: ${c.id}] [SOURCE: ${c.filename}, Page ${c.metadata.page}, Section: ${c.section}]\nTEXT: ${c.text}`
       ).join("\n\n---\n\n");
 
-      const prompt = `You are the VeriXa Research Integrity Agent. Your task is to provide a surgical, evidence-backed analysis based ONLY on the provided document segments.
+      const prompt = `You are the VeriXa Conversational Research Copilot. Provide a surgical, grounded response based ONLY on the provided document segments and conversation history.
 
-DOCUMENT SEGMENTS:
+CONVERSATION HISTORY:
+${session.history.slice(-3).map(h => `User: ${h.query}\nAI: ${h.answer}`).join("\n---\n")}
+
+CURRENT DOCUMENT SEGMENTS:
 ${context}
 
-QUERY: "${query}"
+USER FOLLOW-UP: "${query}"
 
-STRICT INTEGRITY RULES:
-- If the segments do NOT discuss the query (e.g. question is about "quantum" but text is about "transformers"), you MUST state: "No evidence found regarding [query] in the analyzed segments."
-- DO NOT provide a general summary of the paper if it does not answer the specific question.
-- DO NOT hallucinate or infer claims not explicitly stated.
-- CITE exact [CHUNK ID] for every factual statement.
-- Use structured markdown for the answer.
+STRICT RULES:
+- If current segments don't answer the query, but previous ones did, refer back to them.
+- If NO segments provide evidence, explicitly state so.
+- CITE [CHUNK ID] for all facts.
+- Use structured markdown.
 
 JSON RESPONSE FORMAT:
 {
-  "answer": "Your grounded analysis in markdown",
-  "confidence": 0.95,
+  "answer": "markdown",
+  "confidence": 0.9,
   "found_evidence": true
 }`;
 
       const rawAnswer = await askGroq(prompt, true, "llama-3.1-8b-instant");
       const data = JSON.parse(rawAnswer);
 
-      // 5. Telemetry & Formatting
-      console.log(`[SAFE_MODE] Response generated. Confidence: ${data.confidence}. Evidence: ${data.found_evidence}`);
+      // 5. Update Session History
+      session.history.push({ query, answer: data.answer, timestamp: Date.now() });
+      if (session.history.length > 10) session.history.shift(); // Keep memory lean
+
       const sources = scoredChunks.map(c => ({
         id: c.id,
         text: c.text,
         score: c.score,
-        metadata: {
-          source: c.filename,
-          page: c.metadata.page,
-          section: c.section
-        }
+        metadata: { source: c.filename, page: c.metadata.page, section: c.section }
       }));
 
       return res.json({
         ...data,
         sources,
         results: sources,
-        mode: "SAFE_MODE_HYBRID_INTEGRITY"
+        sessionId,
+        mode: "SAFE_MODE_CONVERSATIONAL"
       });
     } catch (err) {
-      console.error("[SAFE_MODE] Research Query Error:", err);
-      return res.status(500).json({ error: "Failed to process research query" });
+      console.error("[SAFE_MODE] Conversational Query Error:", err);
+      return res.status(500).json({ error: "Failed to process conversational query" });
     }
   });
 
