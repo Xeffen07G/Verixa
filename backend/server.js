@@ -350,50 +350,73 @@ if (SAFE_MODE) {
       const embed = await getExtractor();
       const queryOutput = await embed(query, { pooling: 'mean', normalize: true });
       const queryEmbedding = Array.from(queryOutput.data);
+      const queryTerms = query.toLowerCase().split(/\W+/).filter(t => t.length > 3);
 
-      // 2. Semantic Search
-      const scoredChunks = SAFE_CHUNKS.map(chunk => ({
-        ...chunk,
-        score: cosineSimilarity(queryEmbedding, chunk.embedding)
-      }))
+      // 2. Hybrid Semantic + Keyword Search
+      const scoredChunks = SAFE_CHUNKS.map(chunk => {
+        const semanticScore = cosineSimilarity(queryEmbedding, chunk.embedding);
+        
+        // Keyword overlap
+        const chunkTextLower = chunk.text.toLowerCase();
+        let keywordHits = 0;
+        queryTerms.forEach(term => {
+          if (chunkTextLower.includes(term)) keywordHits++;
+        });
+        const keywordScore = queryTerms.length > 0 ? (keywordHits / queryTerms.length) : 0;
+        
+        // Hybrid score (70% semantic, 30% keyword)
+        const finalScore = (semanticScore * 0.7) + (keywordScore * 0.3);
+        
+        return { ...chunk, score: finalScore, semanticScore, keywordScore };
+      })
       .sort((a, b) => b.score - a.score)
-      .slice(0, 5); // Top 5 chunks
+      .slice(0, 5); 
 
+      // 3. Evidence Thresholding
+      const topScore = scoredChunks[0]?.score || 0;
+      console.log(`[SAFE_MODE] Query: "${query}" | Top Hybrid Score: ${topScore.toFixed(3)}`);
+      
+      if (topScore < 0.35) { // Threshold for "no evidence"
+        console.warn(`[SAFE_MODE] Low confidence retrieval for "${query}". Denying grounding.`);
+        return res.json({
+          answer: `I could not find any evidence or specific mention regarding **"${query}"** in the provided document segments. My retrieval engine returned low-confidence matches that do not meet the integrity threshold for a grounded response.`,
+          confidence: 0,
+          sources: [],
+          found_evidence: false
+        });
+      }
+
+      // 4. Build Context & Prompt
       const context = scoredChunks.map(c => 
         `[CHUNK ID: ${c.id}] [SOURCE: ${c.filename}, Page ${c.metadata.page}, Section: ${c.section}]\nTEXT: ${c.text}`
       ).join("\n\n---\n\n");
 
-      const prompt = `You are the VeriXa Research Assistant. Your task is to provide a high-fidelity, grounded analysis of scientific papers based ONLY on the provided chunks.
+      const prompt = `You are the VeriXa Research Integrity Agent. Your task is to provide a surgical, evidence-backed analysis based ONLY on the provided document segments.
 
-DOCUMENT CONTEXT:
+DOCUMENT SEGMENTS:
 ${context}
 
 QUERY: "${query}"
 
-ANALYSIS TASKS (if applicable):
-1. Explain the main objective of the paper.
-2. Explain the methodology used.
-3. Explain the key findings and results.
-4. Explain the broader implications of these findings.
-5. Identify any limitations or assumptions mentioned.
-6. Extract key references or novelty if discussed.
+STRICT INTEGRITY RULES:
+- If the segments do NOT discuss the query (e.g. question is about "quantum" but text is about "transformers"), you MUST state: "No evidence found regarding [query] in the analyzed segments."
+- DO NOT provide a general summary of the paper if it does not answer the specific question.
+- DO NOT hallucinate or infer claims not explicitly stated.
+- CITE exact [CHUNK ID] for every factual statement.
+- Use structured markdown for the answer.
 
-RULES:
-- RESPONSE FORMAT: You MUST return a JSON object with two fields: "answer" (string, containing structured markdown) and "confidence" (number 0-1).
-- CITATIONS: You MUST explicitly cite chunks using [CHUNK ID] format when stating facts.
-- ACCURACY: If the context does not contain the information requested, explicitly state "Information not found in provided segments."
-- TONE: Be academic, precise, and surgical.
-
-JSON OUTPUT FORMAT:
+JSON RESPONSE FORMAT:
 {
-  "answer": "MARKDOWN_STRING",
-  "confidence": 0.95
+  "answer": "Your grounded analysis in markdown",
+  "confidence": 0.95,
+  "found_evidence": true
 }`;
 
       const rawAnswer = await askGroq(prompt, true, "llama-3.1-8b-instant");
       const data = JSON.parse(rawAnswer);
 
-      // Format sources for UI
+      // 5. Telemetry & Formatting
+      console.log(`[SAFE_MODE] Response generated. Confidence: ${data.confidence}. Evidence: ${data.found_evidence}`);
       const sources = scoredChunks.map(c => ({
         id: c.id,
         text: c.text,
@@ -409,7 +432,7 @@ JSON OUTPUT FORMAT:
         ...data,
         sources,
         results: sources,
-        mode: "SAFE_MODE_SEMANTIC"
+        mode: "SAFE_MODE_HYBRID_INTEGRITY"
       });
     } catch (err) {
       console.error("[SAFE_MODE] Research Query Error:", err);
