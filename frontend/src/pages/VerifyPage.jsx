@@ -387,12 +387,20 @@ export default function VerifyPage() {
               </div>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '100px 20px' }}>
-              <div style={{ width: 80, height: 80, borderRadius: '50%', background: T.surface2, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <div style={{ textAlign: 'center', padding: '100px 20px', animation: 'fadeUp 0.8s ease' }}>
+              <div style={{ width: 80, height: 80, borderRadius: 24, background: `${T.accent}0a`, border: `1px solid ${T.accent}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}>
                 <ShieldCheck size={40} color={T.accent} />
               </div>
-              <h2 style={{ fontSize: 32, fontFamily: 'serif', fontWeight: 300 }}>{t('readyToVerify', lang)}</h2>
-              <p style={{ color: T.text3, maxWidth: 400, margin: '16px auto' }}>{t('readyDesc', lang)}</p>
+              <h2 style={{ fontSize: 32, fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, marginBottom: 16 }}>Forensic Audit Ready</h2>
+              <p style={{ color: T.text3, maxWidth: 440, margin: '0 auto 40px', lineHeight: 1.6, fontSize: 15 }}>
+                Submit a text claim, research URL, or document for deep-trace verification. 
+                Our engine will isolate claims and retrieve multi-source evidence for audit.
+              </p>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ padding: '8px 16px', borderRadius: 20, background: T.surface2, fontSize: 10, fontWeight: 900, color: T.text3, letterSpacing: 1 }}>EVIDENCE MAPPING</div>
+                <div style={{ padding: '8px 16px', borderRadius: 20, background: T.surface2, fontSize: 10, fontWeight: 900, color: T.text3, letterSpacing: 1 }}>CONTRADICTION SCAN</div>
+                <div style={{ padding: '8px 16px', borderRadius: 20, background: T.surface2, fontSize: 10, fontWeight: 900, color: T.text3, letterSpacing: 1 }}>HALLUCINATION FILTER</div>
+              </div>
             </div>
           )}
         </div>

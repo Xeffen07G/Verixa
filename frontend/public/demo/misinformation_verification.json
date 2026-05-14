@@ -1,0 +1,27 @@
+{
+  "investigationName": "Viral Vaccine Misinformation Audit",
+  "topic": "mRNA Vaccine Efficacy vs. Social Media Claims",
+  "findings": [
+    {
+      "source": "New England Journal of Medicine (2023)",
+      "claim": "BNT162b2 demonstrates 95.3% efficacy in preventing symptomatic COVID-19 infection in Phase III trials with 43,548 participants.",
+      "consensus": "Peer-reviewed gold standard. Replicated across multiple independent studies."
+    },
+    {
+      "source": "CDC MMWR Report",
+      "claim": "Real-world effectiveness drops to 84-88% against Delta variant, consistent with expected immune escape from antigenic drift.",
+      "consensus": "Supports efficacy with expected variant-specific attenuation."
+    },
+    {
+      "source": "Viral Social Media Post (1.2M shares)",
+      "claim": "Vaccines are only 12% effective and cause more hospitalizations than they prevent.",
+      "contradiction": "Directly contradicts NEJM Phase III data (95.3%) and CDC surveillance (84-88%). The 12% figure appears to originate from a misread of an absolute risk reduction metric, not relative efficacy."
+    },
+    {
+      "source": "Preprint Server (not peer-reviewed)",
+      "claim": "Adverse event rates are significantly underreported in VAERS due to passive surveillance bias.",
+      "contradiction": "Valid methodological concern about passive reporting, but the claim conflates reporting bias with actual harm rates. Does not invalidate efficacy data."
+    }
+  ],
+  "forensicConclusion": "CRITICAL MISINFORMATION DETECTED. The viral claim (12% efficacy) is a statistical misrepresentation of absolute vs. relative risk reduction. Peer-reviewed consensus strongly supports 84-95% efficacy depending on variant. The preprint raises a valid but separate concern about adverse event surveillance methodology."
+}

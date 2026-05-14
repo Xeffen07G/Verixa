@@ -11,6 +11,7 @@ import DashboardPage from './pages/DashboardPage';
 import ExtensionPage from './pages/ExtensionPage';
 import AccountPage from './pages/AccountPage';
 import ResearchWorkspace from './pages/ResearchWorkspace';
+import IntelligenceLab from './pages/IntelligenceLab';
 import { AuthProvider } from './context/AuthContext';
 import { LangProvider } from './context/LangContext';
 import DragDropOverlay from './components/DragDropOverlay';
@@ -32,6 +33,8 @@ export default function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/trending" element={<TrendingPage />} />
+                <Route path="/verification" element={<DashboardPage />} />
+                <Route path="/intelligence" element={<IntelligenceLab />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/extension" element={<ExtensionPage />} />
                 <Route path="/research" element={<ResearchWorkspace />} />

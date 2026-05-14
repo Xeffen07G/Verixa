@@ -1,0 +1,17 @@
+{
+  "investigationName": "Climate Consensus vs. Minority Divergence",
+  "topic": "Arctic Ice Melt Acceleration",
+  "findings": [
+    {
+      "source": "Nature Geoscience 2023",
+      "claim": "Arctic ice loss is accelerating at 12% per decade, exceeding previous CMIP6 projections.",
+      "consensus": "Supports the high-acceleration hypothesis."
+    },
+    {
+      "source": "Atmospheric Research (Minority Report)",
+      "claim": "Localized decadal oscillations may temporarily mask or offset acceleration, suggesting a 9% rate.",
+      "contradiction": "Directly conflicts with Nature's 12% metric."
+    }
+  ],
+  "forensicConclusion": "Moderate contradiction detected regarding melt velocity. Consensus leans towards 12%, but minority views suggest statistical variability in localized data."
+}

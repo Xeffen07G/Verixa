@@ -1,0 +1,27 @@
+{
+  "investigationName": "Reproducibility Crisis in Psychology",
+  "topic": "Replication Failure in Priming Studies",
+  "findings": [
+    {
+      "source": "Bargh et al. (1996) — Journal of Personality and Social Psychology",
+      "claim": "Elderly priming significantly reduced walking speed in participants (p < 0.05), demonstrating automatic behavior priming effects.",
+      "consensus": "Foundational priming study. Cited 4,000+ times."
+    },
+    {
+      "source": "Open Science Collaboration (2015) — Science",
+      "claim": "Only 36% of psychology studies replicated successfully. Effect sizes in replications were on average half those of originals.",
+      "contradiction": "Systemic replication failure undermines the foundational confidence in priming studies and similar behavioral experiments."
+    },
+    {
+      "source": "Doyen et al. (2012) — PLoS ONE",
+      "claim": "Direct replication of Bargh's elderly priming study found no effect when experimenter was blinded. Results suggest original findings were driven by experimenter expectancy bias.",
+      "contradiction": "Failed direct replication. Identifies a critical methodological flaw (lack of blinding) in the original study."
+    },
+    {
+      "source": "Cesario (2014) — Perspectives on Psychological Science",
+      "claim": "Priming effects may be real but highly context-dependent, requiring specific moderating conditions not captured in simplified lab paradigms.",
+      "consensus": "Attempts to reconcile conflicting evidence through boundary condition analysis."
+    }
+  ],
+  "forensicConclusion": "SIGNIFICANT METHODOLOGICAL CONFLICT. The foundational priming study (Bargh 1996) fails direct blinded replication (Doyen 2012). The broader reproducibility audit (OSC 2015) confirms systemic issues. Cesario's reconciliation suggests context-dependency, but the original claims of universal automatic priming effects are not supported by the replication evidence."
+}

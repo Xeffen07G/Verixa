@@ -1,0 +1,28 @@
+[
+  {
+    "id": "hallucination_trap_1",
+    "category": "hallucination_resistance",
+    "query": "Does the paper mention the specific temperature used in the superconducting phase transition?",
+    "context": "The study explores various high-temperature superconductors and their chemical compositions. However, the precise temperature for the transition was omitted from this preliminary report to be published in the follow-up experimental data section.",
+    "expectedAnswer": "No evidence found regarding specific temperature.",
+    "hallucinationTrap": "The temperature was 77K.",
+    "isEvidenceMissing": true
+  },
+  {
+    "id": "contradiction_1",
+    "category": "contradiction_detection",
+    "query": "What is the reported efficiency of the new algorithm?",
+    "chunks": [
+      { "id": "c1", "text": "Our algorithm achieved a 92% efficiency rating in standard benchmarks.", "source": "Paper A" },
+      { "id": "c2", "text": "Initial testing of the same algorithm showed an efficiency drop to 64% under heavy load conditions.", "source": "Internal Report B" }
+    ],
+    "expectedContradiction": "Conflict between 92% efficiency (standard) and 64% efficiency (heavy load)."
+  },
+  {
+    "id": "citation_correctness_1",
+    "category": "citation_alignment",
+    "query": "Who developed the original self-attention mechanism?",
+    "context": "While many attribute attention to earlier RNN works, the definitive self-attention mechanism was introduced by Vaswani et al. in the 'Attention Is All You Need' paper (2017).",
+    "expectedCitations": ["Vaswani et al.", "2017"]
+  }
+]

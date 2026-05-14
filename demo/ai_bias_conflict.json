@@ -1,0 +1,17 @@
+{
+  "investigationName": "LLM Bias & Safety Guardrails",
+  "topic": "Refusal Rates in Frontier Models",
+  "findings": [
+    {
+      "source": "Anthropic Research",
+      "claim": "Aggressive safety training reduces helpfulness but significantly lowers the risk of prompt injection.",
+      "consensus": "Safety alignment is a trade-off for capability."
+    },
+    {
+      "source": "Open-Source Benchmark Group",
+      "claim": "Safety training often leads to 'moralizing' refusals for benign queries, degrading user trust.",
+      "contradiction": "Highlights the negative user-experience impact vs. the safety benefit."
+    }
+  ],
+  "forensicConclusion": "Philosophical and methodological disagreement on the definition of 'safe refusal'. One source prioritizes risk mitigation, the other prioritizes utility and trust."
+}

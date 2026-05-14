@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LANGUAGES, t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
-import { Menu, X, Sun, Moon, Globe, Image, Video, TrendingUp, LogOut, User, FileText, Layout } from 'lucide-react';
+import { Menu, X, Sun, Moon, Globe, Image, Video, TrendingUp, LogOut, User, FileText, Layout, ShieldCheck, BookOpen } from 'lucide-react';
 
 export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const [scrolled, setScrolled] = useState(false);
@@ -28,10 +28,11 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const navLinks = React.useMemo(() => {
     const links = [
       { label: t('navFeatures', lang), href: '/#features' },
-      { label: t('navHowItWorks', lang), href: '/#how-it-works' },
     ];
     if (user) {
-      links.push({ label: t('navDashboard', lang), href: '/dashboard' });
+      links.push({ label: 'Intelligence Lab', href: '/intelligence' });
+      links.push({ label: 'Verification Lab', href: '/verification' });
+      links.push({ label: 'Research Workspace', href: '/research' });
     }
     links.push({ label: t('navPricing', lang), href: '/#pricing' });
     links.push({ label: t('navTestimonials', lang), href: '/#testimonials' });
@@ -97,7 +98,13 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
           </div>
 
           {/* Right: Tools & Menu */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+            {user && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', borderRadius: 20, background: 'rgba(74,222,128,0.05)', border: '1px solid rgba(74,222,128,0.1)' }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 10px #4ade8055' }} />
+                <span style={{ fontSize: 9, fontWeight: 900, color: '#4ade80', letterSpacing: 1 }}>SYSTEM: ACTIVE</span>
+              </div>
+            )}
             {children}
             
             {/* Tool Group (Always Visible) */}
@@ -197,9 +204,17 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <Link to="/dashboard" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
+              <Link to="/intelligence" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(201,169,110,0.1)', color: T.accent, textDecoration: 'none' }}>
                 <Layout size={20} />
-                <span style={{ fontSize: 18, fontWeight: 700 }}>{t('navDashboard', lang)}</span>
+                <span style={{ fontSize: 18, fontWeight: 700 }}>Intelligence Lab</span>
+              </Link>
+              <Link to="/verification" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
+                <ShieldCheck size={20} />
+                <span style={{ fontSize: 18, fontWeight: 700 }}>Verification Lab</span>
+              </Link>
+              <Link to="/research" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
+                <BookOpen size={20} />
+                <span style={{ fontSize: 18, fontWeight: 700 }}>Research Workspace</span>
               </Link>
               <Link to="/account" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
                 <User size={20} />

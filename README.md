@@ -1,250 +1,196 @@
-# VeriXa 🛡️
+<p align="center">
+  <strong>V E R I X A</strong><br/>
+  <em>Forensic Intelligence OS</em>
+</p>
 
-<div align="center">
-
-### Truth is not negotiable.
-
-AI-powered fact verification and misinformation intelligence platform designed to analyze claims, detect manipulated media, and generate contextual verification reports in real time.
-
-[![Live Demo](https://img.shields.io/badge/Live-Demo-gold?style=for-the-badge)](https://verixa-gamma.vercel.app)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=for-the-badge)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Public_Beta-success?style=for-the-badge)]()
-
-</div>
+<p align="center">
+  <code>Evidence over AI Fluency.</code>
+</p>
 
 ---
 
-# 🚀 Overview
+## What is VeriXa?
 
-VeriXa is an AI-powered verification ecosystem focused on combating misinformation, deepfakes, manipulated media, and false claims across digital platforms.
+**VeriXa** is a production-grade forensic intelligence platform that transforms raw research data into structured, evidence-backed insights. Unlike conversational AI tools, VeriXa prioritizes **verification**, **contradiction detection**, and **source credibility** over generative fluency.
 
-The platform combines intelligent verification workflows, contextual analysis, media forensics, and real-time AI reasoning to help users evaluate the authenticity of information in seconds.
+It is designed for researchers, fact-checkers, and intelligence analysts who need to:
 
-Built with a cinematic modern UI and scalable AI-driven architecture, VeriXa aims to evolve into a next-generation trust and verification platform.
-
----
-
-# ✨ Core Features
-
-## 🧠 AI Fact Verification
-- Analyze textual claims using contextual reasoning
-- Generate intelligent verification reports
-- Detect misinformation patterns
-- Evidence-oriented verification workflows
-
-## 🖼️ AI Image Intelligence
-- Detect AI-generated imagery
-- Analyze image metadata and inconsistencies
-- Deepfake artifact inspection
-- Visual authenticity scoring
-
-## 🎥 Deepfake Video Detection
-- Temporal consistency analysis
-- Synthetic media detection
-- Biometric and motion artifact inspection
-- Video integrity workflows
-
-## 🌍 Global News Intelligence
-- Real-time misinformation monitoring
-- Verification confidence indicators
-- AI-powered credibility tracking
-- Trend and narrative analysis
-
-## 📄 Multi-Input Verification
-Supports:
-- Text
-- URLs
-- PDFs
-- Images
-- Videos
+- **Verify claims** against multi-source evidence
+- **Detect contradictions** across research papers
+- **Map consensus vs. minority views** in scientific literature
+- **Generate forensic reports** with full citation chains
 
 ---
 
-# 🛠️ Tech Stack
+## Core Architecture
 
-## Frontend
-- React.js
-- Tailwind CSS
-- JavaScript
-- Framer Motion
-
-## AI / Verification Concepts
-- LLM-based reasoning
-- Contextual retrieval workflows
-- Media authenticity analysis
-- AI-generated content detection
-- Verification confidence systems
-
-## Deployment
-- Vercel
-
----
-
-# 🌐 Live Demo
-
-🔗 https://verixa-gamma.vercel.app
-
----
-
-# 📸 Screenshots
-
-## Landing Page
-
-![Landing Page](./screenshots/landing-page.png)
-
----
-
-## Verification Dashboard
-
-![Verification Dashboard](./screenshots/verification-dashboard.png)
-
----
-
-## AI Image Intelligence
-
-![Image Intelligence](./screenshots/image-intelligence.png)
-
----
-
-## Deepfake Video Detection
-
-![Video Detection](./screenshots/video-detection.png)
-
----
-
-## Global News Intelligence
-
-![News Intelligence](./screenshots/news-intelligence.png)
-
----
-
-# 🧠 How VeriXa Works
-
-```text
-User Input
-   ↓
-Claim / Media Analysis
-   ↓
-Contextual AI Verification
-   ↓
-Evidence & Consistency Evaluation
-   ↓
-Authenticity Assessment
-   ↓
-Verification Report Generation
+```
+┌──────────────────────────────────────────────────────────┐
+│                    VERIXA INTELLIGENCE OS                  │
+├────────────────┬─────────────────┬────────────────────────┤
+│ Verification   │ Research        │ Intelligence           │
+│ Lab            │ Workspace       │ Lab                    │
+│ ─ Claim audit  │ ─ Deep analysis │ ─ Telemetry dashboard  │
+│ ─ URL/PDF/Text │ ─ Contradiction │ ─ Session oversight    │
+│ ─ Score report │   hunting       │ ─ Retrieval analytics  │
+│                │ ─ Forensic      │ ─ System health        │
+│                │   export        │                        │
+├────────────────┴─────────────────┴────────────────────────┤
+│              ADAPTIVE RETRIEVAL ENGINE                     │
+│  ┌─────────┐  ┌──────────┐  ┌─────────────┐             │
+│  │ Intent  │→ │ Hybrid   │→ │ Contradiction│             │
+│  │ Classify│  │ Search   │  │ Engine       │             │
+│  │         │  │ BM25 +   │  │              │             │
+│  │ SYNTH / │  │ Semantic │  │ Cross-doc    │             │
+│  │ FACTUAL │  │ + Section│  │ conflict     │             │
+│  │         │  │ Boost    │  │ detection    │             │
+│  └─────────┘  └──────────┘  └─────────────┘             │
+├──────────────────────────────────────────────────────────┤
+│              DUAL-STAGE INGESTION                         │
+│  Stage 1: Fast (< 5s) — Extract → Chunk → Keyword Index  │
+│  Stage 2: Background — Semantic Embedding (Xenova)        │
+├──────────────────────────────────────────────────────────┤
+│              INFRASTRUCTURE                               │
+│  Groq (LLM) │ Xenova (Embeddings) │ JSON Store │ Express  │
+│  SAFE_MODE: Full operation on 512MB RAM (Render free tier)│
+└──────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-# 🏗️ Architecture Overview
+## Key Features
 
-```text
-Frontend (React + Tailwind)
-        ↓
-Verification Layer
-        ↓
-AI Reasoning & Analysis Pipelines
-        ↓
-Contextual Verification Workflows
-        ↓
-Report & Confidence Generation
-```
+| Feature | Description |
+|---|---|
+| **Adaptive Intent Classification** | Automatically routes queries — broad synthesis vs. strict factual verification |
+| **Contradiction Intelligence** | Cross-document conflict detection with consensus mapping |
+| **Anti-Hallucination Pipeline** | Grounded retrieval with citation-first prompts. Refuses speculation. |
+| **Dual-Stage Ingestion** | Instant keyword indexing (< 5s) + async semantic embedding |
+| **SAFE_MODE** | Full operation within 512MB RAM. No external databases required. |
+| **Investigation Continuity** | Global session state across all workspaces |
+| **Forensic Reports (v2)** | Executive summaries, evidence ledgers, methodology risk, consensus analysis |
+| **Document Deduplication** | Filename-based dedup prevents vault bloat |
+| **Section-Aware Retrieval** | Tiered boosts for Abstract (+0.25), Conclusion (+0.20), Introduction (+0.15) |
+| **Synthesis Fallback** | Broad queries never fail when documents exist in vault |
 
 ---
 
-# ⚡ Installation
+## Tech Stack
 
-Clone the repository:
+| Layer | Technology |
+|---|---|
+| **Reasoning** | Groq — Llama 3.1 70B Versatile |
+| **Embeddings** | Xenova/all-MiniLM-L6-v2 (local, no API calls) |
+| **Backend** | Node.js / Express |
+| **Frontend** | React + Vite |
+| **Persistence** | JSON-backed store (free-tier compatible) |
+| **Deployment** | Render (backend) + Vercel (frontend) |
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Node.js 18+
+- npm 9+
+- Groq API key ([console.groq.com](https://console.groq.com))
+
+### Installation
 
 ```bash
-git clone https://github.com/Xeffen07G/Verixa.git
-```
+# Clone
+git clone https://github.com/your-username/verixa.git
+cd verixa
 
-Navigate into the project:
-
-```bash
-cd Verixa
-```
-
-Install dependencies:
-
-```bash
+# Backend
+cd backend
 npm install
-```
+cp .env.example .env    # Add GROQ_API_KEY
+npm run dev
 
-Run the development server:
-
-```bash
+# Frontend (new terminal)
+cd frontend
+npm install
 npm run dev
 ```
 
+### Environment Variables
+
+```env
+# backend/.env
+GROQ_API_KEY=gsk_...
+SAFE_MODE=true
+PORT=5000
+```
+
+### SAFE_MODE
+
+Set `SAFE_MODE=true` for resource-constrained environments:
+- Uses in-memory document store (no MongoDB)
+- Limits to 15 chunks/doc and 2 concurrent embedding jobs
+- Auto-purges sessions after 30 minutes
+- Memory guard at 450MB triggers emergency session cleanup
+
+See [SAFE_MODE.md](./SAFE_MODE.md) for full documentation.
+
 ---
 
-# 📂 Project Structure
+## Demo Investigations
 
-```bash
-Verixa/
-├── public/
-├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── pages/
-│   ├── sections/
-│   ├── utils/
-│   └── App.jsx
-├── screenshots/
-├── package.json
-└── README.md
+VeriXa ships with 4 pre-configured forensic investigations:
+
+| Demo | Topic | Demonstrates |
+|---|---|---|
+| **LLM Bias & Safety** | Safety alignment trade-offs | Contradiction mapping between sources |
+| **Climate Data Audit** | Arctic ice melt rates | Consensus vs. minority metrics |
+| **Vaccine Misinfo Audit** | mRNA efficacy claims | Misinformation cross-referencing |
+| **Replication Crisis** | Psychology priming studies | Methodology conflict chains |
+
+Access via **Research Workspace → Demo Investigation** cards.
+
+---
+
+## Project Structure
+
+```
+verixa/
+├── backend/
+│   ├── server.js              # Core server + RAG engine
+│   ├── services/
+│   │   ├── groq.js            # LLM orchestration
+│   │   ├── contradictionService.js  # Cross-doc conflict detection
+│   │   ├── investigationService.js  # Session + evidence ledger
+│   │   └── rerank.js          # Retrieval reranking
+│   ├── prompts/               # Versioned prompt templates
+│   │   ├── researchPrompts.js
+│   │   ├── contradictionPrompts.js
+│   │   ├── verificationPrompts.js
+│   │   └── exportPrompts.js
+│   ├── internal/evals/        # Forensic benchmark suite
+│   └── utils/                 # Store, RAG utilities
+├── frontend/
+│   ├── src/pages/
+│   │   ├── LandingPage.jsx    # Product positioning
+│   │   ├── VerifyPage.jsx     # Verification Lab
+│   │   ├── ResearchWorkspace.jsx  # Deep analysis workspace
+│   │   └── IntelligenceLab.jsx    # Command center
+│   └── src/components/
+│       ├── InvestigationPanel.jsx  # Evidence ledger + timeline
+│       └── Navbar.jsx         # System status indicator
+├── demo/                      # Pre-configured investigations
+├── ARCHITECTURE.md
+├── SAFE_MODE.md
+└── PORTFOLIO_CASE_STUDY.md
 ```
 
 ---
 
-# 🎯 Future Improvements
+## Documentation
 
-- Real-time web evidence retrieval
-- Multi-source verification engine
-- Browser extension integration
-- API access for developers
-- Voice-based verification workflows
-- Advanced AI confidence scoring
-- Cross-platform synchronization
-- Multi-language support
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** — System design, retrieval pipeline, contradiction engine
+- **[SAFE_MODE.md](./SAFE_MODE.md)** — Resource-constrained deployment strategy
+- **[PORTFOLIO_CASE_STUDY.md](./PORTFOLIO_CASE_STUDY.md)** — Engineering case study for technical portfolios
 
 ---
 
-# 🧩 Challenges Faced
-
-- Designing scalable AI verification workflows
-- Creating cinematic responsive UI interactions
-- Structuring multi-modal verification systems
-- Handling contextual ambiguity in misinformation
-- Building intuitive verification experiences
-
----
-
-# 📌 Vision
-
-VeriXa is designed to evolve into a complete AI trust infrastructure capable of helping users identify misinformation, manipulated media, and synthetic content across the internet in real time.
-
----
-
-# 🤝 Contributing
-
-Contributions, ideas, and improvements are welcome.
-
-Fork the repository and submit a pull request.
-
----
-
-# 👨‍💻 Developer
-
-### Sayak Das
-
-- GitHub: https://github.com/Xeffen07G
-- LinkedIn: https://www.linkedin.com/in/sayak-das-460157287
-
----
-
-# 📄 License
-
-Licensed under the Apache 2.0 License.
+<p align="center"><em>Evidence-backed intelligence. No speculation.</em></p>
