@@ -54,6 +54,7 @@ export default function DashboardPage() {
   const [vaultLoading, setVaultLoading] = useState(false);
   const [query, setQuery] = useState('');
   const [queryResult, setQueryResult] = useState(null);
+  const [vaultAnswer, setVaultAnswer] = useState('');
   const [queryLoading, setQueryLoading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null); // { status: 'idle', message: '' }
   const fileInputRef = useRef(null);
@@ -168,9 +169,12 @@ export default function DashboardPage() {
     if (!query.trim()) return;
     setQueryLoading(true);
     setQueryResult(null);
+    setVaultAnswer('');
     try {
-      const res = await api.post('/api/rag/query', { query });
-      setQueryResult(res.data.results);
+      const { data } = await api.post('/api/rag/query', { query });
+      console.log("RAG RESPONSE:", data);
+      setVaultAnswer(data.answer);
+      setQueryResult(data.results || data.sources || []);
     } catch (err) {
       console.error('Query failed', err);
     } finally {
@@ -308,9 +312,15 @@ export default function DashboardPage() {
                     {queryLoading ? '...' : t('askVault', lang)}
                   </button>
                 </div>
-                {queryResult && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
-                    <h4 style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3 }}>{t('vaultResults', lang)}</h4>
+                {vaultAnswer && (
+                  <div style={{ marginBottom: 24, padding: '24px', background: `${T.accent}0a`, border: `1px solid ${T.accent}33`, borderRadius: 20 }}>
+                    <h4 style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: T.accent, fontWeight: 900, marginBottom: 12 }}>{t('verixaIntelligence', lang)}</h4>
+                    <p style={{ fontSize: 15, color: T.text, lineHeight: 1.7, margin: 0, fontWeight: 400 }}>{vaultAnswer}</p>
+                  </div>
+                )}
+                {queryResult && queryResult.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <h4 style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3 }}>{t('groundingSources', lang)}</h4>
                     {queryResult.map((res, i) => (
                       <div key={i} style={{ padding: '16px', background: T.cardBg, border: `1px solid ${T.border}`, borderRadius: 12 }}>
                         <p style={{ fontSize: 13, color: T.text, margin: '0 0 8px', lineHeight: 1.6 }}>"{res.text}"</p>
