@@ -13,8 +13,20 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const multer = require("multer");
-const pdfParseLib = require("pdf-parse");
-const pdfParse = pdfParseLib.default || pdfParseLib;
+const pdfParseModule = require("pdf-parse");
+
+const pdfParse =
+  typeof pdfParseModule === "function"
+    ? pdfParseModule
+    : pdfParseModule.default;
+
+if (typeof pdfParse !== "function") {
+  console.error("CRITICAL: pdfParse failed to initialize", { 
+    moduleType: typeof pdfParseModule,
+    hasDefault: !!pdfParseModule?.default 
+  });
+}
+
 const { askGroq } = require("./services/groq");
 
 if (!fs.existsSync("uploads")) {
@@ -142,9 +154,15 @@ if (SAFE_MODE) {
       const dataBuffer = fs.readFileSync(req.file.path);
       let extractedText = "";
 
-      if (req.file.originalname.endsWith(".pdf")) {
-        const data = await pdfParse(dataBuffer);
-        extractedText = data.text;
+      if (req.file.originalname.toLowerCase().endsWith(".pdf")) {
+        console.log("PDF PARSE TYPE:", typeof pdfParse);
+        if (typeof pdfParse !== "function") {
+          throw new Error("pdfParse failed to initialize");
+        }
+        
+        const parsed = await pdfParse(dataBuffer);
+        console.log("PDF TEXT LENGTH:", parsed?.text?.length || 0);
+        extractedText = parsed.text;
       } else {
         extractedText = dataBuffer.toString("utf-8");
       }
