@@ -41,12 +41,16 @@ const PROCESS_TYPE = process.env.PROCESS_TYPE || "api";
 
 const SAFE_DOCS = [];
 const SAFE_CHUNKS = []; // In-memory vector store for SAFE_MODE
+const INGESTION_STATUS = {}; // Track async processing { id: { status, total, current } }
 
 let extractor = null;
 async function getExtractor() {
   if (!extractor) {
+    console.log("[SAFE_MODE] Loading embedding model (all-MiniLM-L6-v2)...");
+    const start = Date.now();
     const { pipeline } = await import("@xenova/transformers");
     extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+    console.log(`[SAFE_MODE] Model loaded in ${Date.now() - start}ms`);
   }
   return extractor;
 }
@@ -63,23 +67,23 @@ function cosineSimilarity(a, b) {
   return dotProduct / (Math.sqrt(mA) * Math.sqrt(mB));
 }
 
-function semanticChunking(text, filename, options = { size: 1000, overlap: 200 }) {
+function semanticChunking(text, filename, options = { size: 700, overlap: 100 }) {
   const chunks = [];
-  let start = 0;
   let chunkIndex = 1;
 
-  // Simple heuristic for section detection
+  // Split into sections
   const sections = text.split(/\n(?=[A-Z0-9\s\.]{5,20}\n)/);
   
   for (const section of sections) {
-    const sectionTitle = section.split('\n')[0].slice(0, 50).trim();
     let sectionStart = 0;
+    const sectionTitle = section.split('\n')[0].slice(0, 50).trim();
     
     while (sectionStart < section.length) {
+      if (chunks.length >= 20) break; // Limit for FREE tier stability
+
       let end = sectionStart + options.size;
       let chunkText = section.slice(sectionStart, end);
       
-      // Look for natural break
       let breakPoint = chunkText.lastIndexOf('\n');
       if (breakPoint < options.size * 0.5) breakPoint = chunkText.lastIndexOf('. ');
       if (breakPoint < options.size * 0.5) breakPoint = chunkText.length;
@@ -90,13 +94,14 @@ function semanticChunking(text, filename, options = { size: 1000, overlap: 200 }
         section: sectionTitle || "General",
         text: section.slice(sectionStart, sectionStart + breakPoint).trim(),
         metadata: {
-          page: Math.floor(start / 3000) + 1, // rough estimate if not provided by pdf-parse
+          page: Math.floor(sectionStart / 2500) + 1,
           length: breakPoint
         }
       });
       
       sectionStart += (breakPoint - options.overlap > 0) ? (breakPoint - options.overlap) : breakPoint;
     }
+    if (chunks.length >= 20) break;
   }
   return chunks;
 }
@@ -208,63 +213,78 @@ if (SAFE_MODE) {
   */
   app.post("/api/pdf/ingest", upload.single("pdf"), async (req, res) => {
     console.log("[SAFE_MODE] Ingesting document...");
-    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-
-    try {
+    if (!req.file) return res.status(400).json({ error: "No file uploaded" });    try {
       const dataBuffer = fs.readFileSync(req.file.path);
       let extractedText = "";
 
       if (req.file.originalname.toLowerCase().endsWith(".pdf")) {
-        console.log("PDF PARSE TYPE:", typeof pdfParse);
-        if (typeof pdfParse !== "function") {
-          throw new Error("pdfParse failed to initialize");
-        }
-        
         const parsed = await pdfParse(dataBuffer);
-        console.log("PDF TEXT LENGTH:", parsed?.text?.length || 0);
         extractedText = parsed.text;
       } else {
         extractedText = dataBuffer.toString("utf-8");
       }
 
+      // Cleanup buffer immediately
+      try { fs.unlinkSync(req.file.path); } catch (e) {}
+
+      const docId = Date.now().toString();
       const docObj = {
-        id: Date.now().toString(),
+        id: docId,
         filename: req.file.originalname,
         text: extractedText,
         uploadedAt: new Date().toISOString(),
       };
 
       SAFE_DOCS.push(docObj);
+      INGESTION_STATUS[docId] = { status: "processing", totalChunks: 0, chunksEmbedded: 0 };
 
-      // Semantic Chunking & Embedding
-      console.log(`[SAFE_MODE] Chunking ${req.file.originalname}...`);
-      const chunks = semanticChunking(extractedText, req.file.originalname);
-      const embed = await getExtractor();
-      
-      for (const chunk of chunks) {
-        const output = await embed(chunk.text, { pooling: 'mean', normalize: true });
-        chunk.embedding = Array.from(output.data);
-        SAFE_CHUNKS.push(chunk);
-      }
-      
-      console.log(`[SAFE_MODE] Ingested ${chunks.length} semantic chunks.`);
+      // START ASYNC PROCESSING (Non-blocking)
+      (async () => {
+        try {
+          console.log(`[SAFE_MODE] Async Chunking ${req.file.originalname}...`);
+          const chunks = semanticChunking(extractedText, req.file.originalname);
+          INGESTION_STATUS[docId].totalChunks = chunks.length;
 
-      // Clean up the uploaded file
-      try { fs.unlinkSync(req.file.path); } catch (e) {}
+          const embed = await getExtractor();
+          const startEmbed = Date.now();
 
-      return res.status(202).json({
+          for (let i = 0; i < chunks.length; i++) {
+            const chunk = chunks[i];
+            try {
+              const output = await embed(chunk.text, { pooling: 'mean', normalize: true });
+              chunk.embedding = Array.from(output.data);
+              SAFE_CHUNKS.push(chunk);
+            } catch (embedErr) {
+              console.error(`[SAFE_MODE] Embedding failed for chunk ${i}, skipping semantic support for this segment.`);
+            }
+            INGESTION_STATUS[docId].chunksEmbedded = i + 1;
+          }
+
+          INGESTION_STATUS[docId].status = "completed";
+          console.log(`[SAFE_MODE] Async Ingestion completed in ${Date.now() - startEmbed}ms for ${chunks.length} chunks.`);
+        } catch (err) {
+          console.error("[SAFE_MODE] Async Ingestion Error:", err);
+          INGESTION_STATUS[docId].status = "failed";
+        }
+      })();
+
+      return res.json({
         success: true,
-        accepted: true,
-        mock: true,
-        jobId: documentId,
-        status: "completed",
-        message: "Document indexed in-memory successfully.",
-        mode: "SAFE_MODE",
+        documentId: docId,
+        message: "Upload successful, processing in background.",
+        mode: "SAFE_MODE"
       });
+
     } catch (err) {
       console.error("[SAFE_MODE] Ingest Error:", err);
-      return res.status(500).json({ error: "Failed to process document in SAFE_MODE" });
+      return res.status(500).json({ error: "Failed to extract document text" });
     }
+  });
+
+  app.get("/api/pdf/status/:id", (req, res) => {
+    const status = INGESTION_STATUS[req.params.id];
+    if (!status) return res.status(404).json({ error: "Not found" });
+    return res.json(status);
   });
 
   /*

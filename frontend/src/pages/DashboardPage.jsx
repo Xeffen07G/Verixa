@@ -130,30 +130,35 @@ export default function DashboardPage() {
       
       // 1. Submit to ultra-lean ingestion endpoint
       const res = await api.post('/api/pdf/ingest', formData);
-      const { jobId } = res.data;
-      console.log(`[Dashboard] Upload accepted. JobId: ${jobId}`);
-      setUploadStatus({ status: 'loading', message: 'Queued...' });
+      const { documentId } = res.data;
+      console.log(`[Dashboard] Upload accepted. Document ID: ${documentId}`);
+      setUploadStatus({ status: 'loading', message: 'Starting analysis...' });
 
-      // 2. Poll for completion (Do not wait for text in the upload response)
+      // 2. Poll for completion
       console.log(`[Dashboard] Polling started`);
       let completed = false;
       let attempts = 0;
-      while (!completed && attempts < 150) { // 5 minute limit
+      while (!completed && attempts < 150) { 
         attempts++;
         await new Promise(r => setTimeout(r, 2000));
         
-        const statusRes = await api.get(`/api/pdf/status/${jobId}`);
-        const { status, progress } = statusRes.data;
-        
-        if (status === 'completed') {
-          completed = true;
-          console.log(`[Dashboard] Job completed: ${jobId}`);
-          setUploadStatus({ status: 'success', message: `${file.name} processed and indexed!` });
-          fetchVault();
-        } else if (status === 'failed') {
-          throw new Error(statusRes.data.error || 'Ingestion failed');
-        } else {
-          setUploadStatus({ status: 'loading', message: `Processing... ${progress || 0}%` });
+        try {
+          const statusRes = await api.get(`/api/pdf/status/${documentId}`);
+          const { status, chunksEmbedded, totalChunks } = statusRes.data;
+          
+          if (status === 'completed') {
+            completed = true;
+            setUploadStatus({ status: 'success', message: `${file.name} learned!` });
+            fetchVault();
+          } else if (status === 'failed') {
+            throw new Error('Ingestion failed');
+          } else {
+            const progress = totalChunks > 0 ? Math.round((chunksEmbedded / totalChunks) * 100) : 0;
+            setUploadStatus({ status: 'loading', message: `Learning... ${progress}%` });
+          }
+        } catch (pollErr) {
+          console.warn("[Dashboard] Polling error:", pollErr);
+          // Continue polling if it's just a transient error
         }
       }
       
