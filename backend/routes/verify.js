@@ -102,8 +102,9 @@ router.post("/", async (req, res) => {
     try {
       const falseOrPartial = verifiedResults.filter(c => c.verdict === "False" || c.verdict === "Partially True");
       if (falseOrPartial.length > 0) {
-        const port = process.env.PORT || 5000;
-        fetch(`http://localhost:${port}/api/trending/report`, {
+        const protocol = req.secure ? "https" : "http";
+        const host = req.get("host");
+        fetch(`${protocol}://${host}/api/trending/report`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ claims: falseOrPartial }),

@@ -49,13 +49,16 @@ async function queryIntelligence(query, documentId = null) {
   const rawAnswer = await askGroq(prompt, true, "llama-3.3-70b-versatile");
   const data = JSON.parse(rawAnswer);
 
+  const sources = reranked.map((r, i) => ({
+    id: i + 1,
+    text: r.text,
+    metadata: r.metadata
+  }));
+
   return {
     ...data,
-    original_sources: reranked.map((r, i) => ({
-      id: i + 1,
-      text: r.text,
-      metadata: r.metadata
-    }))
+    sources,
+    original_sources: sources
   };
 }
 

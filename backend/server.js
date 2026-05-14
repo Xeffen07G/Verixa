@@ -183,6 +183,33 @@ if (SAFE_MODE) {
 
   /*
   ==========================
+  MOCK RAG QUERY
+  ==========================
+  */
+  app.post("/api/rag/query", (req, res) => {
+    console.log("[SAFE_MODE] Mock RAG query hit");
+    return res.json({
+      answer: "This is a synthetic intelligence response generated in SAFE_MODE. In a production environment, this would be grounded in your indexed documents using vector embeddings and the VeriXa RAG engine.",
+      confidence_score: 95,
+      grounding_sources: [
+        { id: 1, page: 1, relevance: "High" },
+        { id: 2, page: 4, relevance: "Medium" }
+      ],
+      sources: [
+        { id: 1, text: "Verification of synthetic media requires multi-stage analysis of noise patterns and frequency domain anomalies.", metadata: { page: 1 } },
+        { id: 2, text: "Deepfake detection models often struggle with high-frequency components in compressed video streams.", metadata: { page: 4 } }
+      ],
+      original_sources: [
+        { id: 1, text: "Verification of synthetic media requires multi-stage analysis of noise patterns and frequency domain anomalies.", metadata: { page: 1 } },
+        { id: 2, text: "Deepfake detection models often struggle with high-frequency components in compressed video streams.", metadata: { page: 4 } }
+      ],
+      mock: true,
+      mode: "SAFE_MODE"
+    });
+  });
+
+  /*
+  ==========================
   MOCK RAG DOCS
   ==========================
   */
@@ -194,7 +221,6 @@ if (SAFE_MODE) {
       mode: "SAFE_MODE",
     });
   });
-
   /*
   ==========================
   MOCK ORGANIZATION
@@ -234,44 +260,48 @@ if (!SAFE_MODE && process.env.MONGO_URI) {
 API ROUTES
 ==================================================
 */
-if (!SAFE_MODE && PROCESS_TYPE === "api") {
-  console.log("[API] Loading production routes...");
-
-  const rateLimit = require("express-rate-limit");
+if (PROCESS_TYPE === "api") {
   const { requireApiKey } = require("./middleware/validate");
 
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: {
-      error: "Too many requests",
-    },
-  });
-
-  app.use("/api/", limiter);
-
-  app.use("/api/verify", requireApiKey, require("./routes/verify"));
-  app.use("/api/url", requireApiKey, require("./routes/url"));
-  app.use("/api/health", require("./routes/health"));
-  app.use("/api/trending", require("./routes/trending"));
-  app.use("/api/organization", require("./routes/organization"));
-  app.use("/api/user", require("./routes/user"));
-  app.use("/api/auth", require("./routes/auth"));
-  app.use("/api/pdf", requireApiKey, require("./routes/pdf"));
-  app.use("/api/image", requireApiKey, require("./routes/image"));
-  app.use("/api/video", requireApiKey, require("./routes/video"));
+  // Mount RAG routes always, so they are available even if some other features are limited
   app.use("/api/rag", require("./routes/rag"));
 
-} else if (PROCESS_TYPE === "api") {
-  console.log("[SAFE API] Minimal routes enabled");
+  if (!SAFE_MODE) {
+    console.log("[API] Loading production routes...");
 
-  app.use("/api/auth", require("./routes/auth"));
+    const rateLimit = require("express-rate-limit");
 
-  app.use("/api/health", (req, res) => {
-    res.json({
-      status: "safe",
+    const limiter = rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 100,
+      message: {
+        error: "Too many requests",
+      },
     });
-  });
+
+    app.use("/api/", limiter);
+
+    app.use("/api/verify", requireApiKey, require("./routes/verify"));
+    app.use("/api/url", requireApiKey, require("./routes/url"));
+    app.use("/api/health", require("./routes/health"));
+    app.use("/api/trending", require("./routes/trending"));
+    app.use("/api/organization", require("./routes/organization"));
+    app.use("/api/user", require("./routes/user"));
+    app.use("/api/auth", require("./routes/auth"));
+    app.use("/api/pdf", requireApiKey, require("./routes/pdf"));
+    app.use("/api/image", requireApiKey, require("./routes/image"));
+    app.use("/api/video", requireApiKey, require("./routes/video"));
+  } else {
+    console.log("[SAFE API] Minimal routes enabled");
+
+    app.use("/api/auth", require("./routes/auth"));
+
+    app.use("/api/health", (req, res) => {
+      res.json({
+        status: "safe",
+      });
+    });
+  }
 }
 
 /*

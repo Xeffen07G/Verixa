@@ -4,7 +4,8 @@
 // In Manifest V3, content scripts can't reliably make cross-origin requests.
 // All API calls are routed through this background service worker instead.
 
-const VERIXA_API = 'http://localhost:5000';
+// In production, change this to your deployed Render URL
+const VERIXA_API = 'https://verixa-backend.onrender.com'; // Fallback to production URL if known, or use a placeholder
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
