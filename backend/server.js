@@ -13,7 +13,8 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const multer = require("multer");
-const pdfParse = require("pdf-parse");
+const pdfParseLib = require("pdf-parse");
+const pdfParse = pdfParseLib.default || pdfParseLib;
 const { askGroq } = require("./services/groq");
 
 if (!fs.existsSync("uploads")) {
