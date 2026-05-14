@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { TrendingUp, ShieldCheck, AlertCircle, Clock, Download, ChevronRight, Users, Activity, BarChart3, History, BookOpen, Upload, Plus, Search, MessageSquare, FileText, CheckCircle2, RefreshCw } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
 import { useAuth } from '../context/AuthContext';
@@ -313,21 +314,37 @@ export default function DashboardPage() {
                   </button>
                 </div>
                 {vaultAnswer && (
-                  <div style={{ marginBottom: 24, padding: '24px', background: `${T.accent}0a`, border: `1px solid ${T.accent}33`, borderRadius: 20 }}>
-                    <h4 style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: T.accent, fontWeight: 900, marginBottom: 12 }}>{t('verixaIntelligence', lang)}</h4>
-                    <p style={{ fontSize: 15, color: T.text, lineHeight: 1.7, margin: 0, fontWeight: 400 }}>{vaultAnswer}</p>
+                  <div className="research-report" style={{ marginBottom: 32, padding: '32px', background: `${T.cardBg}`, border: `1px solid ${T.border}`, borderRadius: 24, boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+                    <h4 style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: T.accent, fontWeight: 900, marginBottom: 20 }}>{t('verixaIntelligence', lang)}</h4>
+                    <div style={{ fontSize: 15, color: T.text, lineHeight: 1.8, margin: 0, fontWeight: 400 }}>
+                      <ReactMarkdown components={{
+                        p: ({node, ...props}) => <p style={{marginBottom: '16px'}} {...props} />,
+                        h1: ({node, ...props}) => <h1 style={{color: T.accent, fontSize: '20px', marginTop: '24px', marginBottom: '12px'}} {...props} />,
+                        h2: ({node, ...props}) => <h2 style={{color: T.accent, fontSize: '18px', marginTop: '20px', marginBottom: '10px'}} {...props} />,
+                        h3: ({node, ...props}) => <h3 style={{color: T.text, fontSize: '16px', marginTop: '16px', marginBottom: '8px', fontWeight: 700}} {...props} />,
+                        ul: ({node, ...props}) => <ul style={{paddingLeft: '20px', marginBottom: '16px'}} {...props} />,
+                        li: ({node, ...props}) => <li style={{marginBottom: '8px'}} {...props} />,
+                        code: ({node, ...props}) => <code style={{background: `${T.accent}22`, padding: '2px 6px', borderRadius: '4px', color: T.accent}} {...props} />
+                      }}>
+                        {vaultAnswer}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                 )}
                 {queryResult && queryResult.length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     <h4 style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3 }}>{t('groundingSources', lang)}</h4>
                     {queryResult.map((res, i) => (
-                      <div key={i} style={{ padding: '16px', background: T.cardBg, border: `1px solid ${T.border}`, borderRadius: 12 }}>
-                        <p style={{ fontSize: 13, color: T.text, margin: '0 0 8px', lineHeight: 1.6 }}>"{res.text}"</p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: 10, color: T.accent, fontWeight: 700 }}>{res.metadata?.source || 'Document'}</span>
-                          <span style={{ fontSize: 10, color: T.text3 }}>{Math.round((res.score || 0.95) * 100)}% match</span>
+                      <div key={i} style={{ padding: '20px', background: `${T.accent}05`, border: `1px solid ${T.border}`, borderRadius: 16 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{ fontSize: 10, color: T.accent, fontWeight: 900, textTransform: 'uppercase' }}>{res.metadata?.source || 'Document'}</span>
+                            <span style={{ fontSize: 12, color: T.text, fontWeight: 700 }}>Page {res.metadata?.page || 'N/A'} — {res.metadata?.section || 'General'}</span>
+                          </div>
+                          <span style={{ fontSize: 10, color: T.text3, background: `${T.border}`, padding: '4px 8px', borderRadius: '6px' }}>{Math.round((res.score || 0) * 100)}% Match</span>
                         </div>
+                        <p style={{ fontSize: 13, color: T.text3, margin: 0, fontStyle: 'italic', lineHeight: 1.6 }}>"{res.text}"</p>
+                        <div style={{ marginTop: 12, fontSize: 9, color: T.text3, opacity: 0.6 }}>CHUNK ID: {res.id}</div>
                       </div>
                     ))}
                   </div>

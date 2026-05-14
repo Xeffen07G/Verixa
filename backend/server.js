@@ -40,6 +40,66 @@ const SAFE_MODE = process.env.SAFE_MODE === "true";
 const PROCESS_TYPE = process.env.PROCESS_TYPE || "api";
 
 const SAFE_DOCS = [];
+const SAFE_CHUNKS = []; // In-memory vector store for SAFE_MODE
+
+let extractor = null;
+async function getExtractor() {
+  if (!extractor) {
+    const { pipeline } = await import("@xenova/transformers");
+    extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+  }
+  return extractor;
+}
+
+function cosineSimilarity(a, b) {
+  let dotProduct = 0;
+  let mA = 0;
+  let mB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dotProduct += a[i] * b[i];
+    mA += a[i] * a[i];
+    mB += b[i] * b[i];
+  }
+  return dotProduct / (Math.sqrt(mA) * Math.sqrt(mB));
+}
+
+function semanticChunking(text, filename, options = { size: 1000, overlap: 200 }) {
+  const chunks = [];
+  let start = 0;
+  let chunkIndex = 1;
+
+  // Simple heuristic for section detection
+  const sections = text.split(/\n(?=[A-Z0-9\s\.]{5,20}\n)/);
+  
+  for (const section of sections) {
+    const sectionTitle = section.split('\n')[0].slice(0, 50).trim();
+    let sectionStart = 0;
+    
+    while (sectionStart < section.length) {
+      let end = sectionStart + options.size;
+      let chunkText = section.slice(sectionStart, end);
+      
+      // Look for natural break
+      let breakPoint = chunkText.lastIndexOf('\n');
+      if (breakPoint < options.size * 0.5) breakPoint = chunkText.lastIndexOf('. ');
+      if (breakPoint < options.size * 0.5) breakPoint = chunkText.length;
+      
+      chunks.push({
+        id: `${filename}-ch-${chunkIndex++}`,
+        filename,
+        section: sectionTitle || "General",
+        text: section.slice(sectionStart, sectionStart + breakPoint).trim(),
+        metadata: {
+          page: Math.floor(start / 3000) + 1, // rough estimate if not provided by pdf-parse
+          length: breakPoint
+        }
+      });
+      
+      sectionStart += (breakPoint - options.overlap > 0) ? (breakPoint - options.overlap) : breakPoint;
+    }
+  }
+  return chunks;
+}
 
 const upload = multer({
   dest: "uploads/",
@@ -167,18 +227,27 @@ if (SAFE_MODE) {
         extractedText = dataBuffer.toString("utf-8");
       }
 
-      const documentId = `safe_doc_${Date.now()}`;
-      const newDoc = {
-        id: documentId,
-        documentId: documentId,
+      const docObj = {
+        id: Date.now().toString(),
         filename: req.file.originalname,
         text: extractedText,
-        uploadedAt: new Date(),
-        timestamp: new Date(), // For frontend compat
+        uploadedAt: new Date().toISOString(),
       };
 
-      SAFE_DOCS.push(newDoc);
-      console.log(`[SAFE_MODE] Document stored: ${req.file.originalname} (${extractedText.length} chars)`);
+      SAFE_DOCS.push(docObj);
+
+      // Semantic Chunking & Embedding
+      console.log(`[SAFE_MODE] Chunking ${req.file.originalname}...`);
+      const chunks = semanticChunking(extractedText, req.file.originalname);
+      const embed = await getExtractor();
+      
+      for (const chunk of chunks) {
+        const output = await embed(chunk.text, { pooling: 'mean', normalize: true });
+        chunk.embedding = Array.from(output.data);
+        SAFE_CHUNKS.push(chunk);
+      }
+      
+      console.log(`[SAFE_MODE] Ingested ${chunks.length} semantic chunks.`);
 
       // Clean up the uploaded file
       try { fs.unlinkSync(req.file.path); } catch (e) {}
@@ -247,69 +316,84 @@ if (SAFE_MODE) {
     const { query, documentId } = req.body;
     if (!query) return res.status(400).json({ error: "Query is required" });
 
-    console.log(`[SAFE_MODE] Grounded query: "${query}" (Doc: ${documentId || 'All'})`);
+    console.log(`[SAFE_MODE] Semantic Research query: "${query}"`);
 
     try {
-      let context = "";
-      let sourceDocs = [];
-
-      if (documentId) {
-        const doc = SAFE_DOCS.find(d => d.id === documentId);
-        if (doc) {
-          context = doc.text.slice(0, 8000);
-          sourceDocs = [doc];
-        }
-      } else {
-        context = SAFE_DOCS.map(d => `[Source: ${d.filename}]: ${d.text.slice(0, 3000)}`).join("\n\n");
-        sourceDocs = SAFE_DOCS;
-      }
-
-      if (!context) {
+      if (SAFE_CHUNKS.length === 0) {
         return res.json({
-          answer: "I don't have any documents indexed to answer that question.",
-          sources: [],
-          results: []
+          answer: "No documents have been learned yet. Please upload a PDF first.",
+          sources: []
         });
       }
 
-      const prompt = `You are VeriXa Intelligence (SAFE_MODE). Answer the query based ONLY on the provided context from uploaded documents.
-      
-      QUERY: "${query}"
-      
-      CONTEXT:
-      ${context}
-      
-      RULES:
-      - Be precise and academic. 
-      - If the context doesn't contain the answer, state that clearly.
-      - Return JSON: { "answer": "...", "confidence_score": 0-100 }`;
+      // 1. Embed query
+      const embed = await getExtractor();
+      const queryOutput = await embed(query, { pooling: 'mean', normalize: true });
+      const queryEmbedding = Array.from(queryOutput.data);
+
+      // 2. Semantic Search
+      const scoredChunks = SAFE_CHUNKS.map(chunk => ({
+        ...chunk,
+        score: cosineSimilarity(queryEmbedding, chunk.embedding)
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5); // Top 5 chunks
+
+      const context = scoredChunks.map(c => 
+        `[CHUNK ID: ${c.id}] [SOURCE: ${c.filename}, Page ${c.metadata.page}, Section: ${c.section}]\nTEXT: ${c.text}`
+      ).join("\n\n---\n\n");
+
+      const prompt = `You are the VeriXa Research Assistant. Your task is to provide a high-fidelity, grounded analysis of scientific papers based ONLY on the provided chunks.
+
+DOCUMENT CONTEXT:
+${context}
+
+QUERY: "${query}"
+
+ANALYSIS TASKS (if applicable):
+1. Explain the main objective of the paper.
+2. Explain the methodology used.
+3. Explain the key findings and results.
+4. Explain the broader implications of these findings.
+5. Identify any limitations or assumptions mentioned.
+6. Extract key references or novelty if discussed.
+
+RULES:
+- RESPONSE FORMAT: You MUST return a JSON object with two fields: "answer" (string, containing structured markdown) and "confidence" (number 0-1).
+- CITATIONS: You MUST explicitly cite chunks using [CHUNK ID] format when stating facts.
+- ACCURACY: If the context does not contain the information requested, explicitly state "Information not found in provided segments."
+- TONE: Be academic, precise, and surgical.
+
+JSON OUTPUT FORMAT:
+{
+  "answer": "MARKDOWN_STRING",
+  "confidence": 0.95
+}`;
 
       const rawAnswer = await askGroq(prompt, true, "llama-3.1-8b-instant");
       const data = JSON.parse(rawAnswer);
 
-      // Create rich sources for both UI views
-      const sources = sourceDocs.map((doc, i) => ({
-        id: i + 1,
-        text: doc.text.slice(0, 500),
-        score: 0.95,
-        metadata: { 
-          filename: doc.filename, 
-          source: doc.filename,
-          page: "N/A" 
+      // Format sources for UI
+      const sources = scoredChunks.map(c => ({
+        id: c.id,
+        text: c.text,
+        score: c.score,
+        metadata: {
+          source: c.filename,
+          page: c.metadata.page,
+          section: c.section
         }
       }));
 
       return res.json({
         ...data,
         sources,
-        results: sources, // For DashboardPage
-        original_sources: sources, // For ResearchWorkspace
-        mock: true,
-        mode: "SAFE_MODE"
+        results: sources,
+        mode: "SAFE_MODE_SEMANTIC"
       });
     } catch (err) {
-      console.error("[SAFE_MODE] Query Error:", err);
-      return res.status(500).json({ error: "Failed to process grounded query" });
+      console.error("[SAFE_MODE] Research Query Error:", err);
+      return res.status(500).json({ error: "Failed to process research query" });
     }
   });
 
