@@ -12,6 +12,9 @@ const fs = require("fs");
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const multer = require("multer");
+const pdfParse = require("pdf-parse");
+const { askGroq } = require("./services/groq");
 
 if (!fs.existsSync("uploads")) {
   fs.mkdirSync("uploads");
@@ -22,6 +25,13 @@ const PORT = process.env.PORT || 5000;
 
 const SAFE_MODE = process.env.SAFE_MODE === "true";
 const PROCESS_TYPE = process.env.PROCESS_TYPE || "api";
+
+const SAFE_DOCS = [];
+
+const upload = multer({
+  dest: "uploads/",
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit for SAFE_MODE
+});
 
 /*
 ==================================================
@@ -116,33 +126,57 @@ SAFE MODE MOCK ROUTES
 ==================================================
 */
 if (SAFE_MODE) {
-  console.log("⚠️ BACKEND RUNNING IN SAFE_MODE");
+  console.log("⚠️ BACKEND RUNNING IN SAFE_MODE (In-Memory Document Store Active)");
 
   /*
   ==========================
-  MOCK PDF INGEST
+  MOCK PDF INGEST -> IN-MEMORY
   ==========================
   */
-  app.post("/api/pdf/ingest", (req, res) => {
-    console.log("[SAFE_MODE] Mock ingest hit");
+  app.post("/api/pdf/ingest", upload.single("pdf"), async (req, res) => {
+    console.log("[SAFE_MODE] Ingesting document...");
+    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
-    return res.status(202).json({
-      success: true,
-      accepted: true,
-      mock: true,
-      queued: true,
+    try {
+      const dataBuffer = fs.readFileSync(req.file.path);
+      let extractedText = "";
 
-      jobId: "safe_job",
+      if (req.file.originalname.endsWith(".pdf")) {
+        const data = await pdfParse(dataBuffer);
+        extractedText = data.text;
+      } else {
+        extractedText = dataBuffer.toString("utf-8");
+      }
 
-      status: "queued",
-      state: "queued",
+      const documentId = `safe_doc_${Date.now()}`;
+      const newDoc = {
+        id: documentId,
+        documentId: documentId,
+        filename: req.file.originalname,
+        text: extractedText,
+        uploadedAt: new Date(),
+        timestamp: new Date(), // For frontend compat
+      };
 
-      progress: 5,
+      SAFE_DOCS.push(newDoc);
+      console.log(`[SAFE_MODE] Document stored: ${req.file.originalname} (${extractedText.length} chars)`);
 
-      message: "Document queued successfully.",
+      // Clean up the uploaded file
+      try { fs.unlinkSync(req.file.path); } catch (e) {}
 
-      mode: "SAFE_MODE",
-    });
+      return res.status(202).json({
+        success: true,
+        accepted: true,
+        mock: true,
+        jobId: documentId,
+        status: "completed",
+        message: "Document indexed in-memory successfully.",
+        mode: "SAFE_MODE",
+      });
+    } catch (err) {
+      console.error("[SAFE_MODE] Ingest Error:", err);
+      return res.status(500).json({ error: "Failed to process document in SAFE_MODE" });
+    }
   });
 
   /*
@@ -151,76 +185,135 @@ if (SAFE_MODE) {
   ==========================
   */
   app.get("/api/pdf/status/:jobId", (req, res) => {
-    console.log(
-      `[SAFE_MODE] Status requested for ${req.params.jobId}`
-    );
-
+    const doc = SAFE_DOCS.find(d => d.id === req.params.jobId);
+    
     return res.json({
       success: true,
-
       jobId: req.params.jobId,
-
-      status: "completed",
-      state: "completed",
-
-      progress: 100,
-
-      completed: true,
-
+      status: doc ? "completed" : "pending",
+      progress: doc ? 100 : 0,
+      completed: !!doc,
       mock: true,
       mode: "SAFE_MODE",
-
-      stage: "completed",
-
-      result: {
-        text: "SAFE_MODE mock extraction completed successfully.",
-      },
-
-      extractedText:
-        "SAFE_MODE mock extraction completed successfully.",
+      result: doc ? {
+        documentId: doc.id,
+        filename: doc.filename
+      } : null
     });
   });
 
   /*
   ==========================
-  MOCK RAG QUERY
+  MOCK PDF SUMMARY / ANALYSIS
   ==========================
   */
-  app.post("/api/rag/query", (req, res) => {
-    console.log("[SAFE_MODE] Mock RAG query hit");
+  app.post("/api/pdf/summary", (req, res) => {
+    const doc = SAFE_DOCS.find(d => d.id === req.body.documentId);
+    if (!doc) return res.status(404).json({ error: "Document not found" });
+    
     return res.json({
-      answer: "This is a synthetic intelligence response generated in SAFE_MODE. In a production environment, this would be grounded in your indexed documents using vector embeddings and the VeriXa RAG engine.",
-      confidence_score: 95,
-      grounding_sources: [
-        { id: 1, page: 1, relevance: "High" },
-        { id: 2, page: 4, relevance: "Medium" }
-      ],
-      sources: [
-        { id: 1, text: "Verification of synthetic media requires multi-stage analysis of noise patterns and frequency domain anomalies.", metadata: { page: 1 } },
-        { id: 2, text: "Deepfake detection models often struggle with high-frequency components in compressed video streams.", metadata: { page: 4 } }
-      ],
-      original_sources: [
-        { id: 1, text: "Verification of synthetic media requires multi-stage analysis of noise patterns and frequency domain anomalies.", metadata: { page: 1 } },
-        { id: 2, text: "Deepfake detection models often struggle with high-frequency components in compressed video streams.", metadata: { page: 4 } }
-      ],
-      mock: true,
-      mode: "SAFE_MODE"
+      objective: "Extracted objective from " + doc.filename,
+      novelty: "Synthetic summary generated for SAFE_MODE demo.",
+      findings: "This document contains " + doc.text.length + " characters of text.",
+      impact: "High impact research artifact."
     });
   });
 
   /*
   ==========================
-  MOCK RAG DOCS
+  MOCK RAG QUERY -> GROUNDED
+  ==========================
+  */
+  app.post("/api/rag/query", async (req, res) => {
+    const { query, documentId } = req.body;
+    if (!query) return res.status(400).json({ error: "Query is required" });
+
+    console.log(`[SAFE_MODE] Grounded query: "${query}" (Doc: ${documentId || 'All'})`);
+
+    try {
+      let context = "";
+      let sourceDocs = [];
+
+      if (documentId) {
+        const doc = SAFE_DOCS.find(d => d.id === documentId);
+        if (doc) {
+          context = doc.text.slice(0, 8000);
+          sourceDocs = [doc];
+        }
+      } else {
+        context = SAFE_DOCS.map(d => `[Source: ${d.filename}]: ${d.text.slice(0, 3000)}`).join("\n\n");
+        sourceDocs = SAFE_DOCS;
+      }
+
+      if (!context) {
+        return res.json({
+          answer: "I don't have any documents indexed to answer that question.",
+          sources: [],
+          results: []
+        });
+      }
+
+      const prompt = `You are VeriXa Intelligence (SAFE_MODE). Answer the query based ONLY on the provided context from uploaded documents.
+      
+      QUERY: "${query}"
+      
+      CONTEXT:
+      ${context}
+      
+      RULES:
+      - Be precise and academic. 
+      - If the context doesn't contain the answer, state that clearly.
+      - Return JSON: { "answer": "...", "confidence_score": 0-100 }`;
+
+      const rawAnswer = await askGroq(prompt, true, "llama-3.1-8b-instant");
+      const data = JSON.parse(rawAnswer);
+
+      // Create rich sources for both UI views
+      const sources = sourceDocs.map((doc, i) => ({
+        id: i + 1,
+        text: doc.text.slice(0, 500),
+        score: 0.95,
+        metadata: { 
+          filename: doc.filename, 
+          source: doc.filename,
+          page: "N/A" 
+        }
+      }));
+
+      return res.json({
+        ...data,
+        sources,
+        results: sources, // For DashboardPage
+        original_sources: sources, // For ResearchWorkspace
+        mock: true,
+        mode: "SAFE_MODE"
+      });
+    } catch (err) {
+      console.error("[SAFE_MODE] Query Error:", err);
+      return res.status(500).json({ error: "Failed to process grounded query" });
+    }
+  });
+
+  /*
+  ==========================
+  MOCK RAG DOCS -> RETURN SAFE_DOCS
   ==========================
   */
   app.get("/api/rag/documents", (req, res) => {
     return res.json({
       success: true,
       mock: true,
-      documents: [],
+      documents: SAFE_DOCS.map(d => ({
+        id: d.id,
+        documentId: d.id,
+        filename: d.filename,
+        uploadedAt: d.uploadedAt,
+        timestamp: d.timestamp // For frontend compat
+      })),
       mode: "SAFE_MODE",
     });
   });
+
   /*
   ==========================
   MOCK ORGANIZATION

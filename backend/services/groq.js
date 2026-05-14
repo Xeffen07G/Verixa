@@ -219,4 +219,4 @@ ${text.slice(0, 3000)}`;
   return JSON.parse(raw.replace(/```json|```/g, "").trim());
 }
 
-module.exports = { extractClaims, searchEvidence, verifyClaims, detectAIText };
+module.exports = { askGroq, extractClaims, searchEvidence, verifyClaims, detectAIText };

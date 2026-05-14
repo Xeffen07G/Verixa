@@ -312,11 +312,11 @@ export default function DashboardPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
                     <h4 style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3 }}>{t('vaultResults', lang)}</h4>
                     {queryResult.map((res, i) => (
-                      <div key={i} style={{ padding: '16px', background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12 }}>
+                      <div key={i} style={{ padding: '16px', background: T.cardBg, border: `1px solid ${T.border}`, borderRadius: 12 }}>
                         <p style={{ fontSize: 13, color: T.text, margin: '0 0 8px', lineHeight: 1.6 }}>"{res.text}"</p>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{ fontSize: 10, color: T.accent, fontWeight: 700 }}>{res.metadata?.source || 'Document'}</span>
-                          <span style={{ fontSize: 10, color: T.text3 }}>{Math.round(res.score * 100)}% match</span>
+                          <span style={{ fontSize: 10, color: T.text3 }}>{Math.round((res.score || 0.95) * 100)}% match</span>
                         </div>
                       </div>
                     ))}
@@ -335,14 +335,14 @@ export default function DashboardPage() {
               ) : vaultDocs.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {vaultDocs.map((doc, i) => (
-                    <div key={i} style={{ padding: '16px 20px', borderRadius: 14, background: T.surface, border: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div key={i} style={{ padding: '16px 20px', borderRadius: 14, background: T.cardBg, border: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
                         <div style={{ width: 40, height: 40, borderRadius: 8, background: `${T.accent}14`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <FileText size={18} color={T.accent} />
                         </div>
                         <div>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{doc.id}</div>
-                          <div style={{ fontSize: 11, color: T.text3 }}>{new Date(doc.timestamp).toLocaleDateString()} • {t('learned', lang)}</div>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{doc.filename || doc.id}</div>
+                          <div style={{ fontSize: 11, color: T.text3 }}>{new Date(doc.uploadedAt || doc.timestamp).toLocaleDateString()} • {t('learned', lang)}</div>
                         </div>
                       </div>
                       <CheckCircle2 size={16} color="#4ade80" />
