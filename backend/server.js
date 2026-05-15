@@ -15,15 +15,17 @@ const morgan = require("morgan");
 const multer = require("multer");
 const pdfParseModule = require("pdf-parse");
 
-const pdfParse =
-  typeof pdfParseModule === "function"
-    ? pdfParseModule
-    : pdfParseModule.default;
+const pdfParse = (function() {
+  if (typeof pdfParseModule === "function") return pdfParseModule;
+  if (pdfParseModule && typeof pdfParseModule.PDFParse === "function") return pdfParseModule.PDFParse;
+  if (pdfParseModule && typeof pdfParseModule.default === "function") return pdfParseModule.default;
+  return null;
+})();
 
-if (typeof pdfParse !== "function") {
-  console.error("CRITICAL: pdfParse failed to initialize", { 
+if (!pdfParse) {
+  console.error("CRITICAL: pdfParse failed to initialize. Ingestion will be disabled.", { 
     moduleType: typeof pdfParseModule,
-    hasDefault: !!pdfParseModule?.default 
+    keys: pdfParseModule ? Object.keys(pdfParseModule) : []
   });
 }
 
@@ -48,6 +50,13 @@ const PORT = process.env.PORT || 5000;
 
 const SAFE_MODE = process.env.SAFE_MODE === "true";
 const PROCESS_TYPE = process.env.PROCESS_TYPE || "api";
+
+// --- DEPLOYMENT RECOVERY FLAGS ---
+const ENABLE_CONTRADICTIONS = process.env.ENABLE_CONTRADICTIONS !== "false";
+const ENABLE_TELEMETRY = process.env.ENABLE_TELEMETRY !== "false";
+const ENABLE_EVALS = process.env.ENABLE_EVALS !== "false";
+
+console.log(`[STABILITY] Feature Flags: CONTRADICTIONS=${ENABLE_CONTRADICTIONS}, TELEMETRY=${ENABLE_TELEMETRY}, EVALS=${ENABLE_EVALS}`);
 
 // Initialize Store
 let STORE = readStore();
@@ -676,19 +685,22 @@ if (SAFE_MODE) {
         confidenceLabel = topScore > 0.7 ? "HIGH" : topScore > 0.4 ? "MEDIUM" : "LOW";
       }
 
-      // --- Full 9-step retrieval telemetry ---
-      console.log(`[RAG][TELEMETRY] ===== QUERY LIFECYCLE ====="`);
-      console.log(`  STEP 1 detected_intent: ${intent}`);
-      console.log(`  STEP 2 threshold_used: ${threshold}`);
-      console.log(`  STEP 3 total_chunks_available: ${SAFE_CHUNKS.length}`);
-      console.log(`  STEP 4 top_5_scores: [${scoredChunks.slice(0, 5).map(c => c.score.toFixed(3)).join(', ')}]`);
-      console.log(`  STEP 5 section_boosts: [${scoredChunks.slice(0, 5).map(c => `${c.section}:${c.structuralBoost}`).join(', ')}]`);
-      console.log(`  STEP 6 chunks_passed_threshold: ${scoredChunks.filter(c => c.score > threshold).length}`);
-      console.log(`  STEP 7 fallback_triggered: ${fallbackTriggered}`);
-      console.log(`  STEP 8 confidence_label: ${confidenceLabel}`);
-      console.log(`  STEP 9 response_path: ${confidenceLabel === 'NONE' ? 'REFUSAL' : fallbackTriggered ? 'FALLBACK_SYNTHESIS' : intent === 'SYNTHESIS' ? 'SYNTHESIS_RESPONSE' : 'GROUNDED_RESPONSE'}`);
-      console.log(`  query: "${query}"`);
-      console.log(`[RAG][TELEMETRY] =========================");
+      // --- Retrieval telemetry ---
+      if (ENABLE_TELEMETRY) {
+        console.log("[RAG][TELEMETRY] ===== QUERY LIFECYCLE =====");
+        console.log("  STEP 1 detected_intent: " + intent);
+        console.log("  STEP 2 threshold_used: " + threshold);
+        console.log("  STEP 3 total_chunks_available: " + SAFE_CHUNKS.length);
+        console.log("  STEP 4 top_5_scores: [" + scoredChunks.slice(0, 5).map(function(c) { return c.score.toFixed(3); }).join(", ") + "]");
+        console.log("  STEP 5 section_boosts: [" + scoredChunks.slice(0, 5).map(function(c) { return (c.section || "?") + ":" + c.structuralBoost; }).join(", ") + "]");
+        console.log("  STEP 6 chunks_passed_threshold: " + scoredChunks.filter(function(c) { return c.score > threshold; }).length);
+        console.log("  STEP 7 fallback_triggered: " + fallbackTriggered);
+        console.log("  STEP 8 confidence_label: " + confidenceLabel);
+        console.log("  STEP 9 response_path: " + (confidenceLabel === "NONE" ? "REFUSAL" : fallbackTriggered ? "FALLBACK_SYNTHESIS" : intent === "SYNTHESIS" ? "SYNTHESIS_RESPONSE" : "GROUNDED_RESPONSE"));
+        console.log("  query: " + JSON.stringify(query));
+        console.log("[RAG][TELEMETRY] =========================");
+      }
+
 
       // ONLY refuse when vault is truly empty OR strict factual with zero relevance
       if (confidenceLabel === "NONE") {
@@ -707,12 +719,19 @@ if (SAFE_MODE) {
         trustRationale: fallbackTriggered ? "Limited synthesis — broad thematic match." : "Grounded."
       }));
 
-      const { analyzeContradictions } = require("./services/contradictionService");
-      const contradictionReport = await analyzeContradictions(enrichedSources, query);
+      let contradictionReport = { hasContradiction: false, contradictions: [], explanation: "Forensic reasoning disabled via flag." };
+      if (ENABLE_CONTRADICTIONS) {
+        try {
+          const { analyzeContradictions } = require("./services/contradictionService");
+          contradictionReport = await analyzeContradictions(enrichedSources, query);
+        } catch (err) {
+          console.error("[RAG] Contradiction engine failed:", err.message);
+        }
+      }
 
       let systemPrompt = "";
       if (intent === "SYNTHESIS" || intent === "EXPLORATORY") {
-        const evidenceLedger = enrichedSources.map((s, i) => `[Source ${i+1}] Paper: ${s.filename}\nEvidence: "${s.text}"`).join('\n\n');
+        const evidenceLedger = enrichedSources.map(function(s, i) { return '[Source ' + (i+1) + '] Paper: ' + s.filename + '\nEvidence: "' + s.text + '"'; }).join('\n\n');
         systemPrompt = RESEARCH_PROMPTS.v2_synthesis.system(evidenceLedger, query);
       } else {
         const modePrompts = {
@@ -722,7 +741,7 @@ if (SAFE_MODE) {
           "Deep Analysis": "Standard grounded response."
         };
         const modeInstruction = modePrompts[mode] || modePrompts["Deep Analysis"];
-        const evidenceLedger = enrichedSources.map((s, i) => `[Source ${i+1}] Paper: ${s.filename} | Trust: ${s.credibilityScore}\nEvidence: "${s.text}"`).join('\n\n');
+        const evidenceLedger = enrichedSources.map(function(s, i) { return '[Source ' + (i+1) + '] Paper: ' + s.filename + ' | Trust: ' + s.credibilityScore + '\nEvidence: "' + s.text + '"'; }).join('\n\n');
         systemPrompt = RESEARCH_PROMPTS.v1.system(mode, modeInstruction, evidenceLedger, contradictionReport.explanation, query);
       }
 
