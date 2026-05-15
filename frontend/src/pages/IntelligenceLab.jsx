@@ -26,6 +26,10 @@ export default function IntelligenceLab() {
   const [boards, setBoards] = useState([]);
   const [activeSessions, setActiveSessions] = useState([]);
   const [telemetry, setTelemetry] = useState(null);
+  const [feed, setFeed] = useState([
+    { id: 1, message: "Forensic pipeline initialized", timestamp: "just now", type: "system" },
+    { id: 2, message: "Cross-document indexing active", timestamp: "2m ago", type: "discovery" }
+  ]);
 
   useEffect(() => {
     fetchBoards();
@@ -117,7 +121,7 @@ export default function IntelligenceLab() {
                <div style={{ fontSize: 12, color: T.accent, fontWeight: 800, cursor: 'pointer' }}>ORCHESTRATE ALL</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-               {activeSessions.length > 0 ? activeSessions.map(sid => (
+               {Array.isArray(activeSessions) && activeSessions.length > 0 ? activeSessions.map(sid => (
                  <div key={sid} style={{ padding: '20px 24px', borderRadius: 20, background: 'rgba(255,255,255,0.02)', border: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                        <div style={{ width: 44, height: 44, borderRadius: 12, background: `${T.accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -185,7 +189,7 @@ export default function IntelligenceLab() {
                  <RefreshCw size={14} className="spin-slow" style={{ color: T.text3 }} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                 {feed.map(item => (
+                 {Array.isArray(feed) && feed.map(item => (
                    <div key={item.id} style={{ display: 'flex', gap: 16 }}>
                       <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.type === 'alert' ? '#ef4444' : item.type === 'discovery' ? '#4ade80' : T.accent, marginTop: 4, flexShrink: 0 }} />
                       <div>

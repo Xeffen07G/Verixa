@@ -45,20 +45,20 @@ export default function InvestigationPanel({ sessionId, T }) {
              <svg width="64" height="64" viewBox="0 0 64 64">
                 <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="4" />
                 <circle cx="32" cy="32" r="28" fill="none" stroke={T.accent} strokeWidth="4" 
-                  strokeDasharray={`${(session.trustScore / 100) * 176} 176`}
+                  strokeDasharray={`${((session?.trustScore || 0) / 100) * 176} 176`}
                   style={{ transition: 'stroke-dasharray 1s ease' }}
                 />
              </svg>
              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 900, color: T.text }}>
-                {session.trustScore}
+                 {session?.trustScore || 0}
              </div>
           </div>
           <div>
-             <div style={{ fontSize: 12, fontWeight: 700, color: session.trustScore > 70 ? '#4ade80' : '#f87171' }}>
-                {session.trustScore > 70 ? 'VERIFIED DEPTH' : 'LOW EVIDENCE'}
+             <div style={{ fontSize: 12, fontWeight: 700, color: (session?.trustScore || 0) > 70 ? '#4ade80' : '#f87171' }}>
+                {(session?.trustScore || 0) > 70 ? 'VERIFIED DEPTH' : 'LOW EVIDENCE'}
              </div>
              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>
-                {session.evidenceLedger.length} artifacts secured
+                 {session?.evidenceLedger?.length || 0} artifacts secured
              </div>
           </div>
         </div>
@@ -91,7 +91,7 @@ export default function InvestigationPanel({ sessionId, T }) {
       <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
         {activeTab === 'ledger' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-             {session.evidenceLedger.slice().reverse().map((e, idx) => (
+              {Array.isArray(session?.evidenceLedger) && session.evidenceLedger.slice().reverse().map((e, idx) => (
                <div key={idx} style={{ padding: 12, borderRadius: 12, background: 'rgba(255,255,255,0.02)', border: `1px solid rgba(255,255,255,0.05)` }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                      <div style={{ fontSize: 9, fontWeight: 900, color: T.accent }}>{e.source}</div>
@@ -107,7 +107,7 @@ export default function InvestigationPanel({ sessionId, T }) {
 
         {activeTab === 'timeline' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20, paddingLeft: 8 }}>
-             {session.timeline.slice().reverse().map((ev, idx) => (
+              {Array.isArray(session?.timeline) && session.timeline.slice().reverse().map((ev, idx) => (
                <div key={idx} style={{ position: 'relative', paddingLeft: 20, borderLeft: `1px solid rgba(255,255,255,0.05)` }}>
                   <div style={{ 
                     position: 'absolute', left: -5, top: 0, width: 9, height: 9, borderRadius: '50%', 
@@ -129,7 +129,7 @@ export default function InvestigationPanel({ sessionId, T }) {
              <div style={{ height: 200, background: 'rgba(0,0,0,0.2)', borderRadius: 16, border: `1px solid rgba(255,255,255,0.05)`, position: 'relative', overflow: 'hidden' }}>
                 <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0 }}>
                    {/* Relationship lines */}
-                   {session.evidenceLedger.slice(0, 5).map((e, i) => (
+                   {Array.isArray(session?.evidenceLedger) && session.evidenceLedger.slice(0, 5).map((e, i) => (
                      <line 
                         key={`line-${i}`}
                         x1="50%" y1="50%" 
@@ -142,7 +142,7 @@ export default function InvestigationPanel({ sessionId, T }) {
                    <text x="50%" y="65%" textAnchor="middle" fontSize="8" fill={T.accent} fontWeight="900">CORE CLAIM</text>
 
                    {/* Evidence Nodes */}
-                   {session.evidenceLedger.slice(0, 5).map((e, i) => (
+                   {Array.isArray(session?.evidenceLedger) && session.evidenceLedger.slice(0, 5).map((e, i) => (
                      <g key={`node-${i}`}>
                         <circle 
                           cx={`${20 + (i * 15)}%`} 
@@ -159,16 +159,16 @@ export default function InvestigationPanel({ sessionId, T }) {
              
              <div style={{ fontSize: 9, fontWeight: 900, color: 'rgba(255,255,255,0.3)', letterSpacing: 1, marginBottom: 4 }}>RELATIONSHIP LEDGER</div>
              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {session.contradictions.map((c, idx) => (
+                 {Array.isArray(session?.contradictions) && session.contradictions.map((c, idx) => (
                   <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 12, borderRadius: 12, background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.1)' }}>
                      <AlertTriangle size={12} color="#ef4444" />
                      <div style={{ fontSize: 10, color: '#f5f3ef', lineHeight: 1.4 }}>{c.explanation}</div>
                   </div>
                 ))}
-                {session.evidenceLedger.length > 0 && (
+                 {(session?.evidenceLedger?.length || 0) > 0 && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 12, borderRadius: 12, background: 'rgba(74,222,128,0.05)', border: '1px solid rgba(74,222,128,0.1)' }}>
                      <CheckCircle2 size={12} color="#4ade80" />
-                     <div style={{ fontSize: 10, color: '#f5f3ef', lineHeight: 1.4 }}>Consensus cluster detected across {session.evidenceLedger.length} artifacts.</div>
+                      <div style={{ fontSize: 10, color: '#f5f3ef', lineHeight: 1.4 }}>Consensus cluster detected across {session?.evidenceLedger?.length || 0} artifacts.</div>
                   </div>
                 )}
              </div>

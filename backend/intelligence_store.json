@@ -1,0 +1,11 @@
+{
+  "boards": [],
+  "sessions": {},
+  "papers": [],
+  "verifications": [],
+  "benchmarks": {
+    "hallucinationRate": 0,
+    "citationAccuracy": 0,
+    "totalEvaluations": 0
+  }
+}

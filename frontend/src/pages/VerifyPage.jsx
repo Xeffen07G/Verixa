@@ -49,10 +49,10 @@ function ScoreBanner({ score, claims, lang }) {
   const color = score >= 70 ? '#166534' : score >= 40 ? '#92400e' : '#991b1b';
   const bg = score >= 70 ? 'linear-gradient(135deg, #14532d, #166534)' : score >= 40 ? 'linear-gradient(135deg, #78350f, #92400e)' : 'linear-gradient(135deg, #7f1d1d, #991b1b)';
   const label = score >= 70 ? t('mostlyAccurate', lang) : score >= 40 ? t('mixedAccuracy', lang) : t('mostlyInaccurate', lang);
-  const trueCount = claims.filter(c => c.verdict === 'True').length;
-  const falseCount = claims.filter(c => c.verdict === 'False').length;
-  const partialCount = claims.filter(c => c.verdict === 'Partially True').length;
-  const unclearCount = claims.filter(c => c.verdict === 'Unverifiable').length;
+  const trueCount = Array.isArray(claims) ? claims.filter(c => c.verdict === 'True').length : 0;
+  const falseCount = Array.isArray(claims) ? claims.filter(c => c.verdict === 'False').length : 0;
+  const partialCount = Array.isArray(claims) ? claims.filter(c => c.verdict === 'Partially True').length : 0;
+  const unclearCount = Array.isArray(claims) ? claims.filter(c => c.verdict === 'Unverifiable').length : 0;
 
   return (
     <div className="score-banner" style={{ background: bg, borderRadius: 16, padding: '28px 32px', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
@@ -119,7 +119,7 @@ function ClaimCard({ claim, index, theme, lang }) {
             <div>
               <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: theme.text3, margin: '0 0 12px', fontWeight: 700 }}>{t('evidenceSources', lang)}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {claim.sources.map((src, j) => {
+                {Array.isArray(claim?.sources) && claim.sources.map((src, j) => {
                   const cred = getCredibilityLabel(src.url);
                   return (
                     <div key={j} style={{ padding: '12px 16px', background: theme.surface, borderRadius: 10, border: `1px solid ${theme.border}`, display: 'flex', gap: 12 }}>
@@ -151,10 +151,10 @@ function HistoryPanel({ history, onLoad, onDelete, theme, lang }) {
   );
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {history.map((item, i) => (
+      {Array.isArray(history) && history.map((item, i) => (
         <div key={i} style={{ padding: '16px', borderRadius: 12, border: `1px solid ${theme.border}`, background: theme.cardBg }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-            <span style={{ fontSize: 11, color: theme.text3 }}>{new Date(item.timestamp).toLocaleString()}</span>
+            <span style={{ fontSize: 11, color: theme.text3 }}>{item.timestamp ? new Date(item.timestamp).toLocaleString() : '...'}</span>
             <button onClick={() => onDelete(i)} style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer' }}>✕</button>
           </div>
           <p style={{ margin: '0 0 10px', fontSize: 12, color: theme.text, lineHeight: 1.5 }}>{item.text?.slice(0, 80)}...</p>
@@ -363,10 +363,10 @@ export default function VerifyPage() {
                   <span style={{ fontSize: 13, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: 2 }}>{t(stage || 'extracting', lang)}</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {logs.slice(-3).map((log, i) => (
+                  {Array.isArray(logs) && logs.slice(-3).map((log, i) => (
                     <div key={i} style={{ fontSize: 13, color: T.text2, display: 'flex', gap: 10, opacity: 1 - (logs.slice(-3).length - 1 - i) * 0.3 }}>
-                      <span style={{ color: T.text3 }}>[{new Date(log.ts).toLocaleTimeString()}]</span>
-                      <span>{log.msg}</span>
+                      <span style={{ color: T.text3 }}>[{log?.ts ? new Date(log.ts).toLocaleTimeString() : '...'}]</span>
+                      <span>{log?.msg || '...'}</span>
                     </div>
                   ))}
                   {logs.length === 0 && <p style={{ margin: 0, fontSize: 13, color: T.text3 }}>{t('processingWait', lang)}</p>}
@@ -383,7 +383,7 @@ export default function VerifyPage() {
                 <button onClick={() => generateCertificate(claims, overallScore, text, lang)} style={{ flex: 1, padding: '14px', borderRadius: 12, background: T.accent, border: 'none', color: '#000', fontWeight: 700, cursor: 'pointer' }}>{t('generateCert', lang)}</button>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {claims.map((c, i) => <ClaimCard key={i} claim={c} theme={T} lang={lang} />)}
+                {Array.isArray(claims) && claims.map((c, i) => <ClaimCard key={i} claim={c} theme={T} lang={lang} />)}
               </div>
             </div>
           ) : (

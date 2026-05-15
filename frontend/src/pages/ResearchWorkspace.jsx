@@ -245,7 +245,7 @@ export default function ResearchWorkspace() {
 
           <div style={{ fontSize: 10, fontWeight: 900, color: T.text3, letterSpacing: 1, marginBottom: 12 }}>CASE FILES</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
-            {investigations.map(inv => (
+            {Array.isArray(investigations) && investigations.map(inv => (
               <div key={inv.id} onClick={() => setCurrentInvestigationId(inv.id)} style={{ padding: '12px 16px', borderRadius: 12, background: sessionId === inv.id ? `${T.accent}15` : 'rgba(255,255,255,0.02)', border: `1px solid ${sessionId === inv.id ? T.accent : T.border}`, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
                 {inv.title}
               </div>
@@ -253,7 +253,7 @@ export default function ResearchWorkspace() {
           </div>
 
           <div style={{ fontSize: 10, fontWeight: 900, color: T.text3, letterSpacing: 1, marginBottom: 12 }}>FORENSIC ARTIFACTS</div>
-          {vaultDocs.length > 0 ? (
+          {Array.isArray(vaultDocs) && vaultDocs.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {vaultDocs.map(doc => (
                 <div key={doc.id} style={{ padding: 16, borderRadius: 12, background: 'rgba(255,255,255,0.02)', border: `1px solid ${T.border}` }}>
@@ -283,7 +283,7 @@ export default function ResearchWorkspace() {
               onChange={e => setActiveMode(e.target.value)}
               style={{ background: 'none', border: `1px solid ${T.border}`, color: T.accent, padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 900, outline: 'none', cursor: 'pointer' }}
             >
-              {modes.map(m => <option key={m} value={m}>{m.toUpperCase()}</option>)}
+              {Array.isArray(modes) && modes.map(m => <option key={m} value={m}>{m.toUpperCase()}</option>)}
             </select>
             <div style={{ width: 1, height: 16, background: T.border }} />
             <button onClick={() => setShowTelemetry(!showTelemetry)} style={{ background: 'none', border: 'none', color: showTelemetry ? T.accent : T.text3, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, fontWeight: 800 }}>
@@ -303,7 +303,7 @@ export default function ResearchWorkspace() {
         {showTelemetry && telemetry && (
           <div style={{ background: 'rgba(20,20,30,0.95)', borderBottom: `1px solid ${T.accent}33`, padding: '12px 32px', display: 'flex', gap: 32, backdropFilter: 'blur(10px)' }}>
              {[
-               { label: 'HEAP', value: telemetry.memory.heapUsed },
+               { label: 'HEAP', value: telemetry?.memory?.heapUsed || '...' },
                { label: 'SESSIONS', value: telemetry.sessions },
                { label: 'ACTIVE JOBS', value: telemetry.activeJobs },
                { label: 'VAULT CHUNKS', value: telemetry.chunkCount }
@@ -317,7 +317,7 @@ export default function ResearchWorkspace() {
         )}
 
         <div style={{ flex: 1, overflowY: 'auto', padding: '40px 64px' }}>
-          {messages.length === 0 ? (
+          {(!Array.isArray(messages) || messages.length === 0) ? (
             <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{ textAlign: 'center', opacity: 0.3, marginBottom: 40 }}>
                 <SearchIcon size={64} style={{ marginBottom: 24, color: T.accent }} />
@@ -352,7 +352,7 @@ export default function ResearchWorkspace() {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
-              {messages.map((msg, idx) => (
+              {Array.isArray(messages) && messages.map((msg, idx) => (
                 <div key={idx} style={{ 
                   alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
                   maxWidth: '90%', width: '100%', display: 'flex', gap: 20, flexDirection: msg.role === 'user' ? 'row-reverse' : 'row'
@@ -375,7 +375,7 @@ export default function ResearchWorkspace() {
                                  ? 'SCHOLARLY SYNTHESIS'
                                  : 'VERIXA INTELLIGENCE'}
                            </div>
-                           <div style={{ fontSize: 9, color: T.text3 }}>{new Date(msg.timestamp).toLocaleTimeString()}</div>
+                           <div style={{ fontSize: 9, color: T.text3 }}>{msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '...'}</div>
                            <div style={{
                              fontSize: 8, padding: '2px 6px', borderRadius: 4, fontWeight: 900,
                              background: msg.confidenceLabel === 'HIGH' ? '#4ade8022' : msg.confidenceLabel === 'MEDIUM' ? '#60a5fa22' : msg.confidenceLabel === 'LIMITED' ? '#fbbf2422' : msg.confidenceLabel === 'LOW' ? '#f8717122' : '#64748b22',
@@ -400,7 +400,7 @@ export default function ResearchWorkspace() {
                                 <GitBranch size={12} /> EVIDENCE RELATIONSHIP TREE
                              </div>
                              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                                {msg.relationships.map((rel, ri) => (
+                                {Array.isArray(msg.relationships) && msg.relationships.map((rel, ri) => (
                                   <div key={ri} style={{ display: 'flex', alignItems: 'center', gap: 12, paddingLeft: 12, borderLeft: `1px solid ${T.border}` }}>
                                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: rel.type === 'supporting' ? '#4ade80' : T.accent }} />
                                      <div style={{ fontSize: 11, fontWeight: 700, color: T.text2 }}>{rel.source}</div>
@@ -418,7 +418,7 @@ export default function ResearchWorkspace() {
                             <AlertTriangle size={18} color="#ef4444" style={{ flexShrink: 0 }} />
                             <div>
                                <div style={{ fontSize: 10, fontWeight: 900, color: '#ef4444', marginBottom: 4 }}>CONTRADICTION DETECTED</div>
-                               {msg.contradictions.map((c, ci) => (
+                                {Array.isArray(msg.contradictions) && msg.contradictions.map((c, ci) => (
                                  <div key={ci} style={{ fontSize: 12, color: T.text2, fontWeight: 500 }}>{c.explanation}</div>
                                ))}
                             </div>
@@ -476,12 +476,12 @@ export default function ResearchWorkspace() {
               <div style={{ padding: 20, borderRadius: 16, background: 'rgba(255,255,255,0.03)', border: `1px solid ${T.border}`, marginBottom: 24 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
                    <div style={{ fontSize: 10, color: T.text3, fontWeight: 800 }}>SOURCE TYPE</div>
-                   <div style={{ fontSize: 10, color: T.accent, fontWeight: 900 }}>{selectedSource.credibility.type.toUpperCase()}</div>
+                   <div style={{ fontSize: 10, color: T.accent, fontWeight: 900 }}>{selectedSource?.credibility?.type?.toUpperCase() || 'N/A'}</div>
                 </div>
                 <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1.4, marginBottom: 12 }}>{selectedSource.metadata.source}</div>
                 <div style={{ padding: '12px', borderRadius: 12, background: 'rgba(0,0,0,0.3)', border: `1px solid ${T.border}` }}>
                    <div style={{ fontSize: 9, color: T.text3, fontWeight: 800, marginBottom: 4 }}>TRUST RATIONALE</div>
-                   <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.5 }}>{selectedSource.credibility.rationale}</div>
+                   <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.5 }}>{selectedSource?.credibility?.rationale || 'No rationale available.'}</div>
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
@@ -491,7 +491,7 @@ export default function ResearchWorkspace() {
                  </div>
                  <div style={{ padding: 16, borderRadius: 16, background: 'rgba(255,255,255,0.02)', border: `1px solid ${T.border}` }}>
                     <div style={{ fontSize: 8, color: T.text3, fontWeight: 800, marginBottom: 4 }}>RELIABILITY</div>
-                    <div style={{ fontSize: 16, fontWeight: 900, color: '#4ade80' }}>{Math.round(selectedSource.credibility.score * 100)}%</div>
+                    <div style={{ fontSize: 16, fontWeight: 900, color: '#4ade80' }}>{selectedSource?.credibility?.score ? Math.round(selectedSource.credibility.score * 100) : 0}%</div>
                  </div>
               </div>
               <div style={{ fontSize: 10, color: T.text3, marginBottom: 12, letterSpacing: 1 }}>EVIDENCE EXCERPT</div>

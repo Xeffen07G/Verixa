@@ -5,7 +5,7 @@ import {
   Shield, Search, BarChart3, Brain, Link2, AlertTriangle, 
   CheckCircle2, XCircle, MinusCircle, Video, Zap, ShieldCheck, 
   ChevronLeft, ChevronRight, Users, Globe, BookOpen, Target,
-  GitBranch, Database, Activity, Lock
+  GitBranch, Database, Activity, Lock, FileText
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
