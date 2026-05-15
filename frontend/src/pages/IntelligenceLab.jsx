@@ -81,12 +81,11 @@ export default function IntelligenceLab() {
       
       <header style={{ marginBottom: 60, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
-          <div style={{ fontSize: 12, letterSpacing: 3, textTransform: 'uppercase', color: T.accent, fontWeight: 900, marginBottom: 12 }}>COMMAND CENTER</div>
+          <div style={{ fontSize: 12, letterSpacing: 3, textTransform: 'uppercase', color: T.accent, fontWeight: 900, marginBottom: 12 }}>PLATFORM OVERVIEW</div>
           <h1 style={{ fontSize: 48, fontWeight: 800, letterSpacing: -1, margin: 0 }}>Intelligence Lab</h1>
-          <p style={{ color: T.text3, marginTop: 8, fontSize: 16 }}>Platform-wide forensic oversight and retrieval analytics.</p>
+          <p style={{ color: T.text3, marginTop: 8, fontSize: 16 }}>Forensic oversight and retrieval analytics.</p>
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
-           <button style={{ padding: '12px 24px', borderRadius: 12, background: 'rgba(255,255,255,0.05)', border: `1px solid ${T.border}`, color: T.text, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>RUN BENCHMARKS</button>
            <button style={{ padding: '12px 24px', borderRadius: 12, background: T.accent, border: 'none', color: T.bg, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>SYSTEM STATUS</button>
         </div>
       </header>
@@ -100,7 +99,7 @@ export default function IntelligenceLab() {
             {[
               { label: 'ACTIVE SESSIONS', value: stats.sessionCount, icon: <ShieldIcon size={16} />, trend: 'Live' },
               { label: 'TOTAL ARTIFACTS', value: stats.totalDocs, icon: <DatabaseIcon size={16} />, trend: 'Indexed' },
-              { label: 'MEMORY HEALTH', value: telemetry ? `${Math.round((telemetry.memory.heapUsedNum / 512) * 100)}%` : '...', icon: <ActivityIcon size={16} />, trend: 'Monitored' },
+              { label: 'MEMORY HEALTH', value: (telemetry && telemetry.memory?.heapUsedNum) ? `${Math.round((telemetry.memory.heapUsedNum / 512) * 100)}%` : '...', icon: <ActivityIcon size={16} />, trend: 'Monitored' },
               { label: 'EMBEDDING JOBS', value: telemetry?.activeJobs || 0, icon: <Zap size={16} />, trend: 'Background' }
             ].map((stat, i) => (
               <div key={i} style={{ padding: 24, borderRadius: 24, background: 'rgba(255,255,255,0.02)', border: `1px solid ${T.border}` }}>

@@ -105,7 +105,7 @@ export default function LandingPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '8px 20px', borderRadius: 999, border: `1px solid ${T.accent}33`, background: `${T.accent}0a`, marginBottom: 40 }}>
               <Shield size={14} color={T.accent} />
-              <span style={{ fontSize: 10, fontWeight: 900, color: T.accent, letterSpacing: 2 }}>FORENSIC INTELLIGENCE OS v1.0</span>
+              <span style={{ fontSize: 10, fontWeight: 900, color: T.accent, letterSpacing: 2 }}>TRUSTED FORENSIC INTELLIGENCE</span>
             </div>
             <h1 style={{ ...sectionHeadingStyle, fontSize: 'clamp(40px, 8vw, 92px)', marginBottom: 32, letterSpacing: -2 }}>
               Evidence over <br />

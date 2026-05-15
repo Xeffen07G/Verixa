@@ -303,10 +303,10 @@ export default function ResearchWorkspace() {
         {showTelemetry && telemetry && (
           <div style={{ background: 'rgba(20,20,30,0.95)', borderBottom: `1px solid ${T.accent}33`, padding: '12px 32px', display: 'flex', gap: 32, backdropFilter: 'blur(10px)' }}>
              {[
-               { label: 'HEAP', value: telemetry?.memory?.heapUsed || '...' },
+               { label: 'MEMORY', value: telemetry?.memory?.heapUsed || '...' },
                { label: 'SESSIONS', value: telemetry.sessions },
-               { label: 'ACTIVE JOBS', value: telemetry.activeJobs },
-               { label: 'VAULT CHUNKS', value: telemetry.chunkCount }
+               { label: 'TASKS', value: telemetry.activeJobs },
+               { label: 'INDEX', value: telemetry.chunkCount }
              ].map(s => (
                <div key={s.label}>
                   <div style={{ fontSize: 8, fontWeight: 900, color: T.text3, letterSpacing: 1 }}>{s.label}</div>

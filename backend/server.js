@@ -1039,6 +1039,19 @@ if (PROCESS_TYPE === "api") {
         status: "safe",
       });
     });
+
+    app.get("/api/admin/telemetry", (req, res) => {
+      res.json({
+        sessions: investigationManager.sessions ? Object.keys(investigationManager.sessions).length : 0,
+        vaultSize: SAFE_DOCS.length,
+        chunkCount: 142, // Mock or calculate from vector store
+        activeJobs: 0,
+        memory: {
+          heapUsed: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + "MB",
+          heapUsedNum: Math.round(process.memoryUsage().heapUsed / 1024 / 1024)
+        }
+      });
+    });
   }
 }
 

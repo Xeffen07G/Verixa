@@ -99,12 +99,6 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
 
           {/* Right: Tools & Menu */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-            {user && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', borderRadius: 20, background: 'rgba(74,222,128,0.05)', border: '1px solid rgba(74,222,128,0.1)' }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 10px #4ade8055' }} />
-                <span style={{ fontSize: 9, fontWeight: 900, color: '#4ade80', letterSpacing: 1 }}>SYSTEM: ACTIVE</span>
-              </div>
-            )}
             {children}
             
             {/* Tool Group (Always Visible) */}
