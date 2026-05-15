@@ -210,37 +210,39 @@ export default function ResearchWorkspace() {
   };
 
   const T = {
-    bg: '#050508',
-    border: 'rgba(255,255,255,0.08)',
+    bg: '#0a0a0f',
+    bg2: '#111118',
+    border: 'rgba(255,255,255,0.07)',
     text: '#f5f3ef',
-    text2: 'rgba(245,243,239,0.8)',
-    text3: 'rgba(245,243,239,0.4)',
+    text2: 'rgba(245,243,239,0.7)',
+    text3: 'rgba(245,243,239,0.35)',
     accent: '#c9a96e',
+    accentDim: 'rgba(201,169,110,0.1)',
   };
 
   return (
     <div style={{ height: '100vh', display: 'flex', background: T.bg, color: T.text, overflow: 'hidden', fontFamily: 'Inter, sans-serif' }}>
       {/* LEFT PANEL: Research Vault & Case Files */}
       <div style={{ width: 320, borderRight: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', background: 'rgba(255,255,255,0.01)' }}>
-        <div style={{ padding: 24, borderBottom: `1px solid ${T.border}` }}>
-          <div style={{ fontSize: 10, fontWeight: 900, color: T.accent, letterSpacing: 1.5, marginBottom: 4 }}>RESEARCH VAULT</div>
-          <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: -0.5 }}>Intelligence Center</div>
+        <div style={{ padding: '32px 24px', borderBottom: `1px solid ${T.border}` }}>
+          <div style={{ fontSize: 10, fontWeight: 900, color: T.accent, letterSpacing: 2, marginBottom: 8 }}>RESEARCH VAULT</div>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 300, color: T.text }}>Case Files</div>
         </div>
 
-        <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 20px' }}>
           <div 
             onClick={() => fileInputRef.current.click()}
             style={{ 
-              padding: '24px 16px', borderRadius: 20, border: `2px dashed ${T.border}`, textAlign: 'center',
-              cursor: 'pointer', transition: '0.2s', background: 'rgba(255,255,255,0.02)', marginBottom: 24
+              padding: '32px 16px', borderRadius: 16, border: `1px solid ${T.border}`, textAlign: 'center',
+              cursor: 'pointer', transition: 'all 0.3s', background: 'rgba(255,255,255,0.02)', marginBottom: 32
             }}
-            onMouseEnter={e => e.currentTarget.style.borderColor = T.accent}
-            onMouseLeave={e => e.currentTarget.style.borderColor = T.border}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.background = 'rgba(201,169,110,0.05)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; }}
           >
             <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} accept=".pdf" />
-            <UploadIcon size={24} style={{ color: T.accent, marginBottom: 12 }} />
-            <div style={{ fontSize: 11, fontWeight: 800 }}>INGEST DOCUMENT</div>
-            <div style={{ fontSize: 9, color: T.text3, marginTop: 4 }}>MAX 10MB | SAFE_MODE</div>
+            <UploadIcon size={20} style={{ color: T.accent, marginBottom: 12, opacity: 0.8 }} />
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: T.text }}>INGEST ARTIFACT</div>
+            <div style={{ fontSize: 9, color: T.text3, marginTop: 4 }}>PDF • MAX 10MB</div>
           </div>
 
           <div style={{ fontSize: 10, fontWeight: 900, color: T.text3, letterSpacing: 1, marginBottom: 12 }}>CASE FILES</div>
@@ -276,18 +278,20 @@ export default function ResearchWorkspace() {
 
       {/* CENTER PANEL: Intelligence Thread */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: T.bg }}>
-        <div style={{ padding: '20px 32px', borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <select 
-              value={activeMode} 
-              onChange={e => setActiveMode(e.target.value)}
-              style={{ background: 'none', border: `1px solid ${T.border}`, color: T.accent, padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 900, outline: 'none', cursor: 'pointer' }}
-            >
-              {Array.isArray(modes) && modes.map(m => <option key={m} value={m}>{m.toUpperCase()}</option>)}
-            </select>
-            <div style={{ width: 1, height: 16, background: T.border }} />
-            <button onClick={() => setShowTelemetry(!showTelemetry)} style={{ background: 'none', border: 'none', color: showTelemetry ? T.accent : T.text3, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, fontWeight: 800 }}>
-              <Activity size={14} /> {showTelemetry ? 'HIDE TELEMETRY' : 'SHOW TELEMETRY'}
+        <div style={{ padding: '24px 40px', borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: T.bg }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', borderRadius: 8, border: `1px solid ${T.border}`, background: 'rgba(255,255,255,0.02)' }}>
+              <span style={{ fontSize: 10, fontWeight: 900, color: T.text3, letterSpacing: 1 }}>MODE</span>
+              <select 
+                value={activeMode} 
+                onChange={e => setActiveMode(e.target.value)}
+                style={{ background: 'none', border: 'none', color: T.accent, fontSize: 11, fontWeight: 800, outline: 'none', cursor: 'pointer' }}
+              >
+                {Array.isArray(modes) && modes.map(m => <option key={m} value={m}>{m.toUpperCase()}</option>)}
+              </select>
+            </div>
+            <button onClick={() => setShowTelemetry(!showTelemetry)} style={{ background: 'none', border: 'none', color: showTelemetry ? T.accent : T.text3, cursor: 'pointer', opacity: 0.8 }} title="System Telemetry">
+              <Activity size={16} />
             </button>
           </div>
           <div style={{ display: 'flex', gap: 12 }}>
@@ -319,26 +323,29 @@ export default function ResearchWorkspace() {
         <div style={{ flex: 1, overflowY: 'auto', padding: '40px 64px' }}>
           {(!Array.isArray(messages) || messages.length === 0) ? (
             <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ textAlign: 'center', opacity: 0.3, marginBottom: 40 }}>
-                <SearchIcon size={64} style={{ marginBottom: 24, color: T.accent }} />
-                <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, color: T.text }}>Forensic Intelligence Ready</div>
-                <div style={{ fontSize: 14, maxWidth: 360, margin: '0 auto', color: T.text2 }}>Ingest forensic artifacts to begin cross-document interrogation or load a pre-configured investigation.</div>
+              <div style={{ textAlign: 'center', marginBottom: 64 }}>
+                <div style={{ width: 80, height: 80, borderRadius: 24, background: 'rgba(201,169,110,0.05)', border: `1px solid ${T.accent}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}>
+                  <Shield size={32} color={T.accent} />
+                </div>
+                <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 300, marginBottom: 12, letterSpacing: -1 }}>Forensic Intelligence Lab</h2>
+                <div style={{ fontSize: 16, maxWidth: 440, margin: '0 auto', color: T.text2, fontWeight: 300, lineHeight: 1.6 }}>Ingest artifacts to begin cross-document interrogation or select a pre-configured investigation.</div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, width: '100%', maxWidth: 640 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, width: '100%', maxWidth: 720 }}>
                 {[
                   { file: 'ai_bias_conflict.json', title: 'LLM Bias & Safety', desc: 'Map contradictions in safety alignment research.' },
                   { file: 'climate_contradiction.json', title: 'Climate Data Audit', desc: 'Analyze conflicting Arctic melt velocity metrics.' },
                   { file: 'misinformation_verification.json', title: 'Vaccine Misinfo Audit', desc: 'Cross-reference viral claims against peer-reviewed data.' },
                   { file: 'methodology_conflict.json', title: 'Replication Crisis', desc: 'Trace replication failures in psychology priming studies.' }
                 ].map(d => (
-                  <div key={d.file} style={{ padding: 20, borderRadius: 20, background: 'rgba(255,255,255,0.02)', border: `1px solid ${T.border}`, cursor: 'pointer', transition: 'border-color 0.2s' }} onClick={() => loadDemo(d.file)} onMouseEnter={e => e.currentTarget.style.borderColor = T.accent} onMouseLeave={e => e.currentTarget.style.borderColor = T.border}>
-                    <div style={{ fontSize: 9, fontWeight: 900, color: T.accent, letterSpacing: 1.5, marginBottom: 8 }}>DEMO INVESTIGATION</div>
-                    <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 4 }}>{d.title}</div>
-                    <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4 }}>{d.desc}</div>
+                  <div key={d.file} style={{ padding: 24, borderRadius: 20, background: 'rgba(255,255,255,0.02)', border: `1px solid ${T.border}`, cursor: 'pointer', transition: 'all 0.3s' }} onClick={() => loadDemo(d.file)} onMouseEnter={e => { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.transform = 'translateY(-4px)'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                    <div style={{ fontSize: 9, fontWeight: 900, color: T.accent, letterSpacing: 2, marginBottom: 12 }}>SAMPLE DATA</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>{d.title}</div>
+                    <div style={{ fontSize: 12, color: T.text3, lineHeight: 1.5 }}>{d.desc}</div>
                   </div>
                 ))}
               </div>
+            </div>
 
               
               <div style={{ marginTop: 40, textAlign: 'center' }}>
@@ -385,10 +392,9 @@ export default function ResearchWorkspace() {
                         </div>
                         <div className="scholarly-answer" style={{ 
                           fontSize: 15, lineHeight: 1.8, color: T.text, 
-                          background: (msg.intent === 'SYNTHESIS' || msg.intent === 'EXPLORATORY') ? 'rgba(201,169,110,0.03)' : 'rgba(255,255,255,0.01)', 
-                          padding: 24, borderRadius: 24, border: `1px solid ${(msg.intent === 'SYNTHESIS' || msg.intent === 'EXPLORATORY') ? T.accent : T.border}`, 
-                          borderLeft: `4px solid ${T.accent}`,
-                          boxShadow: (msg.intent === 'SYNTHESIS' || msg.intent === 'EXPLORATORY') ? `0 0 40px ${T.accent}10` : 'none'
+                          background: (msg.intent === 'SYNTHESIS' || msg.intent === 'EXPLORATORY') ? 'rgba(201,169,110,0.02)' : 'rgba(255,255,255,0.01)', 
+                          padding: '32px 40px', borderRadius: 24, border: `1px solid ${(msg.intent === 'SYNTHESIS' || msg.intent === 'EXPLORATORY') ? `${T.accent}33` : T.border}`, 
+                          boxShadow: (msg.intent === 'SYNTHESIS' || msg.intent === 'EXPLORATORY') ? `0 20px 60px ${T.accent}05` : 'none'
                         }}>
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
                         </div>

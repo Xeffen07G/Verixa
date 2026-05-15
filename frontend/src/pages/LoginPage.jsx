@@ -20,6 +20,16 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const T = {
+    bg: '#0a0a0f',
+    bg2: '#111118',
+    border: 'rgba(255,255,255,0.07)',
+    text: '#f5f3ef',
+    text2: 'rgba(245,243,239,0.7)',
+    text3: 'rgba(245,243,239,0.35)',
+    accent: '#c9a96e',
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErr('');
@@ -40,55 +50,87 @@ export default function LoginPage() {
   };
 
   const inputStyle = {
-    width: '100%', background: T.inputBg, border: `1px solid ${T.inputBorder}`,
-    borderRadius: 12, padding: '12px 16px 12px 44px', color: T.text, fontSize: 14,
-    boxSizing: 'border-box', transition: 'all 0.2s', outline: 'none'
+    width: '100%', 
+    background: 'rgba(255,255,255,0.01)', 
+    border: `1px solid ${T.border}`,
+    borderRadius: 12, 
+    padding: '16px 20px', 
+    color: T.text, 
+    fontSize: 16,
+    boxSizing: 'border-box', 
+    transition: 'all 0.2s', 
+    outline: 'none',
+    fontFamily: 'inherit',
+    fontWeight: 300
   };
 
-  const iconStyle = { position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: T.text2 };
-
   return (
-    <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: 'DM Sans, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', color: T.text }}>
       <style>{`
         @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
-        .form-input:focus { border-color: ${T.accent}66 !important; background: rgba(255,255,255,0.06) !important; }
+        .form-input:focus { border-color: ${T.accent}66 !important; }
       `}</style>
 
-      <Link to="/" style={{ fontFamily: 'serif', fontWeight: 700, fontSize: 28, color: T.text, letterSpacing: 1, textDecoration: 'none', marginBottom: 32 }}>VeriXa</Link>
+      <Link to="/" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 32, color: T.text, letterSpacing: -0.5, textDecoration: 'none', marginBottom: 64 }}>VeriXa</Link>
 
-      <div style={{ maxWidth: 400, width: '100%', padding: '48px 40px', background: T.card, border: `1px solid ${T.border}`, borderRadius: 24, boxShadow: '0 24px 64px rgba(0,0,0,0.4)', animation: 'fadeUp 0.5s ease' }}>
-
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <h1 style={{ fontFamily: 'serif', fontSize: 34, fontWeight: 300, color: T.text, margin: '0 0 8px' }}>{t('welcomeBack', lang)}</h1>
-          <p style={{ fontSize: 14, color: T.text2, margin: 0 }}>{t('accessSuite', lang)}</p>
+      <div style={{ maxWidth: 400, width: '100%', animation: 'fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+        <div style={{ textAlign: 'center', marginBottom: 64 }}>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, fontWeight: 300, color: T.text, margin: '0 0 16px' }}>Welcome back</h1>
+          <p style={{ fontSize: 16, color: T.text2, margin: 0, fontWeight: 300 }}>{t('accessSuite', lang)}</p>
         </div>
 
         {err && (
-          <div style={{ padding: '12px', background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', color: '#f87171', borderRadius: 12, fontSize: 13, marginBottom: 24, textAlign: 'center' }}>
+          <div style={{ padding: '16px', background: 'rgba(248,113,113,0.05)', border: `1px solid rgba(248,113,113,0.1)`, color: '#f87171', borderRadius: 8, fontSize: 14, marginBottom: 32, textAlign: 'center' }}>
             {err}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ position: 'relative' }}>
-            <Mail size={16} style={iconStyle} />
-            <input type="email" required placeholder={t('workEmail', lang)} value={email} onChange={e => setEmail(e.target.value)} className="form-input" style={inputStyle} />
-          </div>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <input 
+            type="email" 
+            required 
+            placeholder={t('workEmail', lang)} 
+            value={email} 
+            onChange={e => setEmail(e.target.value)} 
+            className="form-input" 
+            style={inputStyle} 
+          />
+          <input 
+            type="password" 
+            required 
+            placeholder={t('password', lang)} 
+            value={password} 
+            onChange={e => setPassword(e.target.value)} 
+            className="form-input" 
+            style={inputStyle} 
+          />
 
-          <div style={{ position: 'relative' }}>
-            <Lock size={16} style={iconStyle} />
-            <input type="password" required placeholder={t('password', lang)} value={password} onChange={e => setPassword(e.target.value)} className="form-input" style={inputStyle} />
-          </div>
-
-          <button type="submit" disabled={isLoading}
-            style={{ width: '100%', padding: '14px', marginTop: 12, borderRadius: 12, background: isLoading ? 'rgba(201,169,110,0.2)' : T.accent, border: 'none', color: '#0a0a0f', fontSize: 14, fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
-            {isLoading ? t('authenticating', lang) : t('signIn', lang)}
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            style={{ 
+              width: '100%', 
+              padding: '16px', 
+              marginTop: 16, 
+              borderRadius: 12, 
+              background: T.accent, 
+              border: 'none', 
+              color: '#0a0a0f', 
+              fontSize: 14, 
+              fontWeight: 800, 
+              letterSpacing: 1,
+              cursor: isLoading ? 'not-allowed' : 'pointer', 
+              transition: '0.2s',
+              opacity: isLoading ? 0.7 : 1
+            }}
+          >
+            {isLoading ? 'AUTHENTICATING...' : 'SIGN IN'}
           </button>
         </form>
 
-        <div style={{ textAlign: 'center', marginTop: 24 }}>
-          <p style={{ fontSize: 13, color: T.text2, margin: 0 }}>
-            {t('newToVerixa', lang)} <Link to="/signup" style={{ color: T.accent, textDecoration: 'none', fontWeight: 600 }}>{t('createAccount', lang)}</Link>
+        <div style={{ textAlign: 'center', marginTop: 48 }}>
+          <p style={{ fontSize: 14, color: T.text2, margin: 0, fontWeight: 300 }}>
+            {t('newToVerixa', lang)} <Link to="/signup" style={{ color: T.accent, textDecoration: 'none', fontWeight: 700 }}>{t('createAccount', lang)}</Link>
           </p>
         </div>
       </div>

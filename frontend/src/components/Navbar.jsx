@@ -72,22 +72,10 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
           {/* Left: Logo & Core Nav */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 40 }}>
             <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
-              <div style={{ position: 'relative' }}>
-                <div style={{ 
-                  width: 32, height: 32, borderRadius: 10, background: T.logoBg, 
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                  fontSize: 16, color: darkMode ? '#0a0a0f' : '#fff', fontWeight: 900 
-                }}>V</div>
-                <div style={{ 
-                  position: 'absolute', bottom: -2, right: -2, width: 8, height: 8, 
-                  borderRadius: '50%', background: '#4ade80', 
-                  border: `2px solid ${darkMode ? '#0a0a0f' : '#fdfcf9'}` 
-                }} />
-              </div>
-              <span style={{ 
-                fontFamily: 'Cormorant Garamond, serif',
-                fontSize: 22, fontWeight: 300, color: textColor, letterSpacing: -0.5 
-              }}>VeriXa</span>
+               <span style={{ 
+                 fontFamily: 'Cormorant Garamond, serif',
+                 fontSize: 26, fontWeight: 300, color: textColor, letterSpacing: -1 
+               }}>VeriXa</span>
             </Link>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 24 }} className="hide-tablet">

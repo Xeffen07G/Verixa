@@ -103,13 +103,13 @@ export default function LandingPage() {
 
         <div style={{ padding: '0 24px', maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '8px 20px', borderRadius: 999, border: `1px solid ${T.accent}33`, background: `${T.accent}0a`, marginBottom: 40 }}>
-              <Shield size={14} color={T.accent} />
-              <span style={{ fontSize: 10, fontWeight: 900, color: T.accent, letterSpacing: 2 }}>TRUSTED FORENSIC INTELLIGENCE</span>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '8px 24px', borderRadius: 999, border: `1px solid ${T.accent}20`, background: `${T.accent}05`, marginBottom: 48 }}>
+               <div style={{ width: 4, height: 4, borderRadius: '50%', background: T.accent }} />
+               <span style={{ fontSize: 9, fontWeight: 900, color: T.accent, letterSpacing: 3, opacity: 0.8 }}>PREMIUM FORENSIC INTELLIGENCE</span>
             </div>
-            <h1 style={{ ...sectionHeadingStyle, fontSize: 'clamp(40px, 8vw, 92px)', marginBottom: 32, letterSpacing: -2 }}>
+            <h1 style={{ ...sectionHeadingStyle, fontSize: 'clamp(44px, 10vw, 110px)', marginBottom: 40, letterSpacing: -3 }}>
               Evidence over <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: T.accent }}>AI Fluency.</span>
+              <span style={{ fontStyle: 'italic', fontWeight: 300, color: T.accent, opacity: 0.9 }}>AI Fluency.</span>
             </h1>
           </motion.div>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.7 }} style={{ fontSize: 20, color: T.text2, lineHeight: 1.6, maxWidth: 700, margin: '0 auto 56px', fontWeight: 300 }}>
@@ -133,12 +133,9 @@ export default function LandingPage() {
             { Icon: Activity, title: 'Forensic Evaluation', desc: 'Continuous benchmarking against known misinformation datasets to ensure 99%+ grounding accuracy.' },
             { Icon: Lock, title: 'Research Integrity', desc: 'Full source transparency with alignment metrics and credibility badges for every discovery.' },
           ].map((p, i) => (
-            <motion.div key={i} whileHover={{ y: -10, borderColor: T.accent }} style={{ padding: 40, borderRadius: 24, background: T.cardBg, border: `1px solid ${T.border}`, transition: 'all 0.3s' }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: T.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
-                <p.Icon size={20} color={T.accent} />
-              </div>
-              <h3 style={{ fontSize: 20, fontWeight: 800, color: T.text, marginBottom: 12, letterSpacing: -0.5 }}>{p.title}</h3>
-              <p style={{ fontSize: 14, color: T.text3, lineHeight: 1.6 }}>{p.desc}</p>
+            <motion.div key={i} whileHover={{ y: -8 }} style={{ padding: '48px 40px', borderRadius: 20, background: T.bg2, border: `1px solid ${T.border}`, transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+              <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 300, color: T.text, marginBottom: 16, letterSpacing: -0.5 }}>{p.title}</h3>
+              <p style={{ fontSize: 15, color: T.text2, lineHeight: 1.7, fontWeight: 300 }}>{p.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -153,21 +150,18 @@ export default function LandingPage() {
             <div style={{ ...dividerStyle, margin: '24px auto' }} />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 64 }}>
             {[
-              { num: '01', title: 'Surgical Ingestion', desc: 'PDF text is extracted, keyword-indexed, and semantically mapped in under 5 seconds for immediate interrogation.', icon: Database },
-              { num: '02', title: 'Adaptive Retrieval', desc: 'Hybrid search combines BM25 keyword matching with vector embeddings to find the most relevant forensic chunks.', icon: Search },
-              { num: '03', title: 'Consistency Analysis', desc: 'The Contradiction Engine compares retrieved evidence to identify cross-document disagreements or consensus.', icon: Brain },
+              { num: '01', title: 'Surgical Ingestion', desc: 'PDF text is extracted and semantically mapped in under 5 seconds for immediate interrogation.', icon: Database },
+              { num: '02', title: 'Adaptive Retrieval', desc: 'Hybrid search combines BM25 keyword matching with vector embeddings to find relevant forensic chunks.', icon: Search },
+              { num: '03', title: 'Consistency Analysis', desc: 'The Contradiction Engine compares retrieved evidence to identify cross-document disagreements.', icon: Brain },
               { num: '04', title: 'Grounded Reporting', desc: 'A final intelligence report is synthesized with verbatim citations and credibility-weighted trust scores.', icon: FileText }
             ].map((step, i) => (
-              <motion.div key={i} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} style={{ display: 'flex', gap: 40, alignItems: 'center', padding: '32px', borderRadius: 24, border: `1px solid ${T.border}`, background: T.bg }}>
-                 <div style={{ fontSize: 48, fontWeight: 900, color: T.accent, opacity: 0.2, fontFamily: 'monospace' }}>{step.num}</div>
-                 <div style={{ width: 60, height: 60, borderRadius: '50%', background: T.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <step.icon size={24} color={T.accent} />
-                 </div>
-                 <div>
-                    <h3 style={{ fontSize: 24, fontWeight: 700, color: T.text, marginBottom: 8, letterSpacing: -0.5 }}>{step.title}</h3>
-                    <p style={{ fontSize: 16, color: T.text3, lineHeight: 1.5, margin: 0 }}>{step.desc}</p>
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ display: 'flex', gap: 48, alignItems: 'flex-start' }}>
+                 <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 300, color: T.accent, opacity: 0.5 }}>{step.num}</div>
+                 <div style={{ borderLeft: `1px solid ${T.border}`, paddingLeft: 48 }}>
+                    <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 300, color: T.text, marginBottom: 12, letterSpacing: -0.5 }}>{step.title}</h3>
+                    <p style={{ fontSize: 17, color: T.text2, lineHeight: 1.7, margin: 0, fontWeight: 300, maxWidth: 600 }}>{step.desc}</p>
                  </div>
               </motion.div>
             ))}

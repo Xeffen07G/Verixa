@@ -24,14 +24,14 @@ const VERDICT_CONFIG = (lang) => ({
 const STAGES = ['extracting', 'searching', 'verifying', 'done'];
 
 const DARK = {
-  bg: '#0a0a0f', surface: '#13131a', surface2: '#1a1a24',
+  bg: '#0a0a0f', surface: '#111118', surface2: '#16161f',
   border: 'rgba(255,255,255,0.07)', border2: 'rgba(255,255,255,0.04)',
-  text: '#f5f3ef', text2: 'rgba(245,243,239,0.65)', text3: 'rgba(245,243,239,0.35)',
+  text: '#f5f3ef', text2: 'rgba(245,243,239,0.7)', text3: 'rgba(245,243,239,0.35)',
   topbar: 'rgba(10,10,15,0.95)', panelFooter: 'rgba(10,10,15,0.8)',
-  inputBg: 'rgba(255,255,255,0.04)', inputBorder: 'rgba(255,255,255,0.1)',
-  logBg: 'rgba(255,255,255,0.02)', emptyColor: 'rgba(245,243,239,0.55)',
-  cardBg: '#13131a', cardBorder: 'rgba(255,255,255,0.06)',
-  accent: '#c9a96e', accentMuted: 'rgba(201,169,110,0.12)',
+  inputBg: 'rgba(255,255,255,0.02)', inputBorder: 'rgba(255,255,255,0.08)',
+  logBg: 'rgba(255,255,255,0.01)', emptyColor: 'rgba(245,243,239,0.55)',
+  cardBg: '#111118', cardBorder: 'rgba(255,255,255,0.07)',
+  accent: '#c9a96e', accentMuted: 'rgba(201,169,110,0.1)',
 };
 
 const LIGHT = {

@@ -73,21 +73,18 @@ export default function VideoPage() {
     }
   };
 
-  const T_DARK = {
-    bg: '#0a0a0f', bg2: 'rgba(16,16,23,0.9)', text: '#f5f3ef', text2: 'rgba(245,243,239,0.45)',
-    text3: 'rgba(245,243,239,0.25)', border: 'rgba(255,255,255,0.06)', accent: '#c9a96e',
-    cardBg: 'rgba(16,16,23,0.8)', cardBorder: 'rgba(255,255,255,0.07)',
+  const T = {
+    bg: '#0a0a0f',
+    bg2: '#111118',
+    border: 'rgba(255,255,255,0.07)',
+    text: '#f5f3ef',
+    text2: 'rgba(245,243,239,0.7)',
+    text3: 'rgba(245,243,239,0.35)',
+    accent: '#c9a96e',
+    cardBg: '#111118',
+    cardBorder: 'rgba(255,255,255,0.07)',
     accentMuted: 'rgba(201,169,110,0.1)',
   };
-
-  const T_LIGHT = {
-    bg: '#e8e5de', bg2: 'rgba(232,229,222,0.95)', text: '#0d0d0d', text2: '#2a2a2a',
-    text3: '#555555', border: 'rgba(0,0,0,0.12)', accent: '#5a421a',
-    cardBg: '#f0ede6', cardBorder: 'rgba(0,0,0,0.08)',
-    accentMuted: 'rgba(90,66,26,0.1)',
-  };
-
-  const T = darkMode ? T_DARK : T_LIGHT;
 
   async function analyzeVideo() {
     setLoading(true); setError(null); setResult(null);
@@ -96,7 +93,6 @@ export default function VideoPage() {
       return;
     }
     
-    // Logic for both URL and Upload
     try {
       const endpoint = inputMode === 'url' ? '/api/video/url' : '/api/video/upload';
       let body;
@@ -108,7 +104,6 @@ export default function VideoPage() {
       } else {
         body = new FormData();
         body.append('video', uploadFile);
-        // Do not set Content-Type for FormData, browser will do it with boundary
       }
       
       const res = await api.post(endpoint, body, { headers });
@@ -133,21 +128,17 @@ export default function VideoPage() {
   const cfg = result ? (VERDICT_CONFIG(lang)[result.verdict] || VERDICT_CONFIG(lang)['Uncertain']) : null;
 
   return (
-    <div key={lang} style={{ minHeight: '100vh', background: T.bg, color: T.text, transition: 'background 0.3s', fontFamily: 'DM Sans, sans-serif', paddingTop: 0 }}>
+    <div key={lang} style={{ minHeight: '100vh', background: T.bg, color: T.text, transition: 'background 0.3s', paddingTop: 0 }}>
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
-      <main style={{ maxWidth: 1000, margin: '0 auto', padding: 'calc(var(--nav-h) + 48px) 24px 60px' }}>
+      <main style={{ maxWidth: 1000, margin: '0 auto', padding: '160px 24px 120px' }}>
         
-        {/* Header */}
-        <section style={{ textAlign: 'center', marginBottom: 48 }}>
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '4px 12px', borderRadius: 99, background: T.accentMuted, color: T.accent, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, marginBottom: 16 }}>
-            <Activity size={14} /> {t('videoVerify', lang).toUpperCase()}
-          </motion.div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 300, margin: '0 0 16px' }}>
-            {t('videoHeroTitle1', lang)} <span style={{ fontStyle: 'italic', color: T.accent }}>{t('videoHeroTitle2', lang)}</span>
+        <section style={{ marginBottom: 80 }}>
+          <div style={{ fontSize: 11, letterSpacing: 4, textTransform: 'uppercase', color: T.accent, fontWeight: 900, marginBottom: 24 }}>VIDEO FORENSICS</div>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 64, fontWeight: 300, margin: '0 0 24px', lineHeight: 1 }}>
+            Visual Authentication
           </h1>
-          <p style={{ color: T.text2, fontSize: 16, maxWidth: 500, margin: '0 auto', lineHeight: 1.6 }}>
+          <p style={{ color: T.text2, fontSize: 18, maxWidth: 600, margin: 0, lineHeight: 1.7, fontWeight: 300 }}>
             {t('videoHeroSubtitle', lang)}
           </p>
         </section>

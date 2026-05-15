@@ -43,19 +43,17 @@ export default function ImagePage() {
   const fileRef = useRef(null);
   const chatEndRef = useRef(null);
 
-  const T_DARK = {
-    bg: '#0a0a0f', bg2: 'rgba(16,16,23,0.9)', text: '#f5f3ef', text2: 'rgba(245,243,239,0.45)',
-    text3: 'rgba(245,243,239,0.25)', border: 'rgba(255,255,255,0.06)', accent: '#c9a96e',
-    cardBg: 'rgba(16,16,23,0.8)', cardBorder: 'rgba(255,255,255,0.07)',
+  const T = {
+    bg: '#0a0a0f',
+    bg2: '#111118',
+    border: 'rgba(255,255,255,0.07)',
+    text: '#f5f3ef',
+    text2: 'rgba(245,243,239,0.7)',
+    text3: 'rgba(245,243,239,0.35)',
+    accent: '#c9a96e',
+    cardBg: '#111118',
+    cardBorder: 'rgba(255,255,255,0.07)',
   };
-
-  const T_LIGHT = {
-    bg: '#e8e5de', bg2: 'rgba(232,229,222,0.95)', text: '#0d0d0d', text2: '#2a2a2a',
-    text3: '#555555', border: 'rgba(0,0,0,0.12)', accent: '#5a421a',
-    cardBg: '#f0ede6', cardBorder: 'rgba(0,0,0,0.08)',
-  };
-
-  const T = darkMode ? T_DARK : T_LIGHT;
 
   async function analyzeUrl() {
     if (!imageUrl.trim()) return;
@@ -118,7 +116,6 @@ export default function ImagePage() {
     
     setChatHistory(prev => [...prev, { role: 'user', content: currentQuery }]);
     
-    // Aggregate context from ALL images
     const fullContext = results.map((r, i) => `[IMAGE ${i+1}]: ${r.extracted_text}`).join("\n\n");
     const fullForensic = results.map((r, i) => `[IMAGE ${i+1} AUTH]: ${r.assessment}`).join("\n");
 
@@ -141,26 +138,22 @@ export default function ImagePage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, paddingTop: 0, transition: 'background 0.3s, color 0.3s', fontFamily: 'DM Sans, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: T.bg, color: T.text, paddingTop: 0, transition: 'background 0.3s, color 0.3s' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
         @keyframes pulse { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
-        @media (max-width: 600px) {
-          .analysis-grid { grid-template-columns: 1fr !important; }
-          .analysis-grid img { height: 200px !important; }
-        }
       `}</style>
 
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: 'calc(var(--nav-h) + 48px) 24px 80px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: T.accent, marginBottom: 12 }}>{t('imageIntel', lang)}</p>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 'clamp(36px, 6vw, 56px)', color: T.text, margin: '0 0 16px', lineHeight: 1.1 }}>
-            {t('isImage', lang)} <span style={{ fontStyle: 'italic', color: T.accent }}>{t('real', lang)}?</span>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '160px 24px 120px' }}>
+        <div style={{ marginBottom: 80 }}>
+          <p style={{ fontSize: 11, letterSpacing: 4, textTransform: 'uppercase', color: T.accent, fontWeight: 900, marginBottom: 24 }}>FORENSIC IMAGE INTELLIGENCE</p>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 64, color: T.text, margin: '0 0 24px', lineHeight: 1 }}>
+            Image Authentication
           </h1>
-          <p style={{ fontSize: 15, color: T.text2, maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
+          <p style={{ fontSize: 18, color: T.text2, maxWidth: 600, margin: 0, lineHeight: 1.7, fontWeight: 300 }}>
             {t('imageDesc', lang)}
           </p>
         </div>
