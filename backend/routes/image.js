@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Groq = require("groq-sdk");
 const fetch = require("node-fetch");
+const { VISION_MODEL_PRIMARY, VISION_MODEL_FALLBACK } = require("../config/constants");
 
 let _groq;
 function getGroq() {
@@ -427,27 +428,58 @@ router.post("/url", async (req, res) => {
     const dataUrl = `data:${contentType};base64,${base64}`;
 
     try {
-      const completion = await getGroq().chat.completions.create({
-        model: "llama-3.2-11b-vision-preview",
-        messages: [
-          {
-            role: "user",
-            content: [
+      let completion;
+      try {
+        completion = await getGroq().chat.completions.create({
+          model: VISION_MODEL_PRIMARY,
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: `${SYSTEM_PROMPT}\n\nPerform a technical visual audit on this image. Identify any potential indicators of synthetic generation or algorithmic manipulation.`,
+                },
+                {
+                  type: "image_url",
+                  image_url: { url: dataUrl },
+                },
+              ],
+            },
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.0,
+          max_tokens: 800,
+        });
+      } catch (primaryErr) {
+        console.warn(`[API IMAGE URL] Primary model failed: ${primaryErr.message}. Retrying fallback...`);
+        try {
+          completion = await getGroq().chat.completions.create({
+            model: VISION_MODEL_FALLBACK,
+            messages: [
               {
-                type: "text",
-                text: `${SYSTEM_PROMPT}\n\nPerform a technical visual audit on this image. Identify any potential indicators of synthetic generation or algorithmic manipulation.`,
-              },
-              {
-                type: "image_url",
-                image_url: { url: dataUrl },
+                role: "user",
+                content: [
+                  {
+                    type: "text",
+                    text: `${SYSTEM_PROMPT}\n\nPerform a technical visual audit on this image. Identify any potential indicators of synthetic generation or algorithmic manipulation.`,
+                  },
+                  {
+                    type: "image_url",
+                    image_url: { url: dataUrl },
+                  },
+                ],
               },
             ],
-          },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.0,
-        max_tokens: 800,
-      });
+            response_format: { type: "json_object" },
+            temperature: 0.0,
+            max_tokens: 800,
+          });
+        } catch (fallbackErr) {
+          console.warn(`[API IMAGE URL] Fallback model failed: ${fallbackErr.message}. Activating SAFE_MODE heuristic...`);
+          throw new Error("Both primary and fallback vision models failed. Heuristic bypass activated.");
+        }
+      }
 
       const raw = completion.choices[0].message.content.trim();
       const cleaned = raw.replace(/```json|```/g, "").trim();
@@ -500,7 +532,7 @@ router.post("/url", async (req, res) => {
       return res.json(result);
     } catch (groqErr) {
       console.log(`[API IMAGE URL] Vision AI API Error caught:`, groqErr.message);
-      return res.json(getDegradedFallback(`Groq Vision Analysis failed: ${groqErr.message}`, urlFilename, contentType, buffer.length));
+      return res.json(getDegradedFallback(`Image forensic analysis temporarily unavailable. Fallback analysis mode activated.`, urlFilename, contentType, buffer.length));
     }
   } catch (err) {
     const msg = err.message || "Unknown error";
@@ -585,27 +617,58 @@ router.post("/upload", async (req, res) => {
     const dataUrl = `data:${contentType};base64,${base64}`;
 
     try {
-      const completion = await getGroq().chat.completions.create({
-        model: "llama-3.2-11b-vision-preview",
-        messages: [
-          {
-            role: "user",
-            content: [
+      let completion;
+      try {
+        completion = await getGroq().chat.completions.create({
+          model: VISION_MODEL_PRIMARY,
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: `${SYSTEM_PROMPT}\n\nAnalyze this image for authenticity. Respond with ONLY the JSON format specified.`,
+                },
+                {
+                  type: "image_url",
+                  image_url: { url: dataUrl },
+                },
+              ],
+            },
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.0,
+          max_tokens: 800,
+        });
+      } catch (primaryErr) {
+        console.warn(`[API IMAGE UPLOAD] Primary model failed: ${primaryErr.message}. Retrying fallback...`);
+        try {
+          completion = await getGroq().chat.completions.create({
+            model: VISION_MODEL_FALLBACK,
+            messages: [
               {
-                type: "text",
-                text: `${SYSTEM_PROMPT}\n\nAnalyze this image for authenticity. Respond with ONLY the JSON format specified.`,
-              },
-              {
-                type: "image_url",
-                image_url: { url: dataUrl },
+                role: "user",
+                content: [
+                  {
+                    type: "text",
+                    text: `${SYSTEM_PROMPT}\n\nAnalyze this image for authenticity. Respond with ONLY the JSON format specified.`,
+                  },
+                  {
+                    type: "image_url",
+                    image_url: { url: dataUrl },
+                  },
+                ],
               },
             ],
-          },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.0,
-        max_tokens: 800,
-      });
+            response_format: { type: "json_object" },
+            temperature: 0.0,
+            max_tokens: 800,
+          });
+        } catch (fallbackErr) {
+          console.warn(`[API IMAGE UPLOAD] Fallback model failed: ${fallbackErr.message}. Activating SAFE_MODE heuristic...`);
+          throw new Error("Both primary and fallback vision models failed. Heuristic bypass activated.");
+        }
+      }
 
       const raw = completion.choices[0].message.content.trim();
       const cleaned = raw.replace(/```json|```/g, "").trim();
@@ -659,7 +722,7 @@ router.post("/upload", async (req, res) => {
       return res.json(result);
     } catch (groqErr) {
       console.log(`[API IMAGE UPLOAD] Vision AI API Error caught:`, groqErr.message);
-      return res.json(getDegradedFallback(`Groq Vision Analysis failed: ${groqErr.message}`, payloadFilename, payloadMime, buffer.length));
+      return res.json(getDegradedFallback(`Image forensic analysis temporarily unavailable. Fallback analysis mode activated.`, payloadFilename, payloadMime, buffer.length));
     }
   } catch (err) {
     const msg = err.message || "Unknown error";
@@ -709,4 +772,5 @@ If the text looks like a legal document, court order, or official notice, provid
   }
 });
 
+router.computeForensicTelemetry = computeForensicTelemetry;
 module.exports = router;
