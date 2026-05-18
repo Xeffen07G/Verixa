@@ -23,12 +23,10 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: "Invalid URL format." });
   }
 
-  console.log("URL VERIFY REQUEST:", req.body);
-  console.log("FETCHED URL:", url);
+  console.log(`[API] Processing URL verification for: ${url}`);
 
   try {
     const result = await scrapeUrl(url);
-    console.log("EXTRACTED CONTENT LENGTH:", result.text?.length);
     res.json(result);
   } catch (err) {
     console.error("URL PIPELINE ERROR:", err);
