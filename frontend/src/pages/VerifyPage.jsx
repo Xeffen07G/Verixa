@@ -191,6 +191,7 @@ export default function VerifyPage() {
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const [text, setText] = useState('');
+  const [pdfError, setPdfError] = useState(null);
   const [url, setUrl] = useState('');
   const [inputMode, setInputMode] = useState(() => {
     if (searchParams.get('mode') === 'pdf' || window.location.pathname === '/pdf') return 'pdf';
@@ -263,9 +264,27 @@ export default function VerifyPage() {
 
   const handlePdfUpload = async (file) => {
     if (!file) return;
+    
+    // Auto Reset error state upon selecting a new file
+    setPdfError(null);
+    setIsScannedPdf(false);
+
+    // Client-Side Pre-Check for oversized documents (10MB in SAFE_MODE)
+    const MAX_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      const sizeInMB = (file.size / (1024 * 1024)).toFixed(1);
+      setPdfError({
+        title: "FORENSIC INGESTION LIMIT",
+        body: "This document exceeds the secure ingestion threshold for the current forensic environment.",
+        subtext: "Maximum supported size: 10MB in SAFE_MODE.",
+        sizeInfo: `${sizeInMB}MB / 10MB limit`,
+        helper: "For larger documents, reduce resolution or split the report into sections."
+      });
+      return;
+    }
+
     setUploadingPdf(true);
     setPdfStatus('Uploading...');
-    setIsScannedPdf(false);
     try {
       const formData = new FormData();
       formData.append('pdf', file);
@@ -300,7 +319,13 @@ export default function VerifyPage() {
       if (!completed) throw new Error('Processing timed out');
     } catch (e) { 
       console.error("[VerifyPage] PDF Upload Error:", e.response || e);
-      alert('PDF Error: ' + (e.response?.data?.error || e.message)); 
+      setPdfError({
+        title: "FORENSIC INGESTION FAILURE",
+        body: e.response?.data?.error || e.message || "An unexpected error occurred during document parsing.",
+        subtext: "Verification environment status: Bypassed to prevent analysis blockage.",
+        sizeInfo: null,
+        helper: "Try converting the PDF pages to plain text manually if the extraction fails persistently."
+      });
     }
     finally { 
       setUploadingPdf(false);
@@ -344,10 +369,44 @@ export default function VerifyPage() {
                 )}
 
                 {inputMode === 'pdf' && (
-                  <div onClick={() => document.getElementById('pdf-in').click()} style={{ padding: '40px 20px', border: `2px dashed ${T.border}`, borderRadius: 12, textAlign: 'center', cursor: 'pointer' }}>
-                    <FileText size={32} color={T.accent} style={{ marginBottom: 12 }} />
-                    <p style={{ fontSize: 13, color: T.text3 }}>{uploadingPdf ? pdfStatus : t('clickDragPdf', lang)}</p>
-                    <input id="pdf-in" type="file" accept=".pdf" style={{ display: 'none' }} onChange={e => handlePdfUpload(e.target.files[0])} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {pdfError && (
+                      <div style={{ 
+                        padding: '16px', 
+                        background: darkMode ? 'rgba(201, 169, 110, 0.06)' : 'rgba(90, 66, 26, 0.06)', 
+                        border: `1px solid ${T.accent}40`, 
+                        borderRadius: 12, 
+                        boxShadow: `0 4px 20px ${T.accent}15`,
+                        animation: 'fadeIn 0.3s ease-out'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: T.accent, fontWeight: 700, fontSize: 12, letterSpacing: '0.05em', marginBottom: 6 }}>
+                          <AlertCircle size={15} />
+                          {pdfError.title}
+                        </div>
+                        <p style={{ fontSize: 12, lineHeight: 1.5, color: T.text2, margin: '0 0 8px 0' }}>
+                          {pdfError.body}
+                        </p>
+                        {pdfError.sizeInfo && (
+                          <div style={{ fontSize: 11, fontWeight: 700, color: '#f87171', background: 'rgba(248,113,113,0.1)', padding: '4px 8px', borderRadius: 6, display: 'inline-block', marginBottom: 8 }}>
+                            {pdfError.sizeInfo}
+                          </div>
+                        )}
+                        <div style={{ fontSize: 11, color: T.text3, borderTop: `1px solid ${T.border}`, paddingTop: 8, lineHeight: 1.4 }}>
+                          {pdfError.subtext}
+                        </div>
+                        {pdfError.helper && (
+                          <div style={{ fontSize: 10, color: T.text3, marginTop: 4, fontStyle: 'italic' }}>
+                            {pdfError.helper}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div onClick={() => document.getElementById('pdf-in').click()} style={{ padding: '40px 20px', border: `2px dashed ${T.border}`, borderRadius: 12, textAlign: 'center', cursor: 'pointer' }}>
+                      <FileText size={32} color={T.accent} style={{ marginBottom: 12 }} />
+                      <p style={{ fontSize: 13, color: T.text3 }}>{uploadingPdf ? pdfStatus : t('clickDragPdf', lang)}</p>
+                      <input id="pdf-in" type="file" accept=".pdf" style={{ display: 'none' }} onChange={e => handlePdfUpload(e.target.files[0])} />
+                    </div>
                   </div>
                 )}
 
