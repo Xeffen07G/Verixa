@@ -338,6 +338,32 @@ export default function VideoPage() {
                   </div>
                 </div>
 
+                {Array.isArray(result?.forensicReasoning) && result.forensicReasoning.length > 0 && (
+                  <div style={{ padding: 28, borderRadius: 24, background: T.cardBg, border: `1px solid ${T.cardBorder}` }}>
+                    <h4 style={{ margin: '0 0 20px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>Forensic Reasoning &amp; Evidence</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      {result.forensicReasoning.map((f, i) => (
+                        <div key={i} style={{ borderBottom: i < result.forensicReasoning.length - 1 ? `1px solid ${T.border}` : 'none', paddingBottom: i < result.forensicReasoning.length - 1 ? 16 : 0 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: T.accent }}>{f.type}</span>
+                            <span style={{ 
+                              fontSize: 10, 
+                              fontWeight: 800, 
+                              letterSpacing: 1, 
+                              textTransform: 'uppercase', 
+                              padding: '2px 8px', 
+                              borderRadius: 4, 
+                              background: f.severity === 'Strong' ? 'rgba(248,113,113,0.1)' : f.severity === 'Moderate' ? 'rgba(251,146,60,0.1)' : 'rgba(255,255,255,0.05)',
+                              color: f.severity === 'Strong' ? '#f87171' : f.severity === 'Moderate' ? '#fb923c' : T.text2
+                            }}>{f.severity} Anomaly</span>
+                          </div>
+                          <p style={{ margin: 0, fontSize: 12, color: T.text2, lineHeight: 1.5 }}>{f.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {Array.isArray(result?.anomalies) && result.anomalies.length > 0 && (
                   <div style={{ padding: 28, borderRadius: 24, background: T.cardBg, border: `1px solid ${T.cardBorder}` }}>
                     <h4 style={{ margin: '0 0 16px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>{t('temporalAnomalies', lang)}</h4>
