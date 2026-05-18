@@ -22,22 +22,6 @@ export default function App() {
     return localStorage.getItem('verixa_dev_access') === 'true';
   });
 
-  const [activeStatusIdx, setActiveStatusIdx] = React.useState(0);
-
-  const statuses = [
-    "Verification Systems Calibrating...",
-    "Temporal Analysis Stabilizing...",
-    "Evidence Engines Training...",
-    "Multi-Modal Forensics Optimizing..."
-  ];
-
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveStatusIdx(prev => (prev + 1) % statuses.length);
-    }, 2500);
-    return () => clearInterval(timer);
-  }, []);
-
   const handleLogoClick = () => {
     let clicks = parseInt(sessionStorage.getItem('verixa-logo-clicks') || '0') + 1;
     sessionStorage.setItem('verixa-logo-clicks', clicks.toString());
@@ -61,213 +45,130 @@ export default function App() {
                   left: 0,
                   width: '100vw',
                   height: '100vh',
-                  background: '#0a0a0f',
+                  background: '#07070a',
                   zIndex: 99999,
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  justifyContent: 'space-between',
                   fontFamily: "'Inter', sans-serif",
                   color: '#f5f3ef',
-                  overflow: 'hidden'
+                  padding: '60px 24px',
+                  boxSizing: 'border-box'
                 }}>
                   {/* Styling Injection */}
                   <style>{`
-                    @keyframes pulseGlow {
-                      0% { box-shadow: 0 0 30px rgba(201, 169, 110, 0.1); }
-                      50% { box-shadow: 0 0 60px rgba(201, 169, 110, 0.25); }
-                      100% { box-shadow: 0 0 30px rgba(201, 169, 110, 0.1); }
-                    }
-                    @keyframes ambientShift {
-                      0% { opacity: 0.3; }
-                      50% { opacity: 0.6; }
-                      100% { opacity: 0.3; }
-                    }
-                    @keyframes blinkStatus {
-                      0%, 100% { opacity: 0.4; }
+                    @keyframes softBlink {
+                      0%, 100% { opacity: 0.3; }
                       50% { opacity: 1; }
-                    }
-                    @keyframes progressPulse {
-                      0% { width: 10%; }
-                      50% { width: 85%; }
-                      100% { width: 95%; }
                     }
                   `}</style>
 
-                  {/* High-fidelity Cinematic Grid Overlay */}
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundImage: 'linear-gradient(rgba(201, 169, 110, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(201, 169, 110, 0.02) 1px, transparent 1px)',
-                    backgroundSize: '50px 50px',
-                    pointerEvents: 'none',
-                    opacity: 0.85
-                  }} />
-
-                  {/* Ambient Background Glow */}
-                  <div style={{
-                    position: 'absolute',
-                    top: '-15%',
-                    left: '-15%',
-                    width: '130%',
-                    height: '130%',
-                    background: 'radial-gradient(circle at 50% 50%, rgba(201, 169, 110, 0.06), transparent 70%)',
-                    pointerEvents: 'none',
-                    animation: 'ambientShift 8s ease-in-out infinite'
-                  }} />
-
-                  {/* Scanline Overlay */}
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%)',
-                    backgroundSize: '100% 4px',
-                    pointerEvents: 'none',
-                    opacity: 0.2
-                  }} />
-
-                  {/* Glassmorphic Central Card */}
-                  <div style={{
-                    maxWidth: 620,
-                    width: '90%',
-                    padding: '64px 48px',
-                    borderRadius: 24,
-                    background: 'rgba(11, 11, 17, 0.9)',
-                    border: '1px solid rgba(201, 169, 110, 0.15)',
-                    backdropFilter: 'blur(30px)',
-                    textAlign: 'center',
-                    boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
-                    animation: 'pulseGlow 6s ease-in-out infinite',
-                    position: 'relative',
-                    zIndex: 2
-                  }}>
-                    {/* Brand Identifier (Logo) */}
-                    <div 
-                      onClick={handleLogoClick}
-                      style={{ 
-                        display: 'inline-flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        gap: 12, 
-                        marginBottom: 32,
-                        cursor: 'pointer',
-                        userSelect: 'none'
-                      }}
-                    >
-                      <div style={{
-                        width: 10,
-                        height: 10,
-                        background: '#c9a96e',
-                        transform: 'rotate(45deg)',
-                        boxShadow: '0 0 10px #c9a96e'
-                      }} />
-                      <span style={{
-                        fontFamily: "'Cormorant Garamond', serif",
-                        fontSize: 26,
-                        fontWeight: 300,
-                        letterSpacing: 8,
-                        textTransform: 'uppercase',
-                        color: '#f5f3ef'
-                      }}>VeriXa</span>
-                    </div>
-
-                    {/* Stage Ribbon */}
+                  {/* Top: Brand Identifier (Logo) with Developer Bypass */}
+                  <div 
+                    onClick={handleLogoClick}
+                    style={{ 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: 10,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      opacity: 0.95
+                    }}
+                  >
                     <div style={{
-                      fontSize: 10,
-                      fontWeight: 800,
-                      letterSpacing: 3,
+                      width: 8,
+                      height: 8,
+                      background: '#c9a96e',
+                      transform: 'rotate(45deg)'
+                    }} />
+                    <span style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: 22,
+                      fontWeight: 300,
+                      letterSpacing: 6,
                       textTransform: 'uppercase',
-                      color: '#c9a96e',
-                      marginBottom: 16
-                    }}>
-                      RESEARCH CALIBRATION IN PROGRESS
-                    </div>
+                      color: '#f5f3ef'
+                    }}>VeriXa</span>
+                  </div>
 
-                    {/* Cinematic Header */}
+                  {/* Middle: Content */}
+                  <div style={{
+                    maxWidth: 580,
+                    width: '100%',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 28,
+                    marginTop: '-40px'
+                  }}>
+                    {/* Header */}
                     <h1 style={{
                       fontFamily: "'Cormorant Garamond', serif",
-                      fontSize: 42,
+                      fontSize: 38,
                       fontWeight: 300,
-                      lineHeight: 1.2,
-                      margin: '0 0 24px',
+                      lineHeight: 1.3,
+                      margin: 0,
                       color: '#f5f3ef',
                       letterSpacing: 0.5
                     }}>
-                      Calibrating the Next Generation of Forensic Intelligence.
+                      Something Powerful is Being Refined.
                     </h1>
                     
-                    {/* Subheading Body Copy */}
+                    {/* Body */}
                     <p style={{
-                      fontSize: 15,
-                      color: 'rgba(245, 243, 239, 0.7)',
-                      lineHeight: 1.7,
-                      margin: '0 0 40px',
-                      fontWeight: 300
+                      fontSize: 14,
+                      color: 'rgba(245, 243, 239, 0.65)',
+                      lineHeight: 1.8,
+                      margin: 0,
+                      fontWeight: 300,
+                      maxWidth: 480
                     }}>
-                      VeriXa is currently undergoing active forensic calibration and infrastructure refinement before public release. We are carefully engineering a trust-first intelligence system focused on evidence, resilience, and precision under real-world constraints.
+                      We're currently refining VeriXa before public release.
+                      The platform is undergoing active calibration, testing, and forensic system stabilization.
                     </p>
 
-                    {/* Active Calibration Status Block */}
-                    <div style={{
-                      background: 'rgba(201, 169, 110, 0.03)',
-                      border: '1px solid rgba(201, 169, 110, 0.1)',
-                      borderRadius: 16,
-                      padding: '24px 32px',
-                      marginBottom: 40,
-                      textAlign: 'left'
+                    {/* Status Indicator */}
+                    <div style={{ 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: 10,
+                      background: 'rgba(201, 169, 110, 0.04)',
+                      border: '1px solid rgba(201, 169, 110, 0.08)',
+                      padding: '8px 18px',
+                      borderRadius: 99
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
-                        <div style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: '50%',
-                          background: '#c9a96e',
-                          boxShadow: '0 0 8px #c9a96e',
-                          animation: 'blinkStatus 1.5s infinite ease-in-out'
-                        }} />
-                        <span style={{
-                          fontSize: 12,
-                          fontWeight: 700,
-                          letterSpacing: 1.5,
-                          textTransform: 'uppercase',
-                          color: '#c9a96e',
-                          transition: 'opacity 0.3s'
-                        }}>
-                          {statuses[activeStatusIdx]}
-                        </span>
-                      </div>
-                      
-                      {/* Sub-Progress Indicator */}
                       <div style={{
-                        height: 2,
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        borderRadius: 1,
-                        overflow: 'hidden'
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        background: '#c9a96e',
+                        animation: 'softBlink 2s infinite ease-in-out'
+                      }} />
+                      <span style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        letterSpacing: 1,
+                        textTransform: 'uppercase',
+                        color: '#c9a96e'
                       }}>
-                        <div style={{
-                          height: '100%',
-                          background: 'linear-gradient(90deg, transparent, #c9a96e, transparent)',
-                          width: '100%',
-                          animation: 'progressPulse 4s infinite linear'
-                        }} />
-                      </div>
+                        Active system calibration in progress
+                      </span>
                     </div>
+                  </div>
 
-                    {/* Soft Motivational Footer */}
-                    <div style={{
-                      fontSize: 10,
-                      color: 'rgba(245, 243, 239, 0.4)',
-                      letterSpacing: 1,
-                      fontWeight: 300,
-                      lineHeight: 1.5
-                    }}>
-                      Built with obsession for truth, reliability, and resilient AI systems.
-                    </div>
+                  {/* Bottom: Understated Footer */}
+                  <div style={{
+                    fontSize: 10,
+                    color: 'rgba(245, 243, 239, 0.35)',
+                    letterSpacing: 1,
+                    fontWeight: 300,
+                    textAlign: 'center',
+                    maxWidth: 320,
+                    lineHeight: 1.5
+                  }}>
+                    Built with a focus on truth, resilience, and evidence-first intelligence.
                   </div>
                 </div>
               )}
