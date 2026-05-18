@@ -40,9 +40,26 @@ Analyze the provided image for potential indicators of synthetic generation or a
   "context_info": { "subject": "string", "location": "string", "entities": [] }
 }`;
 
-
-
-
+const getDegradedFallback = (reason = "Vision analysis temporarily unavailable.") => ({
+  success: true,
+  degraded: true,
+  forensicStatus: "VISION_DEGRADED",
+  reasoning: reason,
+  verdict: "Uncertain",
+  ai_probability: 50,
+  real_probability: 50,
+  confidence: 50,
+  risk_level: "Medium",
+  assessment: "Forensic image analysis degraded due to secure offline environment constraints or API limits.",
+  indicators: ["Safe Mode Active", "Vision API Bypass Enabled"],
+  forensic_breakdown: {
+    lighting: "Verification bypassed. Inspect shadows and light sources manually.",
+    anatomy: "Verification bypassed. Inspect anatomy, boundaries, and strand continuity manually.",
+    textures: "Verification bypassed. Inspect skin texture, noise pattern, and repetition manually."
+  },
+  extracted_text: "Text extraction unavailable in degraded mode.",
+  context_info: { subject: "Bypassed", location: "Bypassed", entities: [] }
+});
 
 /**
  * POST /api/image/url — Analyze an image from URL
@@ -78,69 +95,88 @@ router.post("/url", async (req, res) => {
     }
 
     const contentType = imgResponse.headers.get("content-type") || "image/jpeg";
-    if (!contentType.startsWith("image/")) {
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+    const isAllowed = allowedTypes.includes(contentType.toLowerCase()) || contentType.startsWith("image/");
+    
+    if (!isAllowed) {
       return res.status(400).json({
-        error: "URL does not point to an image. Please provide a direct image URL.",
+        error: "Forensic Ingestion Failed",
+        reason: `Unsupported image format detected: ${contentType}. Supported formats: PNG, JPG, JPEG, WEBP.`,
+        fallback: true,
+        forensicStatus: "VISION_DEGRADED"
       });
     }
 
     const buffer = await imgResponse.buffer();
-    if (buffer.length > 10 * 1024 * 1024) {
-      return res.status(400).json({ error: "Image too large. Max 10MB." });
+    
+    // Validate standardized size: 5MB limit
+    const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+    if (buffer.length > MAX_IMAGE_SIZE) {
+      return res.status(400).json({
+        error: "Forensic Ingestion Failed",
+        reason: `Image size (${(buffer.length / (1024 * 1024)).toFixed(2)}MB) exceeds current secure limit of 5MB.`,
+        fallback: true,
+        forensicStatus: "VISION_DEGRADED"
+      });
     }
+
+    // --- SAFE_MODE ROUTER OVERRIDE BYPASS ---
+    if (process.env.SAFE_MODE === "true" || !process.env.GROQ_API_KEY) {
+      console.log(`[API IMAGE URL] SAFE_MODE Synchronous Vision Ingest fallback activated for url.`);
+      return res.json(getDegradedFallback("Vision analysis temporarily bypassed under SAFE_MODE."));
+    }
+
+    console.log(`[API IMAGE URL] Fetch result success. Mimetype: ${contentType}, size: ${buffer.length} bytes.`);
 
     const base64 = buffer.toString("base64");
     const dataUrl = `data:${contentType};base64,${base64}`;
 
-    const completion = await getGroq().chat.completions.create({
-      model: "llama-3.2-11b-vision-preview",
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `${SYSTEM_PROMPT}\n\nPerform a technical visual audit on this image. Identify any potential indicators of synthetic generation or algorithmic manipulation.`,
-            },
-            {
-              type: "image_url",
-              image_url: { url: dataUrl },
-            },
-          ],
-        },
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.0,
-      max_tokens: 800,
-    });
+    try {
+      const completion = await getGroq().chat.completions.create({
+        model: "llama-3.2-11b-vision-preview",
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: `${SYSTEM_PROMPT}\n\nPerform a technical visual audit on this image. Identify any potential indicators of synthetic generation or algorithmic manipulation.`,
+              },
+              {
+                type: "image_url",
+                image_url: { url: dataUrl },
+              },
+            ],
+          },
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.0,
+        max_tokens: 800,
+      });
 
+      const raw = completion.choices[0].message.content.trim();
+      const cleaned = raw.replace(/```json|```/g, "").trim();
+      const result = JSON.parse(cleaned);
 
-    const raw = completion.choices[0].message.content.trim();
-    const cleaned = raw.replace(/```json|```/g, "").trim();
-    const result = JSON.parse(cleaned);
-
-    result.ai_probability = result.ai_probability ?? 50;
-    result.real_probability = result.real_probability ?? (100 - result.ai_probability);
-    result.confidence = result.confidence ?? 60;
-    result.risk_level = result.risk_level ?? "Medium";
-    result.verdict = result.verdict ?? "Uncertain";
-    result.assessment = result.assessment ?? "Analysis completed.";
-    result.indicators = result.indicators ?? [];
-    result.extracted_text = result.extracted_text ?? "";
-    result.forensic_breakdown = result.forensic_breakdown || null;
-    res.json(result);
+      result.ai_probability = result.ai_probability ?? 50;
+      result.real_probability = result.real_probability ?? (100 - result.ai_probability);
+      result.confidence = result.confidence ?? 60;
+      result.risk_level = result.risk_level ?? "Medium";
+      result.verdict = result.verdict ?? "Uncertain";
+      result.assessment = result.assessment ?? "Analysis completed.";
+      result.indicators = result.indicators ?? [];
+      result.extracted_text = result.extracted_text ?? "";
+      result.forensic_breakdown = result.forensic_breakdown || null;
+      
+      return res.json(result);
+    } catch (groqErr) {
+      console.log(`[API IMAGE URL] Vision AI API Error caught:`, groqErr.message);
+      return res.json(getDegradedFallback(`Groq Vision Analysis failed: ${groqErr.message}`));
+    }
   } catch (err) {
     const msg = err.message || "Unknown error";
-    
-    if (msg.includes("fetch") || msg.includes("accessible") || msg.includes("format")) {
-       return res.status(400).json({ error: "Could not fetch image. The URL might be blocked or inaccessible." });
-    }
-    
-    if (msg.includes("400") || msg.includes("model") || msg.includes("content")) {
-       return res.status(400).json({ error: "AI engine could not process this image size or format. Try a smaller file." });
-    }
-
-    res.status(500).json({ error: "Forensic analysis failed: " + msg });
+    console.log(`[API IMAGE URL] Ingest panic caught:`, msg);
+    return res.json(getDegradedFallback(`URL forensic ingestion panic: ${msg}`));
   }
 });
 
@@ -150,69 +186,115 @@ router.post("/url", async (req, res) => {
  */
 router.post("/upload", async (req, res) => {
   try {
-    const chunks = [];
-    for await (const chunk of req) {
-      chunks.push(chunk);
+    let buffer = null;
+    if (Buffer.isBuffer(req.body)) {
+      buffer = req.body;
+    } else if (req.file && req.file.buffer) {
+      buffer = req.file.buffer;
+    } else {
+      const chunks = [];
+      try {
+        for await (const chunk of req) {
+          chunks.push(chunk);
+        }
+        buffer = Buffer.concat(chunks);
+      } catch (streamErr) {
+        console.log("[API IMAGE UPLOAD] Binary stream extraction exception:", streamErr.message);
+      }
     }
-    const buffer = Buffer.concat(chunks);
 
-    if (buffer.length === 0) {
-      return res.status(400).json({ error: "No image data received" });
-    }
-
-    if (buffer.length > 10 * 1024 * 1024) {
-      return res.status(400).json({ error: "Image too large. Max 10MB." });
+    if (!buffer || buffer.length === 0) {
+      return res.status(400).json({
+        error: "Forensic Ingestion Failed",
+        reason: "No image binary payload received in request body.",
+        fallback: true,
+        forensicStatus: "VISION_DEGRADED"
+      });
     }
 
     const contentType = req.headers["content-type"] || "image/jpeg";
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+    const isAllowed = allowedTypes.includes(contentType.toLowerCase()) || contentType.startsWith("image/");
+
+    if (!isAllowed) {
+      return res.status(400).json({
+        error: "Forensic Ingestion Failed",
+        reason: `Unsupported image format detected: ${contentType}. Supported formats: PNG, JPG, JPEG, WEBP.`,
+        fallback: true,
+        forensicStatus: "VISION_DEGRADED"
+      });
+    }
+
+    // Standardize: MAX_IMAGE_SIZE = 5MB
+    const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+    if (buffer.length > MAX_IMAGE_SIZE) {
+      return res.status(400).json({
+        error: "Forensic Ingestion Failed",
+        reason: `Image size (${(buffer.length / (1024 * 1024)).toFixed(2)}MB) exceeds current secure limit of 5MB.`,
+        fallback: true,
+        forensicStatus: "VISION_DEGRADED"
+      });
+    }
+
+    // --- DIAGNOSTIC LOGS ---
+    console.log(`[API IMAGE UPLOAD] req.file existence: ${!!req.file}, mimetype: ${contentType}, bytes: ${buffer.length}.`);
+
+    // --- SAFE_MODE ROUTER OVERRIDE BYPASS ---
+    if (process.env.SAFE_MODE === "true" || !process.env.GROQ_API_KEY) {
+      console.log(`[API IMAGE UPLOAD] SAFE_MODE Synchronous Vision Ingest fallback activated for upload.`);
+      return res.json(getDegradedFallback("Vision analysis temporarily bypassed under SAFE_MODE."));
+    }
+
     const base64 = buffer.toString("base64");
     const dataUrl = `data:${contentType};base64,${base64}`;
 
-    const completion = await getGroq().chat.completions.create({
-      model: "llama-3.2-11b-vision-preview",
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `${SYSTEM_PROMPT}\n\nAnalyze this image for authenticity. Respond with ONLY the JSON format specified.`,
-            },
-            {
-              type: "image_url",
-              image_url: { url: dataUrl },
-            },
-          ],
-        },
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.0,
-      max_tokens: 800,
-    });
+    try {
+      const completion = await getGroq().chat.completions.create({
+        model: "llama-3.2-11b-vision-preview",
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: `${SYSTEM_PROMPT}\n\nAnalyze this image for authenticity. Respond with ONLY the JSON format specified.`,
+              },
+              {
+                type: "image_url",
+                image_url: { url: dataUrl },
+              },
+            ],
+          },
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.0,
+        max_tokens: 800,
+      });
 
+      const raw = completion.choices[0].message.content.trim();
+      const cleaned = raw.replace(/```json|```/g, "").trim();
+      const result = JSON.parse(cleaned);
 
-    const raw = completion.choices[0].message.content.trim();
-    const cleaned = raw.replace(/```json|```/g, "").trim();
-    const result = JSON.parse(cleaned);
+      result.ai_probability = result.ai_probability ?? 50;
+      result.real_probability = result.real_probability ?? (100 - result.ai_probability);
+      result.confidence = result.confidence ?? 60;
+      result.risk_level = result.risk_level ?? "Medium";
+      result.verdict = result.verdict ?? "Uncertain";
+      result.assessment = result.assessment ?? "Analysis completed.";
+      result.indicators = result.indicators ?? [];
+      result.forensic_breakdown = result.forensic_breakdown || null;
+      result.context_info = result.context_info || null;
 
-    result.ai_probability = result.ai_probability ?? 50;
-    result.real_probability = result.real_probability ?? (100 - result.ai_probability);
-    result.confidence = result.confidence ?? 60;
-    result.risk_level = result.risk_level ?? "Medium";
-    result.verdict = result.verdict ?? "Uncertain";
-    result.assessment = result.assessment ?? "Analysis completed.";
-    result.indicators = result.indicators ?? [];
-    result.forensic_breakdown = result.forensic_breakdown || null;
-    result.context_info = result.context_info || null;
-
-    res.json(result);
+      console.log(`[API IMAGE UPLOAD] Groq API Success. Verdict: ${result.verdict}, Probability: ${result.ai_probability}%`);
+      return res.json(result);
+    } catch (groqErr) {
+      console.log(`[API IMAGE UPLOAD] Vision AI API Error caught:`, groqErr.message);
+      return res.json(getDegradedFallback(`Groq Vision Analysis failed: ${groqErr.message}`));
+    }
   } catch (err) {
     const msg = err.message || "Unknown error";
-    
-    if (msg.includes("400") || msg.includes("model") || msg.includes("content")) {
-       return res.status(400).json({ error: "AI engine could not process this image size or format. Try a smaller file." });
-    }
-    res.status(500).json({ error: "Image analysis failed: " + msg });
+    console.log(`[API IMAGE UPLOAD] Ingest panic caught:`, msg);
+    return res.json(getDegradedFallback(`Upload forensic ingestion panic: ${msg}`));
   }
 });
 

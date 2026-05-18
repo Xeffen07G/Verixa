@@ -78,6 +78,23 @@ export default function ImagePage() {
     const newFiles = Array.from(fileList);
     
     for (const file of newFiles) {
+      // 1. Temporary frontend diagnostic trace
+      console.log(`[ImagePage] Uploading Image: file.type = ${file.type}, file.size = ${file.size} bytes, upload endpoint = /api/image/upload`);
+
+      // 2. Validate accepted formats
+      const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+      if (!allowedTypes.includes(file.type.toLowerCase())) {
+        setError(`AI engine could not process this image format. Supported formats: PNG, JPG, JPEG, WEBP.`);
+        continue;
+      }
+
+      // 3. Validate standardized file size (MAX_IMAGE_SIZE = 5MB)
+      const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+      if (file.size > MAX_IMAGE_SIZE) {
+        setError(`AI engine could not process this image size. File (${(file.size / (1024 * 1024)).toFixed(2)}MB) exceeds 5MB limit. Try a smaller file.`);
+        continue;
+      }
+
       const localPreview = URL.createObjectURL(file);
       setPreviews(prev => [...prev, localPreview]);
       
@@ -86,10 +103,12 @@ export default function ImagePage() {
         const res = await api.post('/api/image/upload', arrayBuffer, {
           headers: { 'Content-Type': file.type }
         });
+        console.log(`[ImagePage] Upload Success: response.status = ${res.status}`);
         setResults(prev => [...prev, { ...res.data, url: localPreview }]);
       } catch (e) {
         console.error("[ImagePage] Upload Analysis Error:", e.response || e);
-        setError(e.response?.data?.error || e.message);
+        const errMsg = e.response?.data?.reason || e.response?.data?.error || e.message;
+        setError(errMsg);
       }
     }
     setLoading(false);

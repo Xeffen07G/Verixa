@@ -90,6 +90,23 @@ export default function DragDropOverlay({ children }) {
 
     // ── Images ──
     if (type.startsWith('image/')) {
+      // 1. Temporary frontend diagnostic trace
+      console.log(`[DragDropOverlay] Uploading Image: file.type = ${type}, file.size = ${file.size} bytes, upload endpoint = /api/image/upload`);
+
+      // 2. Validate accepted formats
+      const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+      if (!allowedTypes.includes(type.toLowerCase())) {
+        alert(`AI engine could not process this image format. Supported formats: PNG, JPG, JPEG, WEBP.`);
+        return;
+      }
+
+      // 3. Validate standardized file size (MAX_IMAGE_SIZE = 5MB)
+      const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+      if (file.size > MAX_IMAGE_SIZE) {
+        alert(`AI engine could not process this image size. File (${(file.size / (1024 * 1024)).toFixed(2)}MB) exceeds 5MB limit. Try a smaller file.`);
+        return;
+      }
+
       setProcessing(true);
       setProcessingMsg('Preparing image for analysis...');
       try {
@@ -97,12 +114,14 @@ export default function DragDropOverlay({ children }) {
         const res = await api.post('/api/image/upload', arrayBuffer, {
           headers: { 'Content-Type': file.type }
         });
+        console.log(`[DragDropOverlay] Upload Success: response.status = ${res.status}`);
         const data = res.data;
         sessionStorage.setItem('verixa-dragdrop-image-result', JSON.stringify(data));
         sessionStorage.setItem('verixa-dragdrop-image-preview', URL.createObjectURL(file));
         navigate('/image?source=dragdrop');
       } catch (e) {
-        alert('Image Error: ' + e.message);
+        const errMsg = e.response?.data?.reason || e.response?.data?.error || e.message;
+        alert('Image Error: ' + errMsg);
       } finally {
         setProcessing(false);
         setProcessingMsg('');
