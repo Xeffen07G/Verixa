@@ -17,6 +17,8 @@ import { LangProvider } from './context/LangContext';
 import DragDropOverlay from './components/DragDropOverlay';
 import ErrorBoundary from './components/ErrorBoundary';
 
+import { MAINTENANCE_MODE } from './config/maintenance';
+
 export default function App() {
   const [isBypassed, setIsBypassed] = React.useState(() => {
     return localStorage.getItem('verixa_dev_access') === 'true';
@@ -33,7 +35,7 @@ export default function App() {
   };
 
   // 1. If maintenance mode is active and NOT bypassed, render ONLY the Standalone Maintenance Page
-  if (!isBypassed) {
+  if (MAINTENANCE_MODE && !isBypassed) {
     return (
       <ErrorBoundary>
         <div style={{
