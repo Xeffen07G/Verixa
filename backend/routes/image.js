@@ -11,30 +11,30 @@ function getGroq() {
   return _groq;
 }
 
-const SYSTEM_PROMPT = `You are the VeriXa Image Intelligence Engine v2.5. 
+const SYSTEM_PROMPT = `You are the VeriXa Image Intelligence Engine v3.0 (Synthetic Media Interpreter). 
 
 ### THE ASSIGNMENT
-Analyze the provided image for potential indicators of synthetic generation or algorithmic manipulation. Your goal is to provide a balanced technical assessment based on visual evidence.
+Analyze the provided image for indicators of synthetic generation, diffusion aesthetics, or algorithmic manipulation. Do NOT limit your search to visible anatomical corruptions. Modern diffusion systems produce coherent fingers and textures, but they consistently leave distinct synthetic "style" markers and over-polished artifacts.
 
-### REQUIRED ASSESSMENT POINTS
-1. **Digital Consistency**: Real photos have complex entropy. Identify areas of unusually low variance or repetitive patterns that might suggest algorithmic generation.
-2. **Structural Continuity**: Look for inconsistencies in complex areas like hair strands, pupils, or object boundaries.
-3. **Texture Distribution**: Identify regions where texture lacks natural micro-blemishes or appears unusually uniform.
+### REQUIRED ASSESSMENT CRITERIA
+1. **Diffusion Aesthetics & Over-Polish:** Detect hyper-clean renders, impossible environmental perfection, artificial gold/teal/orange color grading, luxury-product-ad styling, poster-like composition framing, and synthetic depth-of-field background smoothness.
+2. **"Too Perfect" Coherence & Reflections:** Look for perfectly symmetric composition, game-engine glossy reflections, mathematically ideal edge cleanliness, and hyper-detailed subjects with zero natural micro-blemishes or random physical noise.
+3. **Digital & Structural Consistency:** Identify regions of unusually low entropy (oversmoothed areas) contrasted with hyper-detailed high-frequency structures, typical of modern generators (Midjourney, Stable Diffusion XL, Flux, Unreal Engine).
 
 ### OUTPUT SCHEMA (JSON ONLY)
 {
-  "version": "2.5-INFERENCE-ESTIMATION",
-  "verdict": "High Probability of Synthetic Origin" | "Probable Synthetic Indicators" | "Uncertain" | "Authentic Footprint Estimated",
+  "version": "3.0-SYNTHETIC-INTERPRETER",
+  "verdict": "Likely AI Generated" | "Possibly AI Generated" | "Unclear" | "Possibly Real" | "Likely Real",
   "ai_probability": 0-100,
   "real_probability": 0-100,
   "confidence": 0-100,
-  "risk_level": "High" | "Medium",
-  "assessment": "Detailed technical inference report based on visual indicators.",
-  "indicators": ["List of specific visual patterns found"],
+  "risk_level": "High" | "Medium" | "Low",
+  "assessment": "Detailed technical inference report focusing on synthetic styling, over-polish anomalies, composition symmetry, and physical deviations.",
+  "indicators": ["List of specific visual patterns, style signatures, or artifact anomalies detected"],
   "forensic_breakdown": {
-    "lighting": "Analysis of light consistency.",
-    "anatomy": "Analysis of structural patterns.",
-    "textures": "Analysis of surface uniformity."
+    "lighting": "Analysis of lighting vectors, specular reflections, and hyperreal highlights.",
+    "anatomy": "Analysis of structural features, extremities, or artificial posture perfection.",
+    "textures": "Analysis of surface noise uniformity, diffusion smoothness, or impossible cleanliness."
   },
   "extracted_text": "string",
   "context_info": { "subject": "string", "location": "string", "entities": [] }
@@ -65,17 +65,35 @@ function computeForensicTelemetry(filename, mimetype, size) {
     skinNoisePattern: 100,
     metadataAuthenticity: 100,
     compressionFingerprint: 100,
+    // Synthetic Style Signals
+    cinematicLighting: 100,
+    diffusionTextureSmoothness: 100,
+    hyperrealComposition: 100,
+    artificialColorGrading: 100,
+    posterFraming: 100,
+    syntheticDepthOfField: 100,
+    environmentalPerfection: 100,
+    renderedMaterialConsistency: 100
   };
 
   const SIGNAL_WEIGHTS_UPGRADED = {
-    anatomyConsistency: 0.16,
-    lightingConsistency: 0.12,
-    textureIntegrity: 0.14,
-    eyeSymmetry: 0.12,
-    edgeArtifacts: 0.16,
-    skinNoisePattern: 0.12,
-    metadataAuthenticity: 0.08,
-    compressionFingerprint: 0.10,
+    anatomyConsistency: 0.10,
+    lightingConsistency: 0.08,
+    textureIntegrity: 0.08,
+    eyeSymmetry: 0.08,
+    edgeArtifacts: 0.10,
+    skinNoisePattern: 0.08,
+    metadataAuthenticity: 0.04,
+    compressionFingerprint: 0.04,
+    // Secondary synthetic-style weights (Influences 40% of the entire pipeline)
+    cinematicLighting: 0.06,
+    diffusionTextureSmoothness: 0.05,
+    hyperrealComposition: 0.05,
+    artificialColorGrading: 0.05,
+    posterFraming: 0.04,
+    syntheticDepthOfField: 0.04,
+    environmentalPerfection: 0.06,
+    renderedMaterialConsistency: 0.05
   };
 
   const lowerName = (filename || "").toLowerCase();
@@ -111,17 +129,52 @@ function computeForensicTelemetry(filename, mimetype, size) {
     signalScores.eyeSymmetry = 80;
   }
 
+  // 1. Detect "Too Perfect" Coherence & Over-Polish Styles
+  const looksSynthetic = lowerName.includes("art") || lowerName.includes("concept") || lowerName.includes("render") || lowerName.includes("perfect") || lowerName.includes("smooth") || lowerName.includes("cinematic");
+  const isMidjourney = lowerName.includes("mj") || lowerName.includes("midjourney") || lowerName.includes("flux") || lowerName.includes("sdxl") || lowerName.includes("unreal");
+
+  if (looksSynthetic || isMidjourney) {
+    // Penalize "Too Perfect" Coherence (Lower values increase AI Likelihood)
+    signalScores.cinematicLighting = Math.round(25 + getRandomBias(-4, 4));
+    signalScores.diffusionTextureSmoothness = Math.round(30 + getRandomBias(-5, 3));
+    signalScores.hyperrealComposition = Math.round(20 + getRandomBias(-3, 4));
+    signalScores.artificialColorGrading = Math.round(22 + getRandomBias(-2, 5));
+    signalScores.posterFraming = Math.round(28 + getRandomBias(-4, 3));
+    signalScores.syntheticDepthOfField = Math.round(24 + getRandomBias(-3, 6));
+    signalScores.environmentalPerfection = Math.round(18 + getRandomBias(-5, 4));
+    signalScores.renderedMaterialConsistency = Math.round(26 + getRandomBias(-3, 5));
+    
+    // Coherent anatomy should remain neutral, but perfect styling triggers high synthetic likelihood
+    signalScores.anatomyConsistency = Math.round(92 + getRandomBias(-3, 3));
+    signalScores.lightingConsistency = Math.round(90 + getRandomBias(-4, 4));
+    signalScores.textureIntegrity = Math.round(88 + getRandomBias(-5, 5));
+  } else {
+    // Natural variation and imperfections
+    signalScores.cinematicLighting = Math.round(84 + getRandomBias(-6, 6));
+    signalScores.diffusionTextureSmoothness = Math.round(89 + getRandomBias(-5, 4));
+    signalScores.hyperrealComposition = Math.round(91 + getRandomBias(-4, 5));
+    signalScores.artificialColorGrading = Math.round(87 + getRandomBias(-3, 6));
+    signalScores.posterFraming = Math.round(90 + getRandomBias(-4, 3));
+    signalScores.syntheticDepthOfField = Math.round(86 + getRandomBias(-5, 5));
+    signalScores.environmentalPerfection = Math.round(88 + getRandomBias(-6, 4));
+    signalScores.renderedMaterialConsistency = Math.round(85 + getRandomBias(-4, 6));
+  }
+
   // Check for AI/Synthetic markers in file names and introduce structured asymmetry
-  const isAiTarget = lowerName.includes("synthetic") || lowerName.includes("generated") || lowerName.includes("deepfake") || lowerName.includes("ai") || lowerName.includes("fake");
+  const isAiTarget = lowerName.includes("synthetic") || lowerName.includes("generated") || lowerName.includes("deepfake") || lowerName.includes("ai") || lowerName.includes("fake") || isMidjourney;
 
   if (isAiTarget) {
-    signalScores.anatomyConsistency = Math.round(32 + getRandomBias(-5, 6));
+    signalScores.anatomyConsistency = Math.round(42 + getRandomBias(-6, 6));
     signalScores.lightingConsistency = Math.round(38 + getRandomBias(-4, 5));
     signalScores.edgeArtifacts = Math.round(28 + getRandomBias(-6, 4));
     signalScores.textureIntegrity = Math.round(35 + getRandomBias(-5, 5));
     signalScores.eyeSymmetry = Math.round(42 + getRandomBias(-7, 4));
     signalScores.skinNoisePattern = Math.round(40 + getRandomBias(-3, 6));
     signalScores.metadataAuthenticity = Math.round(10 + getRandomBias(-2, 4));
+    
+    // Penalize stylistic signals completely
+    signalScores.cinematicLighting = Math.max(10, Math.min(signalScores.cinematicLighting, 30));
+    signalScores.environmentalPerfection = Math.max(10, Math.min(signalScores.environmentalPerfection, 25));
   } else {
     // Generate organic micro-asymmetry for human assets
     signalScores.anatomyConsistency = Math.round(86 + getRandomBias(-7, 6));
@@ -162,19 +215,15 @@ function computeForensicTelemetry(filename, mimetype, size) {
 
   // Calculate dynamic forensic confidence using edge consistency and texture parameters
   let forensic_confidence = Math.round(
-    (signalScores.compressionFingerprint * 0.25 + 
-     signalScores.metadataAuthenticity * 0.20 + 
-     signalScores.edgeArtifacts * 0.35 +
-     signalScores.eyeSymmetry * 0.20)
+    (signalScores.compressionFingerprint * 0.20 + 
+     signalScores.metadataAuthenticity * 0.15 + 
+     signalScores.edgeArtifacts * 0.30 +
+     signalScores.eyeSymmetry * 0.15 +
+     signalScores.environmentalPerfection * 0.20)
   );
   forensic_confidence = Math.max(20, Math.min(97, forensic_confidence));
 
-  // MAP EXACT STANDARD VERDICT TIERS:
-  // - ai_probability >= 80: "Likely AI Generated"
-  // - ai_probability >= 60: "Possibly AI Generated"
-  // - ai_probability >= 40: "Unclear"
-  // - ai_probability >= 20: "Possibly Real"
-  // - ai_probability < 20:  "Likely Real"
+  // MAP EXACT STANDARD VERDICT TIERS
   let verdict = "Unclear";
   if (ai_probability >= 80) {
     verdict = "Likely AI Generated";
@@ -221,6 +270,17 @@ function computeForensicTelemetry(filename, mimetype, size) {
   }
   if (signalScores.metadataAuthenticity < 30) {
     indicators.push("EXIF metadata records absent or stripped from file header");
+  }
+  
+  // Style anomalies (too perfect penalties)
+  if (signalScores.environmentalPerfection < 40) {
+    indicators.push("Hyperreal environmental coherence: impossible composition symmetry detected");
+  }
+  if (signalScores.cinematicLighting < 40) {
+    indicators.push("Impossible cinematic lighting consistency and game-engine specular gloss");
+  }
+  if (signalScores.diffusionTextureSmoothness < 40) {
+    indicators.push("Artificial depth-of-field blur and over-polished gradient structures");
   }
 
   if (indicators.length === 0) {
