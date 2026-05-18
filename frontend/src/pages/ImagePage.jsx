@@ -11,6 +11,10 @@ const VERDICT_CONFIG = (lang) => ({
   'Probable Synthetic Indicators':      { color: '#fb923c', bg: 'rgba(251,146,60,0.08)',  border: 'rgba(251,146,60,0.25)',  icon: '~', label: t('likelyAI', lang) },
   'Uncertain':                          { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.25)',  icon: '?', label: 'Forensic confidence below decisive threshold' },
   'Authentic Footprint Estimated':      { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: t('real', lang) },
+  'High forensic confidence':           { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: 'High forensic confidence' },
+  'Strong synthetic indicators':        { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', icon: '✗', label: 'Strong synthetic indicators' },
+  'Strong authenticity indicators':     { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: 'Strong authenticity indicators' },
+  'Insufficient forensic indicators':   { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.25)',  icon: '?', label: 'Insufficient forensic indicators' },
 });
 
 const RISK_CONFIG = (lang) => ({
@@ -275,7 +279,7 @@ export default function ImagePage() {
                 <div style={{ fontSize: 11, color: cfg.color, opacity: darkMode ? 0.7 : 0.9, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Synthetic Artifact Presence</div>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 999, background: cfg.bg, border: `1px solid ${cfg.border}`, marginBottom: 12, width: 'fit-content' }}>
                   <span style={{ fontSize: 14, color: cfg.color }}>{cfg.icon}</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: cfg.color }}>{currentResult.verdict === 'Uncertain' ? 'Insufficient forensic indicators' : cfg.label}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: cfg.color }}>{cfg.label}</span>
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 999, background: riskCfg.bg, color: riskCfg.color, fontWeight: 600 }}>{riskCfg.label} {t('risk', lang)}</span>
@@ -311,7 +315,7 @@ export default function ImagePage() {
             </div>
 
             {/* Compact Forensic Explanation block for ambiguous/uncertain assessments */}
-            {currentResult.verdict === 'Uncertain' && (
+            {(currentResult.verdict === 'Uncertain' || currentResult.verdict === 'Insufficient forensic indicators') && (
               <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
                 <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12, fontWeight: 700 }}>Forensic Caution Rationale</p>
                 <p style={{ fontSize: 13, color: T.text2, margin: '0 0 12px 0', lineHeight: 1.5 }}>
@@ -338,7 +342,7 @@ export default function ImagePage() {
 
             <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
               <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12 }}>{t('analysis', lang)}</p>
-              <p style={{ fontSize: 14, color: T.text, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 1, fontWeight: 500 }}>{currentResult.verdict === 'Uncertain' ? 'Analysis finalized with balanced signals. Insufficient forensic evidence to confirm synthetic creation or natural camera capture definitively.' : currentResult.assessment}</p>
+              <p style={{ fontSize: 14, color: T.text, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 1, fontWeight: 500 }}>{(currentResult.verdict === 'Uncertain' || currentResult.verdict === 'Insufficient forensic indicators') ? 'Analysis finalized with balanced signals. Insufficient forensic evidence to confirm synthetic creation or natural camera capture definitively.' : currentResult.assessment}</p>
             </div>
 
             {currentResult.context_info && (
