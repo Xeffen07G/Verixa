@@ -28,7 +28,6 @@ export function useVerify() {
     try {
       const timeoutId = setTimeout(() => abortRef.current?.abort(), 120000); // 2 min timeout
       
-      console.log("VERIFY SUBMIT:", { text, detectAI });
       const response = await fetch(`${BASE}/api/verify?stream=true`, {
         method: 'POST',
         headers: { 
@@ -54,7 +53,6 @@ export function useVerify() {
         if (done) break;
 
         const decodedChunk = decoder.decode(value, { stream: true });
-        console.log("VERIFY STREAM CHUNK:", decodedChunk);
         buffer += decodedChunk;
         const parts = buffer.split('\n\n');
         buffer = parts.pop();
@@ -96,7 +94,6 @@ export function useVerify() {
                 });
                 break;
               case 'result':
-                console.log("VERIFY FINAL:", data);
                 setClaims(Array.isArray(data.claims) ? data.claims : []);
                 setOverallScore(typeof data.overallScore === 'number' ? data.overallScore : 0);
                 if (data.aiDetection) setAiDetection(data.aiDetection);

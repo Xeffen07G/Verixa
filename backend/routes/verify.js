@@ -7,7 +7,6 @@ router.post("/", async (req, res) => {
   const { text, detectAI = false, forensic = false } = req.body;
   const isStream = req.headers.accept === "text/event-stream" || req.query.stream === "true";
 
-  console.log("VERIFY REQUEST:", req.body);
 
   if (!text || text.trim().length < 5) {
     return res.status(400).json({ error: "Please provide at least 5 characters of text." });
@@ -25,7 +24,7 @@ router.post("/", async (req, res) => {
 
   const send = (event, data) => {
     const payload = JSON.stringify({ event, ...data });
-    console.log("VERIFY RESPONSE:", payload);
+
     if (isStream) {
       res.write(`data: ${payload}\n\n`);
     } else {
@@ -132,7 +131,6 @@ router.post("/", async (req, res) => {
 
   } catch (err) {
     console.error("Pipeline error:", err);
-    console.log("VERIFY ERROR:", err);
 
     // SAFE_MODE / API failure recovery fallback
     const fallbackClaim = text.slice(0, 100) + (text.length > 100 ? "..." : "");
