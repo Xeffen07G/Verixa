@@ -14,6 +14,172 @@ const VERDICT_CONFIG = (lang) => ({
   'Likely Real':            { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: 'Likely Real' },
 });
 
+import { Image, Upload } from 'lucide-react';
+
+function GooeyInputWrapper({ children }) {
+  return (
+    <div className="gooey-wrapper" style={{ position: 'relative', width: '100%' }}>
+      <div className="gooey-backplate" style={{
+        position: 'absolute',
+        inset: '-1px',
+        borderRadius: '13px',
+        background: 'linear-gradient(90deg, #c9a96e, #85736d, #c9a96e)',
+        backgroundSize: '200% 200%',
+        opacity: 0.15,
+        filter: 'blur(2px) url(#gooey-filter)',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }} />
+      <div style={{ position: 'relative', zIndex: 1, borderRadius: '12px', background: 'transparent' }}>
+        {children}
+      </div>
+      <style>{`
+        .gooey-wrapper:focus-within .gooey-backplate {
+          opacity: 0.5;
+          filter: blur(4px) url(#gooey-filter);
+          animation: gooey-flow 4s linear infinite;
+          inset: -2px;
+        }
+        @keyframes gooey-flow {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes ingestion-scan {
+          0% { top: 0%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function IngestionZone({ onFileSelected, acceptedTypesText, icon: Icon, uploading, status, theme, lang }) {
+  const [isDragActive, setIsDragActive] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setIsDragActive(true);
+    } else if (e.type === "dragleave") {
+      setIsDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      onFileSelected(e.dataTransfer.files);
+    }
+  };
+
+  return (
+    <div
+      onDragEnter={handleDrag}
+      onDragOver={handleDrag}
+      onDragLeave={handleDrag}
+      onDrop={handleDrop}
+      onClick={() => fileInputRef.current?.click()}
+      style={{
+        position: 'relative',
+        border: `1.5px dashed ${isDragActive ? theme.accent : theme.border}`,
+        borderRadius: 16,
+        padding: '48px 24px',
+        textAlign: 'center',
+        cursor: 'pointer',
+        background: isDragActive ? `${theme.accent}0a` : `${theme.accent}02`,
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        overflow: 'hidden',
+        boxShadow: isDragActive ? `0 12px 32px ${theme.accent}10` : 'none'
+      }}
+    >
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        opacity: isDragActive ? 0.07 : 0.03,
+        backgroundImage: `radial-gradient(${theme.text} 1px, transparent 1px)`,
+        backgroundSize: '16px 16px',
+        pointerEvents: 'none',
+        transition: 'opacity 0.3s ease'
+      }} />
+
+      {isDragActive && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '2px',
+          background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)`,
+          animation: 'ingestion-scan 2s linear infinite',
+          zIndex: 1
+        }} />
+      )}
+
+      <div style={{
+        transform: isDragActive ? 'scale(1.05) translateY(-4px)' : 'none',
+        transition: 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        position: 'relative',
+        zIndex: 2
+      }}>
+        <div style={{
+          width: 56,
+          height: 56,
+          borderRadius: 16,
+          background: isDragActive ? `${theme.accent}1a` : `${theme.accent}05`,
+          border: `1px solid ${isDragActive ? theme.accent : theme.border}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: '0 auto 16px',
+          boxShadow: isDragActive ? `0 8px 24px ${theme.accent}20` : 'none',
+          transition: 'all 0.3s ease'
+        }}>
+          <Icon size={24} color={theme.accent} style={{
+            transform: isDragActive ? 'rotate(180deg)' : 'none',
+            transition: 'transform 0.5s ease'
+          }} />
+        </div>
+
+        <p style={{
+          fontSize: 14,
+          fontWeight: 600,
+          color: theme.text,
+          margin: '0 0 6px 0',
+          letterSpacing: '0.01em'
+        }}>
+          {uploading ? status : (isDragActive ? 'Drop to Ingest Evidence' : t('clickDragImage', lang))}
+        </p>
+        
+        <p style={{
+          fontSize: 11,
+          color: theme.text3,
+          margin: 0,
+          letterSpacing: '0.02em'
+        }}>
+          {uploading ? 'Processing asset signatures...' : `or click to browse local files (${acceptedTypesText})`}
+        </p>
+      </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        style={{ display: 'none' }}
+        onChange={(e) => { if (e.target.files && e.target.files.length > 0) onFileSelected(e.target.files); }}
+      />
+    </div>
+  );
+}
+
 const RISK_CONFIG = (lang) => ({
   'High':   { color: '#f87171', bg: 'rgba(248,113,113,0.08)', label: t('highRisk', lang) },
   'Medium': { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)', label: t('mediumRisk', lang) },
@@ -206,11 +372,13 @@ export default function ImagePage() {
           </div>
 
           {inputMode === 'url' && (
-            <div style={{ display: 'flex', gap: 10 }}>
-              <input value={imageUrl} onChange={e => setImageUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                onKeyDown={e => e.key === 'Enter' && analyzeUrl()}
-                style={{ flex: 1, padding: '12px 16px', background: darkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', border: `1px solid ${T.border}`, borderRadius: 8, color: T.text, fontSize: 13, outline: 'none', fontFamily: 'DM Sans, sans-serif' }} />
+            <div style={{ display: 'flex', gap: 10, width: '100%' }}>
+              <GooeyInputWrapper>
+                <input value={imageUrl} onChange={e => setImageUrl(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                  onKeyDown={e => e.key === 'Enter' && analyzeUrl()}
+                  style={{ width: '100%', padding: '12px 16px', background: 'transparent', border: `1px solid ${T.border}`, borderRadius: 8, color: T.text, fontSize: 13, outline: 'none', fontFamily: 'DM Sans, sans-serif' }} />
+              </GooeyInputWrapper>
               <button onClick={analyzeUrl} disabled={loading || !imageUrl.trim()}
                 style={{ padding: '12px 24px', borderRadius: 8, background: loading ? `${T.accent}33` : `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none', color: loading ? T.accent : (darkMode ? '#0a0a0f' : '#fff'), fontSize: 13, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.3s' }}>
                 {loading ? '...' : t('analyze', lang)}
@@ -220,16 +388,15 @@ export default function ImagePage() {
 
           {inputMode === 'upload' && (
             <div>
-              <div style={{ border: `2px dashed ${T.accent}4d`, borderRadius: 10, padding: '40px 20px', textAlign: 'center', cursor: 'pointer', background: `${T.accent}05` }}
-                onDragOver={e => e.preventDefault()}
-                onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files; if (f.length > 0) analyzeUpload(f); }}
-                onClick={() => fileRef.current?.click()}>
-                <div style={{ fontSize: 36, marginBottom: 10, color: T.accent }}>◈</div>
-                <p style={{ fontSize: 14, color: T.text2, margin: 0 }}>{loading ? t('analyzing', lang) : t('clickDragImage', lang)}</p>
-                <p style={{ fontSize: 11, color: T.text3, marginTop: 6 }}>{t('multiUploadActive', lang)} — JPG, PNG, WEBP</p>
-              </div>
-              <input ref={fileRef} type="file" accept="image/*" multiple style={{ display: 'none' }}
-                onChange={e => { if (e.target.files.length > 0) analyzeUpload(e.target.files); }} />
+              <IngestionZone
+                onFileSelected={analyzeUpload}
+                acceptedTypesText="JPG, PNG, WEBP"
+                icon={Image}
+                uploading={loading}
+                status={t('analyzing', lang)}
+                theme={T}
+                lang={lang}
+              />
             </div>
           )}
         </div>
@@ -556,6 +723,16 @@ export default function ImagePage() {
         )}
       </div>
       <Footer darkMode={darkMode} />
+
+      <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+        <defs>
+          <filter id="gooey-filter">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+          </filter>
+        </defs>
+      </svg>
     </div>
   );
 }

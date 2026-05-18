@@ -191,6 +191,169 @@ function generateCertificate(claims, overallScore, text, lang) {
   }
 }
 
+function GooeyInputWrapper({ children }) {
+  return (
+    <div className="gooey-wrapper" style={{ position: 'relative', width: '100%' }}>
+      <div className="gooey-backplate" style={{
+        position: 'absolute',
+        inset: '-1px',
+        borderRadius: '13px',
+        background: 'linear-gradient(90deg, #c9a96e, #85736d, #c9a96e)',
+        backgroundSize: '200% 200%',
+        opacity: 0.15,
+        filter: 'blur(2px) url(#gooey-filter)',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }} />
+      <div style={{ position: 'relative', zIndex: 1, borderRadius: '12px', background: 'transparent' }}>
+        {children}
+      </div>
+      <style>{`
+        .gooey-wrapper:focus-within .gooey-backplate {
+          opacity: 0.5;
+          filter: blur(4px) url(#gooey-filter);
+          animation: gooey-flow 4s linear infinite;
+          inset: -2px;
+        }
+        @keyframes gooey-flow {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes ingestion-scan {
+          0% { top: 0%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function IngestionZone({ onFileSelected, acceptedTypesText, icon: Icon, uploading, status, theme, lang }) {
+  const [isDragActive, setIsDragActive] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setIsDragActive(true);
+    } else if (e.type === "dragleave") {
+      setIsDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      onFileSelected(e.dataTransfer.files[0]);
+    }
+  };
+
+  return (
+    <div
+      onDragEnter={handleDrag}
+      onDragOver={handleDrag}
+      onDragLeave={handleDrag}
+      onDrop={handleDrop}
+      onClick={() => fileInputRef.current?.click()}
+      style={{
+        position: 'relative',
+        border: `1.5px dashed ${isDragActive ? theme.accent : theme.border}`,
+        borderRadius: 16,
+        padding: '48px 24px',
+        textAlign: 'center',
+        cursor: 'pointer',
+        background: isDragActive ? `${theme.accent}0a` : `${theme.accent}02`,
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        overflow: 'hidden',
+        boxShadow: isDragActive ? `0 12px 32px ${theme.accent}10` : 'none'
+      }}
+    >
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        opacity: isDragActive ? 0.07 : 0.03,
+        backgroundImage: `radial-gradient(${theme.text} 1px, transparent 1px)`,
+        backgroundSize: '16px 16px',
+        pointerEvents: 'none',
+        transition: 'opacity 0.3s ease'
+      }} />
+
+      {isDragActive && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '2px',
+          background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)`,
+          animation: 'ingestion-scan 2s linear infinite',
+          zIndex: 1
+        }} />
+      )}
+
+      <div style={{
+        transform: isDragActive ? 'scale(1.05) translateY(-4px)' : 'none',
+        transition: 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        position: 'relative',
+        zIndex: 2
+      }}>
+        <div style={{
+          width: 56,
+          height: 56,
+          borderRadius: 16,
+          background: isDragActive ? `${theme.accent}1a` : `${theme.accent}05`,
+          border: `1px solid ${isDragActive ? theme.accent : theme.border}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: '0 auto 16px',
+          boxShadow: isDragActive ? `0 8px 24px ${theme.accent}20` : 'none',
+          transition: 'all 0.3s ease'
+        }}>
+          <Icon size={24} color={theme.accent} style={{
+            transform: isDragActive ? 'rotate(180deg)' : 'none',
+            transition: 'transform 0.5s ease'
+          }} />
+        </div>
+
+        <p style={{
+          fontSize: 14,
+          fontWeight: 600,
+          color: theme.text,
+          margin: '0 0 6px 0',
+          letterSpacing: '0.01em'
+        }}>
+          {uploading ? status : (isDragActive ? 'Drop to Ingest Evidence' : t('clickDragPdf', lang))}
+        </p>
+        
+        <p style={{
+          fontSize: 11,
+          color: theme.text3,
+          margin: 0,
+          letterSpacing: '0.02em'
+        }}>
+          {uploading ? 'Processing asset signatures...' : `or click to browse local files (${acceptedTypesText})`}
+        </p>
+      </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf"
+        style={{ display: 'none' }}
+        onChange={(e) => { if (e.target.files && e.target.files.length > 0) onFileSelected(e.target.files[0]); }}
+      />
+    </div>
+  );
+}
+
 export default function VerifyPage() {
   const { lang } = useLang();
   const [searchParams] = useSearchParams();
@@ -439,12 +602,16 @@ export default function VerifyPage() {
                 </div>
 
                 {inputMode === 'text' && (
-                  <textarea value={text} onChange={e => setText(e.target.value)} placeholder={t('pasteText', lang)} style={{ width: '100%', height: 200, background: T.inputBg, border: `1px solid ${T.inputBorder}`, borderRadius: 12, padding: 16, color: T.text, outline: 'none', resize: 'none' }} />
+                  <GooeyInputWrapper>
+                    <textarea value={text} onChange={e => setText(e.target.value)} placeholder={t('pasteText', lang)} style={{ width: '100%', height: 200, background: 'transparent', border: `1px solid ${T.inputBorder}`, borderRadius: 12, padding: 16, color: T.text, outline: 'none', resize: 'none' }} />
+                  </GooeyInputWrapper>
                 )}
 
                 {inputMode === 'url' && (
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <input value={url} onChange={e => setUrl(e.target.value)} placeholder={t('pasteUrl', lang)} style={{ flex: 1, padding: '12px', background: T.inputBg, border: `1px solid ${T.inputBorder}`, borderRadius: 10, color: T.text, outline: 'none' }} />
+                  <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+                    <GooeyInputWrapper>
+                      <input value={url} onChange={e => setUrl(e.target.value)} placeholder={t('pasteUrl', lang)} style={{ width: '100%', padding: '12px', background: 'transparent', border: `1px solid ${T.inputBorder}`, borderRadius: 10, color: T.text, outline: 'none' }} />
+                    </GooeyInputWrapper>
                     <button onClick={handleFetchUrl} disabled={fetchingUrl} style={{ padding: '0 16px', background: T.accent, border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}>{fetchingUrl ? '...' : '→'}</button>
                   </div>
                 )}
@@ -483,11 +650,15 @@ export default function VerifyPage() {
                       </div>
                     )}
 
-                    <div onClick={() => document.getElementById('pdf-in').click()} style={{ padding: '40px 20px', border: `2px dashed ${T.border}`, borderRadius: 12, textAlign: 'center', cursor: 'pointer' }}>
-                      <FileText size={32} color={T.accent} style={{ marginBottom: 12 }} />
-                      <p style={{ fontSize: 13, color: T.text3 }}>{uploadingPdf ? pdfStatus : t('clickDragPdf', lang)}</p>
-                      <input id="pdf-in" type="file" accept=".pdf" style={{ display: 'none' }} onChange={e => { if (e.target?.files && e.target.files.length > 0) { handlePdfUpload(e.target.files[0]); } }} />
-                    </div>
+                    <IngestionZone
+                      onFileSelected={handlePdfUpload}
+                      acceptedTypesText="PDF"
+                      icon={FileText}
+                      uploading={uploadingPdf}
+                      status={pdfStatus}
+                      theme={T}
+                      lang={lang}
+                    />
                   </div>
                 )}
 
@@ -560,6 +731,16 @@ export default function VerifyPage() {
       </div>
       
       <Footer darkMode={darkMode} />
+
+      <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+        <defs>
+          <filter id="gooey-filter">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+          </filter>
+        </defs>
+      </svg>
 
       <style>{`
         @keyframes loading-shimmer { 0% { left: -100%; } 100% { left: 200%; } }
