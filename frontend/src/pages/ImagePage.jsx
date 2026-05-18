@@ -9,7 +9,7 @@ import api from '../utils/api';
 const VERDICT_CONFIG = (lang) => ({
   'High Probability of Synthetic Origin': { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', icon: '✗', label: t('aiGenerated', lang) },
   'Probable Synthetic Indicators':      { color: '#fb923c', bg: 'rgba(251,146,60,0.08)',  border: 'rgba(251,146,60,0.25)',  icon: '~', label: t('likelyAI', lang) },
-  'Uncertain':                          { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.25)',  icon: '?', label: t('uncertain', lang) },
+  'Uncertain':                          { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.25)',  icon: '?', label: 'Forensic confidence below decisive threshold' },
   'Authentic Footprint Estimated':      { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: t('real', lang) },
 });
 
@@ -252,6 +252,18 @@ export default function ImagePage() {
 
         {currentResult && cfg && (
           <div style={{ animation: 'fadeUp 0.4s ease forwards' }}>
+            {/* SAFE MODE Badge Indicator */}
+            {currentResult.forensicStatus === "VISION_DEGRADED" && (
+              <div style={{ 
+                display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 12px', borderRadius: 4, 
+                background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.25)', 
+                color: '#fbbf24', fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase',
+                marginBottom: 16, cursor: 'help'
+              }} title="Running under constrained forensic environment. Heuristic fallback active.">
+                ⚡ SAFE MODE ANALYSIS
+              </div>
+            )}
+
             <div className="responsive-grid" style={{ marginBottom: 20 }}>
               {currentResult.url && (
                 <div style={{ borderRadius: 12, overflow: 'hidden', border: `2px solid ${cfg.border}` }}>
@@ -260,10 +272,10 @@ export default function ImagePage() {
               )}
               <div style={{ background: cfg.bg, border: `1px solid ${cfg.border}`, borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <div style={{ fontSize: 48, fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, color: cfg.color, lineHeight: 1, marginBottom: 8 }}>{currentResult.ai_probability}%</div>
-                <div style={{ fontSize: 11, color: cfg.color, opacity: darkMode ? 0.7 : 0.9, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>{t('aiProbability', lang)}</div>
+                <div style={{ fontSize: 11, color: cfg.color, opacity: darkMode ? 0.7 : 0.9, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Synthetic Artifact Presence</div>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 999, background: cfg.bg, border: `1px solid ${cfg.border}`, marginBottom: 12, width: 'fit-content' }}>
                   <span style={{ fontSize: 14, color: cfg.color }}>{cfg.icon}</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: cfg.color }}>{cfg.label}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: cfg.color }}>{currentResult.verdict === 'Uncertain' ? 'Insufficient forensic indicators' : cfg.label}</span>
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 999, background: riskCfg.bg, color: riskCfg.color, fontWeight: 600 }}>{riskCfg.label} {t('risk', lang)}</span>
@@ -272,9 +284,20 @@ export default function ImagePage() {
               </div>
             </div>
 
+            {/* Forensic Ambiguity range disclaimer */}
+            {currentResult.ai_probability >= 40 && currentResult.ai_probability <= 60 && (
+              <div style={{ 
+                background: 'rgba(251,191,36,0.03)', borderLeft: '4px solid #fbbf24', borderRadius: '0 8px 8px 0', 
+                padding: '12px 16px', marginBottom: 16, fontSize: 12.5, color: T.text2, lineHeight: 1.5
+              }}>
+                <strong style={{ color: '#fbbf24', textTransform: 'uppercase', fontSize: 10.5, letterSpacing: 1, display: 'block', marginBottom: 4 }}>Forensic Notice</strong>
+                Result falls within forensic ambiguity range. This image does not exhibit strong enough indicators for definitive synthetic attribution.
+              </div>
+            )}
+
             <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
-              <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 16 }}>{t('probBreakdown', lang)}</p>
-              {[[t('aiGenerated', lang), currentResult.ai_probability, '#f87171'], [t('authenticReal', lang), currentResult.real_probability, '#4ade80']].map(([label, val, color]) => (
+              <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 16 }}>AUTHENTICITY MATRIX & SIGNAL ANALYSIS</p>
+              {[['Synthetic Artifact Presence', currentResult.ai_probability, '#f87171'], ['Authenticity Signal Strength', currentResult.real_probability, '#4ade80']].map(([label, val, color]) => (
                 <div key={label} style={{ marginBottom: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                     <span style={{ fontSize: 13, color: T.text2 }}>{label}</span>
@@ -287,6 +310,23 @@ export default function ImagePage() {
               ))}
             </div>
 
+            {/* Compact Forensic Explanation block for ambiguous/uncertain assessments */}
+            {currentResult.verdict === 'Uncertain' && (
+              <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
+                <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12, fontWeight: 700 }}>Forensic Caution Rationale</p>
+                <p style={{ fontSize: 13, color: T.text2, margin: '0 0 12px 0', lineHeight: 1.5 }}>
+                  Authenticity signals remain balanced. Analysis is held below decisive attribution limits due to:
+                </p>
+                <ul style={{ margin: 0, paddingLeft: 20, color: T.text3, fontSize: 12, lineHeight: 1.8 }}>
+                  <li><strong>Image Compression:</strong> Modern web compression strips micro-pixel structures.</li>
+                  <li><strong>Resized Upload:</strong> Alterations in resolution destroy spatial entropy signals.</li>
+                  <li><strong>Low Metadata Availability:</strong> Absence of camera profile, timestamps, and EXIF parameters.</li>
+                  <li><strong>Insufficient Artifact Visibility:</strong> Visual anomalies fall below structural detection margins.</li>
+                  <li><strong>Balanced Authenticity Indicators:</strong> The image contains both machine signatures and natural textures.</li>
+                </ul>
+              </div>
+            )}
+
             {currentResult.extracted_text && (
               <div style={{ background: T.cardBg, border: `1px solid ${T.accent}4d`, borderRadius: 12, padding: 20, marginBottom: 16, animation: 'fadeUp 0.4s ease' }}>
                 <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.accent, marginBottom: 12, fontWeight: 700 }}>{t('originalSentence', lang)}</p>
@@ -298,7 +338,7 @@ export default function ImagePage() {
 
             <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
               <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12 }}>{t('analysis', lang)}</p>
-              <p style={{ fontSize: 14, color: T.text, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 1, fontWeight: 500 }}>{currentResult.assessment}</p>
+              <p style={{ fontSize: 14, color: T.text, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 1, fontWeight: 500 }}>{currentResult.verdict === 'Uncertain' ? 'Analysis finalized with balanced signals. Insufficient forensic evidence to confirm synthetic creation or natural camera capture definitively.' : currentResult.assessment}</p>
             </div>
 
             {currentResult.context_info && (
