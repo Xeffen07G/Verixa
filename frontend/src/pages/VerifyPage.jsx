@@ -144,7 +144,7 @@ function ClaimCard({ claim, index, theme, lang }) {
 }
 
 function HistoryPanel({ history, onLoad, onDelete, theme, lang }) {
-  if (history.length === 0) return (
+  if (!Array.isArray(history) || history.length === 0) return (
     <div style={{ textAlign: 'center', padding: '48px 20px', color: theme.text3, fontSize: 13 }}>
       {t('noVerifications', lang)}
     </div>
@@ -170,20 +170,25 @@ function HistoryPanel({ history, onLoad, onDelete, theme, lang }) {
 
 function exportToPDF(claims, overallScore, text, lang) {
   const label = overallScore >= 70 ? t('mostlyAccurate', lang) : overallScore >= 40 ? t('mixedAccuracy', lang) : t('mostlyInaccurate', lang);
-  const html = `<html><head><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;line-height:1.6;}h1{border-bottom:2px solid #c9a96e;padding-bottom:12px;}.score{font-size:48px;font-weight:bold;color:${overallScore>=70?'#166534':overallScore>=40?'#92400e':'#991b1b'}}.claim{border:1px solid #ddd;padding:15px;margin-bottom:10px;border-radius:8px;}</style></head><body><h1>VeriXa Report</h1><div class="score">${overallScore}%</div><p>${label}</p>${claims.map((c,i)=>`<div class="claim"><strong>${i+1}. ${c.claim}</strong><br/>${c.reasoning}</div>`).join('')}</body></html>`;
+  const claimsHtml = Array.isArray(claims) ? claims.map((c,i)=>`<div class="claim"><strong>${i+1}. ${c.claim}</strong><br/>${c.reasoning}</div>`).join('') : '';
+  const html = `<html><head><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;line-height:1.6;}h1{border-bottom:2px solid #c9a96e;padding-bottom:12px;}.score{font-size:48px;font-weight:bold;color:${overallScore>=70?'#166534':overallScore>=40?'#92400e':'#991b1b'}}.claim{border:1px solid #ddd;padding:15px;margin-bottom:10px;border-radius:8px;}</style></head><body><h1>VeriXa Report</h1><div class="score">${overallScore}%</div><p>${label}</p>${claimsHtml}</body></html>`;
   const win = window.open('', '_blank');
-  win.document.write(html);
-  win.document.close();
-  win.print();
+  if (win) {
+    win.document.write(html);
+    win.document.close();
+    win.print();
+  }
 }
 
 function generateCertificate(claims, overallScore, text, lang) {
   const label = overallScore >= 70 ? t('mostlyAccurate', lang) : overallScore >= 40 ? t('mixedAccuracy', lang) : t('mostlyInaccurate', lang);
   const html = `<html><head><style>body{background:#000;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;margin:0;}.cert{width:800px;border:10px solid #c9a96e;padding:60px;text-align:center;position:relative;}.title{font-size:40px;margin-bottom:20px;color:#c9a96e;} .score{font-size:72px;margin:20px 0;}</style></head><body><div class="cert"><div class="title">VeriXa Certificate</div><div class="score">${overallScore}%</div><p>${label}</p></div></body></html>`;
   const win = window.open('', '_blank');
-  win.document.write(html);
-  win.document.close();
-  win.print();
+  if (win) {
+    win.document.write(html);
+    win.document.close();
+    win.print();
+  }
 }
 
 export default function VerifyPage() {
@@ -207,12 +212,28 @@ export default function VerifyPage() {
   const [leftTab, setLeftTab] = useState('input');
   const [listening, setListening] = useState(false);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('verixa-theme') === 'dark');
-  const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem('verixa_history') || '[]'));
+  const [history, setHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem('verixa_history');
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  });
 
   const recognitionRef = useRef(null);
   const T = darkMode ? DARK : LIGHT;
+  const isMountedRef = useRef(true);
 
   const { stage, logs, claims, overallScore, aiDetection, error, isLoading, verify, reset } = useVerify();
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (searchParams.get('source') === 'dragdrop') {
@@ -224,14 +245,19 @@ export default function VerifyPage() {
   useEffect(() => {
     if (stage === 'done' && overallScore >= 90) {
       setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 4000);
+      setTimeout(() => {
+        if (isMountedRef.current) {
+          setShowConfetti(false);
+        }
+      }, 4000);
     }
   }, [stage, overallScore]);
 
   useEffect(() => {
-    if (stage === 'done' && claims.length > 0) {
+    if (stage === 'done' && Array.isArray(claims) && claims.length > 0) {
       const entry = { text, claims, overallScore, aiDetection, timestamp: new Date().toISOString() };
-      const updated = [entry, ...history.slice(0, 19)];
+      const historyArr = Array.isArray(history) ? history : [];
+      const updated = [entry, ...historyArr.slice(0, 19)];
       setHistory(updated);
       localStorage.setItem('verixa_history', JSON.stringify(updated));
     }
@@ -248,18 +274,25 @@ export default function VerifyPage() {
     setFetchingUrl(true);
     try {
       const res = await api.post('/api/url', { url: url.trim() });
-      const scrapedText = res.data.text || res.data.content || '';
+      const scrapedText = res?.data?.text || res?.data?.content || '';
       if (!scrapedText.trim()) {
         throw new Error("Target URL returned empty content or blocked automated extraction.");
       }
-      setText(scrapedText); 
-      setInputMode('text');
+      if (isMountedRef.current) {
+        setText(scrapedText); 
+        setInputMode('text');
+      }
     } catch (e) { 
       console.error("[VerifyPage] URL Fetch Error:", e.response || e);
-      console.error("URL VERIFY ERROR:", e);
-      alert('URL Error: ' + (e.response?.data?.error || e.message || "Failed to extract content. Please copy-paste text manually.")); 
+      if (isMountedRef.current) {
+        alert('URL Error: ' + (e.response?.data?.error || e.message || "Failed to extract content. Please copy-paste text manually."));
+      }
     }
-    finally { setFetchingUrl(false); }
+    finally {
+      if (isMountedRef.current) {
+        setFetchingUrl(false);
+      }
+    }
   };
 
   const handlePdfUpload = async (file) => {
@@ -291,9 +324,10 @@ export default function VerifyPage() {
       
       // 1. Submit to queue (Instantly returns 202, or 200 completed in SAFE_MODE)
       const res = await api.post('/api/pdf/ingest', formData);
+      if (!isMountedRef.current) return;
       
       // Prefer synchronous SAFE_MODE completion over polling if completed instantly
-      if (res.data.status === 'completed' || res.data.progress === 100 || res.data.completed === true) {
+      if (res?.data?.status === 'completed' || res?.data?.progress === 100 || res?.data?.completed === true) {
         setPdfStatus('Completed');
         const extractedText = (res.data.result && res.data.result.text) 
           ? res.data.result.text 
@@ -315,7 +349,7 @@ export default function VerifyPage() {
         return;
       }
 
-      const jobId = res.data.jobId || res.data.docId || res.data.documentId || res.data.id;
+      const jobId = res?.data?.jobId || res?.data?.docId || res?.data?.documentId || res?.data?.id;
       
       if (!jobId) {
         throw new Error("Forensic environment returned an invalid document identifier.");
@@ -329,8 +363,10 @@ export default function VerifyPage() {
       while (!completed && attempts < 150) {
         attempts++;
         await new Promise(r => setTimeout(r, 2000));
+        if (!isMountedRef.current) return;
         
         const statusRes = await api.get(`/api/pdf/status/${jobId}`);
+        if (!isMountedRef.current) return;
         const { status, progress, result } = statusRes.data;
         
         if (status === 'completed') {
@@ -360,17 +396,21 @@ export default function VerifyPage() {
       if (!completed) throw new Error('Processing timed out');
     } catch (e) { 
       console.error("[VerifyPage] PDF Upload Error:", e.response || e);
-      setPdfError({
-        title: "FORENSIC INGESTION FAILURE",
-        body: e.response?.data?.error || e.message || "An unexpected error occurred during document parsing.",
-        subtext: "Verification environment status: Bypassed to prevent analysis blockage.",
-        sizeInfo: null,
-        helper: "Try converting the PDF pages to plain text manually if the extraction fails persistently."
-      });
+      if (isMountedRef.current) {
+        setPdfError({
+          title: "FORENSIC INGESTION FAILURE",
+          body: e.response?.data?.error || e.message || "An unexpected error occurred during document parsing.",
+          subtext: "Verification environment status: Bypassed to prevent analysis blockage.",
+          sizeInfo: null,
+          helper: "Try converting the PDF pages to plain text manually if the extraction fails persistently."
+        });
+      }
     }
     finally { 
-      setUploadingPdf(false);
-      setPdfStatus('');
+      if (isMountedRef.current) {
+        setUploadingPdf(false);
+        setPdfStatus('');
+      }
     }
   };
 
@@ -446,7 +486,7 @@ export default function VerifyPage() {
                     <div onClick={() => document.getElementById('pdf-in').click()} style={{ padding: '40px 20px', border: `2px dashed ${T.border}`, borderRadius: 12, textAlign: 'center', cursor: 'pointer' }}>
                       <FileText size={32} color={T.accent} style={{ marginBottom: 12 }} />
                       <p style={{ fontSize: 13, color: T.text3 }}>{uploadingPdf ? pdfStatus : t('clickDragPdf', lang)}</p>
-                      <input id="pdf-in" type="file" accept=".pdf" style={{ display: 'none' }} onChange={e => handlePdfUpload(e.target.files[0])} />
+                      <input id="pdf-in" type="file" accept=".pdf" style={{ display: 'none' }} onChange={e => { if (e.target?.files && e.target.files.length > 0) { handlePdfUpload(e.target.files[0]); } }} />
                     </div>
                   </div>
                 )}
@@ -495,7 +535,7 @@ export default function VerifyPage() {
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  {claims.map((c, i) => <ClaimCard key={i} claim={c} theme={T} lang={lang} />)}
+                  {Array.isArray(claims) && claims.map((c, i) => <ClaimCard key={i} claim={c} theme={T} lang={lang} />)}
                 </div>
               )}
             </div>

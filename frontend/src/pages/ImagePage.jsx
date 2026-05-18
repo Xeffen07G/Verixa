@@ -7,14 +7,11 @@ import { useLang } from '../context/LangContext';
 import api from '../utils/api';
 
 const VERDICT_CONFIG = (lang) => ({
-  'High Probability of Synthetic Origin': { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', icon: '✗', label: t('aiGenerated', lang) },
-  'Probable Synthetic Indicators':      { color: '#fb923c', bg: 'rgba(251,146,60,0.08)',  border: 'rgba(251,146,60,0.25)',  icon: '~', label: t('likelyAI', lang) },
-  'Uncertain':                          { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.25)',  icon: '?', label: 'Forensic confidence below decisive threshold' },
-  'Authentic Footprint Estimated':      { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: t('real', lang) },
-  'High forensic confidence':           { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: 'High forensic confidence' },
-  'Strong synthetic indicators':        { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', icon: '✗', label: 'Strong synthetic indicators' },
-  'Strong authenticity indicators':     { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: 'Strong authenticity indicators' },
-  'Insufficient forensic indicators':   { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.25)',  icon: '?', label: 'Insufficient forensic indicators' },
+  'Likely AI Generated':    { color: '#f87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.25)', icon: '✗', label: 'Likely AI Generated' },
+  'Possibly AI Generated':  { color: '#fb923c', bg: 'rgba(251,146,60,0.08)',  border: 'rgba(251,146,60,0.25)',  icon: '~', label: 'Possibly AI Generated' },
+  'Unclear':                { color: '#fbbf24', bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.25)',  icon: '?', label: 'Unclear' },
+  'Possibly Real':          { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: 'Possibly Real' },
+  'Likely Real':            { color: '#4ade80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)',  icon: '✓', label: 'Likely Real' },
 });
 
 const RISK_CONFIG = (lang) => ({
@@ -44,6 +41,7 @@ export default function ImagePage() {
   const [error, setError] = useState(null);
   const [inputMode, setInputMode] = useState('url');
   const [imageUrl, setImageUrl] = useState('');
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const fileRef = useRef(null);
   const chatEndRef = useRef(null);
 
@@ -119,8 +117,25 @@ export default function ImagePage() {
     setActiveIdx(prev => results.length);
   }
 
+  const getSimplifiedVerdict = (ai_probability) => {
+    if (ai_probability >= 80) return "Likely AI Generated";
+    if (ai_probability >= 60) return "Possibly AI Generated";
+    if (ai_probability >= 40) return "Unclear";
+    if (ai_probability >= 20) return "Possibly Real";
+    return "Likely Real";
+  };
+
+  const getSecondaryText = (verdict) => {
+    if (verdict === "Likely AI Generated") return "Strong synthetic indicators detected across multiple image features.";
+    if (verdict === "Possibly AI Generated") return "Some synthetic markers detected, showing minor visual anomalies.";
+    if (verdict === "Unclear") return "Mixed signals detected. Not enough evidence for a strong conclusion.";
+    if (verdict === "Possibly Real") return "The analysis found mixed indicators and could not reach a definitive conclusion.";
+    return "Authentic structural characteristics and noise patterns observed.";
+  };
+
   const currentResult = results[activeIdx];
-  const cfg = currentResult ? (VERDICT_CONFIG(lang)[currentResult.verdict] || VERDICT_CONFIG(lang)['Uncertain']) : null;
+  const simplifiedVerdict = currentResult ? getSimplifiedVerdict(currentResult.ai_probability) : 'Unclear';
+  const cfg = currentResult ? (VERDICT_CONFIG(lang)[simplifiedVerdict] || VERDICT_CONFIG(lang)['Unclear']) : null;
   const riskCfg = currentResult ? (RISK_CONFIG(lang)[currentResult.risk_level] || RISK_CONFIG(lang)['Medium']) : null;
 
   const [imageQuery, setImageQuery] = useState('');
@@ -243,7 +258,7 @@ export default function ImagePage() {
                 opacity: activeIdx === i ? 1 : 0.6, transition: '0.2s', position: 'relative'
               }}>
                 <img src={r.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <div style={{ position: 'absolute', bottom: 4, right: 4, background: VERDICT_CONFIG(lang)[r.verdict]?.color || T.accent, width: 12, height: 12, borderRadius: '50%', border: `2px solid ${T.bg}` }} />
+                <div style={{ position: 'absolute', bottom: 4, right: 4, background: VERDICT_CONFIG(lang)[getSimplifiedVerdict(r.ai_probability)]?.color || T.accent, width: 12, height: 12, borderRadius: '50%', border: `2px solid ${T.bg}` }} />
               </div>
             ))}
             {loading && (
@@ -276,10 +291,13 @@ export default function ImagePage() {
               )}
               <div style={{ background: cfg.bg, border: `1px solid ${cfg.border}`, borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <div style={{ fontSize: 48, fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, color: cfg.color, lineHeight: 1, marginBottom: 8 }}>{currentResult.ai_probability}%</div>
-                <div style={{ fontSize: 11, color: cfg.color, opacity: darkMode ? 0.7 : 0.9, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Synthetic Artifact Presence</div>
+                <div style={{ fontSize: 11, color: cfg.color, opacity: darkMode ? 0.7 : 0.9, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>AI Likelihood</div>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 999, background: cfg.bg, border: `1px solid ${cfg.border}`, marginBottom: 12, width: 'fit-content' }}>
                   <span style={{ fontSize: 14, color: cfg.color }}>{cfg.icon}</span>
                   <span style={{ fontSize: 13, fontWeight: 700, color: cfg.color }}>{cfg.label}</span>
+                </div>
+                <div style={{ fontSize: 13, color: T.text2, opacity: 0.9, marginBottom: 16, lineHeight: 1.4 }}>
+                  {getSecondaryText(simplifiedVerdict)}
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 999, background: riskCfg.bg, color: riskCfg.color, fontWeight: 600 }}>{riskCfg.label} {t('risk', lang)}</span>
@@ -294,40 +312,146 @@ export default function ImagePage() {
                 background: 'rgba(251,191,36,0.03)', borderLeft: '4px solid #fbbf24', borderRadius: '0 8px 8px 0', 
                 padding: '12px 16px', marginBottom: 16, fontSize: 12.5, color: T.text2, lineHeight: 1.5
               }}>
-                <strong style={{ color: '#fbbf24', textTransform: 'uppercase', fontSize: 10.5, letterSpacing: 1, display: 'block', marginBottom: 4 }}>Forensic Notice</strong>
-                Result falls within forensic ambiguity range. This image does not exhibit strong enough indicators for definitive synthetic attribution.
+                <strong style={{ color: '#fbbf24', textTransform: 'uppercase', fontSize: 10.5, letterSpacing: 1, display: 'block', marginBottom: 4 }}>Mixed signals detected</strong>
+                The analysis could not reach a strong conclusion.
               </div>
             )}
 
-            <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
-              <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 16 }}>AUTHENTICITY MATRIX & SIGNAL ANALYSIS</p>
-              {[['Synthetic Artifact Presence', currentResult.ai_probability, '#f87171'], ['Authenticity Signal Strength', currentResult.real_probability, '#4ade80']].map(([label, val, color]) => (
-                <div key={label} style={{ marginBottom: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <span style={{ fontSize: 13, color: T.text2 }}>{label}</span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color }}>{val}%</span>
-                  </div>
-                  <div style={{ height: 6, borderRadius: 3, background: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${val}%`, background: color, borderRadius: 3, transition: 'width 1s ease' }} />
-                  </div>
-                </div>
-              ))}
+            {/* Toggle Button for Advanced Forensic Details */}
+            <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0 16px 0' }}>
+              <button 
+                onClick={() => setShowAdvanced(!showAdvanced)} 
+                style={{
+                  background: 'transparent',
+                  border: `1px solid ${T.accent}4d`,
+                  borderRadius: 8,
+                  color: T.accent,
+                  padding: '10px 20px',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 1.5,
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  outline: 'none'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = `${T.accent}0d`; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                {showAdvanced ? '▴ Hide Advanced Forensic Details' : '▾ Show Advanced Forensic Details'}
+              </button>
             </div>
 
-            {/* Compact Forensic Explanation block for ambiguous/uncertain assessments */}
-            {(currentResult.verdict === 'Uncertain' || currentResult.verdict === 'Insufficient forensic indicators') && (
-              <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
-                <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12, fontWeight: 700 }}>Forensic Caution Rationale</p>
-                <p style={{ fontSize: 13, color: T.text2, margin: '0 0 12px 0', lineHeight: 1.5 }}>
-                  Authenticity signals remain balanced. Analysis is held below decisive attribution limits due to:
-                </p>
-                <ul style={{ margin: 0, paddingLeft: 20, color: T.text3, fontSize: 12, lineHeight: 1.8 }}>
-                  <li><strong>Image Compression:</strong> Modern web compression strips micro-pixel structures.</li>
-                  <li><strong>Resized Upload:</strong> Alterations in resolution destroy spatial entropy signals.</li>
-                  <li><strong>Low Metadata Availability:</strong> Absence of camera profile, timestamps, and EXIF parameters.</li>
-                  <li><strong>Insufficient Artifact Visibility:</strong> Visual anomalies fall below structural detection margins.</li>
-                  <li><strong>Balanced Authenticity Indicators:</strong> The image contains both machine signatures and natural textures.</li>
-                </ul>
+            {showAdvanced && (
+              <div style={{ animation: 'fadeUp 0.3s ease forwards' }}>
+                <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
+                  <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 16 }}>AUTHENTICITY MATRIX & SIGNAL ANALYSIS</p>
+                  {[
+                    ['AI Likelihood', currentResult.ai_probability, '#f87171'],
+                    ['Human Authenticity', currentResult.real_probability, '#4ade80']
+                  ].map(([label, val, color]) => (
+                    <div key={label} style={{ marginBottom: 12 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                        <span style={{ fontSize: 13, color: T.text2 }}>{label}</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color }}>{val}%</span>
+                      </div>
+                      <div style={{ height: 6, borderRadius: 3, background: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${val}%`, background: color, borderRadius: 3, transition: 'width 1s ease' }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Compact Forensic Explanation block for ambiguous/uncertain assessments */}
+                {(simplifiedVerdict === 'Unclear' || simplifiedVerdict === 'Possibly Real') && (
+                  <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
+                    <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12, fontWeight: 700 }}>Forensic Caution Rationale</p>
+                    <p style={{ fontSize: 13, color: T.text2, margin: '0 0 12px 0', lineHeight: 1.5 }}>
+                      Authenticity signals remain balanced. Analysis is held below decisive attribution limits due to:
+                    </p>
+                    <ul style={{ margin: 0, paddingLeft: 20, color: T.text3, fontSize: 12, lineHeight: 1.8 }}>
+                      <li><strong>Image Compression:</strong> Modern web compression strips micro-pixel structures.</li>
+                      <li><strong>Resized Upload:</strong> Alterations in resolution destroy spatial entropy signals.</li>
+                      <li><strong>Low Metadata Availability:</strong> Absence of camera profile, timestamps, and EXIF parameters.</li>
+                      <li><strong>Insufficient Artifact Visibility:</strong> Visual anomalies fall below structural detection margins.</li>
+                      <li><strong>Balanced Authenticity Indicators:</strong> The image contains both machine signatures and natural textures.</li>
+                    </ul>
+                  </div>
+                )}
+
+                <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
+                  <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12 }}>{t('analysis', lang)}</p>
+                  <p style={{ fontSize: 14, color: T.text, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 1, fontWeight: 500 }}>
+                    {(simplifiedVerdict === 'Unclear' || simplifiedVerdict === 'Possibly Real') 
+                      ? 'Analysis finalized with balanced signals. Insufficient forensic evidence to confirm synthetic creation or natural camera capture definitively.' 
+                      : currentResult.assessment}
+                  </p>
+                </div>
+
+                {currentResult.context_info && (
+                  <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
+                    <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.accent, marginBottom: 16, fontWeight: 700 }}>{t('imageContext', lang)}</p>
+                    <div className="responsive-grid" style={{ gap: 16 }}>
+                      {currentResult.context_info.subject && (
+                        <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
+                          <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px' }}>{t('subject', lang)}</p>
+                          <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{currentResult.context_info.subject}</p>
+                        </div>
+                      )}
+                      {currentResult.context_info.location && (
+                        <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
+                          <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px' }}>{t('location', lang)}</p>
+                          <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{currentResult.context_info.location}</p>
+                        </div>
+                      )}
+                      {currentResult.context_info.historical_context && (
+                        <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8, gridColumn: 'span 2' }}>
+                          <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px' }}>{t('factContext', lang)}</p>
+                          <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{currentResult.context_info.historical_context}</p>
+                        </div>
+                      )}
+                      {currentResult.context_info.entities?.length > 0 && (
+                        <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8, gridColumn: 'span 2' }}>
+                          <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 8px' }}>{t('identifiedEntities', lang)}</p>
+                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                            {currentResult.context_info.entities.map((e, idx) => (
+                              <span key={idx} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 999, background: T.accentMuted || `${T.accent}1a`, color: T.accent, fontWeight: 600 }}>{e}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {currentResult.forensic_breakdown && (
+                  <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
+                    <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 16 }}>{t('forensicBreakdown', lang)}</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      {Object.entries(currentResult.forensic_breakdown).map(([key, value]) => (
+                        <div key={key} style={{ padding: '16px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8, borderLeft: `3px solid ${T.accent}` }}>
+                          <p style={{ margin: '0 0 8px 0', fontSize: 12, textTransform: 'capitalize', fontWeight: 700, color: T.text, letterSpacing: 0.5 }}>
+                            {key.replace(/_/g, ' ')}
+                          </p>
+                          <p style={{ margin: 0, fontSize: 13, color: T.text2, lineHeight: 1.6 }}>{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
+                  <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 14 }}>{t('detectionIndicators', lang)}</p>
+                  {currentResult.indicators.map((ind, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 10 }}>
+                      <span style={{ color: T.accent, fontSize: 10, marginTop: 4, flexShrink: 0 }}>◆</span>
+                      <p style={{ margin: 0, fontSize: 13, color: T.text2, lineHeight: 1.6 }}>{ind}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -339,73 +463,6 @@ export default function ImagePage() {
                 </div>
               </div>
             )}
-
-            <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
-              <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 12 }}>{t('analysis', lang)}</p>
-              <p style={{ fontSize: 14, color: T.text, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 1, fontWeight: 500 }}>{(currentResult.verdict === 'Uncertain' || currentResult.verdict === 'Insufficient forensic indicators') ? 'Analysis finalized with balanced signals. Insufficient forensic evidence to confirm synthetic creation or natural camera capture definitively.' : currentResult.assessment}</p>
-            </div>
-
-            {currentResult.context_info && (
-              <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16, animation: 'fadeUp 0.5s ease' }}>
-                <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.accent, marginBottom: 16, fontWeight: 700 }}>{t('imageContext', lang)}</p>
-                <div className="responsive-grid" style={{ gap: 16 }}>
-                  {currentResult.context_info.subject && (
-                    <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
-                      <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px' }}>{t('subject', lang)}</p>
-                      <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{currentResult.context_info.subject}</p>
-                    </div>
-                  )}
-                  {currentResult.context_info.location && (
-                    <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
-                      <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px' }}>{t('location', lang)}</p>
-                      <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{currentResult.context_info.location}</p>
-                    </div>
-                  )}
-                  {currentResult.context_info.historical_context && (
-                    <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8, gridColumn: 'span 2' }}>
-                      <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 4px' }}>{t('factContext', lang)}</p>
-                      <p style={{ fontSize: 13, color: T.text, margin: 0 }}>{currentResult.context_info.historical_context}</p>
-                    </div>
-                  )}
-                  {currentResult.context_info.entities?.length > 0 && (
-                    <div style={{ padding: '12px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8, gridColumn: 'span 2' }}>
-                      <p style={{ fontSize: 10, textTransform: 'uppercase', color: T.text3, margin: '0 0 8px' }}>{t('identifiedEntities', lang)}</p>
-                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                        {currentResult.context_info.entities.map((e, idx) => (
-                          <span key={idx} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 999, background: T.accentMuted || `${T.accent}1a`, color: T.accent, fontWeight: 600 }}>{e}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {currentResult.forensic_breakdown && (
-              <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16, animation: 'fadeUp 0.5s ease' }}>
-                <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 16 }}>{t('forensicBreakdown', lang)}</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  {Object.entries(currentResult.forensic_breakdown).map(([key, value]) => (
-                    <div key={key} style={{ padding: '16px', background: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 8, borderLeft: `3px solid ${T.accent}` }}>
-                      <p style={{ margin: '0 0 8px 0', fontSize: 12, textTransform: 'capitalize', fontWeight: 700, color: T.text, letterSpacing: 0.5 }}>
-                        {key.replace(/_/g, ' ')}
-                      </p>
-                      <p style={{ margin: 0, fontSize: 13, color: T.text2, lineHeight: 1.6 }}>{value}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div style={{ background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
-              <p style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: T.text3, marginBottom: 14 }}>{t('detectionIndicators', lang)}</p>
-              {currentResult.indicators.map((ind, i) => (
-                <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 10 }}>
-                  <span style={{ color: T.accent, fontSize: 10, marginTop: 4, flexShrink: 0 }}>◆</span>
-                  <p style={{ margin: 0, fontSize: 13, color: T.text2, lineHeight: 1.6 }}>{ind}</p>
-                </div>
-              ))}
-            </div>
 
             {/* ASK VERIXA CHAT SECTION */}
             <div style={{ background: T.cardBg, border: `1.5px solid ${T.accent}`, borderRadius: 16, padding: 24, marginBottom: 28, boxShadow: `0 10px 40px ${T.accent}1a`, animation: 'fadeUp 0.6s ease' }}>

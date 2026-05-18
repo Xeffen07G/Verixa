@@ -231,7 +231,7 @@ export default function VideoPage() {
                       <div style={{ width: duration ? `${(currentTime / duration) * 100}%` : '0%', height: '100%', background: T.accent, borderRadius: 3, transition: 'width 0.1s linear' }} />
                       
                       {/* Anomalies indicators */}
-                      {result?.anomalies?.map((a, i) => (
+                      {Array.isArray(result?.anomalies) && result.anomalies.map((a, i) => (
                         <div key={i} style={{ position: 'absolute', left: `${a.timestamp_pct}%`, top: -4, width: 4, height: 14, background: '#f87171', borderRadius: 2, boxShadow: '0 0 10px #f87171' }} />
                       ))}
                     </div>
@@ -327,7 +327,7 @@ export default function VideoPage() {
                 <div style={{ padding: 28, borderRadius: 24, background: T.cardBg, border: `1px solid ${T.cardBorder}`, flex: 1 }}>
                   <h4 style={{ margin: '0 0 20px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>{t('technicalIndicators', lang)}</h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {result.indicators?.map((ind, i) => (
+                    {Array.isArray(result?.indicators) && result.indicators.map((ind, i) => (
                       <div key={i} style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
                         <div style={{ marginTop: 2 }}>
                           {ind.risk === 'high' ? <AlertCircle size={18} color="#f87171" /> : <CheckCircle size={18} color="#4ade80" />}
@@ -338,7 +338,7 @@ export default function VideoPage() {
                   </div>
                 </div>
 
-                {result.anomalies?.length > 0 && (
+                {Array.isArray(result?.anomalies) && result.anomalies.length > 0 && (
                   <div style={{ padding: 28, borderRadius: 24, background: T.cardBg, border: `1px solid ${T.cardBorder}` }}>
                     <h4 style={{ margin: '0 0 16px', fontSize: 12, letterSpacing: 1, color: T.text3, textTransform: 'uppercase' }}>{t('temporalAnomalies', lang)}</h4>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
