@@ -135,22 +135,80 @@ router.post("/ingest", upload.single("pdf"), async (req, res) => {
     }
 
     if (fallbackMode) {
-      // --- PHASE 3: PDF PARSER HARDENING (Wrap pdf-parse in isolated try/catch) ---
-      let parsed = null;
+      // --- PHASE 3: PDF PARSER HARDENING & PHASE 1: FAILURE CLASSIFICATION ---
+      let failureType = null;
+      let recoverySuggestion = "";
+      let reasoning = "";
+      let metadataInfo = {};
+
       try {
         const dataBuffer = fs.readFileSync(filePath);
-        parsed = await pdfParse(dataBuffer);
+        let parsed = null;
+        try {
+          parsed = await pdfParse(dataBuffer);
+        } catch (innerParseErr) {
+          const errMsg = (innerParseErr.message || "").toLowerCase();
+          reasoning = innerParseErr.message || "Primary pdf-parse module raised a parsing exception.";
+          
+          if (errMsg.includes("password") || errMsg.includes("decrypt") || errMsg.includes("encrypt")) {
+            failureType = "ENCRYPTED_DOCUMENT";
+            recoverySuggestion = "Encrypted PDF blocked extraction. Please remove the password protection or upload a decrypted copy.";
+          } else {
+            failureType = "CORRUPTED_STRUCTURE";
+            recoverySuggestion = "The PDF structure appears malformed or corrupted. Please verify the file extension or re-save the PDF.";
+          }
+          throw innerParseErr;
+        }
+
         extractedText = parsed ? (parsed.text || "") : "";
-        if (!extractedText.trim()) throw new Error("Parsed text is empty.");
+        metadataInfo = parsed ? (parsed.metadata || parsed.info || {}) : {};
+        const numPages = parsed ? (parsed.numpages || 0) : 0;
+
+        // Clean text formatting
+        const cleanText = extractedText.replace(/\s+/g, ' ').trim();
+
+        // SCANNED DOCUMENT OR EMPTY EXTRACTION DETECTION
+        if (!cleanText || cleanText.length < 150 || !/[a-zA-Z]/.test(cleanText)) {
+          failureType = "SCANNED_DOCUMENT";
+          reasoning = `Document contains ${numPages} page(s) but has only ${cleanText.length} character(s) of extractable alphabetical text.`;
+          recoverySuggestion = "OCR (Optical Character Recognition) is required for deep forensic extraction. Scanned document detected.";
+          throw new Error("Document appears image-based or non-extractable.");
+        }
+        
         console.log(`[API] Ingest Direct Parse success: Extracted ${extractedText.length} characters`);
       } catch (parseErr) {
-        console.error("[API] Graceful fallback parser activated:", parseErr.message);
-        extractedText = `Forensic Alert: Remote source parsing failed during extraction. The PDF structure may be corrupted, scanned without OCR layers, or password protected.
+        console.error(`[API] Granular PDF Parse Recovery Activated:`, parseErr.message);
+        
+        if (!failureType) {
+          failureType = "PARSER_CRASH";
+          reasoning = parseErr.message || "Unknown parsing engine crash.";
+          recoverySuggestion = "The parser encountered an unhandled encoding pattern. Try saving as standard PDF/A format.";
+        }
 
-Please extract the plain text manually or upload an OCR-processed copy. Ingestion degraded to diagnostic fallback mode.`;
+        // Keep it queryable - NEVER hard-fail!
+        extractedText = `FORENSIC DIAGNOSTIC REPORT
+============================
+Status: DEGRADED EXTRACTION MODE
+Failure Type: ${failureType}
+Reasoning: ${reasoning}
+Forensic Recommendation: ${recoverySuggestion}
+
+----------------------------
+TECHNICAL TELEMETRY
+----------------------------
+Filename: ${originalname}
+Size: ${(size / 1024).toFixed(1)} KB
+Mimetype: ${mimetype}
+Timestamp: ${new Date().toISOString()}
+Target Environment: Standard Sync Fallback Active
+
+Please copy and paste the plain text manually into the Verification tab to override this diagnostic block.`;
+
         ingestionJob.extractionFailed = true;
         ingestionJob.forensicStatus = "INGESTION_DEGRADED";
-        ingestionJob.reasoning = `PDF extraction failure: ${parseErr.message}`;
+        ingestionJob.failureType = failureType;
+        ingestionJob.reasoning = reasoning;
+        ingestionJob.recoverySuggestion = recoverySuggestion;
       }
 
       ingestionJob.status = 'completed';
@@ -160,7 +218,8 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
         ...ingestionJob.metadata,
         extractedText,
         directIngested: true,
-        extractionTimeMs: Date.now() - tStart
+        extractionTimeMs: Date.now() - tStart,
+        metadataInfo
       };
       await ingestionJob.save();
     }
@@ -169,19 +228,34 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
       success: true,
       jobId: ingestionJob.jobId || `direct_${documentId}`,
       documentId,
-      ...(ingestionJob.extractionFailed ? {
-        fallback: true,
-        forensicStatus: "INGESTION_DEGRADED",
-        reasoning: ingestionJob.reasoning
-      } : {})
+      fallback: true,
+      forensicStatus: ingestionJob.forensicStatus || "INGESTION_DEGRADED",
+      failureType: ingestionJob.failureType || null,
+      reasoning: ingestionJob.reasoning || null,
+      recoverySuggestion: ingestionJob.recoverySuggestion || null
     });
   } catch (err) {
-    console.error("[API] Ingestion Error:", err);
-    res.status(500).json({ 
-      error: "Ingestion pipeline failure",
+    console.error("[API] Fatal Ingestion Panic recovery:", err);
+    if (ingestionJob) {
+      ingestionJob.status = 'completed';
+      ingestionJob.progress = 100;
+      ingestionJob.extractionFailed = true;
+      ingestionJob.forensicStatus = "INGESTION_DEGRADED";
+      ingestionJob.failureType = "INGESTION_PANIC";
+      ingestionJob.reasoning = `Fatal Ingestion Panic: ${err.message}`;
+      ingestionJob.recoverySuggestion = "Direct extraction fallback initiated. Please review manually.";
+      await ingestionJob.save();
+    }
+    
+    res.status(200).json({ 
+      success: true,
+      jobId: ingestionJob ? (ingestionJob.jobId || `direct_${documentId}`) : `direct_${documentId}`,
+      documentId,
       fallback: true,
       forensicStatus: "INGESTION_DEGRADED",
-      reason: err.message
+      failureType: "INGESTION_PANIC",
+      reasoning: `Fatal Ingestion Panic: ${err.message}`,
+      recoverySuggestion: "Direct extraction fallback initiated. Please review manually."
     });
   } finally {
     // --- PHASE 2: PREVENT PREMATURE CLEANUP ---
@@ -227,11 +301,11 @@ router.get("/status/:jobId", async (req, res) => {
       timing: ingestionJob.timing,
       error: ingestionJob.error,
       result: ingestionJob.status === "completed" ? { text: ingestionJob.metadata?.extractedText || "" } : null,
-      ...(ingestionJob.extractionFailed ? {
-        fallback: true,
-        forensicStatus: "INGESTION_DEGRADED",
-        reasoning: ingestionJob.reasoning || "PDF extraction failure. Graceful text fallback generated."
-      } : {})
+      fallback: ingestionJob.extractionFailed || false,
+      forensicStatus: ingestionJob.forensicStatus || "INGESTION_DEGRADED",
+      failureType: ingestionJob.failureType || null,
+      reasoning: ingestionJob.reasoning || "PDF extraction failure. Graceful text fallback generated.",
+      recoverySuggestion: ingestionJob.recoverySuggestion || "Please copy and paste the plain text manually."
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch status" });

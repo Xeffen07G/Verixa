@@ -15,6 +15,11 @@ const IngestionJobSchema = new mongoose.Schema({
   path: { type: String }, // Local path for temporary storage
   error: { type: String },
   metadata: { type: Object, default: {} },
+  extractionFailed: { type: Boolean, default: false },
+  forensicStatus: { type: String },
+  failureType: { type: String },
+  reasoning: { type: String },
+  recoverySuggestion: { type: String },
   timing: {
     start: { type: Date, default: Date.now },
     extraction: Number,
