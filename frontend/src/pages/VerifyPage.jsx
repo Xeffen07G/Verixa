@@ -307,8 +307,20 @@ export default function VerifyPage() {
         if (status === 'completed') {
           completed = true;
           setPdfStatus('Completed');
-          setText(result.text);
+          
+          const extractedText = (result && result.text) ? result.text : '';
+          setText(extractedText);
           setInputMode('text');
+
+          if (statusRes.data.fallback || statusRes.data.forensicStatus === "INGESTION_DEGRADED") {
+            setPdfError({
+              title: "FORENSIC INGESTION DEGRADED",
+              body: statusRes.data.reasoning || "PDF extraction completed with dynamic fallbacks.",
+              subtext: "Platform status: Bypassed to prevent analysis blockage.",
+              sizeInfo: null,
+              helper: "Verify manual corrections inside the editing panel if structure seems incomplete."
+            });
+          }
         } else if (status === 'failed') {
           throw new Error(statusRes.data.error || 'Ingestion failed');
         } else {

@@ -42,7 +42,7 @@ const VERIFICATION_PROMPTS = require("./prompts/verificationPrompts");
 const EXPORT_PROMPTS = require("./prompts/exportPrompts");
 
 if (!fs.existsSync("uploads")) {
-  fs.mkdirSync("uploads");
+  fs.mkdirSync("uploads", { recursive: true });
 }
 
 const app = express();
@@ -267,15 +267,67 @@ if (SAFE_MODE) {
   app.post("/api/pdf/ingest", upload.single("pdf"), async (req, res) => {
     const globalStart = Date.now();
     const docId = Date.now().toString();
-    console.log(`[INGEST] Request received: ${docId}`);
 
-    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+    // --- PHASE 4: EXTRACTION TELEMETRY (Upload received / file size) ---
+    if (req.file) {
+      console.log(`[INGEST] Upload received: "${req.file.originalname}" (${req.file.size} bytes), Assigned docId: ${docId}`);
+    } else {
+      console.log(`[INGEST] Ingestion attempt failed: No file payload received. Assigned docId: ${docId}`);
+    }
+
+    // --- PHASE 1: HARD FILE VALIDATION ---
+    if (!req.file) {
+      return res.status(400).json({
+        error: "Forensic Ingestion Validation Failed",
+        reason: "No file payload received in multipart/form-data upload.",
+        fallback: true,
+        forensicStatus: "INGESTION_DEGRADED"
+      });
+    }
+
+    const { path: filePath, mimetype, originalname, size } = req.file;
+
+    // Check file existence before parsing
+    if (!fs.existsSync(filePath)) {
+      return res.status(400).json({
+        error: "Forensic Ingestion Validation Failed",
+        reason: "Temporary persistent file not found on server disk.",
+        fallback: true,
+        forensicStatus: "INGESTION_DEGRADED"
+      });
+    }
+
+    // Size limit check (10MB in SAFE_MODE)
+    const fileSizeMB = size / (1024 * 1024);
+    if (fileSizeMB > MAX_FILE_SIZE_MB || size <= 0) {
+      if (fs.existsSync(filePath)) { try { fs.unlinkSync(filePath); } catch (e) {} }
+      return res.status(400).json({
+        error: "Forensic Ingestion Validation Failed",
+        reason: size <= 0 
+          ? "Document contains zero bytes. Corrupted upload." 
+          : `File size ${fileSizeMB.toFixed(1)}MB exceeds current secure threshold limit of ${MAX_FILE_SIZE_MB}MB.`,
+        fallback: true,
+        forensicStatus: "INGESTION_DEGRADED"
+      });
+    }
+
+    // Extension & Mimetype validation
+    const extension = originalname.split('.').pop().toLowerCase();
+    if (mimetype !== "application/pdf" && extension !== "pdf") {
+      if (fs.existsSync(filePath)) { try { fs.unlinkSync(filePath); } catch (e) {} }
+      return res.status(400).json({
+        error: "Forensic Ingestion Validation Failed",
+        reason: `Mimetype must be application/pdf. Detected mimetype: ${mimetype}, extension: .${extension}`,
+        fallback: true,
+        forensicStatus: "INGESTION_DEGRADED"
+      });
+    }
 
     // --- DEDUPLICATION CHECK (filename + content hash) ---
-    const existingByName = SAFE_DOCS.find(d => d.filename === req.file.originalname && d.status !== 'FAILED_EXTRACT' && d.status !== 'FAILED_SIZE');
+    const existingByName = SAFE_DOCS.find(d => d.filename === originalname && d.status !== 'FAILED_EXTRACT' && d.status !== 'FAILED_SIZE');
     if (existingByName) {
-      console.log(`[INGEST] Duplicate filename detected: ${req.file.originalname} (id: ${existingByName.id}). Skipping.`);
-      try { fs.unlinkSync(req.file.path); } catch (e) {}
+      console.log(`[INGEST] Duplicate filename detected: ${originalname} (id: ${existingByName.id}). Skipping.`);
+      if (fs.existsSync(filePath)) { try { fs.unlinkSync(filePath); } catch (e) {} }
       return res.json({
         success: true,
         docId: existingByName.id,
@@ -286,30 +338,45 @@ if (SAFE_MODE) {
       });
     }
 
-    // Initial State: UPLOADING (already done by multer, but we mark it)
+    // Initial State: UPLOADING
     const docObj = {
       id: docId,
-      filename: req.file.originalname,
+      filename: originalname,
       uploadedAt: new Date().toISOString(),
       status: "UPLOADING",
       telemetry: { extraction_time: 0, chunking_time: 0, embedding_time: 0, total_background_time: 0 }
     };
     SAFE_DOCS.push(docObj);
 
-    // Limit Check: File Size
-    const fileSizeMB = req.file.size / (1024 * 1024);
-    if (fileSizeMB > MAX_FILE_SIZE_MB) {
-      docObj.status = "FAILED_SIZE";
-      return res.status(400).json({ error: `File too large (${fileSizeMB.toFixed(1)}MB). Max allowed is ${MAX_FILE_SIZE_MB}MB.` });
-    }
-
     try {
       // --- STAGE 1: FAST INGESTION ---
       docObj.status = "EXTRACTING";
       const extractStart = Date.now();
-      const dataBuffer = fs.readFileSync(req.file.path);
-      const parsed = await pdfParse(dataBuffer);
-      const extractedText = parsed.text;
+      
+      // --- PHASE 3: PDF PARSER HARDENING (Wrap pdf-parse in isolated try/catch) ---
+      let extractedText = "";
+      try {
+        const dataBuffer = fs.readFileSync(filePath);
+        const parsed = await pdfParse(dataBuffer);
+        extractedText = parsed ? (parsed.text || "") : "";
+        
+        if (!extractedText.trim()) {
+          throw new Error("Parsed text is empty.");
+        }
+        
+        console.log(`[INGEST] Parse success: Extracted ${extractedText.length} characters`);
+      } catch (parseErr) {
+        // Fallback degraded ingestion mode
+        console.error(`[INGEST] Parse failure: pdf-parse failed. Graceful fallback activated.`, parseErr);
+        extractedText = `Forensic Alert: Remote source parsing failed during extraction. The PDF structure may be corrupted, scanned without OCR layers, or password protected.
+
+Please extract the plain text manually or upload an OCR-processed copy. Ingestion degraded to diagnostic fallback mode.`;
+        docObj.extractionFailed = true;
+        docObj.forensicStatus = "INGESTION_DEGRADED";
+        docObj.fallback = true;
+        docObj.reasoning = `PDF extraction failure: ${parseErr.message || 'unknown error'}`;
+      }
+
       docObj.text = extractedText;
       docObj.telemetry.extraction_time = Date.now() - extractStart;
 
@@ -317,16 +384,15 @@ if (SAFE_MODE) {
       const contentFingerprint = extractedText.slice(0, 500).replace(/\s+/g, '').toLowerCase();
       const existingByContent = SAFE_DOCS.find(d => d.id !== docId && d.contentFingerprint === contentFingerprint && d.status !== 'FAILED_EXTRACT');
       if (existingByContent) {
-        console.log(`[INGEST] Content duplicate detected: "${req.file.originalname}" matches existing doc "${existingByContent.filename}" (id: ${existingByContent.id})`);
+        console.log(`[INGEST] Content duplicate detected: "${originalname}" matches existing doc "${existingByContent.filename}" (id: ${existingByContent.id})`);
         SAFE_DOCS.splice(SAFE_DOCS.indexOf(docObj), 1); // Remove the placeholder
-        try { fs.unlinkSync(req.file.path); } catch (e) {}
         return res.json({ success: true, docId: existingByContent.id, status: existingByContent.status, message: "Document content already indexed (duplicate detected by content hash).", duplicate: true, telemetry: existingByContent.telemetry });
       }
       docObj.contentFingerprint = contentFingerprint;
 
       docObj.status = "INDEXING";
       const chunkStart = Date.now();
-      let chunks = semanticChunking(extractedText, req.file.originalname);
+      let chunks = semanticChunking(extractedText, originalname);
       if (chunks.length > MAX_CHUNKS_PER_DOC) chunks = chunks.slice(0, MAX_CHUNKS_PER_DOC);
       
       chunks.forEach(c => {
@@ -337,12 +403,10 @@ if (SAFE_MODE) {
       docObj.telemetry.chunking_time = Date.now() - chunkStart;
 
       docObj.status = "READY_BASIC";
-      
-      // Cleanup local file
-      try { fs.unlinkSync(req.file.path); } catch (e) {}
 
       // --- STAGE 2: BACKGROUND ENHANCEMENT ---
       (async () => {
+        // SAFE_MODE memory / concurrency check
         if (activeEmbeddingJobs >= MAX_CONCURRENT_JOBS || (process.memoryUsage().heapUsed / 1024 / 1024) > MEMORY_THRESHOLD_MB) {
           docObj.status = "READY_BASIC"; // Stay at basic if resources low
           return;
@@ -383,13 +447,32 @@ if (SAFE_MODE) {
         docId,
         status: "READY_BASIC",
         message: "Stage 1 complete. Document queryable.",
-        telemetry: docObj.telemetry
+        telemetry: docObj.telemetry,
+        ...(docObj.extractionFailed ? {
+          fallback: true,
+          forensicStatus: "INGESTION_DEGRADED",
+          reasoning: docObj.reasoning
+        } : {})
       });
 
     } catch (err) {
       console.error("[INGEST] Stage 1 Failure:", err);
       docObj.status = "FAILED_EXTRACT";
-      return res.status(500).json({ error: "Document processing failed." });
+      return res.status(500).json({ 
+        error: "Document processing failed.",
+        fallback: true,
+        forensicStatus: "INGESTION_DEGRADED",
+        reason: err.message
+      });
+    } finally {
+      // --- PHASE 2: PREVENT PREMATURE CLEANUP (Cleanup only in finally block, guarded by existsSync) ---
+      if (fs.existsSync(filePath)) {
+        try {
+          fs.unlinkSync(filePath);
+        } catch (e) {
+          console.error("[INGEST] Cleanup failed:", e.message);
+        }
+      }
     }
   });
 
@@ -417,7 +500,12 @@ if (SAFE_MODE) {
       status: status,
       progress: status === "completed" ? 100 : (status === "failed" ? 0 : 50),
       result: status === "completed" ? { text: doc.text } : null,
-      telemetry: doc.telemetry
+      telemetry: doc.telemetry,
+      ...(doc.extractionFailed ? {
+        fallback: true,
+        forensicStatus: "INGESTION_DEGRADED",
+        reasoning: doc.reasoning || "PDF extraction failure. Graceful text fallback generated."
+      } : {})
     });
   });
 
