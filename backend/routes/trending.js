@@ -145,4 +145,5 @@ router.post("/report", (req, res) => {
   res.json({ reported, totalTracked: trendingStore.size });
 });
 
+router.reportClaim = reportClaim;
 module.exports = router;

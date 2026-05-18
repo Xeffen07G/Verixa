@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const BASE = process.env.REACT_APP_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:5000' : '');
-
+const rawBase = process.env.REACT_APP_API_URL || process.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:5000' : '');
+const BASE = rawBase ? rawBase.replace(/\/+$/, '') : '';
 const api = axios.create({
   baseURL: BASE,
   timeout: 120000,

@@ -33,7 +33,6 @@ export default function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/trending" element={<TrendingPage />} />
-                <Route path="/verification" element={<DashboardPage />} />
                 <Route path="/intelligence" element={<IntelligenceLab />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/extension" element={<ExtensionPage />} />

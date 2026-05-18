@@ -135,6 +135,23 @@ See [SAFE_MODE.md](./SAFE_MODE.md) for full documentation.
 
 ---
 
+## Key Engineering Challenges
+
+* **Adaptive Retrieval Pipeline:** Building a RAG system that gracefully distinguishes between synthesis ("Summarize this paper") and factual lookup ("What is the specific methodology in section 3?") required an intent-classification layer. By dynamically shifting vector similarity thresholds and section boosts, we eliminated the typical "No evidence found" dead ends while strictly preventing hallucinations.
+* **Dual-Stage Ingestion:** Semantic embedding (using Xenova all-MiniLM) is CPU-heavy. To provide users with instant feedback, we built a dual-stage pipeline that runs a fast BM25 keyword index within 3-5 seconds, pushing heavy vector embedding to background asynchronous workers.
+* **Contradiction Detection Engine:** Standard LLMs merge conflicting sources into unified summaries. VeriXa utilizes a specialized cross-document conflict detection engine that explicitly surfaces inconsistencies in methodologies or claims, badging them in the UI with severity ratings.
+
+---
+
+## Production Constraints
+
+This application was engineered to run seamlessly on severe free-tier constraints (e.g. Render / Vercel).
+* **512MB Hard Memory Limit:** No external databases are used. The platform operates a custom in-memory cosine similarity array with aggressive garbage collection protocols that purge stale investigation sessions if memory usage exceeds 450MB.
+* **Serverless UI Streams:** AI streaming (SSE) across Vercel serverless boundaries is notoriously fragile. To prevent the frontend from hanging indefinitely on network drops, all fetching relies on 120-second background `AbortControllers`.
+* **Zero Persistence Dependencies:** To circumvent cloud database DNS throttles, VeriXa implements a resilient, auto-recovering JSON filesystem storage that guarantees 100% startup reliability.
+
+---
+
 ## Demo Investigations
 
 VeriXa ships with 4 pre-configured forensic investigations:

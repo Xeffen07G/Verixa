@@ -73,7 +73,7 @@ export default function VerificationLab() {
         text: claim, 
         timestamp: new Date(), 
         overallScore: res.data.overallScore,
-        claims: res.data.claims 
+        claims: Array.isArray(res.data.claims) ? res.data.claims : []
       };
       
       const updatedHistory = [newEntry, ...verificationHistory].slice(0, 50);
@@ -108,7 +108,7 @@ export default function VerificationLab() {
           </p>
         </header>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 80 }}>
+        <div className="dashboard-grid">
           {/* Left: Investigation Console */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 80 }}>
             <section>
@@ -133,17 +133,17 @@ export default function VerificationLab() {
             <section>
               <div style={{ fontSize: 11, fontWeight: 900, color: T.accent, letterSpacing: 2, marginBottom: 40 }}>INTELLIGENCE LEDGER</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-                {verificationHistory.length > 0 ? (
+                {Array.isArray(verificationHistory) && verificationHistory.length > 0 ? (
                   verificationHistory.map((h, i) => (
                     <div key={i} style={{ paddingBottom: 32, borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', gap: 32, alignItems: 'center', flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 32, fontWeight: 300, fontFamily: 'Cormorant Garamond, serif', color: h.overallScore >= 70 ? '#4ade80' : '#f87171' }}>
-                          {h.overallScore}%
+                        <div style={{ fontSize: 32, fontWeight: 300, fontFamily: 'Cormorant Garamond, serif', color: (h?.overallScore || 0) >= 70 ? '#4ade80' : '#f87171' }}>
+                          {h?.overallScore || 0}%
                         </div>
                         <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ fontSize: 18, fontWeight: 500, color: T.text, marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{h.text}</div>
+                          <div style={{ fontSize: 18, fontWeight: 500, color: T.text, marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{h?.text || 'Untitled Investigation'}</div>
                           <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-                            <span style={{ fontSize: 11, color: T.text3, fontWeight: 700, letterSpacing: 1 }}>REF: {h.id.toString().slice(-6)}</span>
+                            <span style={{ fontSize: 11, color: T.text3, fontWeight: 700, letterSpacing: 1 }}>REF: {h?.id ? h.id.toString().slice(-6) : 'N/A'}</span>
                             <button 
                               onClick={() => navigate('/research')}
                               style={{ background: 'none', border: 'none', color: T.accent, fontSize: 11, fontWeight: 900, cursor: 'pointer', letterSpacing: 1, padding: 0 }}

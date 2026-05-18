@@ -35,7 +35,9 @@ export default function IntelligenceLab() {
     try {
       const res = await api.get('/api/investigation/active');
       setActiveSessions(res.data || []);
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+        console.error(err); 
+    }
   };
 
   const fetchTelemetry = async () => {
@@ -48,7 +50,9 @@ export default function IntelligenceLab() {
         contradictionCount: 4,
         avgConfidence: 84.5
       });
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+        console.error(err); 
+    }
   };
 
   const T = {
@@ -74,7 +78,7 @@ export default function IntelligenceLab() {
         </p>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 80 }}>
+      <div className="intelligence-grid">
         {/* MAIN PANEL */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 80 }}>
           

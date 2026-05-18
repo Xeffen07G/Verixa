@@ -1,37 +1,45 @@
 const express = require("express");
 const router = express.Router();
 const { extractClaims, searchEvidence, verifyClaims, detectAIText } = require("../services/groq");
+const { normalizeVerificationResponse } = require("../utils/adapter");
 
 router.post("/", async (req, res) => {
-  const { text, detectAI = false } = req.body;
+  const { text, detectAI = false, forensic = false } = req.body;
+  const isStream = req.headers.accept === "text/event-stream" || req.query.stream === "true";
 
   if (!text || text.trim().length < 5) {
     return res.status(400).json({ error: "Please provide at least 5 characters of text." });
   }
 
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache, no-transform");
-  res.setHeader("Connection", "keep-alive");
-  res.setHeader("X-Accel-Buffering", "no");
-  res.flushHeaders();
+  console.log(`[VERIFY] Request received: ${text.slice(0, 50)}${text.length > 50 ? '...' : ''} (stream=${isStream})`);
+
+  if (isStream) {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
+    res.flushHeaders();
+  }
 
   const send = (event, data) => {
     const payload = JSON.stringify({ event, ...data });
-    res.write(`data: ${payload}\n\n`);
+    if (isStream) {
+      res.write(`data: ${payload}\n\n`);
+    } else {
+      console.log(`[VERIFY][LOG] ${event}: ${data.message || '...'}`);
+    }
   };
 
   try {
     send("stage", { stage: "extracting", message: "Decomposing text & analyzing origin..." });
     
-    // Run extraction and AI detection in parallel to save significant time
-    // Adding a 60-second timeout to prevent permanent hangs
     const timeoutPromise = new Promise((_, reject) => 
       setTimeout(() => reject(new Error("Verification timed out during extraction")), 60000)
     );
 
     const extractPromise = extractClaims(text).then(claims => {
       send("log", { message: `Found ${claims.length} verifiable claims` });
-      return claims;
+      return Array.isArray(claims) ? claims : [];
     });
 
     let aiDetectionPromise = Promise.resolve(null);
@@ -52,28 +60,22 @@ router.post("/", async (req, res) => {
       timeoutPromise
     ]);
 
-    // Send extracted claims immediately to the frontend so they can see what's being checked
     send("claims_extracted", { claims });
 
     send("stage", { stage: "searching", message: "Retrieving evidence & verifying truth..." });
     
-    // Process each claim independently and stream results back immediately
     const verifiedResults = [];
-    for (let index = 0; index < claims.length; index++) {
+    for (let index = 0; index < (claims?.length || 0); index++) {
       const claim = claims[index];
       try {
-        // Add a 500ms delay between claims to stay under TPM limits
         if (index > 0) await new Promise(r => setTimeout(r, 500));
 
-        // 1. Search evidence for this specific claim
         const evidence = await searchEvidence(claim);
         send("log", { message: `Evidence found for claim #${index + 1}` });
 
-        // 2. Verify this specific claim immediately
         const singleClaimResult = await verifyClaims([{ claim, evidenceText: evidence.text, sources: evidence.sources }]);
         const result = singleClaimResult[0];
 
-        // 3. Stream this specific result to the frontend
         send("claim_verified", { claim: result, index });
         verifiedResults.push(result);
       } catch (e) {
@@ -85,38 +87,55 @@ router.post("/", async (req, res) => {
     }
 
     const scoreMap = { True: 100, "Partially True": 50, False: 0, Unverifiable: 50 };
-    const overallScore = Math.round(
-      verifiedResults.reduce((s, c) => s + (scoreMap[c.verdict] ?? 50), 0) / verifiedResults.length
-    );
+    const overallScore = verifiedResults.length > 0 
+      ? Math.round(verifiedResults.reduce((s, c) => s + (scoreMap[c.verdict] ?? 50), 0) / verifiedResults.length)
+      : 0;
 
-    send("result", {
+    const finalResult = {
       stage: "done",
       claims: verifiedResults,
       overallScore,
       totalClaims: verifiedResults.length,
       aiDetection,
       timestamp: new Date().toISOString(),
-    });
+    };
 
-    // Report to trending (same logic as before)
+    if (isStream) {
+      send("result", finalResult);
+    } else {
+      res.json(finalResult);
+    }
+
+    // Report to trending
     try {
       const falseOrPartial = verifiedResults.filter(c => c.verdict === "False" || c.verdict === "Partially True");
       if (falseOrPartial.length > 0) {
         const protocol = req.secure ? "https" : "http";
         const host = req.get("host");
-        fetch(`${protocol}://${host}/api/trending/report`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ claims: falseOrPartial }),
-        }).catch(() => {});
+        // Use direct function call if in the same process to avoid self-fetch issues
+        const { reportClaim } = require("./trending");
+        if (typeof reportClaim === 'function') {
+          falseOrPartial.forEach(c => reportClaim(c.claim, c.verdict, c.confidence_score || 50));
+        } else {
+          // Fallback to fetch if trending isn't exported as a function
+          fetch(`${protocol}://${host}/api/trending/report`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ claims: falseOrPartial }),
+          }).catch(() => {});
+        }
       }
     } catch (e) {}
 
   } catch (err) {
     console.error("Pipeline error:", err);
-    send("error", { message: err.message || "Verification pipeline failed" });
+    if (isStream) {
+      send("error", { message: err.message || "Verification pipeline failed" });
+    } else {
+      res.status(500).json({ error: err.message || "Verification pipeline failed" });
+    }
   } finally {
-    res.end();
+    if (isStream) res.end();
   }
 });
 

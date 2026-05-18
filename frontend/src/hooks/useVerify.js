@@ -26,6 +26,8 @@ export function useVerify() {
     abortRef.current = new AbortController();
 
     try {
+      const timeoutId = setTimeout(() => abortRef.current?.abort(), 120000); // 2 min timeout
+      
       const response = await fetch(`${BASE}/api/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -33,9 +35,10 @@ export function useVerify() {
         signal: abortRef.current.signal,
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || 'Verification failed');
+        throw new Error('Evidence retrieval temporarily unavailable.');
       }
 
       const reader = response.body.getReader();
@@ -61,34 +64,39 @@ export function useVerify() {
             try { data = JSON.parse(jsonStr); }
             catch (e) { continue; }
 
+
+
             switch (data.event) {
               case 'stage':
-                setStage(data.stage);
+                setStage(data.stage || 'extracting');
                 if (data.message) addLog(data.message);
                 break;
               case 'log':
-                addLog(data.message);
+                if (data.message) addLog(data.message);
                 break;
               case 'claims_extracted':
-                // Initial placeholder claims
-                setClaims(data.claims.map(c => ({ claim: c, verdict: 'Pending', reasoning: 'Analyzing evidence...', sources: [] })));
+                if (Array.isArray(data.claims)) {
+                    setClaims(data.claims.map(c => ({ claim: c, verdict: 'Pending', reasoning: 'Analyzing evidence...', sources: [] })));
+                }
                 break;
               case 'claim_verified':
                 setClaims(prev => {
-                  const next = [...prev];
-                  if (next[data.index]) next[data.index] = data.claim;
-                  else next.push(data.claim);
+                  const next = Array.isArray(prev) ? [...prev] : [];
+                  if (data.claim) {
+                      if (next[data.index]) next[data.index] = data.claim;
+                      else next.push(data.claim);
+                  }
                   return next;
                 });
                 break;
               case 'result':
-                setClaims(data.claims || []);
-                setOverallScore(data.overallScore);
+                setClaims(Array.isArray(data.claims) ? data.claims : []);
+                setOverallScore(typeof data.overallScore === 'number' ? data.overallScore : 0);
                 if (data.aiDetection) setAiDetection(data.aiDetection);
                 setStage('done');
                 break;
               case 'error':
-                throw new Error(data.message || 'Unknown error');
+                throw new Error('Forensic analysis interrupted. Please retry.');
               default:
                 break;
             }
@@ -97,11 +105,12 @@ export function useVerify() {
       }
     } catch (err) {
       if (err.name !== 'AbortError') {
-        setError(err.message || 'Something went wrong. Check your API keys.');
+        setError(err.message || 'Evidence retrieval temporarily unavailable.');
         setStage(null);
       }
     } finally {
       setIsLoading(false);
+      abortRef.current = null;
     }
   }, []);
 

@@ -382,9 +382,16 @@ export default function VerifyPage() {
                 <button onClick={() => exportToPDF(claims, overallScore, text, lang)} style={{ flex: 1, padding: '14px', borderRadius: 12, background: T.surface2, border: `1px solid ${T.border}`, color: T.text, fontWeight: 700, cursor: 'pointer' }}>{t('exportReport', lang)}</button>
                 <button onClick={() => generateCertificate(claims, overallScore, text, lang)} style={{ flex: 1, padding: '14px', borderRadius: 12, background: T.accent, border: 'none', color: '#000', fontWeight: 700, cursor: 'pointer' }}>{t('generateCert', lang)}</button>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {Array.isArray(claims) && claims.map((c, i) => <ClaimCard key={i} claim={c} theme={T} lang={lang} />)}
-              </div>
+              {!Array.isArray(claims) || claims.length === 0 ? (
+                <div style={{ padding: '80px 40px', borderRadius: 24, border: `1px solid ${T.border}`, textAlign: 'center', background: 'rgba(255,255,255,0.01)' }}>
+                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 300, color: T.text3 }}>No Claims Identified</div>
+                  <p style={{ color: T.text3, fontSize: 13, marginTop: 12 }}>Please provide text containing factual assertions.</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {claims.map((c, i) => <ClaimCard key={i} claim={c} theme={T} lang={lang} />)}
+                </div>
+              )}
             </div>
           ) : (
             <div style={{ textAlign: 'center', padding: '100px 20px', animation: 'fadeUp 0.8s ease' }}>

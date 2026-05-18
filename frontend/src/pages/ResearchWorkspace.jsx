@@ -56,21 +56,27 @@ export default function ResearchWorkspace() {
     try {
       const res = await api.get('/api/rag/documents');
       setVaultDocs(res.data.documents || []);
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+        console.error(err); 
+    }
   };
 
   const fetchInvestigations = async () => {
     try {
       const res = await api.get('/api/boards');
       setInvestigations(res.data.boards || []);
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+        console.error(err); 
+    }
   };
 
   const fetchTelemetry = async () => {
     try {
       const res = await api.get('/api/admin/telemetry');
       setTelemetry(res.data);
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+        console.error(err); 
+    }
   };
 
   const handleFileUpload = async (e) => {
@@ -95,7 +101,9 @@ export default function ResearchWorkspace() {
             setUploadStatus({ status: 'success', message: 'READY_SEMANTIC: Enhancement complete' });
             setTimeout(() => setUploadStatus(null), 3000);
           }
-        } catch (e) { clearInterval(poll); }
+        } catch (e) { 
+            clearInterval(poll); 
+        }
       }, 5000);
     } catch (err) {
       setUploadStatus({ status: 'error', message: 'INGESTION FAILED' });
@@ -115,10 +123,10 @@ export default function ResearchWorkspace() {
       setMessages(prev => [...prev, { 
         role: 'ai', 
         content: res.data.answer,
-        sources: res.data.sources,
+        sources: res.data.sources || [],
         confidence: res.data.confidence,
         confidenceLabel: res.data.confidenceLabel,
-        contradictions: res.data.contradictions,
+        contradictions: res.data.contradictions || [],
         mode: res.data.mode,
         intent: res.data.intent,
         fallbackTriggered: res.data.fallbackTriggered || false,
@@ -206,7 +214,9 @@ export default function ResearchWorkspace() {
       });
       fetchInvestigations();
       setCurrentInvestigationId(res.data.board.id);
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+        console.error(err); 
+    }
   };
 
   const T = {
@@ -221,9 +231,9 @@ export default function ResearchWorkspace() {
   };
 
   return (
-    <div style={{ height: '100vh', display: 'flex', background: T.bg, color: T.text, overflow: 'hidden', fontFamily: 'Inter, sans-serif' }}>
+    <div className="research-layout">
       {/* LEFT PANEL: Research Vault & Case Files */}
-      <div style={{ width: 320, borderRight: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', background: 'rgba(255,255,255,0.01)' }}>
+      <div className="research-sidebar-left">
         <div style={{ padding: '32px 24px', borderBottom: `1px solid ${T.border}` }}>
           <div style={{ fontSize: 10, fontWeight: 900, color: T.accent, letterSpacing: 2, marginBottom: 8 }}>RESEARCH VAULT</div>
           <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 300, color: T.text }}>Case Files</div>
@@ -277,7 +287,7 @@ export default function ResearchWorkspace() {
       </div>
 
       {/* CENTER PANEL: Intelligence Thread */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: T.bg }}>
+      <div className="research-main">
         <div style={{ padding: '24px 40px', borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: T.bg }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', borderRadius: 8, border: `1px solid ${T.border}`, background: 'rgba(255,255,255,0.02)' }}>
@@ -322,32 +332,32 @@ export default function ResearchWorkspace() {
 
         <div style={{ flex: 1, overflowY: 'auto', padding: '40px 64px' }}>
           {(!Array.isArray(messages) || messages.length === 0) ? (
-            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ textAlign: 'center', marginBottom: 64 }}>
-                <div style={{ width: 80, height: 80, borderRadius: 24, background: 'rgba(201,169,110,0.05)', border: `1px solid ${T.accent}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}>
-                  <Shield size={32} color={T.accent} />
-                </div>
-                <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 300, marginBottom: 12, letterSpacing: -1 }}>Forensic Intelligence Lab</h2>
-                <div style={{ fontSize: 16, maxWidth: 440, margin: '0 auto', color: T.text2, fontWeight: 300, lineHeight: 1.6 }}>Ingest artifacts to begin cross-document interrogation or select a pre-configured investigation.</div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, width: '100%', maxWidth: 720 }}>
-                {[
-                  { file: 'ai_bias_conflict.json', title: 'LLM Bias & Safety', desc: 'Map contradictions in safety alignment research.' },
-                  { file: 'climate_contradiction.json', title: 'Climate Data Audit', desc: 'Analyze conflicting Arctic melt velocity metrics.' },
-                  { file: 'misinformation_verification.json', title: 'Vaccine Misinfo Audit', desc: 'Cross-reference viral claims against peer-reviewed data.' },
-                  { file: 'methodology_conflict.json', title: 'Replication Crisis', desc: 'Trace replication failures in psychology priming studies.' }
-                ].map(d => (
-                  <div key={d.file} style={{ padding: 24, borderRadius: 20, background: 'rgba(255,255,255,0.02)', border: `1px solid ${T.border}`, cursor: 'pointer', transition: 'all 0.3s' }} onClick={() => loadDemo(d.file)} onMouseEnter={e => { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.transform = 'translateY(-4px)'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.transform = 'translateY(0)'; }}>
-                    <div style={{ fontSize: 9, fontWeight: 900, color: T.accent, letterSpacing: 2, marginBottom: 12 }}>SAMPLE DATA</div>
-                    <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>{d.title}</div>
-                    <div style={{ fontSize: 12, color: T.text3, lineHeight: 1.5 }}>{d.desc}</div>
+            <>
+              <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ textAlign: 'center', marginBottom: 64 }}>
+                  <div style={{ width: 80, height: 80, borderRadius: 24, background: 'rgba(201,169,110,0.05)', border: `1px solid ${T.accent}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}>
+                    <Shield size={32} color={T.accent} />
                   </div>
-                ))}
-              </div>
-            </div>
+                  <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 300, marginBottom: 12, letterSpacing: -1 }}>Forensic Intelligence Lab</h2>
+                  <div style={{ fontSize: 16, maxWidth: 440, margin: '0 auto', color: T.text2, fontWeight: 300, lineHeight: 1.6 }}>Ingest artifacts to begin cross-document interrogation or select a pre-configured investigation.</div>
+                </div>
 
-              
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, width: '100%', maxWidth: 720 }}>
+                  {[
+                    { file: 'ai_bias_conflict.json', title: 'LLM Bias & Safety', desc: 'Map contradictions in safety alignment research.' },
+                    { file: 'climate_contradiction.json', title: 'Climate Data Audit', desc: 'Analyze conflicting Arctic melt velocity metrics.' },
+                    { file: 'misinformation_verification.json', title: 'Vaccine Misinfo Audit', desc: 'Cross-reference viral claims against peer-reviewed data.' },
+                    { file: 'methodology_conflict.json', title: 'Replication Crisis', desc: 'Trace replication failures in psychology priming studies.' }
+                  ].map(d => (
+                    <div key={d.file} style={{ padding: 24, borderRadius: 20, background: 'rgba(255,255,255,0.02)', border: `1px solid ${T.border}`, cursor: 'pointer', transition: 'all 0.3s' }} onClick={() => loadDemo(d.file)} onMouseEnter={e => { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.transform = 'translateY(-4px)'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                      <div style={{ fontSize: 9, fontWeight: 900, color: T.accent, letterSpacing: 2, marginBottom: 12 }}>SAMPLE DATA</div>
+                      <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>{d.title}</div>
+                      <div style={{ fontSize: 12, color: T.text3, lineHeight: 1.5 }}>{d.desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div style={{ marginTop: 40, textAlign: 'center' }}>
                 <div style={{ fontSize: 10, fontWeight: 800, color: T.text3, letterSpacing: 2, marginBottom: 16 }}>SUGGESTED WORKFLOWS</div>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -356,7 +366,7 @@ export default function ResearchWorkspace() {
                   ))}
                 </div>
               </div>
-            </div>
+            </>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
               {Array.isArray(messages) && messages.map((msg, idx) => (
@@ -463,7 +473,7 @@ export default function ResearchWorkspace() {
       </div>
 
       {/* RIGHT PANEL: Evidence Deep-Dive & Timeline */}
-      <div style={{ width: 380, borderLeft: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', background: 'rgba(255,255,255,0.01)' }}>
+      <div className="research-sidebar-right">
         <div style={{ padding: 24, borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <div style={{ fontSize: 10, fontWeight: 900, color: T.accent, letterSpacing: 1.5, marginBottom: 4 }}>ANALYSIS CENTER</div>

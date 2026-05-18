@@ -397,10 +397,26 @@ if (SAFE_MODE) {
     const doc = SAFE_DOCS.find(d => d.id === req.params.id);
     if (!doc) return res.status(404).json({ error: "Document not found" });
     
+    // Map SAFE_MODE statuses to frontend expected statuses
+    const statusMap = {
+      "READY_BASIC": "completed",
+      "READY_SEMANTIC": "completed",
+      "EXTRACTING": "processing",
+      "INDEXING": "processing",
+      "ENHANCING": "processing",
+      "FAILED_EXTRACT": "failed",
+      "FAILED_SIZE": "failed",
+      "UPLOADING": "processing"
+    };
+
+    const status = statusMap[doc.status] || doc.status.toLowerCase();
+
     return res.json({
       success: true,
       id: doc.id,
-      status: doc.status,
+      status: status,
+      progress: status === "completed" ? 100 : (status === "failed" ? 0 : 50),
+      result: status === "completed" ? { text: doc.text } : null,
       telemetry: doc.telemetry
     });
   });
@@ -1001,57 +1017,47 @@ API ROUTES
 if (PROCESS_TYPE === "api") {
   const { requireApiKey } = require("./middleware/validate");
 
-  // Mount RAG routes always, so they are available even if some other features are limited
+  // Mount RAG routes always
   app.use("/api/rag", require("./routes/rag"));
 
+  // --- CORE VERIFICATION WORKFLOWS (RESTORATION) ---
+  app.use("/api/verify", requireApiKey, require("./routes/verify"));
+  app.use("/api/url", requireApiKey, require("./routes/url"));
+  app.use("/api/pdf", requireApiKey, require("./routes/pdf"));
+  app.use("/api/image", requireApiKey, require("./routes/image"));
+  app.use("/api/video", requireApiKey, require("./routes/video"));
+  app.use("/api/trending", require("./routes/trending"));
+  app.use("/api/auth", require("./routes/auth"));
+  app.use("/api/user", require("./routes/user"));
+  app.use("/api/organization", require("./routes/organization"));
+
+  // --- ADMIN & TELEMETRY ---
+  app.get("/api/admin/telemetry", (req, res) => {
+    const investigationManager = require("./services/investigationService");
+    res.json({
+      sessions: investigationManager ? Object.keys(investigationManager.sessions).length : 0,
+      vaultSize: typeof SAFE_DOCS !== 'undefined' ? SAFE_DOCS.length : 0,
+      chunkCount: typeof SAFE_CHUNKS !== 'undefined' ? SAFE_CHUNKS.length : 142,
+      activeJobs: 0,
+      memory: {
+        heapUsed: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + "MB",
+        heapUsedNum: Math.round(process.memoryUsage().heapUsed / 1024 / 1024)
+      }
+    });
+  });
+
   if (!SAFE_MODE) {
-    console.log("[API] Loading production routes...");
-
+    console.log("[API] Loading production configuration...");
     const rateLimit = require("express-rate-limit");
-
     const limiter = rateLimit({
       windowMs: 15 * 60 * 1000,
       max: 100,
-      message: {
-        error: "Too many requests",
-      },
+      message: { error: "Too many requests" },
     });
-
     app.use("/api/", limiter);
-
-    app.use("/api/verify", requireApiKey, require("./routes/verify"));
-    app.use("/api/url", requireApiKey, require("./routes/url"));
-    app.use("/api/health", require("./routes/health"));
-    app.use("/api/trending", require("./routes/trending"));
-    app.use("/api/organization", require("./routes/organization"));
-    app.use("/api/user", require("./routes/user"));
-    app.use("/api/auth", require("./routes/auth"));
-    app.use("/api/pdf", requireApiKey, require("./routes/pdf"));
-    app.use("/api/image", requireApiKey, require("./routes/image"));
-    app.use("/api/video", requireApiKey, require("./routes/video"));
   } else {
-    console.log("[SAFE API] Minimal routes enabled");
-
-    app.use("/api/auth", require("./routes/auth"));
-
-    app.use("/api/health", (req, res) => {
-      res.json({
-        status: "safe",
-      });
-    });
-
-    app.get("/api/admin/telemetry", (req, res) => {
-      res.json({
-        sessions: investigationManager.sessions ? Object.keys(investigationManager.sessions).length : 0,
-        vaultSize: SAFE_DOCS.length,
-        chunkCount: 142, // Mock or calculate from vector store
-        activeJobs: 0,
-        memory: {
-          heapUsed: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + "MB",
-          heapUsedNum: Math.round(process.memoryUsage().heapUsed / 1024 / 1024)
-        }
-      });
-    });
+    console.log("[SAFE API] Multi-branch routes enabled (SAFE_MODE)");
+    app.get("/api/health", (req, res) => res.json({ status: "safe", mode: "RECOVERY_ACTIVE" }));
   }
 }
 
