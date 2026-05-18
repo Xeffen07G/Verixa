@@ -20,6 +20,13 @@ VeriXa RC-1 marks the transition from beta development into a production-ready, 
 * **Cross-Device Fluidity:** Introduced CSS Grid structural classes (`.dashboard-grid`, `.intelligence-grid`, `.research-layout`) for the core forensic modules.
 * **Mobile & Tablet Layouts:** Ensured sidebars gracefully stack beneath main workspaces on sub-1024px displays without compromising the high-fidelity aesthetic.
 
+### 4. PDF Ingestion & Extraction Stabilization (Hotfix)
+* **Strict Security Pre-validation:** Added file integrity checks (existence, mime-type boundaries, non-zero size, <25MB payload threshold) to block malformed inputs gracefully.
+* **Guarded Filesystem Cleanups:** Implemented defensive temporal persistence; file unlinks are now strictly confined to `finally` blocks, resolving Render ephemeral disk deletion races.
+* **Parser Isolation:** Wrapped primary `pdf-parse` services in dedicated try/catch wrappers to return standard forensic degraded telemetry rather than raw runtime crashes.
+* **Autonomic Queue Fallbacks:** Created live queue-offline fallbacks. If Redis or BullMQ is unreachable (e.g. cold starts or local dev environment), the app instantly transitions to in-process synchronous parsing and database storage to prevent document blocks.
+* **Resilient UI Integration:** Guarded frontend status handlers against empty result streams and bound fallback modes to elegant inline warnings.
+
 ## 🛠 Validation Checklist Complete
 - [x] **Verification Lab:** Text, URL, and File inputs handle streams perfectly.
 - [x] **Research Workspace:** File ingestion, AI interrogations, and mode-switching are operationally fluid.
