@@ -41,13 +41,6 @@ router.post("/ingest", upload.single("pdf"), async (req, res) => {
   const tStart = Date.now();
   const documentId = `doc_${Date.now()}`;
 
-  // --- PHASE 4: EXTRACTION TELEMETRY (Upload received / file size) ---
-  if (req.file) {
-    console.log(`[API] Ingestion upload received: "${req.file.originalname}" (${req.file.size} bytes), documentId: ${documentId}`);
-  } else {
-    console.log(`[API] Ingestion upload failed: No file payload. documentId: ${documentId}`);
-  }
-
   // --- PHASE 1: HARD FILE VALIDATION ---
   if (!req.file) {
     return res.status(400).json({
@@ -73,7 +66,6 @@ router.post("/ingest", upload.single("pdf"), async (req, res) => {
   // --- SAFE_MODE ROUTER OVERRIDE BYPASS ---
   if (process.env.SAFE_MODE === "true") {
     try {
-      console.log(`[API SAFE_MODE ROUTER] Direct synchronous ingestion initiated for: ${originalname}`);
       const store = readStore();
       const papers = store.papers || [];
 
@@ -182,11 +174,13 @@ Please copy and paste the plain text manually into the Verification tab to overr
 
       return res.json({
         success: true,
+        completed: true,
+        status: "completed",
+        progress: 100,
+        text: extractedText,
         jobId: docId,
         docId,
         documentId: docId,
-        status: "completed",
-        progress: 100,
         message: "Stage 1 complete. Document queryable under SAFE_MODE.",
         telemetry: docObj.telemetry,
         fallback: docObj.extractionFailed || false,
@@ -200,9 +194,10 @@ Please copy and paste the plain text manually into the Verification tab to overr
       if (fs.existsSync(filePath)) { try { fs.unlinkSync(filePath); } catch (e) {} }
       return res.status(200).json({
         success: true,
-        jobId: `err_${Date.now()}`,
+        completed: true,
         status: "completed",
         progress: 100,
+        jobId: `err_${Date.now()}`,
         fallback: true,
         forensicStatus: "INGESTION_DEGRADED",
         reasoning: safeErr.message,
@@ -317,8 +312,6 @@ Please copy and paste the plain text manually into the Verification tab to overr
           recoverySuggestion = "OCR (Optical Character Recognition) is required for deep forensic extraction. Scanned document detected.";
           throw new Error("Document appears image-based or non-extractable.");
         }
-        
-        console.log(`[API] Ingest Direct Parse success: Extracted ${extractedText.length} characters`);
       } catch (parseErr) {
         console.error(`[API] Granular PDF Parse Recovery Activated:`, parseErr.message);
         

@@ -293,11 +293,11 @@ export default function VerifyPage() {
       const res = await api.post('/api/pdf/ingest', formData);
       
       // Prefer synchronous SAFE_MODE completion over polling if completed instantly
-      if (res.data.status === 'completed' || res.data.progress === 100) {
+      if (res.data.status === 'completed' || res.data.progress === 100 || res.data.completed === true) {
         setPdfStatus('Completed');
         const extractedText = (res.data.result && res.data.result.text) 
           ? res.data.result.text 
-          : (res.data.extractedText || '');
+          : (res.data.text || res.data.extractedText || '');
         setText(extractedText);
         setInputMode('text');
         
