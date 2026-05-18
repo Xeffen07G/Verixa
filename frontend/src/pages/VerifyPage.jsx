@@ -291,7 +291,12 @@ export default function VerifyPage() {
       
       // 1. Submit to queue (Instantly returns 202)
       const res = await api.post('/api/pdf/ingest', formData);
-      const { jobId } = res.data;
+      const jobId = res.data.jobId || res.data.docId || res.data.documentId || res.data.id;
+      
+      if (!jobId) {
+        throw new Error("Forensic environment returned an invalid document identifier.");
+      }
+
       setPdfStatus('Queued...');
 
       // 2. Poll for extraction completion
