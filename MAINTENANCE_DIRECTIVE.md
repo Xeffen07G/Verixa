@@ -61,3 +61,20 @@ The following core tenets of the VeriXa platform MUST remain intact and untouche
 **Stability > Feature Quantity**
 
 *VeriXa is a finished product.*
+
+---
+
+## 6. Official Maintenance Lock Confirmation
+* **Lock State:** `ACTIVE`
+* **Initiated Date:** `2026-05-18`
+* **Target Build:** `RC-1 Stable`
+* **Certified Components:**
+  * Cinematic Dark UI/UX
+  * Verification Lab (SSE Streaming & URL parser adapter)
+  * Intelligence Lab (BullMQ background pipelines with asynchronous safeguards)
+  * Research Workspace (Multi-source intent classification & evidence maps)
+  * `SAFE_MODE` Synchronous Ingestion & Extraction Bypass
+  * Forensic Diagnostic Card Render Pipeline
+
+Any future edits must strictly satisfy the 5-point root-cause protocol prior to applying changes.
+
