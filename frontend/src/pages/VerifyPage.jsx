@@ -247,10 +247,16 @@ export default function VerifyPage() {
     setFetchingUrl(true);
     try {
       const res = await api.post('/api/url', { url: url.trim() });
-      setText(res.data.content); setInputMode('text');
+      const scrapedText = res.data.text || res.data.content || '';
+      if (!scrapedText.trim()) {
+        throw new Error("Target URL returned empty content or blocked automated extraction.");
+      }
+      setText(scrapedText); 
+      setInputMode('text');
     } catch (e) { 
       console.error("[VerifyPage] URL Fetch Error:", e.response || e);
-      alert('URL Error: ' + (e.response?.data?.error || e.message)); 
+      console.error("URL VERIFY ERROR:", e);
+      alert('URL Error: ' + (e.response?.data?.error || e.message || "Failed to extract content. Please copy-paste text manually.")); 
     }
     finally { setFetchingUrl(false); }
   };
@@ -345,7 +351,7 @@ export default function VerifyPage() {
                   </div>
                 )}
 
-                <button onClick={() => verify(text, detectAI)} disabled={isLoading || !text.trim()} style={{ width: '100%', padding: '16px', borderRadius: 12, background: T.accent, border: 'none', color: '#000', fontWeight: 800, fontSize: 16, cursor: 'pointer', boxShadow: `0 8px 24px ${T.accent}33` }}>
+                <button onClick={() => verify(text, detectAI)} disabled={isLoading || !text || typeof text.trim !== 'function' || !text.trim()} style={{ width: '100%', padding: '16px', borderRadius: 12, background: T.accent, border: 'none', color: '#000', fontWeight: 800, fontSize: 16, cursor: 'pointer', boxShadow: `0 8px 24px ${T.accent}33` }}>
                   {isLoading ? t('verifying', lang) : t('startVerification', lang)}
                 </button>
               </div>

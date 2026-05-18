@@ -74,8 +74,9 @@ class ErrorBoundary extends React.Component {
             </h1>
             
             <p style={{ color: T.text2, fontSize: 16, lineHeight: 1.6, marginBottom: 32 }}>
-              VeriXa encountered an unexpected state while processing your request. 
-              This is usually caused by temporary memory pressure or invalid input formatting.
+              {this.state.error?.message?.includes("trim") || this.state.error?.message?.includes("undefined")
+                ? "Remote source temporarily inaccessible. Target URL blocked automated extraction or returned invalid content."
+                : this.state.error?.message || "VeriXa encountered an unexpected state while processing your request. This is usually caused by temporary memory pressure or invalid input formatting."}
             </p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

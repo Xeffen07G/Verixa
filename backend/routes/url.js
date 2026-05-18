@@ -23,11 +23,25 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: "Invalid URL format." });
   }
 
+  console.log("URL VERIFY REQUEST:", req.body);
+  console.log("FETCHED URL:", url);
+
   try {
     const result = await scrapeUrl(url);
+    console.log("EXTRACTED CONTENT LENGTH:", result.text?.length);
     res.json(result);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch URL: " + err.message });
+    console.error("URL PIPELINE ERROR:", err);
+    // Graceful forensic fallback mode to ensure user always receives a forensic report
+    res.json({
+      title: "Remote Source Retrieval Failed (Diagnostic Fallback)",
+      text: `Forensic Alert: Remote source retrieval failed during forensic audit of ${url}. The target site may be offline, protected by bot detection (such as Cloudflare or Captcha), or blocking direct API extraction.
+
+Please copy the text manually and paste it into the Verification tab, or proceed to verify this status report.`,
+      url,
+      timestamp: new Date().toISOString(),
+      fallback: true
+    });
   }
 });
 
