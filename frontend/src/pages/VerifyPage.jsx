@@ -289,8 +289,32 @@ export default function VerifyPage() {
       const formData = new FormData();
       formData.append('pdf', file);
       
-      // 1. Submit to queue (Instantly returns 202)
+      // 1. Submit to queue (Instantly returns 202, or 200 completed in SAFE_MODE)
       const res = await api.post('/api/pdf/ingest', formData);
+      
+      // Prefer synchronous SAFE_MODE completion over polling if completed instantly
+      if (res.data.status === 'completed' || res.data.progress === 100) {
+        setPdfStatus('Completed');
+        const extractedText = (res.data.result && res.data.result.text) 
+          ? res.data.result.text 
+          : (res.data.extractedText || '');
+        setText(extractedText);
+        setInputMode('text');
+        
+        if (res.data.fallback || res.data.forensicStatus === "INGESTION_DEGRADED") {
+          setPdfError({
+            title: "FORENSIC INGESTION DEGRADED",
+            body: res.data.reasoning || "PDF extraction completed with dynamic fallbacks.",
+            subtext: "Platform status: Bypassed to prevent analysis blockage.",
+            sizeInfo: null,
+            helper: "Verify manual corrections inside the editing panel if structure seems incomplete."
+          });
+        }
+        setUploadingPdf(false);
+        setPdfStatus('');
+        return;
+      }
+
       const jobId = res.data.jobId || res.data.docId || res.data.documentId || res.data.id;
       
       if (!jobId) {
