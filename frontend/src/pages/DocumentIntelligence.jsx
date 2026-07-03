@@ -108,11 +108,11 @@ export default function DocumentIntelligence() {
             const resolvedDoc = foundDoc || { id: data.docId, filename: file.name, pages: 12, language: 'English', uploadTime: new Date() };
             setActiveDoc(resolvedDoc);
 
-            // Contextual welcome message in chat feed
+            // Contextual welcome message in chat feed (Welcoming and capability checklist)
             setMessages([
               { 
                 role: 'ai', 
-                content: `I've finished reading "${file.name}". \n\nYou can ask me to summarize it, explain sections, compare ideas, or answer questions grounded in the document.`, 
+                content: `I've finished reading "${file.name}".\n\nYou can ask me to:\n- summarize the document\n- explain specific sections\n- find key ideas\n- answer questions using only the uploaded content\n- generate a report`, 
                 timestamp: new Date(),
                 isFirstGreeting: true
               }
@@ -163,7 +163,7 @@ export default function DocumentIntelligence() {
     setMessages([
       { 
         role: 'ai', 
-        content: `I've finished reading "${inv.title}". \n\nYou can ask me to summarize it, explain sections, compare ideas, or answer questions grounded in the document.`, 
+        content: `I've finished reading "${inv.title}".\n\nYou can ask me to:\n- summarize the document\n- explain specific sections\n- find key ideas\n- answer questions using only the uploaded content\n- generate a report`, 
         timestamp: new Date(),
         isFirstGreeting: true
       }
@@ -195,17 +195,17 @@ export default function DocumentIntelligence() {
       case 'Summarize':
         prompt = 'Provide a summary of the core arguments and conclusions of this document.';
         break;
-      case 'Key Findings':
-        prompt = 'Identify and list the key findings or takeaways from this document.';
+      case 'Key Insights':
+        prompt = 'Identify and list the key insights or takeaways from this document.';
         break;
-      case 'Timeline':
-        prompt = 'Synthesize a timeline of all main events described in the text.';
+      case 'Explain Simply':
+        prompt = 'Explain the key concepts of this document in simple terms.';
         break;
       case 'Generate Report':
         prompt = 'Format a structured report summarizing the contents of this document.';
         break;
-      case 'Explain Simply':
-        prompt = 'Explain the key concepts of this document in simple terms.';
+      case 'Find Contradictions':
+        prompt = 'Identify any logical gaps, inconsistencies, or contradictions within this document.';
         break;
       case 'Extract Tables':
         prompt = 'Identify and extract any tabular details, statistics, or metrics from the text.';
@@ -214,6 +214,22 @@ export default function DocumentIntelligence() {
         return;
     }
     handleSend(prompt);
+  };
+
+  // Client-side parser to transform backend Source markers into interactive page citations
+  const renderMessageContent = (msg) => {
+    let content = msg.content;
+    if (msg.role === 'ai' && msg.sources && msg.sources.length > 0) {
+      content = content.replace(/\[Source (\d+)\]/g, (match, num) => {
+        const idx = parseInt(num, 10);
+        const src = msg.sources.find(s => s.id === idx);
+        if (src && src.metadata && src.metadata.page !== undefined) {
+          return `**[Page ${src.metadata.page}]**`;
+        }
+        return match;
+      });
+    }
+    return content;
   };
 
   return (
@@ -293,16 +309,16 @@ export default function DocumentIntelligence() {
               </div>
             </div>
 
-            <div className="di-feed">
+            <div className={`di-feed ${messages.length === 1 ? 'centered' : ''}`}>
               {messages.map((msg, idx) => (
                 <div key={idx} className={`di-message ${msg.role}`}>
                   <div className="di-bubble">
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    <ReactMarkdown>{renderMessageContent(msg)}</ReactMarkdown>
                     
                     {/* Suggestion Chips placed directly under first AI greeting */}
                     {msg.isFirstGreeting && (
                       <div className="di-chips-container">
-                        {['Summarize', 'Key Findings', 'Timeline', 'Generate Report', 'Explain Simply', 'Extract Tables'].map(action => (
+                        {['Summarize', 'Key Insights', 'Explain Simply', 'Generate Report', 'Find Contradictions', 'Extract Tables'].map(action => (
                           <button 
                             key={action} 
                             className="di-chip"
