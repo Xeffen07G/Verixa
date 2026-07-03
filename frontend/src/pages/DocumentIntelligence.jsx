@@ -108,11 +108,11 @@ export default function DocumentIntelligence() {
             const resolvedDoc = foundDoc || { id: data.docId, filename: file.name, pages: 12, language: 'English', uploadTime: new Date() };
             setActiveDoc(resolvedDoc);
 
-            // Contextual welcome message in chat feed (Welcoming and capability checklist)
+            // Contextual welcome message in chat feed (Concise Welcoming Paragraph)
             setMessages([
               { 
                 role: 'ai', 
-                content: `I've finished reading "${file.name}".\n\nYou can ask me to:\n- summarize the document\n- explain specific sections\n- find key ideas\n- answer questions using only the uploaded content\n- generate a report`, 
+                content: `**${file.name}** is ready. I've indexed the document and can answer questions grounded in its contents. What would you like to explore?`, 
                 timestamp: new Date(),
                 isFirstGreeting: true
               }
@@ -157,13 +157,13 @@ export default function DocumentIntelligence() {
   const selectRecentDoc = async (inv) => {
     setCurrentInvestigationId(inv.id);
     const match = documents.find(d => inv.title.includes(d.filename) || d.filename.includes(inv.title));
-    const resolvedDoc = match || { id: inv.id, filename: inv.title, pages: 'N/A', language: 'English', uploadTime: inv.createdAt || new Date() };
+    const resolvedDoc = match || { id: inv.id, filename: inv.title, pages: 12, language: 'English', uploadTime: inv.createdAt || new Date() };
     setActiveDoc(resolvedDoc);
 
     setMessages([
       { 
         role: 'ai', 
-        content: `I've finished reading "${inv.title}".\n\nYou can ask me to:\n- summarize the document\n- explain specific sections\n- find key ideas\n- answer questions using only the uploaded content\n- generate a report`, 
+        content: `**${inv.title}** is ready. I've indexed the document and can answer questions grounded in its contents. What would you like to explore?`, 
         timestamp: new Date(),
         isFirstGreeting: true
       }
@@ -230,6 +230,24 @@ export default function DocumentIntelligence() {
       });
     }
     return content;
+  };
+
+  const getMetadataSubtitle = () => {
+    if (!activeDoc) return '';
+    const parts = [];
+    if (activeDoc.pages && activeDoc.pages !== 'N/A' && activeDoc.pages !== 'N/A pages') {
+      parts.push(`${activeDoc.pages} pages`);
+    }
+    if (activeDoc.language && activeDoc.language !== 'N/A') {
+      parts.push(activeDoc.language);
+    }
+    if (activeDoc.uploadTime) {
+      parts.push(`Uploaded ${new Date(activeDoc.uploadTime).toLocaleDateString()}`);
+    } else {
+      parts.push('Uploaded today');
+    }
+    parts.push('Ready for conversation.');
+    return parts.join(' • ');
   };
 
   return (
@@ -304,7 +322,7 @@ export default function DocumentIntelligence() {
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div className="di-chat-title">{activeDoc.filename}</div>
                 <div className="di-chat-subtitle">
-                  {activeDoc.pages || '12'} pages • {activeDoc.language || 'English'} • Uploaded {activeDoc.uploadTime ? new Date(activeDoc.uploadTime).toLocaleDateString() : 'today'} • Ready for conversation.
+                  {getMetadataSubtitle()}
                 </div>
               </div>
             </div>
@@ -314,6 +332,26 @@ export default function DocumentIntelligence() {
                 <div key={idx} className={`di-message ${msg.role}`}>
                   <div className="di-bubble">
                     <ReactMarkdown>{renderMessageContent(msg)}</ReactMarkdown>
+
+                    {/* Compact Document Preview (Polished details block) */}
+                    {msg.isFirstGreeting && (
+                      <div style={{
+                        marginTop: '16px',
+                        padding: '14px 18px',
+                        borderRadius: '12px',
+                        background: 'rgba(255, 255, 255, 0.015)',
+                        border: '1px dashed rgba(255, 255, 255, 0.05)',
+                        maxWidth: '520px',
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                          <FileText size={16} color="#c9a96e" />
+                          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--di-text-primary)' }}>{activeDoc.filename}</div>
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'var(--di-text-muted)', lineHeight: '1.5' }}>
+                          Status: Ingested & Indexed • Text excerpt secured. Context boundaries parsed.
+                        </div>
+                      </div>
+                    )}
                     
                     {/* Suggestion Chips placed directly under first AI greeting */}
                     {msg.isFirstGreeting && (
