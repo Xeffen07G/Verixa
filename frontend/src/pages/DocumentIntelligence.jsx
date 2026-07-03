@@ -88,10 +88,16 @@ export default function DocumentIntelligence() {
       fetchRecentInvestigations();
       setCurrentInvestigationId(boardRes.data.board.id);
 
+      let step = 0;
       const poll = setInterval(async () => {
         try {
+          // Incrementally simulate steps on client during polling
+          step++;
+          if (step === 2) setUploadState('extracting');
+          if (step === 4) setUploadState('indexing');
+
           const s = await api.get(`/api/pdf/status/${data.docId}`);
-          if (s.data.status === 'READY_SEMANTIC' || s.data.status === 'READY_BASIC') {
+          if (s.data.status === 'READY_SEMANTIC' || s.data.status === 'READY_BASIC' || s.data.status === 'completed') {
             clearInterval(poll);
             setUploadState('ready');
             fetchDocuments();
@@ -118,7 +124,7 @@ export default function DocumentIntelligence() {
           clearInterval(poll);
           setUploadState(null);
         }
-      }, 3000);
+      }, 2000);
     } catch (err) {
       console.error(err);
       setUploadState(null);
