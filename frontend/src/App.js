@@ -12,6 +12,7 @@ import ExtensionPage from './pages/ExtensionPage';
 import AccountPage from './pages/AccountPage';
 import ResearchWorkspace from './pages/ResearchWorkspace';
 import IntelligenceLab from './pages/IntelligenceLab';
+import DocumentIntelligence from './pages/DocumentIntelligence';
 import { AuthProvider } from './context/AuthContext';
 import { LangProvider } from './context/LangContext';
 import DragDropOverlay from './components/DragDropOverlay';
@@ -39,7 +40,8 @@ export default function App() {
                 <Route path="/intelligence" element={<IntelligenceLab />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/extension" element={<ExtensionPage />} />
-                <Route path="/research" element={<ResearchWorkspace />} />
+                <Route path="/research" element={<DocumentIntelligence />} />
+                <Route path="/document-intelligence" element={<DocumentIntelligence />} />
                 <Route path="/account" element={<AccountPage />} />
               </Routes>
             </DragDropOverlay>

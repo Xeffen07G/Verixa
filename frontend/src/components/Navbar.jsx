@@ -32,7 +32,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
     if (user) {
       links.push({ label: 'Intelligence Lab', href: '/intelligence' });
       links.push({ label: 'Verification Lab', href: '/verification' });
-      links.push({ label: 'Research Workspace', href: '/research' });
+      links.push({ label: 'Document Intelligence', href: '/research' });
     }
     links.push({ label: t('navPricing', lang), href: '/#pricing' });
     links.push({ label: t('navTestimonials', lang), href: '/#testimonials' });
