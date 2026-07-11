@@ -31,6 +31,7 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/verify" element={<VerifyPage />} />
+                <Route path="/verification" element={<VerifyPage />} />
                 <Route path="/image" element={<ImagePage />} />
                 <Route path="/pdf" element={<VerifyPage />} />
                 <Route path="/video" element={<VideoPage />} />

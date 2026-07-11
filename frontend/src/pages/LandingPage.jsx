@@ -119,7 +119,7 @@ export default function LandingPage() {
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.9 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
             <Link to="/research"><motion.button whileHover={{ scale: 1.04, boxShadow: `0 8px 40px ${T.accent}30` }} whileTap={{ scale: 0.97 }} style={{ padding: '20px 48px', borderRadius: 12, fontSize: 16, fontWeight: 700, background: T.accent, border: 'none', color: T.bg, cursor: 'pointer' }}>ENTER RESEARCH LAB</motion.button></Link>
-            <Link to="/verification"><motion.button whileHover={{ scale: 1.04, borderColor: `${T.accent}66` }} whileTap={{ scale: 0.97 }} style={{ padding: '20px 48px', borderRadius: 12, fontSize: 16, fontWeight: 600, background: 'transparent', border: `1px solid ${T.border}`, color: T.text, cursor: 'pointer' }}>VERIFY EVIDENCE</motion.button></Link>
+            <Link to="/verify"><motion.button whileHover={{ scale: 1.04, borderColor: `${T.accent}66` }} whileTap={{ scale: 0.97 }} style={{ padding: '20px 48px', borderRadius: 12, fontSize: 16, fontWeight: 600, background: 'transparent', border: `1px solid ${T.border}`, color: T.text, cursor: 'pointer' }}>VERIFY EVIDENCE</motion.button></Link>
           </motion.div>
         </div>
       </Section>

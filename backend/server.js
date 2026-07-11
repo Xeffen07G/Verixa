@@ -863,6 +863,29 @@ if (SAFE_MODE) {
       return { error: "Query required" };
     }
 
+    if (!targetDocId && req.body.scope !== "global" && req.body.sessionId !== "evals" && !req.body.isGlobal) {
+      const errRes = { error: "DOCUMENT_ID_REQUIRED", message: "Select a document before asking a question." };
+      if (res.status) return res.status(400).json(errRes);
+      return errRes;
+    }
+
+    if (targetDocId) {
+      const docObj = SAFE_DOCS.find(d => d.id === targetDocId);
+      if (!docObj) {
+        const errRes = { error: "DOCUMENT_NOT_FOUND", message: "The selected document was not found." };
+        if (res.status) return res.status(404).json(errRes);
+        return errRes;
+      }
+      const isQueryable = isDocumentEvidenceEligible(docObj) && 
+                          SAFE_CHUNKS.some(c => c.docId === docObj.id) &&
+                          SAFE_CHUNKS.filter(c => c.docId === docObj.id).every(c => c.text && c.text.trim().length > 0);
+      if (!isQueryable) {
+        const errRes = { error: "DOCUMENT_NOT_QUERYABLE", message: "This document is not ready for questions." };
+        if (res.status) return res.status(422).json(errRes);
+        return errRes;
+      }
+    }
+
     const intent = classifyQueryIntent(query);
     const threshold = intent === "SYNTHESIS" ? 0.20 : intent === "EXPLORATORY" ? 0.30 : 0.40;
 
@@ -1093,6 +1116,18 @@ if (SAFE_MODE) {
       finalResponse.telemetry.trustScore = updatedSession.trustScore;
 
       session.history.push({ query, answer: groqResponse, timestamp: Date.now() });
+
+      // [RAG REQUEST] diagnostic logging (Phase 6)
+      const reqDoc = targetDocId ? SAFE_DOCS.find(d => d.id === targetDocId) : null;
+      console.log(`[RAG REQUEST]`);
+      console.log(`documentId=${targetDocId || "none"}`);
+      console.log(`sessionId=${sessionId || "none"}`);
+      console.log(`documentFound=${!!reqDoc}`);
+      console.log(`documentStatus=${reqDoc ? reqDoc.status : "n/a"}`);
+      console.log(`queryable=${reqDoc ? (isDocumentEvidenceEligible(reqDoc) && SAFE_CHUNKS.some(c => c.docId === reqDoc.id)) : "false"}`);
+      console.log(`eligibleChunkCount=${targetDocId ? SAFE_CHUNKS.filter(c => c.docId === targetDocId).length : 0}`);
+      console.log(`retrievedChunkCount=${finalChunks.length}`);
+
       if (res.json) return res.json(finalResponse);
       return finalResponse;
 
@@ -1140,13 +1175,21 @@ if (SAFE_MODE) {
     return res.json({
       success: true,
       mock: true,
-      documents: SAFE_DOCS.map(d => ({
-        id: d.id,
-        documentId: d.id,
-        filename: d.filename,
-        uploadedAt: d.uploadedAt,
-        timestamp: d.timestamp // For frontend compat
-      })),
+      documents: SAFE_DOCS.map(d => {
+        const isQueryable = isDocumentEvidenceEligible(d) && 
+                            SAFE_CHUNKS.some(c => c.docId === d.id) &&
+                            SAFE_CHUNKS.filter(c => c.docId === d.id).every(c => c.text && c.text.trim().length > 0);
+        return {
+          id: d.id,
+          documentId: d.id,
+          filename: d.filename,
+          uploadedAt: d.uploadedAt,
+          status: d.status,
+          queryable: isQueryable,
+          extractionFailed: d.extractionFailed || false,
+          timestamp: d.timestamp || d.uploadedAt
+        };
+      }),
       mode: "SAFE_MODE",
     });
   });

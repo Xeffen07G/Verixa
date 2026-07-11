@@ -31,7 +31,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
     ];
     if (user) {
       links.push({ label: 'Intelligence Lab', href: '/intelligence' });
-      links.push({ label: 'Verification Lab', href: '/verification' });
+      links.push({ label: 'Verification Lab', href: '/verify' });
       links.push({ label: 'Document Intelligence', href: '/research' });
     }
     links.push({ label: t('navPricing', lang), href: '/#pricing' });
@@ -190,7 +190,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
                 <Layout size={20} />
                 <span style={{ fontSize: 18, fontWeight: 700 }}>Intelligence Lab</span>
               </Link>
-              <Link to="/verification" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
+              <Link to="/verify" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
                 <ShieldCheck size={20} />
                 <span style={{ fontSize: 18, fontWeight: 700 }}>Verification Lab</span>
               </Link>

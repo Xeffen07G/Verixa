@@ -1,7 +1,201 @@
 {
-  "boards": [],
-  "sessions": {},
-  "papers": [],
+  "boards": [
+    {
+      "id": "board_1783789354999",
+      "title": "PID Test Board",
+      "description": "Testing nodemon ignore",
+      "items": [],
+      "createdAt": "2026-07-11T17:02:34.999Z"
+    }
+  ],
+  "sessions": {
+    "board_1783789354999": {
+      "history": [],
+      "lastActive": 1783795684917
+    }
+  },
+  "papers": [
+    {
+      "id": "doc_1783789464274",
+      "filename": "test.pdf",
+      "uploadedAt": "2026-07-11T17:04:24.274Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 167,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "failureType": "SCANNED_DOCUMENT",
+      "reasoning": "Document contains 1 page(s) but has only 108 character(s) of extractable alphabetical text.",
+      "recoverySuggestion": "OCR (Optical Character Recognition) is required for deep forensic extraction. Scanned document detected.",
+      "text": ""
+    },
+    {
+      "id": "doc_1783789531422",
+      "filename": "fresh_test.pdf",
+      "uploadedAt": "2026-07-11T17:05:31.422Z",
+      "status": "READY_SEMANTIC",
+      "telemetry": {
+        "extraction_time": 101,
+        "chunking_time": 0,
+        "embedding_time": 13351,
+        "total_background_time": 13454
+      },
+      "text": "\n\n \n \n \n \n \n \nThis is a test PDF document. \nIf you can read this, you have Adobe Acrobat Reader installed on your computer. ",
+      "contentFingerprint": "thisisatestpdfdocument.ifyoucanreadthis,youhaveadobeacrobatreaderinstalledonyourcomputer."
+    },
+    {
+      "id": "doc_1783793435552",
+      "filename": "scanned.pdf",
+      "uploadedAt": "2026-07-11T18:10:35.552Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 139,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783793437843",
+      "filename": "alpha.pdf",
+      "uploadedAt": "2026-07-11T18:10:37.843Z",
+      "status": "READY_SEMANTIC",
+      "telemetry": {
+        "extraction_time": 24,
+        "chunking_time": 0,
+        "embedding_time": 29,
+        "total_background_time": 55
+      },
+      "text": "\n\nVERIXA ISOLATION TEST ALPHA 7429. This is additional padding text to satisfy the minimum document length requirement of 150 characters for successful forensic text extraction. Repeating: VeriXa RAG test. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      "contentFingerprint": "verixaisolationtestalpha7429.thisisadditionalpaddingtexttosatisfytheminimumdocumentlengthrequirementof150charactersforsuccessfulforensictextextraction.repeating:verixaragtest.loremipsumdolorsitamet,consecteturadipiscingelit."
+    },
+    {
+      "id": "doc_1783793444411",
+      "filename": "beta.pdf",
+      "uploadedAt": "2026-07-11T18:10:44.411Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 3,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783793468823",
+      "filename": "scanned.pdf",
+      "uploadedAt": "2026-07-11T18:11:08.823Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 3,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783793477959",
+      "filename": "beta.pdf",
+      "uploadedAt": "2026-07-11T18:11:17.959Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 1,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: Command token too long: 128",
+      "text": ""
+    },
+    {
+      "id": "doc_1783793562748",
+      "filename": "scanned.pdf",
+      "uploadedAt": "2026-07-11T18:12:42.748Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 4,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: Command token too long: 128",
+      "text": ""
+    },
+    {
+      "id": "doc_1783793569909",
+      "filename": "beta.pdf",
+      "uploadedAt": "2026-07-11T18:12:49.909Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 3,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783793621908",
+      "filename": "scanned.pdf",
+      "uploadedAt": "2026-07-11T18:13:41.908Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 3,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783793629071",
+      "filename": "beta.pdf",
+      "uploadedAt": "2026-07-11T18:13:49.071Z",
+      "status": "READY_SEMANTIC",
+      "telemetry": {
+        "extraction_time": 9,
+        "chunking_time": 0,
+        "embedding_time": 24,
+        "total_background_time": 36
+      },
+      "text": "\n\nVERIXA ISOLATION TEST BETA 3816.  Here is some padding text that will make the total length of this document content more than 150 characters. Testing RAG.",
+      "contentFingerprint": "verixaisolationtestbeta3816.hereissomepaddingtextthatwillmakethetotallengthofthisdocumentcontentmorethan150characters.testingrag."
+    }
+  ],
   "verifications": [],
   "benchmarks": {
     "hallucinationRate": 0,

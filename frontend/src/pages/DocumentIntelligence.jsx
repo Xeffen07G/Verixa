@@ -64,8 +64,53 @@ export default function DocumentIntelligence() {
     setCurrentInvestigationId(null);
   };
 
+  const getInitialMessageForDoc = (doc) => {
+    if (doc.status === 'failed' || doc.extractionFailed || doc.status === 'FAILED_EXTRACT') {
+      return [
+        {
+          role: 'ai',
+          content: `We couldn't read enough text from **${doc.filename}**. Try a text-based PDF or an OCR-processed copy.`,
+          timestamp: new Date(),
+          isError: true
+        }
+      ];
+    } else if (doc.queryable !== true) {
+      return [
+        {
+          role: 'ai',
+          content: `This document isn't ready for conversation yet.`,
+          timestamp: new Date(),
+          isError: true
+        }
+      ];
+    } else {
+      return [
+        {
+          role: 'ai',
+          content: `**${doc.filename}** is ready. I've indexed the document and can answer questions grounded in its contents. What would you like to explore?`,
+          timestamp: new Date(),
+          isFirstGreeting: true
+        }
+      ];
+    }
+  };
+
   const handleFileUpload = async (file) => {
     if (!file) return;
+
+    // Validate client-side that file is a PDF (Phase 8)
+    const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    if (!isPDF) {
+      setMessages([
+        {
+          role: 'ai',
+          content: "This file type isn't supported yet. Please upload a PDF.",
+          timestamp: new Date(),
+          isError: true
+        }
+      ]);
+      return;
+    }
 
     setUploadState('uploading');
     const formData = new FormData();
@@ -119,18 +164,10 @@ export default function DocumentIntelligence() {
             // Set uploaded file as active
             const updatedDocs = await api.get('/api/rag/documents');
             const foundDoc = (updatedDocs.data.documents || []).find(d => d.filename === file.name || d.id === data.docId);
-            const resolvedDoc = foundDoc || { id: data.docId, filename: file.name, pages: 12, language: 'English', uploadTime: new Date() };
-            setActiveDoc(resolvedDoc);
-
-            // Contextual welcome message in chat feed (Concise Welcoming Paragraph)
-            setMessages([
-              { 
-                role: 'ai', 
-                content: `**${file.name}** is ready. I've indexed the document and can answer questions grounded in its contents. What would you like to explore?`, 
-                timestamp: new Date(),
-                isFirstGreeting: true
-              }
-            ]);
+            if (foundDoc) {
+              setActiveDoc(foundDoc);
+              setMessages(getInitialMessageForDoc(foundDoc));
+            }
 
             setTimeout(() => setUploadState(null), 1000);
           }
@@ -173,20 +210,10 @@ export default function DocumentIntelligence() {
     }
   };
 
-  const selectRecentDoc = async (inv) => {
-    setCurrentInvestigationId(inv.id);
-    const match = documents.find(d => inv.title.includes(d.filename) || d.filename.includes(inv.title));
-    const resolvedDoc = match || { id: inv.id, filename: inv.title, pages: 12, language: 'English', uploadTime: inv.createdAt || new Date() };
-    setActiveDoc(resolvedDoc);
-
-    setMessages([
-      { 
-        role: 'ai', 
-        content: `**${inv.title}** is ready. I've indexed the document and can answer questions grounded in its contents. What would you like to explore?`, 
-        timestamp: new Date(),
-        isFirstGreeting: true
-      }
-    ]);
+  const selectLibraryDoc = (doc) => {
+    setActiveDoc(doc);
+    setCurrentInvestigationId(doc.id);
+    setMessages(getInitialMessageForDoc(doc));
   };
 
   const handleKeyDown = (e) => {
@@ -265,7 +292,9 @@ export default function DocumentIntelligence() {
     } else {
       parts.push('Uploaded today');
     }
-    parts.push('Ready for conversation.');
+    if (activeDoc.queryable === true) {
+      parts.push('Ready for conversation.');
+    }
     return parts.join(' • ');
   };
 
@@ -283,17 +312,17 @@ export default function DocumentIntelligence() {
         </button>
 
         <div className="di-sidebar-content">
-          {recentInvestigations.map(inv => (
+          {documents.map(doc => (
             <div 
-              key={inv.id} 
-              className={`di-doc-item ${currentInvestigationId === inv.id ? 'active' : ''}`}
-              onClick={() => selectRecentDoc(inv)}
+              key={doc.id} 
+              className={`di-doc-item ${activeDoc?.id === doc.id ? 'active' : ''}`}
+              onClick={() => selectLibraryDoc(doc)}
             >
               <File size={14} style={{ color: '#c9a96e', opacity: 0.6, flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="di-doc-title">{inv.title}</div>
+                <div className="di-doc-title">{doc.filename}</div>
                 <div className="di-doc-meta">
-                  {inv.createdAt ? new Date(inv.createdAt).toLocaleDateString() : 'Today'}
+                  {doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString() : 'Today'}
                 </div>
               </div>
             </div>
@@ -324,13 +353,13 @@ export default function DocumentIntelligence() {
             <div className="di-dropzone" onClick={() => fileInputRef.current.click()}>
               <Upload size={24} style={{ color: '#c9a96e', marginBottom: 12, opacity: 0.7 }} />
               <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 4 }}>Drag & drop files here or click to browse</div>
-              <div className="di-supported-formats">PDF • DOCX • PPTX • TXT • CSV • XLSX</div>
+              <div className="di-supported-formats">PDF</div>
               <input 
                 type="file" 
                 ref={fileInputRef} 
                 onChange={(e) => handleFileUpload(e.target.files[0])} 
                 style={{ display: 'none' }} 
-                accept=".pdf,.docx,.pptx,.txt,.csv,.xlsx" 
+                accept=".pdf" 
               />
             </div>
           </div>
@@ -373,7 +402,7 @@ export default function DocumentIntelligence() {
                     )}
                     
                     {/* Suggestion Chips placed directly under first AI greeting */}
-                    {msg.isFirstGreeting && (
+                    {msg.isFirstGreeting && activeDoc?.queryable === true && (
                       <div className="di-chips-container">
                         {['Summarize', 'Key Insights', 'Explain Simply', 'Generate Report', 'Find Contradictions', 'Extract Tables'].map(action => (
                           <button 
@@ -411,9 +440,11 @@ export default function DocumentIntelligence() {
                             )}
                           </div>
                         )}
-                        <button className="di-msg-action-btn" onClick={() => triggerQuickAction('Summarize')}>
-                          Continue
-                        </button>
+                        {activeDoc?.queryable === true && (
+                          <button className="di-msg-action-btn" onClick={() => triggerQuickAction('Summarize')}>
+                            Continue
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -426,16 +457,17 @@ export default function DocumentIntelligence() {
               <div className="di-input-wrapper">
                 <textarea
                   className="di-input"
-                  placeholder="Ask anything about this document..."
+                  placeholder={activeDoc?.queryable !== true ? "Conversation disabled for this document." : "Ask anything about this document..."}
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   rows={1}
+                  disabled={activeDoc?.queryable !== true}
                 />
                 <button 
                   className="di-send-btn"
                   onClick={() => handleSend()}
-                  disabled={loading || !input.trim()}
+                  disabled={loading || !input.trim() || activeDoc?.queryable !== true}
                 >
                   {loading ? <RefreshCw className="spin" size={16} /> : <Send size={16} />}
                 </button>
