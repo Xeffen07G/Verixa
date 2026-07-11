@@ -159,6 +159,21 @@ function semanticChunking(text, filename, options = { size: 700, overlap: 100 })
   return chunks;
 }
 
+// --- CENTRAL EVIDENCE ELIGIBILITY INVARIANT (PHASE 2) ---
+function isDocumentEvidenceEligible(doc) {
+  if (!doc) return false;
+  if (doc.extractionFailed === true) return false;
+  if (doc.status === "FAILED_EXTRACT" || doc.status === "FAILED_SIZE" || doc.status === "failed") return false;
+  if (typeof doc.text !== "string") return false;
+  const clean = doc.text.trim();
+  if (clean.length === 0) return false;
+  // Reject text matching diagnostic payloads
+  if (clean.startsWith("FORENSIC DIAGNOSTIC REPORT") || clean.includes("Status: DEGRADED EXTRACTION MODE") || clean.includes("Forensic Alert: Remote source parsing failed")) {
+    return false;
+  }
+  return true;
+}
+
 // --- STARTUP RECOVERY (PHASE 4) ---
 if (SAFE_DOCS.length > 0) {
   console.log(`[RAG Recovery] Starting recovery of chunks for ${SAFE_DOCS.length} documents...`);
@@ -166,12 +181,27 @@ if (SAFE_DOCS.length > 0) {
   let docsRecovered = 0;
   let chunksRestored = 0;
   let docsSkipped = 0;
+  let failedExtractionDocs = 0;
+  let diagnosticRejections = 0;
 
   SAFE_DOCS.forEach(doc => {
     docsInspected++;
-    if (!doc.text || !doc.text.trim()) {
-      console.warn(`[RAG Recovery] Skipped document ${doc.id} (${doc.filename || "unknown"}): Empty extracted text.`);
-      docsSkipped++;
+
+    // Detect legacy diagnostic payloads or failed status
+    const isLegacyDiagnostic = typeof doc.text === 'string' && (doc.text.startsWith("FORENSIC DIAGNOSTIC REPORT") || doc.text.includes("Status: DEGRADED EXTRACTION MODE") || doc.text.includes("Forensic Alert: Remote source parsing failed"));
+    
+    if (isLegacyDiagnostic) {
+      console.warn(`[RAG Recovery] Rejecting legacy diagnostic payload for document ${doc.id} (${doc.filename || "unknown"}). Purging text.`);
+      doc.text = "";
+      doc.extractionFailed = true;
+      doc.status = "FAILED_EXTRACT";
+      diagnosticRejections++;
+      return;
+    }
+
+    if (!isDocumentEvidenceEligible(doc)) {
+      console.warn(`[RAG Recovery] Document ${doc.id} (${doc.filename || "unknown"}) is not evidence eligible (status: ${doc.status}).`);
+      failedExtractionDocs++;
       return;
     }
 
@@ -229,11 +259,16 @@ if (SAFE_DOCS.length > 0) {
     }
   });
 
+  // Save the database in case we marked legacy files as failed
+  STORE.papers = SAFE_DOCS;
+  writeStore(STORE);
+
   console.log(`[RAG Recovery]`);
   console.log(`Documents inspected: ${docsInspected}`);
-  console.log(`Documents recovered: ${docsRecovered}`);
+  console.log(`Eligible documents: ${docsRecovered}`);
+  console.log(`Failed extraction documents: ${failedExtractionDocs}`);
+  console.log(`Diagnostic payloads rejected: ${diagnosticRejections}`);
   console.log(`Chunks restored: ${chunksRestored}`);
-  console.log(`Documents skipped: ${docsSkipped}`);
 }
 
 
@@ -474,108 +509,112 @@ if (SAFE_MODE) {
       } catch (parseErr) {
         // Fallback degraded ingestion mode
         console.error(`[INGEST] Parse failure: pdf-parse failed. Graceful fallback activated.`, parseErr);
-        extractedText = `Forensic Alert: Remote source parsing failed during extraction. The PDF structure may be corrupted, scanned without OCR layers, or password protected.
-
-Please extract the plain text manually or upload an OCR-processed copy. Ingestion degraded to diagnostic fallback mode.`;
+        extractedText = "";
         docObj.extractionFailed = true;
         docObj.forensicStatus = "INGESTION_DEGRADED";
         docObj.fallback = true;
         docObj.reasoning = `PDF extraction failure: ${parseErr.message || 'unknown error'}`;
+        docObj.status = "FAILED_EXTRACT";
       }
 
       docObj.text = extractedText;
       docObj.telemetry.extraction_time = Date.now() - extractStart;
 
-      // --- Content-hash deduplication (catches renamed duplicates) ---
-      const contentFingerprint = extractedText.slice(0, 500).replace(/\s+/g, '').toLowerCase();
-      const existingByContent = SAFE_DOCS.find(d => d.id !== docId && d.contentFingerprint === contentFingerprint && d.status !== 'FAILED_EXTRACT');
-      if (existingByContent) {
-        console.log(`[INGEST] Content duplicate detected: "${originalname}" matches existing doc "${existingByContent.filename}" (id: ${existingByContent.id})`);
-        
-        // Cleanup the temporary placeholder
-        SAFE_DOCS.splice(SAFE_DOCS.indexOf(docObj), 1);
-        if (fs.existsSync(filePath)) { try { fs.unlinkSync(filePath); } catch (e) {} }
-        
-        return res.json({ 
-          success: true, 
-          jobId: existingByContent.id,
-          docId: existingByContent.id, 
-          documentId: existingByContent.id, 
-          status: existingByContent.status, 
-          message: "Document content already indexed (duplicate detected by content hash).", 
-          duplicate: true, 
-          telemetry: existingByContent.telemetry 
-        });
-      }
-      docObj.contentFingerprint = contentFingerprint;
-
-      docObj.status = "INDEXING";
-      const chunkStart = Date.now();
-      let chunks = semanticChunking(extractedText, originalname);
-      if (chunks.length > MAX_CHUNKS_PER_DOC) chunks = chunks.slice(0, MAX_CHUNKS_PER_DOC);
-      
-      chunks.forEach(c => {
-        c.docId = docId;
-        c.status = 'basic';
-        SAFE_CHUNKS.push(c);
-      });
-      docObj.telemetry.chunking_time = Date.now() - chunkStart;
-
-      docObj.status = "READY_BASIC";
-      STORE.papers = SAFE_DOCS;
-      writeStore(STORE);
-
-      // --- STAGE 2: BACKGROUND ENHANCEMENT ---
-      (async () => {
-        // SAFE_MODE memory / concurrency check
-        if (activeEmbeddingJobs >= MAX_CONCURRENT_JOBS || (process.memoryUsage().heapUsed / 1024 / 1024) > MEMORY_THRESHOLD_MB) {
-          docObj.status = "READY_BASIC"; // Stay at basic if resources low
-          STORE.papers = SAFE_DOCS;
-          writeStore(STORE);
-          return;
-        }
-
-        activeEmbeddingJobs++;
-        docObj.status = "ENHANCING";
-        const embedStart = Date.now();
-        try {
-          const docChunks = SAFE_CHUNKS.filter(c => c.docId === docId);
-          const embedder = await getExtractor();
+      if (docObj.extractionFailed) {
+        STORE.papers = SAFE_DOCS;
+        writeStore(STORE);
+      } else {
+        // --- Content-hash deduplication (catches renamed duplicates) ---
+        const contentFingerprint = extractedText.slice(0, 500).replace(/\s+/g, '').toLowerCase();
+        const existingByContent = SAFE_DOCS.find(d => d.id !== docId && d.contentFingerprint === contentFingerprint && d.status !== 'FAILED_EXTRACT');
+        if (existingByContent) {
+          console.log(`[INGEST] Content duplicate detected: "${originalname}" matches existing doc "${existingByContent.filename}" (id: ${existingByContent.id})`);
           
-          const chunksToEmbed = docChunks.slice(0, 15); // Hard limit 15 chunks for embeddings
-          for (let i = 0; i < chunksToEmbed.length; i++) {
-            try {
-              const output = await embedder(chunksToEmbed[i].text, { pooling: 'mean', normalize: true });
-              chunksToEmbed[i].embedding = Array.from(output.data);
-              chunksToEmbed[i].status = 'semantic';
-            } catch (e) {
-              console.warn(`[ENHANCING] Chunk ${i} failed:`, e.message);
-            }
+          // Cleanup the temporary placeholder
+          SAFE_DOCS.splice(SAFE_DOCS.indexOf(docObj), 1);
+          if (fs.existsSync(filePath)) { try { fs.unlinkSync(filePath); } catch (e) {} }
+          
+          return res.json({ 
+            success: true, 
+            jobId: existingByContent.id,
+            docId: existingByContent.id, 
+            documentId: existingByContent.id, 
+            status: existingByContent.status, 
+            message: "Document content already indexed (duplicate detected by content hash).", 
+            duplicate: true, 
+            telemetry: existingByContent.telemetry 
+          });
+        }
+        docObj.contentFingerprint = contentFingerprint;
+
+        docObj.status = "INDEXING";
+        const chunkStart = Date.now();
+        let chunks = semanticChunking(extractedText, originalname);
+        if (chunks.length > MAX_CHUNKS_PER_DOC) chunks = chunks.slice(0, MAX_CHUNKS_PER_DOC);
+        
+        chunks.forEach(c => {
+          c.docId = docId;
+          c.status = 'basic';
+          SAFE_CHUNKS.push(c);
+        });
+        docObj.telemetry.chunking_time = Date.now() - chunkStart;
+
+        docObj.status = "READY_BASIC";
+        STORE.papers = SAFE_DOCS;
+        writeStore(STORE);
+
+        // --- STAGE 2: BACKGROUND ENHANCEMENT ---
+        (async () => {
+          // SAFE_MODE memory / concurrency check
+          if (activeEmbeddingJobs >= MAX_CONCURRENT_JOBS || (process.memoryUsage().heapUsed / 1024 / 1024) > MEMORY_THRESHOLD_MB) {
+            docObj.status = "READY_BASIC"; // Stay at basic if resources low
+            STORE.papers = SAFE_DOCS;
+            writeStore(STORE);
+            return;
           }
 
-          docObj.status = "READY_SEMANTIC";
-          docObj.telemetry.embedding_time = Date.now() - embedStart;
-          docObj.telemetry.total_background_time = Date.now() - globalStart;
-          STORE.papers = SAFE_DOCS;
-          writeStore(STORE);
-        } catch (err) {
-          console.error(`[ENHANCING] Fatal error for ${docId}:`, err);
-          docObj.status = "READY_BASIC"; // Fallback to basic
-          STORE.papers = SAFE_DOCS;
-          writeStore(STORE);
-        } finally {
-          activeEmbeddingJobs--;
-          if (global.gc) global.gc();
-        }
-      })();
+          activeEmbeddingJobs++;
+          docObj.status = "ENHANCING";
+          const embedStart = Date.now();
+          try {
+            const docChunks = SAFE_CHUNKS.filter(c => c.docId === docId);
+            const embedder = await getExtractor();
+            
+            const chunksToEmbed = docChunks.slice(0, 15); // Hard limit 15 chunks for embeddings
+            for (let i = 0; i < chunksToEmbed.length; i++) {
+              try {
+                const output = await embedder(chunksToEmbed[i].text, { pooling: 'mean', normalize: true });
+                chunksToEmbed[i].embedding = Array.from(output.data);
+                chunksToEmbed[i].status = 'semantic';
+              } catch (e) {
+                console.warn(`[ENHANCING] Chunk ${i} failed:`, e.message);
+              }
+            }
+
+            docObj.status = "READY_SEMANTIC";
+            docObj.telemetry.embedding_time = Date.now() - embedStart;
+            docObj.telemetry.total_background_time = Date.now() - globalStart;
+            STORE.papers = SAFE_DOCS;
+            writeStore(STORE);
+          } catch (err) {
+            console.error(`[ENHANCING] Fatal error for ${docId}:`, err);
+            docObj.status = "READY_BASIC"; // Fallback to basic
+            STORE.papers = SAFE_DOCS;
+            writeStore(STORE);
+          } finally {
+            activeEmbeddingJobs--;
+            if (global.gc) global.gc();
+          }
+        })();
+      }
 
       return res.json({
-        success: true,
+        success: !docObj.extractionFailed,
         jobId: docId,
         docId,
         documentId: docId,
-        status: "READY_BASIC",
-        message: "Stage 1 complete. Document queryable.",
+        status: docObj.status === "FAILED_EXTRACT" ? "failed" : "READY_BASIC",
+        message: docObj.status === "FAILED_EXTRACT" ? "Ingestion failed during extraction." : "Stage 1 complete. Document queryable.",
         telemetry: docObj.telemetry,
         ...(docObj.extractionFailed ? {
           fallback: true,
@@ -630,10 +669,12 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
     };
 
     const status = statusMap[doc.status] || doc.status.toLowerCase();
-    const isQueryable = SAFE_CHUNKS.some(c => c.docId === doc.id);
+    const isQueryable = isDocumentEvidenceEligible(doc) && 
+                        SAFE_CHUNKS.some(c => c.docId === doc.id) &&
+                        SAFE_CHUNKS.filter(c => c.docId === doc.id).every(c => c.text && c.text.trim().length > 0);
 
     return res.json({
-      success: true,
+      success: !doc.extractionFailed,
       id: doc.id,
       status: status,
       queryable: isQueryable,
@@ -643,7 +684,9 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
       ...(doc.extractionFailed ? {
         fallback: true,
         forensicStatus: "INGESTION_DEGRADED",
-        reasoning: doc.reasoning || "PDF extraction failure. Graceful text fallback generated."
+        reasoning: doc.reasoning || "PDF extraction failure.",
+        errorCode: "TEXT_EXTRACTION_FAILED",
+        extractionReason: doc.failureType || "SCANNED_DOCUMENT"
       } : {})
     });
   });
@@ -813,7 +856,8 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
   ==========================
   */
   async function handleRagQueryInternal(req, res) {
-    const { query, sessionId = "default", mode = "Deep Analysis" } = req.body;
+    const { query, sessionId = "default", mode = "Deep Analysis", documentId, docId } = req.body;
+    const targetDocId = documentId || docId;
     if (!query) {
       if (res.status) return res.status(400).json({ error: "Query required" });
       return { error: "Query required" };
@@ -833,7 +877,13 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
       const session = CONVERSATION_SESSIONS[sessionId];
       session.lastActive = Date.now();
 
-      if (SAFE_CHUNKS.length === 0) {
+      // Document-scoped retrieval filtering (Phase 5)
+      let chunksToSearch = SAFE_CHUNKS;
+      if (targetDocId) {
+        chunksToSearch = SAFE_CHUNKS.filter(c => c.docId === targetDocId);
+      }
+
+      if (chunksToSearch.length === 0) {
         const refusal = { answer: "Vault empty.", sources: [] };
         if (res.json) return res.json(refusal);
         return refusal;
@@ -857,7 +907,7 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
         'methods': 0.10, 'methodology': 0.10, 'general': 0.0
       };
 
-      const scoredChunks = SAFE_CHUNKS.map(chunk => {
+      const scoredChunks = chunksToSearch.map(chunk => {
         let semanticScore = 0;
         if (queryVector && chunk.embedding) {
           for (let i = 0; i < queryVector.length; i++) {
@@ -903,12 +953,12 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
 
       // --- Fallback: prevent false refusals for non-FACTUAL intents ---
       let fallbackTriggered = false;
-      if (filteredChunks.length === 0 && intent !== "FACTUAL" && SAFE_CHUNKS.length > 0) {
+      if (filteredChunks.length === 0 && intent !== "FACTUAL" && chunksToSearch.length > 0) {
         // SYNTHESIS or EXPLORATORY with docs in vault: take top 5 regardless
         console.log(`[RAG][FALLBACK] ${intent} fallback triggered for: "${query}" (best score: ${scoredChunks[0]?.score?.toFixed(3) || 0})`);
         filteredChunks = scoredChunks.slice(0, 5);
         fallbackTriggered = true;
-      } else if (filteredChunks.length === 0 && intent === "FACTUAL" && SAFE_CHUNKS.length > 0) {
+      } else if (filteredChunks.length === 0 && intent === "FACTUAL" && chunksToSearch.length > 0) {
         // Even for FACTUAL: if best score > 0.15, use limited fallback instead of refusing
         const bestScore = scoredChunks[0]?.score || 0;
         if (bestScore > 0.15) {
@@ -933,7 +983,7 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
         console.log("[RAG][TELEMETRY] ===== QUERY LIFECYCLE =====");
         console.log("  STEP 1 detected_intent: " + intent);
         console.log("  STEP 2 threshold_used: " + threshold);
-        console.log("  STEP 3 total_chunks_available: " + SAFE_CHUNKS.length);
+        console.log("  STEP 3 total_chunks_available: " + chunksToSearch.length);
         console.log("  STEP 4 top_5_scores: [" + scoredChunks.slice(0, 5).map(function(c) { return c.score.toFixed(3); }).join(", ") + "]");
         console.log("  STEP 5 section_boosts: [" + scoredChunks.slice(0, 5).map(function(c) { return (c.section || "?") + ":" + c.structuralBoost; }).join(", ") + "]");
         console.log("  STEP 6 chunks_passed_threshold: " + scoredChunks.filter(function(c) { return c.score > threshold; }).length);

@@ -137,35 +137,21 @@ router.post("/ingest", upload.single("pdf"), async (req, res) => {
           recoverySuggestion = "The parser encountered an unhandled encoding pattern. Try saving as standard PDF/A format.";
         }
 
-        extractedText = `FORENSIC DIAGNOSTIC REPORT
-============================
-Status: DEGRADED EXTRACTION MODE
-Failure Type: ${failureType}
-Reasoning: ${reasoning}
-Forensic Recommendation: ${recoverySuggestion}
-
-----------------------------
-TECHNICAL TELEMETRY
-----------------------------
-Filename: ${originalname}
-Size: ${(size / 1024).toFixed(1)} KB
-Mimetype: ${mimetype}
-Timestamp: ${new Date().toISOString()}
-Target Environment: SAFE_MODE Router Sync Override
-
-Please copy and paste the plain text manually into the Verification tab to override this diagnostic block.`;
-
         docObj.extractionFailed = true;
         docObj.forensicStatus = "INGESTION_DEGRADED";
         docObj.fallback = true;
         docObj.failureType = failureType;
         docObj.reasoning = reasoning;
         docObj.recoverySuggestion = recoverySuggestion;
+        docObj.status = "FAILED_EXTRACT";
+        extractedText = "";
       }
 
       docObj.text = extractedText;
       docObj.telemetry.extraction_time = Date.now() - extractStart;
-      docObj.status = "READY_BASIC";
+      if (!docObj.extractionFailed) {
+        docObj.status = "READY_BASIC";
+      }
 
       // Save complete record to persistent store
       writeStore(store);
@@ -173,15 +159,15 @@ Please copy and paste the plain text manually into the Verification tab to overr
       if (fs.existsSync(filePath)) { try { fs.unlinkSync(filePath); } catch (e) {} }
 
       return res.json({
-        success: true,
+        success: !docObj.extractionFailed,
         completed: true,
-        status: "completed",
-        progress: 100,
+        status: docObj.status === "FAILED_EXTRACT" ? "failed" : "completed",
+        progress: docObj.status === "FAILED_EXTRACT" ? 0 : 100,
         text: extractedText,
         jobId: docId,
         docId,
         documentId: docId,
-        message: "Stage 1 complete. Document queryable under SAFE_MODE.",
+        message: docObj.status === "FAILED_EXTRACT" ? "Ingestion failed during extraction." : "Stage 1 complete. Document queryable under SAFE_MODE.",
         telemetry: docObj.telemetry,
         fallback: docObj.extractionFailed || false,
         forensicStatus: docObj.forensicStatus || null,
@@ -189,6 +175,7 @@ Please copy and paste the plain text manually into the Verification tab to overr
         reasoning: docObj.reasoning || null,
         recoverySuggestion: docObj.recoverySuggestion || null
       });
+
     } catch (safeErr) {
       console.error("[API SAFE_MODE ROUTER] Fatal safe ingestion fail:", safeErr);
       if (fs.existsSync(filePath)) { try { fs.unlinkSync(filePath); } catch (e) {} }

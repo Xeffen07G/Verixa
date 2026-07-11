@@ -97,6 +97,20 @@ export default function DocumentIntelligence() {
           if (step === 4) setUploadState('indexing');
 
           const s = await api.get(`/api/pdf/status/${data.docId}`);
+          if (s.data.status === 'failed' || s.data.success === false) {
+            clearInterval(poll);
+            setUploadState(null);
+            setMessages([
+              { 
+                role: 'ai', 
+                content: `We couldn't read **${file.name}**. It may be scanned, protected, or contain no extractable text. Try another file or an OCR-processed copy.`, 
+                timestamp: new Date(),
+                isError: true
+              }
+            ]);
+            return;
+          }
+
           if (s.data.queryable) {
             clearInterval(poll);
             setUploadState('ready');
@@ -140,7 +154,12 @@ export default function DocumentIntelligence() {
     setLoading(true);
 
     try {
-      const res = await api.post('/api/rag/query', { query: queryText, sessionId, mode: 'Deep Analysis' });
+      const res = await api.post('/api/rag/query', { 
+        query: queryText, 
+        sessionId, 
+        mode: 'Deep Analysis',
+        documentId: activeDoc?.id 
+      });
       setMessages(prev => [...prev, {
         role: 'ai',
         content: res.data.answer,
