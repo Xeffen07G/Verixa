@@ -25,13 +25,7 @@ const upload = multer({
 
 const { ingestionQueue } = require("../services/queue");
 
-const pdfParseModule = require("pdf-parse");
-const pdfParse = (function() {
-  if (typeof pdfParseModule === "function") return pdfParseModule;
-  if (pdfParseModule && typeof pdfParseModule.PDFParse === "function") return pdfParseModule.PDFParse;
-  if (pdfParseModule && typeof pdfParseModule.default === "function") return pdfParseModule.default;
-  return null;
-})();
+const extractPdfText = require("../utils/pdfExtract");
 
 /**
  * POST /api/pdf/ingest
@@ -106,10 +100,10 @@ router.post("/ingest", upload.single("pdf"), async (req, res) => {
         const dataBuffer = fs.readFileSync(filePath);
         let parsed = null;
         try {
-          parsed = await pdfParse(dataBuffer);
+          parsed = await extractPdfText(dataBuffer);
         } catch (innerErr) {
           const errMsg = (innerErr.message || "").toLowerCase();
-          reasoning = innerErr.message || "Primary pdf-parse module raised a parsing exception.";
+          reasoning = innerErr.message || "PDF text extraction failed.";
           if (errMsg.includes("password") || errMsg.includes("decrypt") || errMsg.includes("encrypt")) {
             failureType = "ENCRYPTED_DOCUMENT";
             recoverySuggestion = "Encrypted PDF blocked extraction. Please remove the password protection or upload a decrypted copy.";
@@ -270,10 +264,10 @@ router.post("/ingest", upload.single("pdf"), async (req, res) => {
         const dataBuffer = fs.readFileSync(filePath);
         let parsed = null;
         try {
-          parsed = await pdfParse(dataBuffer);
+          parsed = await extractPdfText(dataBuffer);
         } catch (innerParseErr) {
           const errMsg = (innerParseErr.message || "").toLowerCase();
-          reasoning = innerParseErr.message || "Primary pdf-parse module raised a parsing exception.";
+          reasoning = innerParseErr.message || "PDF text extraction failed.";
           
           if (errMsg.includes("password") || errMsg.includes("decrypt") || errMsg.includes("encrypt")) {
             failureType = "ENCRYPTED_DOCUMENT";

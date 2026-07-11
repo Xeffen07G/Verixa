@@ -13,21 +13,7 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const multer = require("multer");
-const pdfParseModule = require("pdf-parse");
-
-const pdfParse = (function() {
-  if (typeof pdfParseModule === "function") return pdfParseModule;
-  if (pdfParseModule && typeof pdfParseModule.PDFParse === "function") return pdfParseModule.PDFParse;
-  if (pdfParseModule && typeof pdfParseModule.default === "function") return pdfParseModule.default;
-  return null;
-})();
-
-if (!pdfParse) {
-  console.error("CRITICAL: pdfParse failed to initialize. Ingestion will be disabled.", { 
-    moduleType: typeof pdfParseModule,
-    keys: pdfParseModule ? Object.keys(pdfParseModule) : []
-  });
-}
+const extractPdfText = require("./utils/pdfExtract");
 
 const { askGroq } = require("./services/groq");
 const { readStore, writeStore } = require("./utils/store");
@@ -494,11 +480,11 @@ if (SAFE_MODE) {
       docObj.status = "EXTRACTING";
       const extractStart = Date.now();
       
-      // --- PHASE 3: PDF PARSER HARDENING (Wrap pdf-parse in isolated try/catch) ---
+      // --- PHASE 3: PDF TEXT EXTRACTION (pdfjs-dist) ---
       let extractedText = "";
       try {
         const dataBuffer = fs.readFileSync(filePath);
-        const parsed = await pdfParse(dataBuffer);
+        const parsed = await extractPdfText(dataBuffer);
         extractedText = parsed ? (parsed.text || "") : "";
         
         if (!extractedText.trim()) {

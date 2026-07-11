@@ -6,12 +6,126 @@
       "description": "Testing nodemon ignore",
       "items": [],
       "createdAt": "2026-07-11T17:02:34.999Z"
+    },
+    {
+      "id": "board_1783796992420",
+      "title": "alpha_proof.pdf",
+      "description": "Conversational session with alpha_proof.pdf.",
+      "items": [],
+      "createdAt": "2026-07-11T19:09:52.421Z"
+    },
+    {
+      "id": "board_1783797063905",
+      "title": "alpha_proof.pdf",
+      "description": "Conversational session with alpha_proof.pdf.",
+      "items": [],
+      "createdAt": "2026-07-11T19:11:03.906Z"
+    },
+    {
+      "id": "board_1783797096818",
+      "title": "alpha_proof.pdf",
+      "description": "Conversational session with alpha_proof.pdf.",
+      "items": [],
+      "createdAt": "2026-07-11T19:11:36.818Z"
+    },
+    {
+      "id": "board_1783797115620",
+      "title": "beta_proof.pdf",
+      "description": "Conversational session with beta_proof.pdf.",
+      "items": [],
+      "createdAt": "2026-07-11T19:11:55.620Z"
     }
   ],
   "sessions": {
-    "board_1783789354999": {
-      "history": [],
-      "lastActive": 1783795684917
+    "doc_1783793437843": {
+      "history": [
+        {
+          "query": "Summarize the document",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The document appears to be a test case for the VeriXa Forensic Synthesis Engine, with the primary objective of evaluating its text extraction capabilities [Source 1]. The core objective is to assess the engine's performance in isolating relevant information from a given text. The document provides a test scenario for this purpose.\",\n  \n  \"METHODOLOGY\": \"The study took a straightforward approach by providing a sample text, 'VERIXA ISOLATION TEST ALPHA 7429', along with additional padding text to meet the minimum document length requirement [Source 1].\",\n  \n  \"KEY FINDINGS\": [\n    \"The document is identified as a test case for the VeriXa Forensic Synthesis Engine [Source 1]\",\n    \"The text includes a specific test scenario, 'VERIXA ISOLATION TEST ALPHA 7429' [Source 1]\",\n    \"The document meets the minimum length requirement for successful forensic text extraction [Source 1]\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts to fully understand the scope and implications of the test results.\",\n  \n  \"FORENSIC CONCLUSION\": \"The document serves as a basic test case for the VeriXa Forensic Synthesis Engine, demonstrating its ability to extract and process text from a given sample [Source 1]. Further analysis would require additional data and context.\"\n}\n```",
+          "timestamp": 1783796483485
+        }
+      ],
+      "lastActive": 1783796482080
+    },
+    "default": {
+      "history": [
+        {
+          "query": "What is the unique code?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this study is to identify the unique code, with a focus on the VERIXA ISOLATION TEST ALPHA. The unique code is reported to be ALPHA-7429, as per the provided evidence [Source 1]. This study aims to synthesize the available information to provide a comprehensive overview of the unique code.\",\n  \n  \"METHODOLOGY\": \"The study took an evidence-based approach, relying on the provided evidence ledger, specifically the alpha_proof.pdf document [Source 1], to gather information about the unique code.\",\n  \n  \"KEY FINDINGS\": [\n    \"The unique code is identified as ALPHA-7429 [Source 1]\",\n    \"The Raven protocol utilizes a silver verification key [Source 1]\",\n    \"The North archive is designated as the approved evidence source [Source 1]\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts regarding the context, application, or further details about the unique code, the Raven protocol, or the North archive.\",\n  \n  \"FORENSIC CONCLUSION\": \"Based on the available evidence [Source 1], the unique code is confirmed to be ALPHA-7429, with the Raven protocol and North archive playing significant roles in the context of this code. However, due to the limited information, further analysis is required to fully understand the implications and applications of this unique code.\"\n}\n```",
+          "timestamp": 1783797385222
+        },
+        {
+          "query": "What is the unique code?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this research is to identify the unique code, with a focus on the VERIXA ISOLATION TEST ALPHA. The study aims to uncover key details about the unique code and its associated protocols. The unique code is reported to be ALPHA-7429 [Source 1].\",\n  \"METHODOLOGY\": \"The study took an evidence-based approach, analyzing documents such as the alpha_proof.pdf paper [Source 1] to gather information about the unique code and related protocols.\",\n  \"KEY FINDINGS\": [\n    \"The unique code is ALPHA-7429 [Source 1]\",\n    \"The Raven protocol uses a silver verification key [Source 1]\",\n    \"The North archive is the approved evidence source [Source 1]\"\n  ],\n  \"LIMITATIONS\": \"Data not present in provided artifacts regarding other potential unique codes or protocols beyond what is mentioned in the alpha_proof.pdf paper.\",\n  \"FORENSIC CONCLUSION\": \"Based on the available evidence, the unique code is identified as ALPHA-7429, and it is associated with the Raven protocol and the North archive [Source 1]. Further research would be required to confirm if this is the only unique code or if there are others.\"\n}\n```",
+          "timestamp": 1783797386585
+        },
+        {
+          "query": "What is the unique validation code?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this study is to identify the unique validation code for the ORION LEDGER project, which aims to improve evidence precision through document intelligence validation. The study focuses on the Helios retrieval experiment and its impact on evidence precision. The unique validation code is a crucial aspect of this project.\",\n  \n  \"METHODOLOGY\": \"The study took an experimental approach, conducting the Helios retrieval experiment to measure its impact on evidence precision, and comparing it to the Atlas pipeline [Source 1].\",\n  \n  \"KEY FINDINGS\": [\n    \"The Helios retrieval experiment achieved a 37 percent improvement in evidence precision [Source 1].\",\n    \"The Atlas pipeline was rejected due to cross-document contamination [Source 1].\",\n    \"The unique validation code for the ORION LEDGER project is VX-9147-ORION [Source 1].\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts to discuss other potential limitations or constraints of the study beyond the rejection of the Atlas pipeline.\",\n  \n  \"FORENSIC CONCLUSION\": \"The unique validation code for the ORION LEDGER project is VX-9147-ORION, as determined by the Helios retrieval experiment, which demonstrated a significant improvement in evidence precision [Source 1].\"\n}\n```",
+          "timestamp": 1783797484767
+        },
+        {
+          "query": "What improvement did the Helios retrieval experiment achieve?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The Helios retrieval experiment aimed to enhance evidence precision, and its primary objective was to validate the effectiveness of document-scoped retrieval. The study achieved a notable improvement in evidence precision, with significant implications for document intelligence. The experiment's findings have important recommendations for future retrieval experiments.\",\n  \n  \"METHODOLOGY\": \"The approach taken by the study is not explicitly detailed in the provided evidence ledger, but it is mentioned that the Helios retrieval experiment was conducted, and the Atlas pipeline was evaluated [Source 1].\",\n  \n  \"KEY FINDINGS\": [\n    \"The Helios retrieval experiment achieved a 37 percent improvement in evidence precision [Source 1].\",\n    \"The Atlas pipeline was rejected due to introducing cross-document contamination [Source 1].\",\n    \"The use of document-scoped retrieval and preservation of evidence isolation is recommended [Source 1].\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts to discuss limitations of the study beyond the rejection of the Atlas pipeline due to cross-document contamination.\",\n  \n  \"FORENSIC CONCLUSION\": \"The Helios retrieval experiment demonstrated a significant improvement in evidence precision, achieving a 37 percent increase [Source 1]. This finding supports the use of document-scoped retrieval and the importance of preserving evidence isolation to prevent cross-document contamination, as seen in the rejected Atlas pipeline [Source 1].\"\n}\n```",
+          "timestamp": 1783797485833
+        },
+        {
+          "query": "Why was the Atlas pipeline rejected?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The Atlas pipeline was rejected due to its introduction of cross-document contamination, as evidenced by the Helios retrieval experiment. This experiment achieved a 37 percent improvement in evidence precision, highlighting the importance of document-scoped retrieval and evidence isolation. The rejection of the Atlas pipeline is a critical finding in the context of document intelligence validation.\",\n  \"METHODOLOGY\": \"The study employed the Helios retrieval experiment to evaluate the effectiveness of the Atlas pipeline, using a unique validation code VX-9147-ORION [Source 1].\",\n  \"KEY FINDINGS\": [\n    \"The Atlas pipeline was rejected because it introduced cross-document contamination [Source 1].\",\n    \"The Helios retrieval experiment achieved a 37 percent improvement in evidence precision [Source 1].\",\n    \"Document-scoped retrieval and preservation of evidence isolation are recommended [Source 1].\"\n  ],\n  \"LIMITATIONS\": \"Data not present in provided artifacts to fully elaborate on the specifics of the Helios retrieval experiment or the Atlas pipeline's design.\",\n  \"FORENSIC CONCLUSION\": \"The rejection of the Atlas pipeline is primarily attributed to its introduction of cross-document contamination, as demonstrated by the Helios retrieval experiment [Source 1]. This finding underscores the importance of maintaining evidence isolation in document intelligence validation.\"\n}\n```",
+          "timestamp": 1783797486707
+        },
+        {
+          "query": "What is the unique code?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this study is to identify the unique code, with a focus on the VERIXA ISOLATION TEST ALPHA. The unique code is crucial for verification purposes, and this study aims to provide an overview of the findings. The research is based on evidence from the North archive, an approved evidence source [Source 1].\",\n  \n  \"METHODOLOGY\": \"The study took an analytical approach, examining the VERIXA ISOLATION TEST ALPHA and the Raven protocol to identify the unique code. The North archive was used as the primary source of evidence [Source 1].\",\n  \n  \"KEY FINDINGS\": [\n    \"The unique code is identified as ALPHA-7429 [Source 1].\",\n    \"The Raven protocol utilizes a silver verification key [Source 1].\",\n    \"The North archive is the approved evidence source for this study [Source 1].\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts regarding potential limitations or constraints of the study.\",\n  \n  \"FORENSIC CONCLUSION\": \"Based on the evidence from the North archive, the unique code is ALPHA-7429, and it is associated with the VERIXA ISOLATION TEST ALPHA and the Raven protocol [Source 1].\"\n}\n```",
+          "timestamp": 1783797514485
+        },
+        {
+          "query": "What is the unique validation code?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this study is to identify the unique validation code for the ORION LEDGER project, which aims to improve evidence precision through document intelligence validation. The study focuses on the Helios retrieval experiment and its impact on evidence precision. The unique validation code is a crucial component of this project.\",\n  \n  \"METHODOLOGY\": \"The study took an experimental approach, conducting the Helios retrieval experiment to measure its impact on evidence precision, and comparing it to the Atlas pipeline [Source 1].\",\n  \n  \"KEY FINDINGS\": [\n    \"The Helios retrieval experiment achieved a 37 percent improvement in evidence precision [Source 1].\",\n    \"The Atlas pipeline was rejected due to cross-document contamination [Source 1].\",\n    \"The unique validation code for the ORION LEDGER project is VX-9147-ORION [Source 1].\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts to discuss other potential limitations or constraints of the study beyond the rejection of the Atlas pipeline.\",\n  \n  \"FORENSIC CONCLUSION\": \"The unique validation code for the ORION LEDGER project is VX-9147-ORION, as determined by the Helios retrieval experiment, which demonstrated a significant improvement in evidence precision [Source 1].\"\n}\n```",
+          "timestamp": 1783797543279
+        },
+        {
+          "query": "What improvement did the Helios retrieval experiment achieve?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The Helios retrieval experiment aimed to enhance evidence precision, and according to the findings, it achieved a notable improvement. The primary objective was to validate the effectiveness of the Helios retrieval experiment in enhancing evidence precision. The experiment's outcome has significant implications for document intelligence and evidence retrieval.\",\n  \n  \"METHODOLOGY\": \"The study took a document-scoped retrieval approach, emphasizing the importance of preserving evidence isolation to prevent cross-document contamination [Source 1].\",\n  \n  \"KEY FINDINGS\": [\n    \"The Helios retrieval experiment achieved a 37 percent improvement in evidence precision [Source 1].\",\n    \"The Atlas pipeline was rejected due to its introduction of cross-document contamination [Source 1].\",\n    \"Document-scoped retrieval is recommended to preserve evidence isolation [Source 1].\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts.\",\n  \n  \"FORENSIC CONCLUSION\": \"The Helios retrieval experiment demonstrated a significant improvement in evidence precision, achieving a 37 percent enhancement [Source 1]. This outcome underscores the importance of adopting a document-scoped retrieval approach to maintain evidence integrity and avoid cross-document contamination.\"\n}\n```",
+          "timestamp": 1783797544342
+        },
+        {
+          "query": "Why was the Atlas pipeline rejected?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The Atlas pipeline was rejected due to its introduction of cross-document contamination, as evidenced by the Helios retrieval experiment. This experiment achieved a 37 percent improvement in evidence precision, highlighting the importance of document-scoped retrieval and evidence isolation. The rejection of the Atlas pipeline underscores the need for precise and isolated evidence retrieval methods.\",\n  \"METHODOLOGY\": \"The study employed the Helios retrieval experiment to evaluate the effectiveness of different evidence retrieval methods, including the Atlas pipeline [Source 1].\",\n  \"KEY FINDINGS\": [\n    \"The Atlas pipeline was rejected because it introduced cross-document contamination [Source 1].\",\n    \"The Helios retrieval experiment achieved a 37 percent improvement in evidence precision [Source 1].\",\n    \"Document-scoped retrieval and preservation of evidence isolation are recommended [Source 1].\"\n  ],\n  \"LIMITATIONS\": \"Data not present in provided artifacts to fully elaborate on the specifics of the Helios retrieval experiment or the Atlas pipeline's design.\",\n  \"FORENSIC CONCLUSION\": \"The rejection of the Atlas pipeline is attributed to its introduction of cross-document contamination, as demonstrated by the Helios retrieval experiment [Source 1]. This finding emphasizes the importance of precise and isolated evidence retrieval methods to maintain the integrity of the evidence.\"\n}\n```",
+          "timestamp": 1783797545259
+        },
+        {
+          "query": "What is the unique code?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this research is to identify the unique code, with a focus on the VERIXA ISOLATION TEST ALPHA. The study aims to uncover key details about the unique code and its associated protocols. The unique code is reported to be ALPHA-7429 [Source 1].\",\n  \"METHODOLOGY\": \"The study took an evidence-based approach, analyzing documents such as the alpha_proof.pdf paper [Source 1] to gather information about the unique code and related protocols.\",\n  \"KEY FINDINGS\": [\n    \"The unique code is ALPHA-7429 [Source 1]\",\n    \"The Raven protocol uses a silver verification key [Source 1]\",\n    \"The North archive is the approved evidence source [Source 1]\"\n  ],\n  \"LIMITATIONS\": \"Data not present in provided artifacts regarding other potential unique codes or protocols. The study is limited to the information available in the alpha_proof.pdf paper [Source 1].\",\n  \"FORENSIC CONCLUSION\": \"Based on the available evidence, the unique code is identified as ALPHA-7429, and it is associated with the Raven protocol and the North archive [Source 1]. Further research is needed to fully understand the scope and implications of this unique code.\"\n}\n```",
+          "timestamp": 1783797572778
+        },
+        {
+          "query": "What is the unique validation code?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this study is to identify the unique validation code for the ORION LEDGER project, which aims to improve evidence precision through document intelligence validation. The study focuses on the Helios retrieval experiment and its impact on evidence precision. The unique validation code is a crucial component of this project.\",\n  \n  \"METHODOLOGY\": \"The study took an experimental approach, conducting the Helios retrieval experiment to measure its impact on evidence precision [Source 1]. The experiment compared the results of the Helios retrieval method with other methods, such as the Atlas pipeline, which was rejected due to cross-document contamination [Source 1].\",\n  \n  \"KEY FINDINGS\": [\n    \"The Helios retrieval experiment achieved a 37 percent improvement in evidence precision [Source 1].\",\n    \"The Atlas pipeline was rejected because it introduced cross-document contamination [Source 1].\",\n    \"The final recommendation is to use document-scoped retrieval and preserve evidence isolation [Source 1, Source 2].\",\n    \"The unique validation code for the ORION LEDGER project is VX-9147-ORION [Source 1].\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts regarding potential limitations of the study, such as sample size or experimental design.\",\n  \n  \"FORENSIC CONCLUSION\": \"Based on the evidence provided, the unique validation code for the ORION LEDGER project is VX-9147-ORION, and the use of document-scoped retrieval with evidence isolation is recommended to achieve improved evidence precision [Source 1, Source 2].\"\n}\n```",
+          "timestamp": 1783798492477
+        },
+        {
+          "query": "What improvement did the Helios retrieval experiment achieve?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The Helios retrieval experiment aimed to enhance evidence precision through improved retrieval methods. The core objective was to assess the effectiveness of document-scoped retrieval in minimizing cross-document contamination. The experiment achieved a notable improvement in evidence precision, as reported in [Source 1].\",\n  \n  \"METHODOLOGY\": \"The study took a document-scoped retrieval approach, as recommended in [Source 1], to preserve evidence isolation and prevent cross-document contamination. Data not present in provided artifacts regarding the specific experimental design and procedures.\",\n  \n  \"KEY FINDINGS\": [\n    \"The Helios retrieval experiment achieved a 37 percent improvement in evidence precision, as stated in [Source 1].\",\n    \"The Atlas pipeline was rejected due to introducing cross-document contamination, as mentioned in [Source 1].\",\n    \"The use of document-scoped retrieval is recommended to preserve evidence isolation, as suggested in [Source 1] and reiterated in [Source 2].\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts regarding potential limitations or constraints of the study, such as sample size, experimental controls, or potential biases.\",\n  \n  \"FORENSIC CONCLUSION\": \"The Helios retrieval experiment demonstrated a significant improvement in evidence precision through the use of document-scoped retrieval, as supported by [Source 1]. The rejection of the Atlas pipeline due to cross-document contamination highlights the importance of preserving evidence isolation, as emphasized in [Source 1] and [Source 2].\"\n}\n```",
+          "timestamp": 1783798529804
+        },
+        {
+          "query": "Why was the Atlas pipeline rejected?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The Atlas pipeline was rejected due to its introduction of cross-document contamination, as evidenced by the Helios retrieval experiment. This rejection is crucial for maintaining evidence precision and isolation. The study highlights the importance of document-scoped retrieval in preventing contamination.\",\n  \n  \"METHODOLOGY\": \"The study took an experimental approach, conducting the Helios retrieval experiment to evaluate the effectiveness of the Atlas pipeline [Source 1]. The experiment aimed to measure the precision of evidence retrieval and identify potential contamination issues.\",\n  \n  \"KEY FINDINGS\": [\n    \"The Atlas pipeline introduced cross-document contamination, leading to its rejection [Source 1].\",\n    \"The Helios retrieval experiment achieved a 37 percent improvement in evidence precision [Source 1].\",\n    \"The use of document-scoped retrieval is recommended to preserve evidence isolation [Source 1, Source 2].\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts to fully elaborate on the experimental design and setup of the Helios retrieval experiment.\",\n  \n  \"FORENSIC CONCLUSION\": \"The rejection of the Atlas pipeline is primarily attributed to its introduction of cross-document contamination, as supported by the findings of the Helios retrieval experiment [Source 1]. The study emphasizes the importance of maintaining evidence isolation through document-scoped retrieval, as recommended in both [Source 1] and [Source 2].\"\n}\n```",
+          "timestamp": 1783798578245
+        },
+        {
+          "query": "What is the unique code?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this research is to identify the unique code, with a focus on the VERIXA ISOLATION TEST ALPHA. The study examines the Raven protocol and its verification key. The North archive serves as the approved evidence source [Source 1].\",\n  \"METHODOLOGY\": \"The study took an approach based on analyzing documents from the North archive, specifically the alpha_proof.pdf paper [Source 1, Source 2].\",\n  \"KEY FINDINGS\": [\n    \"The unique code is identified as ALPHA-7429 [Source 1].\",\n    \"The Raven protocol utilizes a silver verification key [Source 1].\",\n    \"The ven protocol also uses a silver verification key [Source 2].\",\n    \"The North archive is confirmed as the approved evidence source [Source 1, Source 2].\"\n  ],\n  \"LIMITATIONS\": \"Data not present in provided artifacts regarding other potential unique codes or protocols beyond Raven and ven.\",\n  \"FORENSIC CONCLUSION\": \"Based on the evidence from the alpha_proof.pdf paper, the unique code ALPHA-7429 is associated with the VERIXA ISOLATION TEST ALPHA, and both the Raven and ven protocols employ a silver verification key [Source 1, Source 2].\"\n}\n```",
+          "timestamp": 1783798582477
+        },
+        {
+          "query": "What is the unique code?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this study is to identify the unique code, with a focus on the VERIXA ISOLATION TEST BETA. The unique code is a crucial component of the Falcon protocol, which utilizes a bronze verification key [Source 1]. The South archive is designated as the approved evidence source for this investigation.\",\n  \n  \"METHODOLOGY\": \"The study took an evidence-based approach, analyzing the VERIXA ISOLATION TEST BETA protocol and its associated verification key [Source 1].\",\n  \n  \"KEY FINDINGS\": [\n    \"The unique code is identified as BETA-3816 [Source 1]\",\n    \"The Falcon protocol uses a bronze verification key [Source 1]\",\n    \"The South archive is the approved evidence source [Source 1]\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts regarding potential limitations or constraints of the study.\",\n  \n  \"FORENSIC CONCLUSION\": \"Based on the evidence provided, the unique code is determined to be BETA-3816, as part of the VERIXA ISOLATION TEST BETA protocol [Source 1]. The use of a bronze verification key and the designation of the South archive as the approved evidence source are also key findings [Source 1].\"\n}\n```",
+          "timestamp": 1783798583496
+        }
+      ],
+      "lastActive": 1783798582484
     }
   },
   "papers": [
@@ -194,6 +308,334 @@
       },
       "text": "\n\nVERIXA ISOLATION TEST BETA 3816.  Here is some padding text that will make the total length of this document content more than 150 characters. Testing RAG.",
       "contentFingerprint": "verixaisolationtestbeta3816.hereissomepaddingtextthatwillmakethetotallengthofthisdocumentcontentmorethan150characters.testingrag."
+    },
+    {
+      "id": "doc_1783796991347",
+      "filename": "alpha_proof.pdf",
+      "uploadedAt": "2026-07-11T19:09:51.348Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 936,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: Invalid number: > (charCode 62)",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797063755",
+      "filename": "alpha_proof.pdf",
+      "uploadedAt": "2026-07-11T19:11:03.755Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 58,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797096059",
+      "filename": "alpha_proof.pdf",
+      "uploadedAt": "2026-07-11T19:11:36.059Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 219,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: Command token too long: 128",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797115164",
+      "filename": "beta_proof.pdf",
+      "uploadedAt": "2026-07-11T19:11:55.164Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 128,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797188501",
+      "filename": "orion.pdf",
+      "uploadedAt": "2026-07-11T19:13:08.501Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 13,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: Command token too long: 128",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797214641",
+      "filename": "alpha_proof.pdf",
+      "uploadedAt": "2026-07-11T19:13:34.641Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 10,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797240034",
+      "filename": "beta_proof.pdf",
+      "uploadedAt": "2026-07-11T19:14:00.034Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 16,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797265503",
+      "filename": "scanned_proof.pdf",
+      "uploadedAt": "2026-07-11T19:14:25.503Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 9,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797356241",
+      "filename": "orion.pdf",
+      "uploadedAt": "2026-07-11T19:15:56.241Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 3,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797381854",
+      "filename": "alpha_proof.pdf",
+      "uploadedAt": "2026-07-11T19:16:21.854Z",
+      "status": "READY_SEMANTIC",
+      "telemetry": {
+        "extraction_time": 64,
+        "chunking_time": 0,
+        "embedding_time": 111,
+        "total_background_time": 176
+      },
+      "text": "\n\nVERIXA ISOLATION TEST ALPHA. Unique Code: ALPHA-7429. The Raven protocol uses a silver verification key. The North archive is the approved evidence source.     ",
+      "contentFingerprint": "verixaisolationtestalpha.uniquecode:alpha-7429.theravenprotocolusesasilververificationkey.thenortharchiveistheapprovedevidencesource."
+    },
+    {
+      "id": "doc_1783797386618",
+      "filename": "scanned_proof.pdf",
+      "uploadedAt": "2026-07-11T19:16:26.618Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 3,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: Command token too long: 128",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797440395",
+      "filename": "orion.pdf",
+      "uploadedAt": "2026-07-11T19:17:20.395Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 2,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797482457",
+      "filename": "orion.pdf",
+      "uploadedAt": "2026-07-11T19:18:02.457Z",
+      "status": "READY_SEMANTIC",
+      "telemetry": {
+        "extraction_time": 11,
+        "chunking_time": 0,
+        "embedding_time": 45,
+        "total_background_time": 58
+      },
+      "text": "\n\nVERIXA DOCUMENT INTELLIGENCE VALIDATION. Project Name: ORION LEDGER.\nUnique Validation Code: VX-9147-ORION. Primary Finding: The Helios\nretrieval experiment achieved a 37 percent improvement in evidence\nprecision. Secondary Finding: The Atlas pipeline was rejected\nbecause it introduced cross-document contamination. Final Recommendation:\nUse document-scoped retrieval and preserve evidence isolation.",
+      "contentFingerprint": "verixadocumentintelligencevalidation.projectname:orionledger.uniquevalidationcode:vx-9147-orion.primaryfinding:theheliosretrievalexperimentachieveda37percentimprovementinevidenceprecision.secondaryfinding:theatlaspipelinewasrejectedbecauseitintroducedcross-documentcontamination.finalrecommendation:usedocument-scopedretrievalandpreserveevidenceisolation."
+    },
+    {
+      "id": "doc_1783797487897",
+      "filename": "beta_proof.pdf",
+      "uploadedAt": "2026-07-11T19:18:07.897Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 3,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797514636",
+      "filename": "scanned_proof.pdf",
+      "uploadedAt": "2026-07-11T19:18:34.636Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 2,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797546401",
+      "filename": "beta_proof.pdf",
+      "uploadedAt": "2026-07-11T19:19:06.401Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 3,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797572896",
+      "filename": "scanned_proof.pdf",
+      "uploadedAt": "2026-07-11T19:19:32.896Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 3,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783797929488",
+      "filename": "beta_direct_test.pdf",
+      "uploadedAt": "2026-07-11T19:25:29.488Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 2,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: bad XRef entry",
+      "text": ""
+    },
+    {
+      "id": "doc_1783798579420",
+      "filename": "beta_proof.pdf",
+      "uploadedAt": "2026-07-11T19:36:19.420Z",
+      "status": "READY_SEMANTIC",
+      "telemetry": {
+        "extraction_time": 102,
+        "chunking_time": 0,
+        "embedding_time": 13,
+        "total_background_time": 118
+      },
+      "text": "VERIXA ISOLATION TEST BETA. Unique Code: BETA-3816. The Falcon protocol uses a bronze verification key. The South archive is the approved evidence source.",
+      "contentFingerprint": "verixaisolationtestbeta.uniquecode:beta-3816.thefalconprotocolusesabronzeverificationkey.thesoutharchiveistheapprovedevidencesource."
+    },
+    {
+      "id": "doc_1783798583534",
+      "filename": "scanned_proof.pdf",
+      "uploadedAt": "2026-07-11T19:36:23.534Z",
+      "status": "READY_SEMANTIC",
+      "telemetry": {
+        "extraction_time": 7,
+        "chunking_time": 0,
+        "embedding_time": 6,
+        "total_background_time": 14
+      },
+      "text": "short",
+      "contentFingerprint": "short"
     }
   ],
   "verifications": [],
