@@ -97,7 +97,7 @@ export default function DocumentIntelligence() {
           if (step === 4) setUploadState('indexing');
 
           const s = await api.get(`/api/pdf/status/${data.docId}`);
-          if (s.data.status === 'READY_SEMANTIC' || s.data.status === 'READY_BASIC' || s.data.status === 'completed') {
+          if (s.data.queryable) {
             clearInterval(poll);
             setUploadState('ready');
             fetchDocuments();

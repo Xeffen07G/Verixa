@@ -1,0 +1,6 @@
+{
+  "ignore": [
+    "uploads/*",
+    "intelligence_store.json"
+  ]
+}

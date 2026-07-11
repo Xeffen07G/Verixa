@@ -159,6 +159,85 @@ function semanticChunking(text, filename, options = { size: 700, overlap: 100 })
   return chunks;
 }
 
+// --- STARTUP RECOVERY (PHASE 4) ---
+if (SAFE_DOCS.length > 0) {
+  console.log(`[RAG Recovery] Starting recovery of chunks for ${SAFE_DOCS.length} documents...`);
+  let docsInspected = 0;
+  let docsRecovered = 0;
+  let chunksRestored = 0;
+  let docsSkipped = 0;
+
+  SAFE_DOCS.forEach(doc => {
+    docsInspected++;
+    if (!doc.text || !doc.text.trim()) {
+      console.warn(`[RAG Recovery] Skipped document ${doc.id} (${doc.filename || "unknown"}): Empty extracted text.`);
+      docsSkipped++;
+      return;
+    }
+
+    try {
+      let chunks = semanticChunking(doc.text, doc.filename || "unknown");
+      if (chunks.length > MAX_CHUNKS_PER_DOC) chunks = chunks.slice(0, MAX_CHUNKS_PER_DOC);
+      
+      chunks.forEach(c => {
+        c.docId = doc.id;
+        c.status = 'basic';
+        // Deduplicate: check if this canonical chunk ID already exists in SAFE_CHUNKS
+        if (!SAFE_CHUNKS.some(existing => existing.id === c.id)) {
+          SAFE_CHUNKS.push(c);
+          chunksRestored++;
+        }
+      });
+
+      docsRecovered++;
+
+      // Re-embed chunks in background if the doc was READY_SEMANTIC
+      if (doc.status === "READY_SEMANTIC") {
+        (async () => {
+          if (activeEmbeddingJobs >= MAX_CONCURRENT_JOBS || (process.memoryUsage().heapUsed / 1024 / 1024) > MEMORY_THRESHOLD_MB) {
+            console.log(`[RAG Recovery] Concurrency limit or memory limit reached. Skipping background embedding generation for ${doc.id}`);
+            return;
+          }
+          activeEmbeddingJobs++;
+          try {
+            const docChunks = SAFE_CHUNKS.filter(c => c.docId === doc.id);
+            const embedder = await getExtractor();
+            const chunksToEmbed = docChunks.slice(0, 15);
+            for (let i = 0; i < chunksToEmbed.length; i++) {
+              try {
+                const output = await embedder(chunksToEmbed[i].text, { pooling: 'mean', normalize: true });
+                chunksToEmbed[i].embedding = Array.from(output.data);
+                chunksToEmbed[i].status = 'semantic';
+              } catch (e) {
+                console.warn(`[RAG Recovery] Embedding chunk ${i} failed for ${doc.id}:`, e.message);
+              }
+            }
+            console.log(`[RAG Recovery] Background embedding generation completed for ${doc.id}`);
+            doc.status = "READY_SEMANTIC";
+            STORE.papers = SAFE_DOCS;
+            writeStore(STORE);
+          } catch (err) {
+            console.error(`[RAG Recovery] Fatal background embedding error for ${doc.id}:`, err);
+          } finally {
+            activeEmbeddingJobs--;
+          }
+        })();
+      }
+    } catch (err) {
+      console.error(`[RAG Recovery] Failed to recover document ${doc.id}:`, err);
+      docsSkipped++;
+    }
+  });
+
+  console.log(`[RAG Recovery]`);
+  console.log(`Documents inspected: ${docsInspected}`);
+  console.log(`Documents recovered: ${docsRecovered}`);
+  console.log(`Chunks restored: ${chunksRestored}`);
+  console.log(`Documents skipped: ${docsSkipped}`);
+}
+
+
+
 const upload = multer({
   dest: "uploads/",
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit for SAFE_MODE
@@ -263,7 +342,8 @@ if (SAFE_MODE) {
   ==========================
   MOCK PDF INGEST -> IN-MEMORY
   ==========================
-    app.post("/api/pdf/ingest", upload.single("pdf"), async (req, res) => {
+  */
+  app.post("/api/pdf/ingest", upload.single("pdf"), async (req, res) => {
     const globalStart = Date.now();
     const docId = `doc_${Date.now()}`;
 
@@ -442,12 +522,16 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
       docObj.telemetry.chunking_time = Date.now() - chunkStart;
 
       docObj.status = "READY_BASIC";
+      STORE.papers = SAFE_DOCS;
+      writeStore(STORE);
 
       // --- STAGE 2: BACKGROUND ENHANCEMENT ---
       (async () => {
         // SAFE_MODE memory / concurrency check
         if (activeEmbeddingJobs >= MAX_CONCURRENT_JOBS || (process.memoryUsage().heapUsed / 1024 / 1024) > MEMORY_THRESHOLD_MB) {
           docObj.status = "READY_BASIC"; // Stay at basic if resources low
+          STORE.papers = SAFE_DOCS;
+          writeStore(STORE);
           return;
         }
 
@@ -472,9 +556,13 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
           docObj.status = "READY_SEMANTIC";
           docObj.telemetry.embedding_time = Date.now() - embedStart;
           docObj.telemetry.total_background_time = Date.now() - globalStart;
+          STORE.papers = SAFE_DOCS;
+          writeStore(STORE);
         } catch (err) {
           console.error(`[ENHANCING] Fatal error for ${docId}:`, err);
           docObj.status = "READY_BASIC"; // Fallback to basic
+          STORE.papers = SAFE_DOCS;
+          writeStore(STORE);
         } finally {
           activeEmbeddingJobs--;
           if (global.gc) global.gc();
@@ -542,11 +630,13 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
     };
 
     const status = statusMap[doc.status] || doc.status.toLowerCase();
+    const isQueryable = SAFE_CHUNKS.some(c => c.docId === doc.id);
 
     return res.json({
       success: true,
       id: doc.id,
       status: status,
+      queryable: isQueryable,
       progress: status === "completed" ? 100 : (status === "failed" ? 0 : 50),
       result: status === "completed" ? { text: doc.text } : null,
       telemetry: doc.telemetry,
@@ -898,7 +988,7 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
         systemPrompt = RESEARCH_PROMPTS.v1.system(mode, modeInstruction, evidenceLedger, contradictionReport.explanation, query);
       }
 
-      const groqResponse = await askGroq(systemPrompt, false, "llama-3.1-70b-versatile");
+      const groqResponse = await askGroq(systemPrompt, false, "llama-3.3-70b-versatile");
       
       const sources = enrichedSources.map((c, i) => ({
         id: c.id,
@@ -980,7 +1070,7 @@ Please extract the plain text manually or upload an OCR-processed copy. Ingestio
 
     try {
       const prompt = EXPORT_PROMPTS.v2.system(sessionPackage);
-      const report = await askGroq(prompt, false, "llama-3.1-70b-versatile");
+      const report = await askGroq(prompt, false, "llama-3.3-70b-versatile");
       
       investigationManager.logEvent(sessionId, "REPORT_GENERATED", "V2 Forensic Intelligence Report exported.");
       
