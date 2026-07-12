@@ -494,7 +494,7 @@ if (SAFE_MODE) {
         console.log(`[INGEST] Parse success: Extracted ${extractedText.length} characters`);
       } catch (parseErr) {
         // Fallback degraded ingestion mode
-        console.error(`[INGEST] Parse failure: pdf-parse failed. Graceful fallback activated.`, parseErr);
+        console.error(`[INGEST] Parse failure: PDF text extraction failed. Graceful fallback activated.`, parseErr);
         extractedText = "";
         docObj.extractionFailed = true;
         docObj.forensicStatus = "INGESTION_DEGRADED";
