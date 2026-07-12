@@ -26,6 +26,8 @@ export default function DocumentIntelligence() {
 
   const chatEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  const pollingRef = useRef(null);
+  const queryInFlightRef = useRef(false);
 
   const sessionId = useMemo(() => currentInvestigationId || `session_${Math.random().toString(36).slice(2, 9)}`, [currentInvestigationId]);
 
@@ -33,6 +35,9 @@ export default function DocumentIntelligence() {
     if (!authLoading && !user) navigate('/login');
     fetchDocuments();
     fetchRecentInvestigations();
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
@@ -134,16 +139,34 @@ export default function DocumentIntelligence() {
       setCurrentInvestigationId(boardRes.data.board.id);
 
       let step = 0;
+      const MAX_POLL_ATTEMPTS = 30; // 60s max at 2s intervals
+      if (pollingRef.current) clearInterval(pollingRef.current);
       const poll = setInterval(async () => {
         try {
-          // Incrementally simulate steps on client during polling
           step++;
           if (step === 2) setUploadState('extracting');
           if (step === 4) setUploadState('indexing');
 
+          // Finite polling timeout
+          if (step > MAX_POLL_ATTEMPTS) {
+            clearInterval(poll);
+            pollingRef.current = null;
+            setUploadState(null);
+            setMessages([
+              {
+                role: 'ai',
+                content: `Processing **${file.name}** is taking longer than expected. Please try again or upload a different file.`,
+                timestamp: new Date(),
+                isError: true
+              }
+            ]);
+            return;
+          }
+
           const s = await api.get(`/api/pdf/status/${data.docId}`);
           if (s.data.status === 'failed' || s.data.success === false) {
             clearInterval(poll);
+            pollingRef.current = null;
             setUploadState(null);
             setMessages([
               { 
@@ -158,10 +181,10 @@ export default function DocumentIntelligence() {
 
           if (s.data.queryable) {
             clearInterval(poll);
+            pollingRef.current = null;
             setUploadState('ready');
             fetchDocuments();
             
-            // Set uploaded file as active
             const updatedDocs = await api.get('/api/rag/documents');
             const foundDoc = (updatedDocs.data.documents || []).find(d => d.filename === file.name || d.id === data.docId);
             if (foundDoc) {
@@ -173,9 +196,11 @@ export default function DocumentIntelligence() {
           }
         } catch (e) {
           clearInterval(poll);
+          pollingRef.current = null;
           setUploadState(null);
         }
       }, 2000);
+      pollingRef.current = poll;
     } catch (err) {
       console.error(err);
       setUploadState(null);
@@ -184,8 +209,9 @@ export default function DocumentIntelligence() {
 
   const handleSend = async (customPrompt = '') => {
     const queryText = (customPrompt || input).trim();
-    if (!queryText || loading) return;
+    if (!queryText || loading || queryInFlightRef.current) return;
 
+    queryInFlightRef.current = true;
     setMessages(prev => [...prev, { role: 'user', content: queryText, timestamp: new Date() }]);
     if (!customPrompt) setInput('');
     setLoading(true);
@@ -207,6 +233,7 @@ export default function DocumentIntelligence() {
       setMessages(prev => [...prev, { role: 'ai', content: "Failed to retrieve context. Please verify connectivity.", isError: true }]);
     } finally {
       setLoading(false);
+      queryInFlightRef.current = false;
     }
   };
 
@@ -409,6 +436,7 @@ export default function DocumentIntelligence() {
                             key={action} 
                             className="di-chip"
                             onClick={() => triggerQuickAction(action)}
+                            disabled={loading}
                           >
                             {action}
                           </button>

@@ -36,7 +36,48 @@
       "createdAt": "2026-07-11T19:11:55.620Z"
     }
   ],
-  "sessions": {},
+  "sessions": {
+    "test": {
+      "history": [
+        {
+          "query": "What is the unique code or key finding?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this study is to validate the effectiveness of the ORION LEDGER project in improving evidence precision. The project aimed to achieve a higher level of accuracy in evidence retrieval through the use of document-scoped retrieval and preservation of evidence isolation. The study's primary finding indicates a significant improvement in evidence precision [Source 1].\",\n  \n  \"METHODOLOGY\": \"The study took an experimental approach, conducting the Helios retrieval experiment to test the effectiveness of the ORION LEDGER project [Source 1]. The methodology also involved evaluating the Atlas pipeline, which was ultimately rejected due to its introduction of cross-document contamination [Source 1].\",\n  \n  \"KEY FINDINGS\": [\n    \"The Helios retrieval experiment achieved a 37 percent improvement in evidence precision [Source 1].\",\n    \"The Atlas pipeline was rejected because it introduced cross-document contamination [Source 1].\",\n    \"The use of document-scoped retrieval and preservation of evidence isolation is recommended [Source 1, Source 2].\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts regarding potential limitations of the study, such as sample size or experimental design.\",\n  \n  \"FORENSIC CONCLUSION\": \"The study provides evidence that the ORION LEDGER project, specifically the Helios retrieval experiment, can significantly improve evidence precision [Source 1]. The rejection of the Atlas pipeline due to contamination highlights the importance of preserving evidence isolation [Source 1]. The recommendation to use document-scoped retrieval and preserve evidence isolation is supported by the findings [Source 1, Source 2].\"\n}\n```",
+          "timestamp": 1783874288612
+        },
+        {
+          "query": "What is the unique code or key finding?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this research is to identify the unique code or key finding related to the VERIXA ISOLATION TEST ALPHA. The study focuses on the Raven protocol and its verification key. The North archive is cited as the approved evidence source for this research.\",\n  \n  \"METHODOLOGY\": \"The study took an approach based on analyzing documents from the North archive, specifically the alpha_proof.pdf paper, to extract information about the VERIXA ISOLATION TEST ALPHA and the Raven protocol [Source 1, Source 2].\",\n  \n  \"KEY FINDINGS\": [\n    \"The unique code for the VERIXA ISOLATION TEST ALPHA is ALPHA-7429 [Source 1].\",\n    \"The Raven protocol utilizes a silver verification key [Source 1, Source 2].\",\n    \"The North archive is designated as the approved evidence source for this research [Source 1, Source 2].\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts to discuss potential limitations of the study's methodology or the implications of the findings beyond the context of the VERIXA ISOLATION TEST ALPHA and the Raven protocol.\",\n  \n  \"FORENSIC CONCLUSION\": \"Based on the evidence from [Source 1] and [Source 2], the unique code ALPHA-7429 and the use of a silver verification key in the Raven protocol are key findings. The research relies on the North archive as its evidence source, highlighting the importance of verified sources in forensic analysis.\"\n}\n```",
+          "timestamp": 1783874327751
+        },
+        {
+          "query": "What is the unique code or key finding?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this research is to identify the unique code or key finding related to the VERIXA ISOLATION TEST BETA. The study focuses on the Falcon protocol and its verification key. The South archive is noted as the approved evidence source [Source 1].\",\n  \n  \"METHODOLOGY\": \"The approach taken by the study involves analyzing the VERIXA ISOLATION TEST BETA, specifically the Falcon protocol and its associated verification key [Source 1, Source 2].\",\n  \n  \"KEY FINDINGS\": [\n    \"The unique code for the VERIXA ISOLATION TEST BETA is BETA-3816 [Source 1].\",\n    \"The Falcon protocol utilizes a bronze verification key [Source 1, Source 2].\",\n    \"The South archive is designated as the approved evidence source [Source 1, Source 2].\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts to discuss limitations beyond the scope of the VERIXA ISOLATION TEST BETA and the Falcon protocol.\",\n  \n  \"FORENSIC CONCLUSION\": \"The forensic analysis concludes that the unique code BETA-3816 and the use of a bronze verification key in the Falcon protocol are key findings, with the South archive serving as the approved evidence source [Source 1, Source 2].\"\n}\n```",
+          "timestamp": 1783874376634
+        },
+        {
+          "query": "What is the unique code or key finding?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"This study aimed to investigate the effectiveness of a treatment using the Quantum Resonance Index, with a control group response rate of 67 percent and a treatment group response rate of 89 percent [Source 1]. The research utilized a triple-blind methodology with 2,847 participants across 12 regions [Source 2]. The ultimate goal was to determine the statistical significance of the treatment's improvement and recommend next steps.\",\n  \"METHODOLOGY\": \"The study employed a triple-blind methodology, which is a research approach where both the experimenters and the participants are unaware of the group assignments, to minimize bias [Source 2]. The sample size consisted of 2,847 participants across 12 regions, with the Quantum Resonance Index measured at 94.7 percent [Source 2].\",\n  \"KEY FINDINGS\": [\n    \"The treatment group showed a response rate of 89 percent, compared to the control group's 67 percent [Source 1].\",\n    \"The Quantum Resonance Index confirmed statistically significant improvement [Source 1].\",\n    \"The study used a sample size of 2,847 participants across 12 regions [Source 2].\",\n    \"The primary researcher was Dr. Helena Voss from the Northern Research Laboratory [Source 2].\"\n  ],\n  \"LIMITATIONS\": \"Data not present in provided artifacts regarding potential limitations or constraints of the study.\",\n  \"FORENSIC CONCLUSION\": \"The study demonstrated statistically significant improvement in the treatment group, with a recommended next step of Phase 3 clinical trials and a budget allocation of 4.2 million credits [Source 1, Source 3]. The research methodology and findings suggest a robust investigation, but the absence of information on limitations or potential biases is notable [Source 2].\"\n}\n```",
+          "timestamp": 1783874379931
+        },
+        {
+          "query": "What is the unique code or key finding?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this analysis is to identify the unique code or key finding from the provided evidence ledger. The study aims to extract and synthesize relevant information from the given source. The primary goal is to provide a concise overview of the findings.\",\n  \n  \"METHODOLOGY\": \"The approach taken in this study involves analyzing the provided evidence ledger, specifically the document 'minimal_test.pdf' [Source 1]. The methodology is based on extracting and examining the content of the document to identify any unique codes or key findings.\",\n  \n  \"KEY FINDINGS\": [\n    \"The document 'minimal_test.pdf' contains a single line of text for extraction test [Source 1].\"\n  ],\n  \n  \"LIMITATIONS\": \"The provided evidence ledger has limited information, with only one source document available for analysis. Data not present in provided artifacts includes detailed descriptions of the unique code or key finding.\",\n  \n  \"FORENSIC CONCLUSION\": \"Based on the analysis of the provided evidence ledger, the unique code or key finding is not explicitly stated. However, the document 'minimal_test.pdf' [Source 1] contains a single line of text that may be relevant to the study. Further analysis is required to determine the significance of this finding.\"\n}\n```",
+          "timestamp": 1783874382096
+        },
+        {
+          "query": "What is the unique code?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this study is to identify the unique code, with a focus on the VERIXA ISOLATION TEST ALPHA. The unique code is reportedly associated with the Raven protocol, which utilizes a silver verification key [Source 1]. The North archive serves as the approved evidence source for this investigation [Source 1, Source 2].\",\n  \n  \"METHODOLOGY\": \"The study approach involves analyzing documents from the North archive, specifically the alpha_proof.pdf paper, to extract information about the unique code and its associated protocols [Source 1, Source 2].\",\n  \n  \"KEY FINDINGS\": [\n    \"The unique code is identified as ALPHA-7429 [Source 1].\",\n    \"The Raven protocol uses a silver verification key [Source 1].\",\n    \"The North archive is the approved evidence source [Source 1, Source 2].\",\n    \"The ven protocol also uses a silver verification key [Source 2].\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts regarding the specific applications or implications of the unique code and protocols beyond their identification and association with the North archive.\",\n  \n  \"FORENSIC CONCLUSION\": \"Based on the evidence from the alpha_proof.pdf paper, the unique code ALPHA-7429 is associated with the Raven protocol, which, along with the ven protocol, utilizes a silver verification key [Source 1, Source 2]. The North archive is confirmed as the approved evidence source for this information [Source 1, Source 2].\"\n}\n```",
+          "timestamp": 1783874387390
+        },
+        {
+          "query": "What is the unique code?",
+          "answer": "```json\n{\n  \"EXECUTIVE SUMMARY\": \"The core objective of this study is to identify the unique code, with a focus on the Falcon protocol and its associated verification key. The research aims to provide an overview of the unique code and its relevance to the protocol. The study is based on evidence from the beta_proof.pdf paper.\",\n  \n  \"METHODOLOGY\": \"The study took an approach of analyzing the provided evidence ledger, specifically the beta_proof.pdf paper, to extract information about the unique code and the Falcon protocol [Source 1, Source 2].\",\n  \n  \"KEY FINDINGS\": [\n    \"The unique code is identified as BETA-3816 [Source 1].\",\n    \"The Falcon protocol uses a bronze verification key [Source 1, Source 2].\",\n    \"The South archive is the approved evidence source [Source 1, Source 2].\"\n  ],\n  \n  \"LIMITATIONS\": \"Data not present in provided artifacts regarding the scope and applications of the unique code and the Falcon protocol beyond the information provided in the beta_proof.pdf paper.\",\n  \n  \"FORENSIC CONCLUSION\": \"Based on the evidence provided, the unique code is BETA-3816, and it is associated with the Falcon protocol, which uses a bronze verification key [Source 1]. The South archive is confirmed as the approved evidence source [Source 1, Source 2].\"\n}\n```",
+          "timestamp": 1783874389024
+        }
+      ],
+      "lastActive": 1783874387439
+    }
+  },
   "papers": [
     {
       "id": "doc_1783789464274",
@@ -545,6 +586,85 @@
       },
       "text": "short",
       "contentFingerprint": "short"
+    },
+    {
+      "id": "doc_1783874376690",
+      "filename": "multipage_test.pdf",
+      "uploadedAt": "2026-07-12T16:39:36.690Z",
+      "status": "READY_SEMANTIC",
+      "telemetry": {
+        "extraction_time": 247,
+        "chunking_time": 0,
+        "embedding_time": 65,
+        "total_background_time": 315
+      },
+      "text": "MULTI-PAGE DOCUMENT TEST - PAGE 1 of 3 This document tests multi-page extraction fidelity. The Quantum Resonance Index measured at 94.7 percent. Primary researcher: Dr. Helena Voss. Institution: Northern Research Laboratory.\n\nMULTI-PAGE DOCUMENT TEST - PAGE 2 of 3 The experiment used a triple-blind methodology. Sample size: 2,847 participants across 12 regions. Control group response rate: 67 percent. Treatment group response rate: 89 percent.\n\nMULTI-PAGE DOCUMENT TEST - PAGE 3 of 3 Conclusion: The Quantum Resonance Index confirms statistically significant improvement. Recommended next steps: Phase 3 clinical trials. Budget allocation: 4.2 million credits.",
+      "contentFingerprint": "multi-pagedocumenttest-page1of3thisdocumenttestsmulti-pageextractionfidelity.thequantumresonanceindexmeasuredat94.7percent.primaryresearcher:dr.helenavoss.institution:northernresearchlaboratory.multi-pagedocumenttest-page2of3theexperimentusedatriple-blindmethodology.samplesize:2,847participantsacross12regions.controlgroupresponserate:67percent.treatmentgroupresponserate:89percent.multi-pagedocumenttest-page3of3conclusion:"
+    },
+    {
+      "id": "doc_1783874379963",
+      "filename": "minimal_test.pdf",
+      "uploadedAt": "2026-07-12T16:39:39.963Z",
+      "status": "READY_SEMANTIC",
+      "telemetry": {
+        "extraction_time": 8,
+        "chunking_time": 0,
+        "embedding_time": 8,
+        "total_background_time": 18
+      },
+      "text": "MINIMAL DOCUMENT. Single line of text for extraction test.",
+      "contentFingerprint": "minimaldocument.singlelineoftextforextractiontest."
+    },
+    {
+      "id": "doc_1783874382143",
+      "filename": "scanned_only.pdf",
+      "uploadedAt": "2026-07-12T16:39:42.143Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 8,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: Parsed text is empty.",
+      "text": ""
+    },
+    {
+      "id": "doc_1783874383204",
+      "filename": "malformed.pdf",
+      "uploadedAt": "2026-07-12T16:39:43.204Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 7,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: Invalid PDF structure.",
+      "text": ""
+    },
+    {
+      "id": "doc_1783874384274",
+      "filename": "fake.pdf",
+      "uploadedAt": "2026-07-12T16:39:44.274Z",
+      "status": "FAILED_EXTRACT",
+      "telemetry": {
+        "extraction_time": 2,
+        "chunking_time": 0,
+        "embedding_time": 0,
+        "total_background_time": 0
+      },
+      "extractionFailed": true,
+      "forensicStatus": "INGESTION_DEGRADED",
+      "fallback": true,
+      "reasoning": "PDF extraction failure: Invalid PDF structure.",
+      "text": ""
     }
   ],
   "verifications": [],
