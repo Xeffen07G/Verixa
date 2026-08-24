@@ -27,3 +27,9 @@
 - **Never** make users think about the underlying technical architecture.
 - **Never** hide the primary action.
 - **Never** sacrifice clarity for aesthetics.
+
+---
+
+## Locked UI Components
+
+- **Landing Page (`frontend/src/pages/LandingPage.jsx`)**: The landing page UI is locked permanently. Under no circumstances should the layout, copy (specifically the "Truth is not negotiable" theme, "NOW IN PUBLIC BETA" tagline, button placements, etc.), or visual appearance of this page be changed.
