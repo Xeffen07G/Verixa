@@ -181,6 +181,18 @@ export default function LandingPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (window.location.hash) {
+      const id = window.location.hash.substring(1);
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 300);
+    }
+  }, []);
+
   /* ── Theme tokens ── */
   const T_DARK = {
     bg: '#0a0a0f', bg2: 'rgba(16,16,23,0.5)', text: '#f5f3ef',

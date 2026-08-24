@@ -26,12 +26,26 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   };
 
   const navLinks = React.useMemo(() => [
-    { label: t('navFeatures', lang), href: '#features' },
-    { label: t('navHowItWorks', lang), href: '#how-it-works' },
+    { label: t('navFeatures', lang), href: '/#features' },
+    { label: t('navHowItWorks', lang), href: '/#how-it-works' },
     { label: t('navDashboard', lang), href: '/dashboard' },
-    { label: t('navPricing', lang), href: '#pricing' },
-    { label: t('navTestimonials', lang), href: '#testimonials' },
+    { label: t('navPricing', lang), href: '/#pricing' },
+    { label: t('navTestimonials', lang), href: '/#testimonials' },
   ], [lang]);
+
+  const handleNavLinkClick = (e, href) => {
+    if (href.startsWith('/#')) {
+      const isLandingPage = location.pathname === '/' || location.pathname === '/index.html' || !location.pathname;
+      if (isLandingPage) {
+        e.preventDefault();
+        const element = document.getElementById(href.split('#')[1]);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+    setMobileOpen(false);
+  };
 
   const textColor = darkMode ? '#ffffff' : '#000000';
   const textMuted = darkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)';
@@ -67,7 +81,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 24 }} className="hide-tablet">
               {navLinks.map((l, i) => (
-                <a key={i} href={l.href} style={{ fontSize: 13, color: textMuted, textDecoration: 'none', fontWeight: 500, transition: '0.2s' }} onMouseEnter={e => e.target.style.color = textColor} onMouseLeave={e => e.target.style.color = textMuted}>{l.label}</a>
+                <a key={i} href={l.href} onClick={(e) => handleNavLinkClick(e, l.href)} style={{ fontSize: 13, color: textMuted, textDecoration: 'none', fontWeight: 500, transition: '0.2s' }} onMouseEnter={e => e.target.style.color = textColor} onMouseLeave={e => e.target.style.color = textMuted}>{l.label}</a>
               ))}
             </div>
           </div>
@@ -169,7 +183,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
         {/* Compact Footer Links (Mobile Only) */}
         <div className="mobile-only" style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {navLinks.map((l, i) => (
-            <a key={i} href={l.href} onClick={() => setMobileOpen(false)} style={{ fontSize: 14, color: textMuted, textDecoration: 'none' }}>{l.label}</a>
+            <a key={i} href={l.href} onClick={(e) => handleNavLinkClick(e, l.href)} style={{ fontSize: 14, color: textMuted, textDecoration: 'none' }}>{l.label}</a>
           ))}
         </div>
       </div>
