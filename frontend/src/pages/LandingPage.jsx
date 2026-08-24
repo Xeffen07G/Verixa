@@ -1,184 +1,214 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { 
-  ShieldCheck, AlertTriangle, CheckCircle2, FileText, 
-  XCircle, Info, ArrowRight
+  Shield, Search, BarChart3, Brain, Link2, AlertTriangle, 
+  CheckCircle2, XCircle, MinusCircle, Video, Zap, ShieldCheck, 
+  ChevronLeft, ChevronRight, Users, Globe, BookOpen, Target,
+  GitBranch, Database, Activity, Lock, FileText
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { t } from '../utils/i18n';
+import { useLang } from '../context/LangContext';
 import { useAuth } from '../context/AuthContext';
 
+/* ─────────── Counter Hook ─────────── */
+function useCountUp(target, duration = 1800) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  useEffect(() => {
+    let timer;
+    const observer = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        let start = 0;
+        const step = target / (duration / 16);
+        timer = setInterval(() => {
+          start += step;
+          if (start >= target) { setCount(target); clearInterval(timer); }
+          else setCount(Math.floor(start));
+        }, 16);
+        observer.disconnect();
+      }
+    }, { threshold: 0.5 });
+    if (ref.current) observer.observe(ref.current);
+    return () => {
+      observer.disconnect();
+      if (timer) clearInterval(timer);
+    };
+  }, [target, duration]);
+  return [count, ref];
+}
+
+/* ─────────── Animated Section Wrapper ─────────── */
+function Section({ children, id, style, className }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  return (
+    <motion.section
+      id={id} ref={ref} className={className}
+      style={{ ...style, position: 'relative' }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {children}
+    </motion.section>
+  );
+}
+
 export default function LandingPage() {
+  const { lang } = useLang();
   const { user } = useAuth();
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('verixa-theme') === 'dark' || true); // Default dark for forensic feel
 
   const toggleTheme = () => {
-    setDarkMode(!darkMode);
+    const newVal = !darkMode;
+    setDarkMode(newVal);
+    localStorage.setItem('verixa-theme', newVal ? 'dark' : 'light');
   };
 
-  // Theme styles (Warm Gold & Obsidian)
+  const [stat1, ref1] = useCountUp(25);
+  const [stat2, ref2] = useCountUp(98);
+  const [stat3, ref3] = useCountUp(500);
+  const [stat4, ref4] = useCountUp(2);
+
   const T = {
-    bg: '#06060a',
-    bg2: '#0b0b10',
-    accent: '#c9a96e',
-    accentDim: 'rgba(201, 169, 110, 0.08)',
-    text: '#f5f3ef',
-    textMuted: 'rgba(245, 243, 239, 0.65)',
-    textDim: 'rgba(245, 243, 239, 0.35)',
-    border: 'rgba(255, 255, 255, 0.04)',
-    borderHover: 'rgba(255, 255, 255, 0.08)',
-    cardBg: '#0f0f15',
-    amber: '#fbbf24',
-    amberBg: 'rgba(251, 191, 36, 0.08)',
-    red: '#f87171',
-    redBg: 'rgba(248, 113, 113, 0.08)',
-    green: '#4ade80',
-    greenBg: 'rgba(74, 222, 128, 0.08)',
+    bg: '#050508', 
+    bg2: '#0a0a0f',
+    accent: '#c9a96e', 
+    accentLight: 'rgba(201,169,110,0.1)',
+    text: '#f5f3ef', 
+    text2: 'rgba(245,243,239,0.7)', 
+    text3: 'rgba(245,243,239,0.4)',
+    border: 'rgba(255,255,255,0.08)', 
+    cardBg: '#0f0f16',
+    demoBg: 'rgba(10,10,15,0.9)',
   };
+
+  const sectionLabelStyle = { fontSize: 10, color: T.accent, fontWeight: 900, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 20 };
+  const sectionHeadingStyle = { fontFamily: 'Cormorant Garamond, serif', color: T.text, fontWeight: 300, lineHeight: 1.1 };
+  const dividerStyle = { width: 60, height: 1, background: T.accent, opacity: 0.3 };
 
   return (
-    <div style={{ background: T.bg, minHeight: '100vh', color: T.text, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', overflowX: 'hidden' }}>
+    <div style={{ background: T.bg, minHeight: '100vh', transition: 'background 0.3s', paddingTop: 0, color: T.text, fontFamily: 'Inter, sans-serif' }}>
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
-      {/* Hero Section */}
-      <section className="hero-section" style={{ position: 'relative', paddingTop: 'calc(var(--nav-h) + 60px)', paddingBottom: '80px', textAlign: 'center', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-          <div style={{ position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: '80vw', height: '60vh', background: `radial-gradient(circle, ${T.accent}0d 0%, transparent 60%)`, borderRadius: '50%' }} />
-          <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', height: '150px', background: `linear-gradient(to top, ${T.bg}, transparent)` }} />
+      {/* ══════════ HERO SECTION ══════════ */}
+      <Section style={{ padding: 'calc(var(--nav-h) + 80px) 0 160px', textAlign: 'center', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 50% 50%, ${T.accent}0a 0%, transparent 70%)` }} />
+          <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to bottom, transparent 60%, ${T.bg} 100%)` }} />
         </div>
 
-        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 0.6 }}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: '999px', border: `1px solid ${T.accent}15`, background: `${T.accent}05`, marginBottom: '32px' }}
-          >
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: T.accent }} />
-            <span style={{ fontSize: '10px', fontWeight: '700', color: T.accent, letterSpacing: '2px', textTransform: 'uppercase' }}>Evidence-First Forensic Verification</span>
+        <div style={{ padding: '0 24px', maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '8px 24px', borderRadius: 999, border: `1px solid ${T.accent}20`, background: `${T.accent}05`, marginBottom: 48 }}>
+               <div style={{ width: 4, height: 4, borderRadius: '50%', background: T.accent }} />
+               <span style={{ fontSize: 9, fontWeight: 900, color: T.accent, letterSpacing: 3, opacity: 0.8 }}>PREMIUM FORENSIC INTELLIGENCE</span>
+            </div>
+            <h1 style={{ ...sectionHeadingStyle, fontSize: 'clamp(44px, 10vw, 110px)', marginBottom: 40, letterSpacing: -3 }}>
+              Evidence over <br />
+              <span style={{ fontStyle: 'italic', fontWeight: 300, color: T.accent, opacity: 0.9 }}>AI Fluency.</span>
+            </h1>
           </motion.div>
-
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(42px, 8vw, 88px)', fontWeight: 300, lineHeight: 1.05, letterSpacing: '-2px', marginBottom: '24px' }}>
-            Evidence over <br />
-            <span style={{ fontStyle: 'italic', color: T.accent }}>AI Fluency.</span>
-          </h1>
-
-          <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', color: T.textMuted, lineHeight: 1.6, maxWidth: '680px', margin: '0 auto 48px', fontWeight: 300 }}>
-            VeriXa is a trust-first platform built for contradiction analysis, statement verification, and evidence-backed claims integrity.
-          </p>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 0.6, delay: 0.4 }}
-            style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}
-          >
-            <Link to="/verify">
-              <button className="shimmer-btn" style={{ padding: '16px 36px', borderRadius: '10px', fontSize: '15px', fontWeight: '600', background: T.accent, border: 'none', color: '#000', cursor: 'pointer', boxShadow: `0 4px 20px ${T.accent}20` }}>
-                Verify Statements
-              </button>
-            </Link>
-            <Link to="/research">
-              <button style={{ padding: '16px 36px', borderRadius: '10px', fontSize: '15px', fontWeight: '600', background: 'transparent', border: `1px solid ${T.border}`, color: T.text, cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.borderColor = T.accent} onMouseLeave={e => e.currentTarget.style.borderColor = T.border}>
-                Document Intelligence
-              </button>
-            </Link>
+          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.7 }} style={{ fontSize: 20, color: T.text2, lineHeight: 1.6, maxWidth: 700, margin: '0 auto 56px', fontWeight: 300 }}>
+            VeriXa is a trust-first forensic intelligence platform engineered for contradiction analysis, 
+            evidence-backed reasoning, and anti-hallucination research workflows. 
+            Verification at the speed of thought, precision at the scale of truth.
+          </motion.p>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.9 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <Link to="/research"><motion.button whileHover={{ scale: 1.04, boxShadow: `0 8px 40px ${T.accent}30` }} whileTap={{ scale: 0.97 }} style={{ padding: '20px 48px', borderRadius: 12, fontSize: 16, fontWeight: 700, background: T.accent, border: 'none', color: T.bg, cursor: 'pointer' }}>ENTER RESEARCH LAB</motion.button></Link>
+            <Link to="/verify"><motion.button whileHover={{ scale: 1.04, borderColor: `${T.accent}66` }} whileTap={{ scale: 0.97 }} style={{ padding: '20px 48px', borderRadius: 12, fontSize: 16, fontWeight: 600, background: 'transparent', border: `1px solid ${T.border}`, color: T.text, cursor: 'pointer' }}>VERIFY EVIDENCE</motion.button></Link>
           </motion.div>
         </div>
-      </section>
+      </Section>
 
-      {/* Interactive Mock Verification Demo */}
-      <section style={{ padding: '40px 24px 80px', position: 'relative' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <p style={{ fontSize: '10px', color: T.accent, fontWeight: '700', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '12px' }}>Verification Workspace</p>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 300 }}>Verification in Action</h2>
+      {/* ══════════ CORE PILLARS ══════════ */}
+      <Section style={{ padding: '0 24px 120px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+          {[
+            { Icon: GitBranch, title: 'Contradiction Intelligence', desc: 'Automatically map conflicting claims across multiple papers, identifying consensus and minority views.' },
+            { Icon: ShieldCheck, title: 'Anti-Hallucination Pipeline', desc: 'Rigid grounding protocols that force AI to cite verbatim evidence before generating any interpretation.' },
+            { Icon: Activity, title: 'Forensic Evaluation', desc: 'Continuous benchmarking against known misinformation datasets to ensure 99%+ grounding accuracy.' },
+            { Icon: Lock, title: 'Research Integrity', desc: 'Full source transparency with alignment metrics and credibility badges for every discovery.' },
+          ].map((p, i) => (
+            <motion.div key={i} whileHover={{ y: -8 }} style={{ padding: '48px 40px', borderRadius: 20, background: T.bg2, border: `1px solid ${T.border}`, transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+              <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 300, color: T.text, marginBottom: 16, letterSpacing: -0.5 }}>{p.title}</h3>
+              <p style={{ fontSize: 15, color: T.text2, lineHeight: 1.7, fontWeight: 300 }}>{p.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </Section>
+
+      {/* ══════════ HOW IT WORKS: THE PIPELINE ══════════ */}
+      <Section id="how-it-works" style={{ padding: '120px 0', background: T.bg2 }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ textAlign: 'center', marginBottom: 80 }}>
+            <p style={sectionLabelStyle}>INTEGRITY PIPELINE</p>
+            <h2 style={{ ...sectionHeadingStyle, fontSize: 'clamp(32px, 5vw, 56px)' }}>Engineering the Path to Truth</h2>
+            <div style={{ ...dividerStyle, margin: '24px auto' }} />
           </div>
 
-          <div className="mock-window glassmorphism" style={{ border: `1px solid ${T.border}`, borderRadius: '16px', overflow: 'hidden', background: '#09090e', boxShadow: '0 24px 80px rgba(0,0,0,0.5)' }}>
-            
-            {/* Header bar */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: `1px solid ${T.border}`, background: 'rgba(255,255,255,0.01)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff5f56' }} />
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ffbd2e' }} />
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#27c93f' }} />
-                <span style={{ fontSize: '11px', color: T.textDim, marginLeft: '12px', letterSpacing: '0.5px' }}>VERIXA STATEMENT VERIFICATION LAB</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: T.amberBg, padding: '4px 10px', borderRadius: '6px', border: `1px solid rgba(251, 191, 36, 0.2)` }}>
-                <AlertTriangle size={12} color={T.amber} />
-                <span style={{ fontSize: '11px', color: T.amber, fontWeight: '600' }}>Claims Flagged</span>
-              </div>
-            </div>
-
-            {/* Layout Grid */}
-            <div className="mock-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px', padding: '32px' }}>
-              
-              {/* Left Column: Highlighted Statement */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', justifyContent: 'center' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: T.textDim, letterSpacing: '1px', textTransform: 'uppercase' }}>Audited Statement</span>
-                <div style={{ background: 'rgba(255,255,255,0.01)', border: `1px solid ${T.border}`, padding: '24px', borderRadius: '12px', fontSize: '16px', lineHeight: 1.7, color: T.text, fontStyle: 'italic', fontWeight: 300 }}>
-                  "Option A regimen was tested on <span style={{ color: T.green, background: 'rgba(74, 222, 128, 0.08)', padding: '2px 6px', borderRadius: '4px', border: `1px solid rgba(74, 222, 128, 0.25)`, fontStyle: 'normal', fontWeight: 500 }}>36 patients [1]</span>, stabilizing recovery rates at <span style={{ color: T.amber, background: 'rgba(251, 191, 36, 0.08)', padding: '2px 6px', borderRadius: '4px', border: `1px solid rgba(251, 191, 36, 0.25)`, fontStyle: 'normal', fontWeight: 500 }}>92% [2]</span> with <span style={{ color: T.red, background: 'rgba(248, 113, 113, 0.08)', padding: '2px 6px', borderRadius: '4px', border: `1px solid rgba(248, 113, 113, 0.25)`, fontStyle: 'normal', fontWeight: 500 }}>zero documented [3]</span> clinical side-effects."
-                </div>
-              </div>
-
-              {/* Right Column: Grounded Findings */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: T.textDim, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>Audited Findings</span>
-                
-                {/* Finding 1: True */}
-                <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderLeft: `3px solid ${T.green}`, padding: '12px 18px', borderRadius: '8px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: '600', color: T.green }}>[1] Verified Cohort Size</span>
-                    <span style={{ fontSize: '11px', background: T.greenBg, color: T.green, padding: '2px 6px', borderRadius: '4px', fontWeight: '600' }}>True</span>
-                  </div>
-                  <p style={{ fontSize: '12px', color: T.textMuted, lineHeight: 1.4, margin: 0, fontWeight: 300 }}>
-                    Tested on 36 patients. Source logs state: "Cohort size: 36."
-                  </p>
-                </div>
-
-                {/* Finding 2: Partially True */}
-                <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderLeft: `3px solid ${T.amber}`, padding: '12px 18px', borderRadius: '8px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: '600', color: T.amber }}>[2] Recovery Parameters</span>
-                    <span style={{ fontSize: '11px', background: T.amberBg, color: T.amber, padding: '2px 6px', borderRadius: '4px', fontWeight: '600' }}>Partially True</span>
-                  </div>
-                  <p style={{ fontSize: '12px', color: T.textMuted, lineHeight: 1.4, margin: 0, fontWeight: 300 }}>
-                    92% recovery in controls, but general trials observed 67% efficacy.
-                  </p>
-                </div>
-
-                {/* Finding 3: False */}
-                <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderLeft: `3px solid ${T.red}`, padding: '12px 18px', borderRadius: '8px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: '600', color: T.red }}>[3] Safety Assertions</span>
-                    <span style={{ fontSize: '11px', background: T.redBg, color: T.red, padding: '2px 6px', borderRadius: '4px', fontWeight: '600' }}>False</span>
-                  </div>
-                  <p style={{ fontSize: '12px', color: T.textMuted, lineHeight: 1.4, margin: 0, fontWeight: 300 }}>
-                    Mild side-effects (nausea, fatigue) were documented in 12% of patients.
-                  </p>
-                </div>
-
-              </div>
-
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 64 }}>
+            {[
+              { num: '01', title: 'Surgical Ingestion', desc: 'PDF text is extracted and semantically mapped in under 5 seconds for immediate interrogation.', icon: Database },
+              { num: '02', title: 'Adaptive Retrieval', desc: 'Hybrid search combines BM25 keyword matching with vector embeddings to find relevant forensic chunks.', icon: Search },
+              { num: '03', title: 'Consistency Analysis', desc: 'The Contradiction Engine compares retrieved evidence to identify cross-document disagreements.', icon: Brain },
+              { num: '04', title: 'Grounded Reporting', desc: 'A final intelligence report is synthesized with verbatim citations and credibility-weighted trust scores.', icon: FileText }
+            ].map((step, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ display: 'flex', gap: 48, alignItems: 'flex-start' }}>
+                 <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 300, color: T.accent, opacity: 0.5 }}>{step.num}</div>
+                 <div style={{ borderLeft: `1px solid ${T.border}`, paddingLeft: 48 }}>
+                    <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 300, color: T.text, marginBottom: 12, letterSpacing: -0.5 }}>{step.title}</h3>
+                    <p style={{ fontSize: 17, color: T.text2, lineHeight: 1.7, margin: 0, fontWeight: 300, maxWidth: 600 }}>{step.desc}</p>
+                 </div>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </section>
+      </Section>
+
+      {/* ══════════ NOT A CHATBOT ══════════ */}
+      <Section style={{ padding: '100px 0' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
+          <p style={sectionLabelStyle}>WHAT VERIXA IS NOT</p>
+          <h2 style={{ ...sectionHeadingStyle, fontSize: 'clamp(28px, 4vw, 44px)', marginBottom: 48 }}>This is not "chat with your PDF."</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, textAlign: 'left' }}>
+            {[
+              { label: 'Not a chatbot', desc: 'Every response is grounded in retrieved evidence. No fluent hallucinations.' },
+              { label: 'Not a RAG demo', desc: 'Contradiction detection, trust scoring, and forensic reporting go far beyond basic retrieval.' },
+              { label: 'Not an AI wrapper', desc: 'Custom retrieval pipeline with intent classification, section boosts, and fallback synthesis.' },
+              { label: 'Not speculation', desc: 'When evidence is missing, VeriXa says so. Explicit refusal over confident fabrication.' }
+            ].map((item, i) => (
+              <div key={i} style={{ padding: 28, borderRadius: 20, border: `1px solid ${T.border}`, background: T.bg }}>
+                <div style={{ fontSize: 16, fontWeight: 800, color: T.text, marginBottom: 8 }}>{item.label}</div>
+                <div style={{ fontSize: 13, color: T.text3, lineHeight: 1.5 }}>{item.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ══════════ FINAL CTA ══════════ */}
+      <Section style={{ padding: '160px 0', textAlign: 'center' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 24px' }}>
+          <h2 style={{ ...sectionHeadingStyle, fontSize: 'clamp(32px, 6vw, 64px)', marginBottom: 40 }}>Ready for Forensic <br /><span style={{ color: T.accent }}>Intelligence?</span></h2>
+          <Link to="/research"><motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} style={{ padding: '24px 64px', borderRadius: 16, background: T.accent, color: T.bg, border: 'none', fontSize: 18, fontWeight: 800, cursor: 'pointer' }}>START INVESTIGATION</motion.button></Link>
+          <div style={{ marginTop: 40, display: 'flex', justifyContent: 'center', gap: 32 }}>
+             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <CheckCircle2 size={16} color={T.accent} />
+                <span style={{ fontSize: 12, color: T.text3, fontWeight: 700, letterSpacing: 1 }}>NO CREDIT CARD</span>
+             </div>
+             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <CheckCircle2 size={16} color={T.accent} />
+                <span style={{ fontSize: 12, color: T.text3, fontWeight: 700, letterSpacing: 1 }}>FREE TIER ALWAYS</span>
+             </div>
+          </div>
+        </div>
+      </Section>
 
       <Footer darkMode={darkMode} toggleTheme={toggleTheme} />
-
-      {/* Responsive styles override */}
-      <style>{`
-        @media (max-width: 900px) {
-          .mock-grid {
-            grid-template-columns: 1fr !important;
-            height: auto !important;
-            padding: 20px !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }
