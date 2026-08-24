@@ -38,15 +38,15 @@ export default function VerificationLab() {
   }, [user, authLoading, navigate]);
 
   const T = {
-    bg: '#0a0a0f',
-    bg2: '#111118',
-    border: 'rgba(255,255,255,0.07)',
-    text: '#f5f3ef',
-    text2: 'rgba(245,243,239,0.7)',
-    text3: 'rgba(245,243,239,0.35)',
-    accent: '#c9a96e',
-    cardBg: '#111118',
-    cardBorder: 'rgba(255,255,255,0.07)',
+    bg: '#000000',
+    bg2: '#09090e',
+    border: 'rgba(255,255,255,0.08)',
+    text: '#ffffff',
+    text2: 'rgba(255,255,255,0.75)',
+    text3: 'rgba(255,255,255,0.45)',
+    accent: '#ffffff',
+    cardBg: '#09090e',
+    cardBorder: 'rgba(255,255,255,0.08)',
   };
 
   const [claim, setClaim] = useState('');

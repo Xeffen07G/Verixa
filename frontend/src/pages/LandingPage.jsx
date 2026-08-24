@@ -210,17 +210,17 @@ export default function LandingPage() {
   };
 
   const T_LIGHT = {
-    bg: '#e8e5de', bg2: 'rgba(220,216,208,0.9)', text: '#0d0d0d',
-    text2: '#2a2a2a', text3: '#555555',
-    border: 'rgba(0,0,0,0.12)', cardBg: '#f5f3ed',
-    heroBg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(90,66,26,0.08) 0%, transparent 70%)',
-    statBg: '#f5f3ed', featureHover: 'rgba(90,66,26,0.1)',
-    stepBg: '#f5f3ed', testimonialBg: '#f5f3ed', pricingBg: '#f5f3ed',
-    ctaBg: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(90,66,26,0.1) 0%, transparent 70%)',
-    sectionBg: 'rgba(220,216,208,0.9)', badgeText: '#5a421a',
-    demoBg: 'rgba(245,243,237,0.95)', demoCardBg: '#f5f3ed',
-    glassCard: 'rgba(245,243,237,0.85)', glassBorder: 'rgba(0,0,0,0.1)',
-    accent: '#5a421a', accentMuted: 'rgba(90,66,26,0.15)',
+    bg: '#ffffff', bg2: '#f8f9fa', text: '#0a0a0f',
+    text2: 'rgba(10,10,15,0.75)', text3: 'rgba(10,10,15,0.45)',
+    border: 'rgba(0,0,0,0.06)', cardBg: '#ffffff',
+    heroBg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,169,110,0.08) 0%, transparent 70%)',
+    statBg: '#ffffff', featureHover: 'rgba(201,169,110,0.05)',
+    stepBg: '#f8f9fa', testimonialBg: '#ffffff', pricingBg: '#ffffff',
+    ctaBg: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(201,169,110,0.05) 0%, transparent 70%)',
+    sectionBg: '#f8f9fa', badgeText: '#c9a96e',
+    demoBg: '#f8f9fa', demoCardBg: '#ffffff',
+    glassCard: '#ffffff', glassBorder: 'rgba(0,0,0,0.06)',
+    accent: '#c9a96e', accentMuted: 'rgba(201,169,110,0.15)',
   };
 
   const T = darkMode ? T_DARK : T_LIGHT;

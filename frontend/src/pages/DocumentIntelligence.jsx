@@ -343,11 +343,11 @@ export default function DocumentIntelligence() {
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',
-              backgroundColor: 'rgba(201, 169, 110, 0.05)',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
               transition: 'all 0.2s ease'
             }}
-            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(201, 169, 110, 0.12)'}
-            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(201, 169, 110, 0.05)'}
+            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)'}
+            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'}
           >
             <ChevronLeft size={16} />
           </button>
@@ -366,7 +366,7 @@ export default function DocumentIntelligence() {
               className={`di-doc-item ${activeDoc?.id === doc.id ? 'active' : ''}`}
               onClick={() => selectLibraryDoc(doc)}
             >
-              <File size={14} style={{ color: '#c9a96e', opacity: 0.6, flexShrink: 0 }} />
+              <File size={14} style={{ color: 'var(--di-accent)', opacity: 0.6, flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="di-doc-title">{doc.filename}</div>
                 <div className="di-doc-meta">
@@ -382,7 +382,7 @@ export default function DocumentIntelligence() {
       <div className="di-main" onDragOver={handleDragOver} onDrop={handleDrop}>
         {uploadState ? (
           <div className="di-loader-container">
-            <RefreshCw className="spin" size={24} color="#c9a96e" />
+            <RefreshCw className="spin" size={24} color="var(--di-accent)" />
             <div className="di-loader-text">
               {uploadState === 'uploading' && 'Uploading document...'}
               {uploadState === 'extracting' && 'Reading pages...'}
@@ -399,7 +399,7 @@ export default function DocumentIntelligence() {
             </div>
             
             <div className="di-dropzone" onClick={() => fileInputRef.current.click()}>
-              <Upload size={24} style={{ color: '#c9a96e', marginBottom: 12, opacity: 0.7 }} />
+              <Upload size={24} style={{ color: 'var(--di-accent)', marginBottom: 12, opacity: 0.7 }} />
               <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 4 }}>Drag & drop files here or click to browse</div>
               <div className="di-supported-formats">PDF</div>
               <input 
@@ -440,7 +440,7 @@ export default function DocumentIntelligence() {
                         maxWidth: '520px',
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                          <FileText size={16} color="#c9a96e" />
+                          <FileText size={16} color="var(--di-accent)" />
                           <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--di-text-primary)' }}>{activeDoc.filename}</div>
                         </div>
                         <div style={{ fontSize: '11px', color: 'var(--di-text-muted)', lineHeight: '1.5' }}>
