@@ -118,7 +118,7 @@ router.post("/ingest", upload.single("pdf"), async (req, res) => {
         const cleanText = extractedText.replace(/\s+/g, ' ').trim();
         const numPages = parsed ? (parsed.numpages || 0) : 0;
 
-        if (!cleanText || cleanText.length < 5 || !/[a-zA-Z]/.test(cleanText)) {
+        if (!cleanText || cleanText.length < 2) {
           failureType = "SCANNED_DOCUMENT";
           reasoning = `Document contains ${numPages} page(s) but has only ${cleanText.length} character(s) of extractable alphabetical text.`;
           recoverySuggestion = "OCR (Optical Character Recognition) is required for deep forensic extraction. Scanned document detected.";
@@ -287,7 +287,7 @@ router.post("/ingest", upload.single("pdf"), async (req, res) => {
         const cleanText = extractedText.replace(/\s+/g, ' ').trim();
 
         // SCANNED DOCUMENT OR EMPTY EXTRACTION DETECTION
-        if (!cleanText || cleanText.length < 5 || !/[a-zA-Z]/.test(cleanText)) {
+        if (!cleanText || cleanText.length < 2) {
           failureType = "SCANNED_DOCUMENT";
           reasoning = `Document contains ${numPages} page(s) but has only ${cleanText.length} character(s) of extractable alphabetical text.`;
           recoverySuggestion = "OCR (Optical Character Recognition) is required for deep forensic extraction. Scanned document detected.";
