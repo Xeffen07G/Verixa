@@ -5,6 +5,36 @@ function getClient() {
   return new Groq({ apiKey: process.env.GROQ_API_KEY });
 }
 
+function safeJsonParse(text) {
+  if (!text) return null;
+  const cleaned = text.replace(/```json|```/g, "").trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    const firstBrace = cleaned.indexOf('{');
+    const lastBrace = cleaned.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+      const jsonCandidate = cleaned.substring(firstBrace, lastBrace + 1);
+      try {
+        return JSON.parse(jsonCandidate);
+      } catch (err) {
+        console.error("Failed to parse extracted JSON block:", err);
+      }
+    }
+    const firstBracket = cleaned.indexOf('[');
+    const lastBracket = cleaned.lastIndexOf(']');
+    if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
+      const jsonCandidate = cleaned.substring(firstBracket, lastBracket + 1);
+      try {
+        return JSON.parse(jsonCandidate);
+      } catch (err) {
+        console.error("Failed to parse extracted Array block:", err);
+      }
+    }
+    throw new Error("Could not parse JSON from model output: " + text.slice(0, 100) + "...");
+  }
+}
+
 async function askGroq(prompt, jsonMode = false, model = "groq/compound", retries = 3) {
   const groq = getClient();
   for (let attempt = 0; attempt <= retries; attempt++) {
@@ -25,7 +55,7 @@ MULTILINGUAL & CODE-SWITCHING SUPPORT: You are an expert at processing text in A
         ],
         temperature: jsonMode ? 0.1 : 0.2,
         response_format: jsonMode ? { type: "json_object" } : undefined,
-        max_completion_tokens: 4096,
+        max_tokens: 4096,
       }),
       new Promise((_, reject) => setTimeout(() => reject(new Error("Groq API timeout")), 50000))
     ]);
@@ -114,7 +144,7 @@ Return ONLY this exact JSON format:
 
   // Using 8b model for extraction (faster, higher TPM limit)
   const raw = await askGroq(prompt, true, "groq/compound-mini");
-  const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+  const parsed = safeJsonParse(raw);
   return parsed.claims || parsed;
 }
 
@@ -175,7 +205,7 @@ ${formatted}`;
 
   // Using 70b model for final verification (high reasoning quality)
   const raw = await askGroq(prompt, true, "groq/compound");
-  const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+  const parsed = safeJsonParse(raw);
   const verified = parsed.results || parsed;
 
   return verified.map((item, i) => ({
@@ -216,7 +246,7 @@ ${text.slice(0, 3000)}`;
 
   // Using 70b for AI detection (high accuracy)
   const raw = await askGroq(prompt, true, "groq/compound");
-  return JSON.parse(raw.replace(/```json|```/g, "").trim());
+  return safeJsonParse(raw);
 }
 
 module.exports = { askGroq, extractClaims, searchEvidence, verifyClaims, detectAIText };
