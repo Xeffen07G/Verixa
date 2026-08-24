@@ -53,7 +53,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const bg = darkMode 
     ? ((!isLanding || scrolled) ? 'rgba(10,10,15,0.85)' : 'transparent') 
     : ((!isLanding || scrolled) ? 'rgba(255,255,255,0.85)' : 'transparent');
-  const T = { accent: '#c9a96e' };
+  const T = { accent: darkMode ? '#ffffff' : '#000000' };
 
   const currentLang = LANGUAGES.find(l => l.code === lang);
 
@@ -139,7 +139,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
         <div style={{ marginBottom: 48 }}>
           <div style={{ fontSize: 11, color: textMuted, fontWeight: 700, marginBottom: 20, letterSpacing: 1 }}>{t('tools', lang).toUpperCase()}</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <Link to="/verify" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(201,169,110,0.1)', color: T.accent, textDecoration: 'none', transition: '0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,169,110,0.15)'}>
+            <Link to="/verify" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', color: T.accent, textDecoration: 'none', transition: '0.2s' }} onMouseEnter={e => e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'}>
               <FileText size={20} />
               <span style={{ fontSize: 18, fontWeight: 700 }}>{t('textVerify', lang)}</span>
             </Link>
