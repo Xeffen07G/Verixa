@@ -112,71 +112,38 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Layout Grid */}
-            <div className="mock-grid" style={{ display: 'grid', gridTemplateColumns: '380px 1fr', minHeight: '380px' }}>
+            {/* Layout Container */}
+            <div style={{ padding: '36px 40px', display: 'flex', flexDirection: 'column', gap: '24px', background: 'rgba(255,255,255,0.003)' }}>
               
-              {/* Left Panel: Audited Statement Input */}
-              <div className="mock-panel-left" style={{ borderRight: `1px solid ${T.border}`, padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', background: 'rgba(0,0,0,0.1)' }}>
-                <div>
-                  <span style={{ fontSize: '10px', fontWeight: '700', color: T.textDim, letterSpacing: '1px', textTransform: 'uppercase', display: 'block', marginBottom: '12px' }}>STATEMENT TO AUDIT</span>
-                  <div style={{ background: 'rgba(255,255,255,0.015)', padding: '16px', borderRadius: '10px', border: `1px solid ${T.border}`, fontSize: '13px', lineHeight: 1.6, color: T.text, fontStyle: 'italic' }}>
-                    "The clinical trial for Option A stabilized patient recovery rates at 92% with zero documented clinical side-effects."
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', borderBottom: `1px solid ${T.border}`, paddingBottom: '8px' }}>
-                    <span style={{ color: T.textDim }}>Extract Analysis</span>
-                    <span style={{ color: T.text, fontWeight: '500' }}>2 Claims Checked</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', borderBottom: `1px solid ${T.border}`, paddingBottom: '8px' }}>
-                    <span style={{ color: T.textDim }}>Safety Metric</span>
-                    <span style={{ color: T.accent, fontWeight: '500' }}>Forensically Grounded</span>
-                  </div>
-                </div>
+              {/* Line 1: Input Statement */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '800', color: T.accent, letterSpacing: '1px', textTransform: 'uppercase', minWidth: '90px', paddingTop: '4px' }}>Statement</span>
+                <p style={{ fontSize: '15px', lineHeight: 1.5, color: T.text, margin: 0, fontWeight: 300, fontStyle: 'italic' }}>
+                  "Option A regimen stabilized patient recovery rates at 92% with zero documented clinical side-effects."
+                </p>
               </div>
 
-              {/* Right Panel: Claims & Verification Report */}
-              <div className="mock-panel-right" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '20px', background: 'rgba(255,255,255,0.005)' }}>
-                
-                {/* Mini Score Banner */}
-                <div style={{ background: 'linear-gradient(135deg, #78350f, #92400e)', padding: '16px 20px', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', color: 'rgba(255,255,255,0.6)' }}>ACCURACY RATING</span>
-                    <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#fff', margin: '4px 0 0 0' }}>Mixed Accuracy (58% Score)</h4>
+              {/* Line 2: Contradiction Alert */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', borderTop: `1px solid ${T.border}`, paddingTop: '20px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '800', color: T.amber, letterSpacing: '1px', textTransform: 'uppercase', minWidth: '90px', paddingTop: '4px' }}>Contradiction</span>
+                <p style={{ fontSize: '14px', lineHeight: 1.6, color: T.textMuted, margin: 0, fontWeight: 300 }}>
+                  Section 4.2 claims a <span style={{ color: T.accent, fontWeight: '500' }}>92% recovery rate</span>, but Page 9 patient logs reflect only 24 recoveries out of 36 subjects (<span style={{ color: T.red, fontWeight: '500' }}>67% recovery</span>).
+                </p>
+              </div>
+
+              {/* Line 3: Grounded Evidence */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', borderTop: `1px solid ${T.border}`, paddingTop: '20px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '800', color: T.textDim, letterSpacing: '1px', textTransform: 'uppercase', minWidth: '90px', paddingTop: '2px' }}>Evidence</span>
+                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '6px 12px', borderRadius: '6px', border: `1px solid ${T.border}`, fontSize: '12px' }}>
+                    <FileText size={12} color={T.accent} />
+                    <span style={{ color: T.textMuted }}>clinical_trial_v12.pdf — Page 4</span>
                   </div>
-                  <div style={{ fontSize: '24px', fontWeight: '300', color: '#fff', fontFamily: 'Cormorant Garamond, serif' }}>58%</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '6px 12px', borderRadius: '6px', border: `1px solid ${T.border}`, fontSize: '12px' }}>
+                    <FileText size={12} color={T.accent} />
+                    <span style={{ color: T.textMuted }}>clinical_trial_v12.pdf — Page 9</span>
+                  </div>
                 </div>
-
-                {/* Verification Cards */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  
-                  {/* Claim Card 1 */}
-                  <div style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '10px', border: `1px solid ${T.border}` }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: '600', color: T.accent }}>Claim 1: Recovery rates stabilized at 92%</span>
-                      <span style={{ fontSize: '11px', background: T.amberBg, color: T.amber, padding: '2px 8px', borderRadius: '4px', fontWeight: '600' }}>Partially True</span>
-                    </div>
-                    <p style={{ fontSize: '12px', color: T.textMuted, lineHeight: 1.5, margin: '0 0 8px 0', fontStyle: 'italic' }}>
-                      "...efficacy parameters stabilized at 92% in control demographics; however, general cohort trials observed a lower 67% recovery rate."
-                    </p>
-                    <span style={{ fontSize: '10px', color: T.textDim }}>Source: clinical_trial_v12.pdf — Page 4</span>
-                  </div>
-
-                  {/* Claim Card 2 */}
-                  <div style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '10px', border: `1px solid ${T.border}` }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: '600', color: T.accent }}>Claim 2: Zero documented clinical side-effects</span>
-                      <span style={{ fontSize: '11px', background: T.redBg, color: T.red, padding: '2px 8px', borderRadius: '4px', fontWeight: '600' }}>False</span>
-                    </div>
-                    <p style={{ fontSize: '12px', color: T.textMuted, lineHeight: 1.5, margin: '0 0 8px 0', fontStyle: 'italic' }}>
-                      "Mild side-effects including persistent fatigue and moderate nausea were reported in 12% of Option A test subjects."
-                    </p>
-                    <span style={{ fontSize: '10px', color: T.textDim }}>Source: clinical_trial_v12.pdf — Page 9</span>
-                  </div>
-
-                </div>
-
               </div>
 
             </div>
