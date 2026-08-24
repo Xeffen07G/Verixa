@@ -343,11 +343,11 @@ export default function DocumentIntelligence() {
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              backgroundColor: 'rgba(227, 30, 36, 0.05)',
               transition: 'all 0.2s ease'
             }}
-            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)'}
-            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'}
+            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(227, 30, 36, 0.12)'}
+            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(227, 30, 36, 0.05)'}
           >
             <ChevronLeft size={16} />
           </button>

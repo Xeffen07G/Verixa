@@ -31,7 +31,7 @@ const DARK = {
   inputBg: 'rgba(255,255,255,0.015)', inputBorder: 'rgba(255,255,255,0.08)',
   logBg: 'rgba(255,255,255,0.01)', emptyColor: 'rgba(255,255,255,0.45)',
   cardBg: '#09090e', cardBorder: 'rgba(255,255,255,0.08)',
-  accent: '#ffffff', accentMuted: 'rgba(255,255,255,0.12)',
+  accent: '#e31e24', accentMuted: 'rgba(227,30,36,0.12)',
 };
 
 const LIGHT = {
@@ -42,7 +42,7 @@ const LIGHT = {
   inputBg: '#ffffff', inputBorder: 'rgba(0,0,0,0.08)',
   logBg: 'rgba(0,0,0,0.02)', emptyColor: 'rgba(10,10,15,0.45)',
   cardBg: '#ffffff', cardBorder: 'rgba(0,0,0,0.08)',
-  accent: '#000000', accentMuted: 'rgba(0,0,0,0.08)',
+  accent: '#e31e24', accentMuted: 'rgba(227,30,36,0.08)',
 };
 
 function ScoreBanner({ score, claims, lang }) {
