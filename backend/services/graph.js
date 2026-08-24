@@ -25,7 +25,7 @@ class GraphService {
     }`;
 
     try {
-      const raw = await askGroq(prompt, true, "llama-3.1-8b-instant");
+      const raw = await askGroq(prompt, true, "groq/compound-mini");
       const { nodes, edges } = JSON.parse(raw);
 
       // Persist Nodes

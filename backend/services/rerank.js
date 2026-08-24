@@ -17,7 +17,7 @@ async function rerankResults(query, results, topN = 5) {
   ${context}`;
 
   try {
-    const response = await askGroq(prompt, false, "llama-3.1-8b-instant");
+    const response = await askGroq(prompt, false, "groq/compound-mini");
     const rankedIds = response.split(",").map(id => parseInt(id.trim())).filter(id => !isNaN(id));
     
     const reranked = rankedIds

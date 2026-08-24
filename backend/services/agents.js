@@ -12,7 +12,7 @@ async function SummarizationAgent(documentId, context) {
   ${context}
   
   Respond in JSON: { "summary": "...", "highlights": ["..."] }`;
-  return JSON.parse(await askGroq(prompt, true, "llama-3.3-70b-versatile"));
+  return JSON.parse(await askGroq(prompt, true, "groq/compound"));
 }
 
 async function ContradictionAgent(query, contexts) {
@@ -22,7 +22,7 @@ async function ContradictionAgent(query, contexts) {
   ${contexts.join("\n\n---\n\n")}
   
   Respond in JSON: { "contradictions": [ { "point": "...", "sourceA": "...", "sourceB": "...", "reconciliation": "..." } ] }`;
-  return JSON.parse(await askGroq(prompt, true, "llama-3.3-70b-versatile"));
+  return JSON.parse(await askGroq(prompt, true, "groq/compound"));
 }
 
 async function CitationAgent(answer, sources) {
@@ -32,7 +32,7 @@ async function CitationAgent(answer, sources) {
   SOURCES: ${sources.map(s => `[${s.id}] ${s.text}`).join("\n")}
   
   Respond in JSON: { "refined_answer": "...", "citations_verified": true }`;
-  return JSON.parse(await askGroq(prompt, true, "llama-3.1-8b-instant"));
+  return JSON.parse(await askGroq(prompt, true, "groq/compound-mini"));
 }
 
 async function MethodologyAgent(context) {
@@ -41,7 +41,7 @@ async function MethodologyAgent(context) {
   CONTEXT: ${context}
   
   Respond in JSON: { "methodology": "...", "rigor_score": 0-100, "pros": [], "cons": [] }`;
-  return JSON.parse(await askGroq(prompt, true, "llama-3.3-70b-versatile"));
+  return JSON.parse(await askGroq(prompt, true, "groq/compound"));
 }
 
 module.exports = {

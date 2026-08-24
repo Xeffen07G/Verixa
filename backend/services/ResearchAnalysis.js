@@ -33,7 +33,7 @@ class ResearchAnalysisService {
       "mode": "${mode}"
     }`;
 
-    const raw = await askGroq(prompt, true, "llama-3.3-70b-versatile");
+    const raw = await askGroq(prompt, true, "groq/compound");
     return JSON.parse(raw);
   }
 
@@ -60,7 +60,7 @@ class ResearchAnalysisService {
       
       Respond in JSON: { "summary": "...", "page_references": [${chunks.map(c => c.metadata.page).join(",")}] }`;
       
-      const raw = await askGroq(prompt, true, "llama-3.1-8b-instant");
+      const raw = await askGroq(prompt, true, "groq/compound-mini");
       results[section] = JSON.parse(raw);
     }
 
@@ -91,7 +91,7 @@ class ResearchAnalysisService {
       "critique": "..."
     }`;
 
-    const raw = await askGroq(prompt, true, "llama-3.3-70b-versatile");
+    const raw = await askGroq(prompt, true, "groq/compound");
     return JSON.parse(raw);
   }
 
@@ -117,7 +117,7 @@ class ResearchAnalysisService {
       "architecture_summary": "..."
     }`;
 
-    const raw = await askGroq(prompt, true, "llama-3.3-70b-versatile");
+    const raw = await askGroq(prompt, true, "groq/compound");
     return JSON.parse(raw);
   }
 }

@@ -21,7 +21,7 @@ async function analyzeContradictions(evidenceChunks, query) {
   const prompt = CONTRADICTION_PROMPTS.v1.system(evidenceContext, query);
 
   try {
-    const rawResult = await askGroq(prompt, true, "llama-3.1-8b-instant");
+    const rawResult = await askGroq(prompt, true, "groq/compound-mini");
     const result = JSON.parse(rawResult);
     
     // Add additional metadata for UI

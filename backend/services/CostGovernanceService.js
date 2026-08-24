@@ -58,16 +58,16 @@ class CostGovernanceService {
    * Decides which model to use based on task complexity and budget.
    */
   routeModel(taskType, remainingBudget) {
-    if (remainingBudget < 1000) return "llama-3.1-8b-instant";
+    if (remainingBudget < 1000) return "groq/compound-mini";
     
     switch (taskType) {
       case 'synthesis':
       case 'contradiction':
-        return "llama-3.3-70b-versatile";
+        return "groq/compound";
       case 'extraction':
       case 'summarization':
       default:
-        return "llama-3.1-8b-instant";
+        return "groq/compound-mini";
     }
   }
 

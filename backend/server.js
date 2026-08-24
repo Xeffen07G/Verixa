@@ -1047,7 +1047,7 @@ if (SAFE_MODE) {
         systemPrompt = RESEARCH_PROMPTS.v1.system(mode, modeInstruction, evidenceLedger, contradictionReport.explanation, query);
       }
 
-      const groqResponse = await askGroq(systemPrompt, false, "llama-3.3-70b-versatile");
+      const groqResponse = await askGroq(systemPrompt, false, "groq/compound");
       
       const sources = enrichedSources.map((c, i) => ({
         id: c.id,
@@ -1141,7 +1141,7 @@ if (SAFE_MODE) {
 
     try {
       const prompt = EXPORT_PROMPTS.v2.system(sessionPackage);
-      const report = await askGroq(prompt, false, "llama-3.3-70b-versatile");
+      const report = await askGroq(prompt, false, "groq/compound");
       
       investigationManager.logEvent(sessionId, "REPORT_GENERATED", "V2 Forensic Intelligence Report exported.");
       

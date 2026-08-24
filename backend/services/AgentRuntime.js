@@ -47,7 +47,7 @@ class AgentRuntime {
       If this is an iteration, identify gaps in the previous answer and fill them.`;
       
       const { askGroq } = require('./groq');
-      currentAnswer = await askGroq(prompt, false, "llama-3.3-70b-versatile");
+      currentAnswer = await askGroq(prompt, false, "groq/compound");
       
       // Optionally retrieve more context based on the current answer's gaps
     }

@@ -86,7 +86,7 @@ async function fetchLiveNews() {
         { role: "system", content: "Extract 8-10 major current global news claims or controversies from the provided text. Format as JSON: { trending: [{ claim: string, verdict: 'True'|'False'|'Partially True', confidence: number, source: string }] }" },
         { role: "user", content: `Text: ${context}` }
       ],
-      model: "llama-3.3-70b-versatile",
+      model: "groq/compound",
       response_format: { type: "json_object" }
     });
 

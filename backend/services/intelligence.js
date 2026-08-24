@@ -46,7 +46,7 @@ async function queryIntelligence(query, documentId = null) {
     ]
   }`;
 
-  const rawAnswer = await askGroq(prompt, true, "llama-3.3-70b-versatile");
+  const rawAnswer = await askGroq(prompt, true, "groq/compound");
   const data = JSON.parse(rawAnswer);
 
   const sources = reranked.map((r, i) => ({

@@ -30,7 +30,7 @@ class EvaluationEngine {
     }`;
 
     try {
-      const raw = await askGroq(prompt, true, "llama-3.3-70b-versatile");
+      const raw = await askGroq(prompt, true, "groq/compound");
       return JSON.parse(raw);
     } catch (err) {
       return { error: "Evaluation failed", score: 0 };
@@ -55,7 +55,7 @@ class EvaluationEngine {
     }`;
 
     try {
-      const raw = await askGroq(prompt, true, "llama-3.1-8b-instant");
+      const raw = await askGroq(prompt, true, "groq/compound-mini");
       return JSON.parse(raw);
     } catch (err) {
       return { precision: 0 };

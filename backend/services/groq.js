@@ -5,7 +5,7 @@ function getClient() {
   return new Groq({ apiKey: process.env.GROQ_API_KEY });
 }
 
-async function askGroq(prompt, jsonMode = false, model = "llama-3.3-70b-versatile", retries = 3) {
+async function askGroq(prompt, jsonMode = false, model = "groq/compound", retries = 3) {
   const groq = getClient();
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
@@ -113,7 +113,7 @@ Return ONLY this exact JSON format:
 {"claims": ["claim 1", "claim 2"]}`;
 
   // Using 8b model for extraction (faster, higher TPM limit)
-  const raw = await askGroq(prompt, true, "llama-3.1-8b-instant");
+  const raw = await askGroq(prompt, true, "groq/compound-mini");
   const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
   return parsed.claims || parsed;
 }
@@ -174,7 +174,7 @@ Claims to verify:
 ${formatted}`;
 
   // Using 70b model for final verification (high reasoning quality)
-  const raw = await askGroq(prompt, true, "llama-3.3-70b-versatile");
+  const raw = await askGroq(prompt, true, "groq/compound");
   const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
   const verified = parsed.results || parsed;
 
@@ -215,7 +215,7 @@ Text to analyze:
 ${text.slice(0, 3000)}`;
 
   // Using 70b for AI detection (high accuracy)
-  const raw = await askGroq(prompt, true, "llama-3.3-70b-versatile");
+  const raw = await askGroq(prompt, true, "groq/compound");
   return JSON.parse(raw.replace(/```json|```/g, "").trim());
 }
 

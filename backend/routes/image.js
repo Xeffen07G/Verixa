@@ -759,7 +759,7 @@ NEW QUESTION: ${query}
 If the text looks like a legal document, court order, or official notice, provide a professional and helpful explanation of its meaning. If the question is about a specific detail (like dates, names, or property), extract it accurately. If you cannot answer based on the provided text, say so. Respond naturally and helpfully. Keep history in mind for context.`;
 
     const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: "groq/compound",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.2,
       max_tokens: 1024

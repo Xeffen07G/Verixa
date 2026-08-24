@@ -36,7 +36,7 @@ class ConsensusEngine {
     }`;
 
     try {
-      const raw = await askGroq(prompt, true, "llama-3.3-70b-versatile");
+      const raw = await askGroq(prompt, true, "groq/compound");
       const data = JSON.parse(raw);
 
       // Map evidence indices back to IDs
