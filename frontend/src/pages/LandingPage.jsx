@@ -195,32 +195,31 @@ export default function LandingPage() {
 
   /* ── Theme tokens ── */
   const T_DARK = {
-    bg: '#0a0a0f', bg2: 'rgba(16,16,23,0.5)', text: '#f5f3ef',
-    text2: 'rgba(245,243,239,0.65)', text3: 'rgba(245,243,239,0.35)',
-    border: 'rgba(255,255,255,0.07)', cardBg: 'rgba(18,18,28,0.6)',
-    heroBg: `radial-gradient(ellipse 80% 60% at 50% 0%, ${darkMode ? 'rgba(201,169,110,0.08)' : 'rgba(90,66,26,0.08)'} 0%, transparent 70%)`,
-    statBg: 'rgba(10,10,15,0.8)', featureHover: 'rgba(201,169,110,0.06)',
-    stepBg: 'rgba(26,26,36,0.6)', testimonialBg: 'rgba(22,22,31,0.8)',
-    pricingBg: 'rgba(16,16,23,0.8)',
-    ctaBg: `radial-gradient(ellipse 60% 50% at 50% 50%, ${darkMode ? 'rgba(201,169,110,0.06)' : 'rgba(90,66,26,0.06)'} 0%, transparent 70%)`,
-    sectionBg: 'rgba(16,16,23,0.5)', badgeText: '#c9a96e',
-    demoBg: 'rgba(14,14,22,0.85)', demoCardBg: 'rgba(20,20,30,0.9)',
+    bg: '#000000', bg2: '#09090e', text: '#ffffff',
+    text2: 'rgba(255,255,255,0.75)', text3: 'rgba(255,255,255,0.45)',
+    border: 'rgba(255,255,255,0.08)', cardBg: '#09090e',
+    heroBg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.06) 0%, transparent 70%)',
+    statBg: '#000000', featureHover: 'rgba(255,255,255,0.05)',
+    stepBg: '#09090e', testimonialBg: '#09090e', pricingBg: '#09090e',
+    ctaBg: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 70%)',
+    sectionBg: '#09090e', badgeText: '#ffffff',
+    demoBg: '#09090e', demoCardBg: '#000000',
     glassCard: 'rgba(255,255,255,0.03)', glassBorder: 'rgba(255,255,255,0.06)',
-    accent: '#c9a96e', accentMuted: 'rgba(201,169,110,0.15)',
+    accent: '#ffffff', accentMuted: 'rgba(255,255,255,0.12)',
   };
 
   const T_LIGHT = {
     bg: '#ffffff', bg2: '#f8f9fa', text: '#0a0a0f',
     text2: 'rgba(10,10,15,0.75)', text3: 'rgba(10,10,15,0.45)',
     border: 'rgba(0,0,0,0.06)', cardBg: '#ffffff',
-    heroBg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,169,110,0.08) 0%, transparent 70%)',
-    statBg: '#ffffff', featureHover: 'rgba(201,169,110,0.05)',
+    heroBg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,0,0,0.03) 0%, transparent 70%)',
+    statBg: '#ffffff', featureHover: 'rgba(0,0,0,0.03)',
     stepBg: '#f8f9fa', testimonialBg: '#ffffff', pricingBg: '#ffffff',
-    ctaBg: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(201,169,110,0.05) 0%, transparent 70%)',
-    sectionBg: '#f8f9fa', badgeText: '#c9a96e',
+    ctaBg: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0,0,0,0.03) 0%, transparent 70%)',
+    sectionBg: '#f8f9fa', badgeText: '#000000',
     demoBg: '#f8f9fa', demoCardBg: '#ffffff',
     glassCard: '#ffffff', glassBorder: 'rgba(0,0,0,0.06)',
-    accent: '#c9a96e', accentMuted: 'rgba(201,169,110,0.15)',
+    accent: '#000000', accentMuted: 'rgba(0,0,0,0.08)',
   };
 
   const T = darkMode ? T_DARK : T_LIGHT;
