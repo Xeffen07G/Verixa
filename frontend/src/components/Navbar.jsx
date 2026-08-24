@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LANGUAGES, t } from '../utils/i18n';
 import { useLang } from '../context/LangContext';
-import { Menu, X, Sun, Moon, Globe, Image, Video, TrendingUp, LogOut, User, FileText, Layout, ShieldCheck, BookOpen } from 'lucide-react';
+import { Menu, X, Sun, Moon, Globe, Image, TrendingUp, LogOut, User, FileText, Layout } from 'lucide-react';
 
 export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const [scrolled, setScrolled] = useState(false);
@@ -12,7 +12,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const { lang, changeLanguage } = useLang();
   const { user, logout } = useAuth();
   const location = useLocation();
-  const isLanding = location.pathname === '/' || location.pathname === '/index.html';
+  const isLanding = location.pathname === '/';
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -25,35 +25,21 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
     setLangOpen(false);
   };
 
-  const navLinks = React.useMemo(() => {
-    const links = [
-      { label: t('navFeatures', lang), href: '/#features' },
-    ];
-    if (user) {
-      links.push({ label: 'Intelligence Lab', href: '/intelligence' });
-      links.push({ label: 'Verification Lab', href: '/verify' });
-      links.push({ label: 'Document Intelligence', href: '/research' });
-    }
-    links.push({ label: t('navPricing', lang), href: '/#pricing' });
-    links.push({ label: t('navTestimonials', lang), href: '/#testimonials' });
-    return links;
-  }, [lang, user]);
+  const navLinks = React.useMemo(() => [
+    { label: t('navFeatures', lang), href: '#features' },
+    { label: t('navHowItWorks', lang), href: '#how-it-works' },
+    { label: t('navDashboard', lang), href: '/dashboard' },
+    { label: t('navPricing', lang), href: '#pricing' },
+    { label: t('navTestimonials', lang), href: '#testimonials' },
+  ], [lang]);
 
-  const textColor = darkMode ? '#f5f3ef' : '#201a18';
-  const textMuted = darkMode ? 'rgba(245,243,239,0.6)' : 'rgba(32, 26, 24, 0.6)';
-  const border = darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(212, 140, 112, 0.15)';
-
-  const isTransparent = (location.pathname === '/' || location.pathname === '/index.html' || !location.pathname || location.pathname === '') && !scrolled;
-  
-  const bg = isTransparent 
-    ? 'transparent' 
-    : (darkMode ? 'rgba(10,10,15,0.85)' : 'rgba(253, 252, 249, 0.9)');
-  const backdrop = isTransparent ? 'none' : 'blur(20px)';
-  const navBorder = isTransparent ? 'transparent' : border;
-  const T = { 
-    accent: darkMode ? '#c9a96e' : '#d48c70',
-    logoBg: darkMode ? '#c9a96e' : '#d48c70'
-  };
+  const textColor = darkMode ? '#ffffff' : '#000000';
+  const textMuted = darkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)';
+  const border = darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+  const bg = darkMode 
+    ? ((!isLanding || scrolled) ? 'rgba(10,10,15,0.85)' : 'transparent') 
+    : ((!isLanding || scrolled) ? 'rgba(255,255,255,0.85)' : 'transparent');
+  const T = { accent: '#c9a96e' };
 
   const currentLang = LANGUAGES.find(l => l.code === lang);
 
@@ -61,9 +47,9 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
     <>
       <nav style={{ 
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 2000,
-        background: bg, backdropFilter: backdrop,
-        borderBottom: `1px solid ${navBorder}`,
-        transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+        background: bg, backdropFilter: (!isLanding || scrolled) ? 'blur(24px)' : 'none',
+        borderBottom: (!isLanding || scrolled) ? `1px solid ${border}` : '1px solid transparent',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
         height: 'var(--nav-h)',
         display: 'flex', alignItems: 'center'
       }}>
@@ -72,10 +58,11 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
           {/* Left: Logo & Core Nav */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 40 }}>
             <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
-               <span style={{ 
-                 fontFamily: 'Cormorant Garamond, serif',
-                 fontSize: 26, fontWeight: 300, color: textColor, letterSpacing: -1 
-               }}>VeriXa</span>
+              <div style={{ position: 'relative' }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#000', fontWeight: 900 }}>V</div>
+                <div style={{ position: 'absolute', bottom: -2, right: -2, width: 8, height: 8, borderRadius: '50%', background: '#4ade80', border: `2px solid ${darkMode ? '#0a0a0f' : '#fff'}` }} />
+              </div>
+              <span style={{ fontSize: 20, fontWeight: 700, color: textColor, letterSpacing: -0.5 }}>VeriXa</span>
             </Link>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 24 }} className="hide-tablet">
@@ -86,8 +73,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
           </div>
 
           {/* Right: Tools & Menu */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-            {children}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             
             {/* Tool Group (Always Visible) */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -100,19 +86,8 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
                 {langOpen && (
                   <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 12, background: darkMode ? '#15151a' : '#fff', border: `1px solid ${border}`, borderRadius: 12, padding: '8px', minWidth: 180, maxHeight: '70vh', overflowY: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.4)', animation: 'fadeIn 0.2s ease', zIndex: 2001 }}>
                     {LANGUAGES.map(l => (
-                      <button 
-                        key={l.code} 
-                        onClick={() => handleLangChange(l.code)} 
-                        className={`lang-option ${lang === l.code ? 'active' : ''}`}
-                        style={{ 
-                          width: '100%', padding: '10px 12px', border: 'none', 
-                          textAlign: 'left', cursor: 'pointer', borderRadius: 8, 
-                          fontSize: 13, fontWeight: 500, background: 'none',
-                          color: lang === l.code ? T.accent : textColor,
-                          transition: '0.2s'
-                        }}
-                      >
-                        {l.nativeLabel}
+                      <button key={l.code} onClick={() => handleLangChange(l.code)} style={{ width: '100%', padding: '10px 12px', background: lang === l.code ? `${T.accent}1a` : 'none', border: 'none', color: lang === l.code ? T.accent : textColor, textAlign: 'left', cursor: 'pointer', borderRadius: 8, fontSize: 13, fontWeight: 500 }} onMouseEnter={e => e.target.style.background = `${T.accent}0d`}>
+                        {l.label}
                       </button>
                     ))}
                   </div>
@@ -125,15 +100,8 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
               </button>
 
               {/* The "Three Lines" Menu Trigger (Now right of Tools) */}
-              <button 
-                onClick={() => { setMobileOpen(!mobileOpen); setLangOpen(false); }} 
-                style={{ 
-                  background: 'none', border: 'none', color: textColor, cursor: 'pointer', 
-                  padding: '8px 12px', borderRadius: 8, display: 'flex', alignItems: 'center', 
-                  zIndex: 2005 
-                }}
-              >
-                {mobileOpen ? <X size={24} /> : <Menu size={20} />}
+              <button onClick={() => setMobileOpen(true)} style={{ background: 'none', border: 'none', color: textColor, cursor: 'pointer', padding: '8px 12px', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Menu size={20} />
               </button>
             </div>
           </div>
@@ -149,9 +117,9 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
         padding: '80px 48px', display: 'flex', flexDirection: 'column',
         boxShadow: '-20px 0 60px rgba(0,0,0,0.5)', borderLeft: `1px solid ${border}`
       }}>
-        {/* Mobile menu content */}
+        <button onClick={() => setMobileOpen(false)} style={{ position: 'absolute', top: 24, right: 40, background: 'none', border: 'none', color: textColor, cursor: 'pointer' }}><X size={32} /></button>
         
-        <div style={{ fontSize: 10, letterSpacing: 4, color: T.accent, fontWeight: 900, marginBottom: 40 }}>{user ? `${t('hi', lang)}, ${user.name?.toUpperCase() || t('user', lang).toUpperCase()}` : t('identityAccess', lang).toUpperCase().replace('_', ' ')}</div>
+        <div style={{ fontSize: 10, letterSpacing: 4, color: T.accent, fontWeight: 900, marginBottom: 40 }}>{user ? `${t('hi', lang)}, ${user.name?.toUpperCase() || t('user', lang).toUpperCase()}` : t('identityAccess', lang)}</div>
         
         {/* Verification Tools Section */}
         <div style={{ marginBottom: 48 }}>
@@ -164,10 +132,6 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
             <Link to="/image" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
               <Image size={20} />
               <span style={{ fontSize: 18, fontWeight: 700 }}>{t('imageVerify', lang)}</span>
-            </Link>
-            <Link to="/video" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
-              <Video size={20} />
-              <span style={{ fontSize: 18, fontWeight: 700 }}>{t('videoVerify', lang)}</span>
             </Link>
             <Link to="/trending" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
               <TrendingUp size={20} />
@@ -186,17 +150,9 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <Link to="/intelligence" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(201,169,110,0.1)', color: T.accent, textDecoration: 'none' }}>
+              <Link to="/dashboard" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
                 <Layout size={20} />
-                <span style={{ fontSize: 18, fontWeight: 700 }}>Intelligence Lab</span>
-              </Link>
-              <Link to="/verify" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
-                <ShieldCheck size={20} />
-                <span style={{ fontSize: 18, fontWeight: 700 }}>Verification Lab</span>
-              </Link>
-              <Link to="/research" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
-                <BookOpen size={20} />
-                <span style={{ fontSize: 18, fontWeight: 700 }}>Research Workspace</span>
+                <span style={{ fontSize: 18, fontWeight: 700 }}>{t('navDashboard', lang)}</span>
               </Link>
               <Link to="/account" onClick={() => setMobileOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: textColor, textDecoration: 'none' }}>
                 <User size={20} />
@@ -219,12 +175,8 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
       </div>
 
       <style>{`
-        .lang-option:hover { background: ${T.accent}0d !important; }
-        .lang-option.active { background: ${T.accent}1a !important; }
-        
         :root { --nav-h: ${scrolled ? '64px' : '80px'}; }
         @media (max-width: 1024px) {
-          :root { --nav-h: 64px !important; }
           .hide-tablet { display: none !important; }
           .mobile-only { display: flex !important; }
           .hide-mobile { display: none !important; }
