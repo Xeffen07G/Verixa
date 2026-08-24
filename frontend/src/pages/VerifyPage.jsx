@@ -24,25 +24,25 @@ const VERDICT_CONFIG = (lang) => ({
 const STAGES = ['extracting', 'searching', 'verifying', 'done'];
 
 const DARK = {
-  bg: '#000000', surface: '#09090e', surface2: '#111118',
-  border: 'rgba(255,255,255,0.08)', border2: 'rgba(255,255,255,0.04)',
-  text: '#ffffff', text2: 'rgba(255,255,255,0.75)', text3: 'rgba(255,255,255,0.45)',
-  topbar: 'rgba(0,0,0,0.95)', panelFooter: 'rgba(0,0,0,0.8)',
-  inputBg: 'rgba(255,255,255,0.015)', inputBorder: 'rgba(255,255,255,0.08)',
-  logBg: 'rgba(255,255,255,0.01)', emptyColor: 'rgba(255,255,255,0.45)',
-  cardBg: '#09090e', cardBorder: 'rgba(255,255,255,0.08)',
-  accent: '#ffffff', accentMuted: 'rgba(255,255,255,0.12)',
+  bg: '#0a0a0f', surface: '#111118', surface2: '#16161f',
+  border: 'rgba(255,255,255,0.07)', border2: 'rgba(255,255,255,0.04)',
+  text: '#f5f3ef', text2: 'rgba(245,243,239,0.7)', text3: 'rgba(245,243,239,0.35)',
+  topbar: 'rgba(10,10,15,0.95)', panelFooter: 'rgba(10,10,15,0.8)',
+  inputBg: 'rgba(255,255,255,0.02)', inputBorder: 'rgba(255,255,255,0.08)',
+  logBg: 'rgba(255,255,255,0.01)', emptyColor: 'rgba(245,243,239,0.55)',
+  cardBg: '#111118', cardBorder: 'rgba(255,255,255,0.07)',
+  accent: '#c9a96e', accentMuted: 'rgba(201,169,110,0.1)',
 };
 
 const LIGHT = {
-  bg: '#ffffff', surface: '#ffffff', surface2: '#f8f9fa',
-  border: 'rgba(0,0,0,0.08)', border2: 'rgba(0,0,0,0.04)',
-  text: '#0a0a0f', text2: 'rgba(10,10,15,0.75)', text3: 'rgba(10,10,15,0.45)',
-  topbar: 'rgba(255, 255, 255, 0.95)', panelFooter: 'rgba(255, 255, 255, 0.9)',
-  inputBg: '#ffffff', inputBorder: 'rgba(0,0,0,0.08)',
-  logBg: 'rgba(0,0,0,0.02)', emptyColor: 'rgba(10,10,15,0.45)',
-  cardBg: '#ffffff', cardBorder: 'rgba(0,0,0,0.08)',
-  accent: '#000000', accentMuted: 'rgba(0,0,0,0.08)',
+  bg: '#fdfcf9', surface: '#fdfcf9', surface2: '#f5f3ed',
+  border: 'rgba(212, 140, 112, 0.15)', border2: 'rgba(212, 140, 112, 0.08)',
+  text: '#201a18', text2: '#53433e', text3: '#85736d',
+  topbar: 'rgba(253, 252, 249, 0.95)', panelFooter: 'rgba(253, 252, 249, 0.9)',
+  inputBg: '#ffffff', inputBorder: 'rgba(212, 140, 112, 0.2)',
+  logBg: 'rgba(212, 140, 112, 0.03)', emptyColor: '#85736d',
+  cardBg: '#ffffff', cardBorder: 'rgba(212, 140, 112, 0.15)',
+  accent: '#d48c70', accentMuted: 'rgba(212, 140, 112, 0.12)',
 };
 
 function ScoreBanner({ score, claims, lang }) {
