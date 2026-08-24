@@ -53,7 +53,7 @@ export default function Navbar({ darkMode = true, onToggleTheme, children }) {
   const bg = darkMode 
     ? ((!isLanding || scrolled) ? 'rgba(10,10,15,0.85)' : 'transparent') 
     : ((!isLanding || scrolled) ? 'rgba(255,255,255,0.85)' : 'transparent');
-  const T = { accent: '#e31e24' };
+  const T = { accent: darkMode ? '#ffffff' : '#000000' };
 
   const currentLang = LANGUAGES.find(l => l.code === lang);
 

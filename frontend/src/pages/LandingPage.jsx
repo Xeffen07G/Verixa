@@ -198,28 +198,28 @@ export default function LandingPage() {
     bg: '#000000', bg2: '#09090e', text: '#ffffff',
     text2: 'rgba(255,255,255,0.75)', text3: 'rgba(255,255,255,0.45)',
     border: 'rgba(255,255,255,0.08)', cardBg: '#09090e',
-    heroBg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(227, 30, 36, 0.06) 0%, transparent 70%)',
-    statBg: '#000000', featureHover: 'rgba(227, 30, 36, 0.05)',
+    heroBg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.06) 0%, transparent 70%)',
+    statBg: '#000000', featureHover: 'rgba(255,255,255,0.05)',
     stepBg: '#09090e', testimonialBg: '#09090e', pricingBg: '#09090e',
-    ctaBg: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(227, 30, 36, 0.05) 0%, transparent 70%)',
-    sectionBg: '#09090e', badgeText: '#e31e24',
+    ctaBg: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 70%)',
+    sectionBg: '#09090e', badgeText: '#ffffff',
     demoBg: '#09090e', demoCardBg: '#000000',
     glassCard: 'rgba(255,255,255,0.03)', glassBorder: 'rgba(255,255,255,0.06)',
-    accent: '#e31e24', accentMuted: 'rgba(227, 30, 36, 0.12)',
+    accent: '#ffffff', accentMuted: 'rgba(255,255,255,0.12)',
   };
 
   const T_LIGHT = {
     bg: '#ffffff', bg2: '#f8f9fa', text: '#0a0a0f',
     text2: 'rgba(10,10,15,0.75)', text3: 'rgba(10,10,15,0.45)',
     border: 'rgba(0,0,0,0.06)', cardBg: '#ffffff',
-    heroBg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(227, 30, 36, 0.03) 0%, transparent 70%)',
-    statBg: '#ffffff', featureHover: 'rgba(227, 30, 36, 0.03)',
+    heroBg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,0,0,0.03) 0%, transparent 70%)',
+    statBg: '#ffffff', featureHover: 'rgba(0,0,0,0.03)',
     stepBg: '#f8f9fa', testimonialBg: '#ffffff', pricingBg: '#ffffff',
-    ctaBg: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(227, 30, 36, 0.03) 0%, transparent 70%)',
-    sectionBg: '#f8f9fa', badgeText: '#e31e24',
+    ctaBg: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0,0,0,0.03) 0%, transparent 70%)',
+    sectionBg: '#f8f9fa', badgeText: '#000000',
     demoBg: '#f8f9fa', demoCardBg: '#ffffff',
     glassCard: '#ffffff', glassBorder: 'rgba(0,0,0,0.06)',
-    accent: '#e31e24', accentMuted: 'rgba(227, 30, 36, 0.08)',
+    accent: '#000000', accentMuted: 'rgba(0,0,0,0.08)',
   };
 
   const T = darkMode ? T_DARK : T_LIGHT;

@@ -10,10 +10,10 @@
   --surface-2: #181826;
   --border: rgba(255, 255, 255, 0.08);
   --border-hover: rgba(255, 255, 255, 0.15);
-  --gold: #e31e24;
-  --gold-light: #ff4d4f;
-  --gold-dim: rgba(227, 30, 36, 0.15);
-  --gold-glow: rgba(227, 30, 36, 0.08);
+  --gold: #ffffff;
+  --gold-light: #ffffff;
+  --gold-dim: rgba(255, 255, 255, 0.15);
+  --gold-glow: rgba(255, 255, 255, 0.08);
   --white: #ffffff;
   --white-60: rgba(245, 243, 239, 0.6);
   --white-30: rgba(245, 243, 239, 0.3);
@@ -349,7 +349,7 @@ button:active {
 }
 
 .text-shimmer {
-  background: linear-gradient(90deg, #e31e24 20%, #ff4d4f 40%, #ff4d4f 60%, #e31e24 80%);
+  background: linear-gradient(90deg, #ffffff 20%, #e0e0e0 40%, #e0e0e0 60%, #ffffff 80%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -500,7 +500,7 @@ input:focus, textarea:focus, select:focus {
   left: 0;
   width: 0;
   height: 1px;
-  background: linear-gradient(90deg, #e31e24, #ff4d4f);
+  background: linear-gradient(90deg, #ffffff, #a0a0a0);
   transition: width 0.4s cubic-bezier(0.23,1,0.32,1);
 }
 

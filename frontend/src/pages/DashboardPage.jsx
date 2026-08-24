@@ -44,7 +44,7 @@ export default function VerificationLab() {
     text: '#ffffff',
     text2: 'rgba(255,255,255,0.75)',
     text3: 'rgba(255,255,255,0.45)',
-    accent: '#e31e24',
+    accent: '#ffffff',
     cardBg: '#09090e',
     cardBorder: 'rgba(255,255,255,0.08)',
   };
