@@ -112,28 +112,43 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Layout Container */}
-            <div style={{ padding: '40px 48px', display: 'flex', flexDirection: 'column', gap: '20px', background: 'rgba(255,255,255,0.003)' }}>
+            {/* Layout Grid */}
+            <div className="mock-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px', padding: '32px' }}>
               
-              {/* Line 1: Monospaced/Academic Quote */}
-              <p style={{ fontSize: '16px', lineHeight: 1.6, color: T.text, margin: 0, fontWeight: 300, fontStyle: 'italic', letterSpacing: '-0.2px' }}>
-                "Option A regimen stabilized patient recovery rates at <span style={{ borderBottom: `1px dashed ${T.amber}`, color: T.amber, paddingBottom: '2px' }}>92% [1]</span> with <span style={{ borderBottom: `1px dashed ${T.red}`, color: T.red, paddingBottom: '2px' }}>zero documented [2]</span> clinical side-effects."
-              </p>
-
-              {/* Line 2: Footnote Reference 1 */}
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', borderTop: `1px solid ${T.border}`, paddingTop: '16px' }}>
-                <span style={{ fontSize: '11px', color: T.accent, fontWeight: '700', minWidth: '24px' }}>[1]</span>
-                <p style={{ fontSize: '13px', color: T.textMuted, margin: 0, fontWeight: 300 }}>
-                  Page 4 (clinical_trial_v12.pdf): 92% recovery in control environments, but general trials observed 67% efficacy.
-                </p>
+              {/* Left Column: Highlighted Statement */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', justifyContent: 'center' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: T.textDim, letterSpacing: '1px', textTransform: 'uppercase' }}>Audited Statement</span>
+                <div style={{ background: 'rgba(255,255,255,0.01)', border: `1px solid ${T.border}`, padding: '24px', borderRadius: '12px', fontSize: '16px', lineHeight: 1.7, color: T.text, fontStyle: 'italic', fontWeight: 300 }}>
+                  "Option A regimen stabilized patient recovery rates at <span style={{ color: T.amber, background: 'rgba(251, 191, 36, 0.08)', padding: '2px 6px', borderRadius: '4px', border: `1px solid rgba(251, 191, 36, 0.25)`, fontStyle: 'normal', fontWeight: 500 }}>92% [1]</span> with <span style={{ color: T.red, background: 'rgba(248, 113, 113, 0.08)', padding: '2px 6px', borderRadius: '4px', border: `1px solid rgba(248, 113, 113, 0.25)`, fontStyle: 'normal', fontWeight: 500 }}>zero documented [2]</span> clinical side-effects."
+                </div>
               </div>
 
-              {/* Line 3: Footnote Reference 2 */}
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', borderTop: `1px solid ${T.border}`, paddingTop: '12px' }}>
-                <span style={{ fontSize: '11px', color: T.accent, fontWeight: '700', minWidth: '24px' }}>[2]</span>
-                <p style={{ fontSize: '13px', color: T.textMuted, margin: 0, fontWeight: 300 }}>
-                  Page 9 (clinical_trial_v12.pdf): Mild side-effects (nausea, fatigue) were reported in 12% of patients.
-                </p>
+              {/* Right Column: Grounded Findings */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: T.textDim, letterSpacing: '1px', textTransform: 'uppercase' }}>Audited Findings</span>
+                
+                {/* Finding 1 */}
+                <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderLeft: `3px solid ${T.amber}`, padding: '16px 20px', borderRadius: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '600', color: T.amber }}>[1] Recovery Discrepancy</span>
+                    <span style={{ fontSize: '10px', color: T.textDim }}>clinical_trial_v12.pdf (p. 4)</span>
+                  </div>
+                  <p style={{ fontSize: '12.5px', color: T.textMuted, lineHeight: 1.5, margin: 0, fontWeight: 300 }}>
+                    92% recovery in control environments, but general trials observed 67% efficacy.
+                  </p>
+                </div>
+
+                {/* Finding 2 */}
+                <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderLeft: `3px solid ${T.red}`, padding: '16px 20px', borderRadius: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '600', color: T.red }}>[2] Side-Effects Reported</span>
+                    <span style={{ fontSize: '10px', color: T.textDim }}>clinical_trial_v12.pdf (p. 9)</span>
+                  </div>
+                  <p style={{ fontSize: '12.5px', color: T.textMuted, lineHeight: 1.5, margin: 0, fontWeight: 300 }}>
+                    Mild side-effects (nausea, fatigue) were reported in 12% of patients.
+                  </p>
+                </div>
+
               </div>
 
             </div>
