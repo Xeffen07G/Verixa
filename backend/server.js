@@ -1032,18 +1032,20 @@ if (SAFE_MODE) {
       }
 
       let systemPrompt = "";
-      if (intent === "SYNTHESIS" || intent === "EXPLORATORY") {
-        const evidenceLedger = enrichedSources.map(function(s, i) { return '[Source ' + (i+1) + '] Paper: ' + s.filename + '\nEvidence: "' + s.text + '"'; }).join('\n\n');
+      const modePrompts = {
+        "Scholar": "Academic explanation.",
+        "Skeptic": "Challenge claims.",
+        "Contradiction Hunter": "Disagreements.",
+        "Deep Analysis": "Standard grounded response."
+      };
+      const modeInstruction = modePrompts[mode] || modePrompts["Deep Analysis"];
+      const evidenceLedger = enrichedSources.map(function(s, i) { return '[Source ' + (i+1) + '] Paper: ' + s.filename + ' | Trust: ' + s.credibilityScore + '\nEvidence: "' + s.text + '"'; }).join('\n\n');
+
+      const isGenericSummary = query.toLowerCase().trim() === "provide a summary of the core arguments and conclusions of this document.";
+
+      if (isGenericSummary) {
         systemPrompt = RESEARCH_PROMPTS.v2_synthesis.system(evidenceLedger, query);
       } else {
-        const modePrompts = {
-          "Scholar": "Academic explanation.",
-          "Skeptic": "Challenge claims.",
-          "Contradiction Hunter": "Disagreements.",
-          "Deep Analysis": "Standard grounded response."
-        };
-        const modeInstruction = modePrompts[mode] || modePrompts["Deep Analysis"];
-        const evidenceLedger = enrichedSources.map(function(s, i) { return '[Source ' + (i+1) + '] Paper: ' + s.filename + ' | Trust: ' + s.credibilityScore + '\nEvidence: "' + s.text + '"'; }).join('\n\n');
         systemPrompt = RESEARCH_PROMPTS.v1.system(mode, modeInstruction, evidenceLedger, contradictionReport.explanation, query);
       }
 
