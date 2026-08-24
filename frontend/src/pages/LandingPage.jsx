@@ -113,37 +113,27 @@ export default function LandingPage() {
             </div>
 
             {/* Layout Container */}
-            <div style={{ padding: '36px 40px', display: 'flex', flexDirection: 'column', gap: '24px', background: 'rgba(255,255,255,0.003)' }}>
+            <div style={{ padding: '40px 48px', display: 'flex', flexDirection: 'column', gap: '20px', background: 'rgba(255,255,255,0.003)' }}>
               
-              {/* Line 1: Input Statement */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-                <span style={{ fontSize: '11px', fontWeight: '800', color: T.accent, letterSpacing: '1px', textTransform: 'uppercase', minWidth: '90px', paddingTop: '4px' }}>Statement</span>
-                <p style={{ fontSize: '15px', lineHeight: 1.5, color: T.text, margin: 0, fontWeight: 300, fontStyle: 'italic' }}>
-                  "Option A regimen stabilized patient recovery rates at 92% with zero documented clinical side-effects."
+              {/* Line 1: Monospaced/Academic Quote */}
+              <p style={{ fontSize: '16px', lineHeight: 1.6, color: T.text, margin: 0, fontWeight: 300, fontStyle: 'italic', letterSpacing: '-0.2px' }}>
+                "Option A regimen stabilized patient recovery rates at <span style={{ borderBottom: `1px dashed ${T.amber}`, color: T.amber, paddingBottom: '2px' }}>92% [1]</span> with <span style={{ borderBottom: `1px dashed ${T.red}`, color: T.red, paddingBottom: '2px' }}>zero documented [2]</span> clinical side-effects."
+              </p>
+
+              {/* Line 2: Footnote Reference 1 */}
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', borderTop: `1px solid ${T.border}`, paddingTop: '16px' }}>
+                <span style={{ fontSize: '11px', color: T.accent, fontWeight: '700', minWidth: '24px' }}>[1]</span>
+                <p style={{ fontSize: '13px', color: T.textMuted, margin: 0, fontWeight: 300 }}>
+                  Page 4 (clinical_trial_v12.pdf): 92% recovery in control environments, but general trials observed 67% efficacy.
                 </p>
               </div>
 
-              {/* Line 2: Contradiction Alert */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', borderTop: `1px solid ${T.border}`, paddingTop: '20px' }}>
-                <span style={{ fontSize: '11px', fontWeight: '800', color: T.amber, letterSpacing: '1px', textTransform: 'uppercase', minWidth: '90px', paddingTop: '4px' }}>Contradiction</span>
-                <p style={{ fontSize: '14px', lineHeight: 1.6, color: T.textMuted, margin: 0, fontWeight: 300 }}>
-                  Section 4.2 claims a <span style={{ color: T.accent, fontWeight: '500' }}>92% recovery rate</span>, but Page 9 patient logs reflect only 24 recoveries out of 36 subjects (<span style={{ color: T.red, fontWeight: '500' }}>67% recovery</span>).
+              {/* Line 3: Footnote Reference 2 */}
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', borderTop: `1px solid ${T.border}`, paddingTop: '12px' }}>
+                <span style={{ fontSize: '11px', color: T.accent, fontWeight: '700', minWidth: '24px' }}>[2]</span>
+                <p style={{ fontSize: '13px', color: T.textMuted, margin: 0, fontWeight: 300 }}>
+                  Page 9 (clinical_trial_v12.pdf): Mild side-effects (nausea, fatigue) were reported in 12% of patients.
                 </p>
-              </div>
-
-              {/* Line 3: Grounded Evidence */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', borderTop: `1px solid ${T.border}`, paddingTop: '20px' }}>
-                <span style={{ fontSize: '11px', fontWeight: '800', color: T.textDim, letterSpacing: '1px', textTransform: 'uppercase', minWidth: '90px', paddingTop: '2px' }}>Evidence</span>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '6px 12px', borderRadius: '6px', border: `1px solid ${T.border}`, fontSize: '12px' }}>
-                    <FileText size={12} color={T.accent} />
-                    <span style={{ color: T.textMuted }}>clinical_trial_v12.pdf — Page 4</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '6px 12px', borderRadius: '6px', border: `1px solid ${T.border}`, fontSize: '12px' }}>
-                    <FileText size={12} color={T.accent} />
-                    <span style={{ color: T.textMuted }}>clinical_trial_v12.pdf — Page 9</span>
-                  </div>
-                </div>
               </div>
 
             </div>
