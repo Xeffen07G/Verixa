@@ -119,33 +119,44 @@ export default function LandingPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', justifyContent: 'center' }}>
                 <span style={{ fontSize: '10px', fontWeight: '700', color: T.textDim, letterSpacing: '1px', textTransform: 'uppercase' }}>Audited Statement</span>
                 <div style={{ background: 'rgba(255,255,255,0.01)', border: `1px solid ${T.border}`, padding: '24px', borderRadius: '12px', fontSize: '16px', lineHeight: 1.7, color: T.text, fontStyle: 'italic', fontWeight: 300 }}>
-                  "Option A regimen stabilized patient recovery rates at <span style={{ color: T.amber, background: 'rgba(251, 191, 36, 0.08)', padding: '2px 6px', borderRadius: '4px', border: `1px solid rgba(251, 191, 36, 0.25)`, fontStyle: 'normal', fontWeight: 500 }}>92% [1]</span> with <span style={{ color: T.red, background: 'rgba(248, 113, 113, 0.08)', padding: '2px 6px', borderRadius: '4px', border: `1px solid rgba(248, 113, 113, 0.25)`, fontStyle: 'normal', fontWeight: 500 }}>zero documented [2]</span> clinical side-effects."
+                  "Option A regimen was tested on <span style={{ color: T.green, background: 'rgba(74, 222, 128, 0.08)', padding: '2px 6px', borderRadius: '4px', border: `1px solid rgba(74, 222, 128, 0.25)`, fontStyle: 'normal', fontWeight: 500 }}>36 patients [1]</span>, stabilizing recovery rates at <span style={{ color: T.amber, background: 'rgba(251, 191, 36, 0.08)', padding: '2px 6px', borderRadius: '4px', border: `1px solid rgba(251, 191, 36, 0.25)`, fontStyle: 'normal', fontWeight: 500 }}>92% [2]</span> with <span style={{ color: T.red, background: 'rgba(248, 113, 113, 0.08)', padding: '2px 6px', borderRadius: '4px', border: `1px solid rgba(248, 113, 113, 0.25)`, fontStyle: 'normal', fontWeight: 500 }}>zero documented [3]</span> clinical side-effects."
                 </div>
               </div>
 
               {/* Right Column: Grounded Findings */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: T.textDim, letterSpacing: '1px', textTransform: 'uppercase' }}>Audited Findings</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: T.textDim, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>Audited Findings</span>
                 
-                {/* Finding 1 */}
-                <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderLeft: `3px solid ${T.amber}`, padding: '16px 20px', borderRadius: '8px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: '600', color: T.amber }}>[1] Recovery Discrepancy</span>
-                    <span style={{ fontSize: '10px', color: T.textDim }}>clinical_trial_v12.pdf (p. 4)</span>
+                {/* Finding 1: True */}
+                <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderLeft: `3px solid ${T.green}`, padding: '12px 18px', borderRadius: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '600', color: T.green }}>[1] Verified Cohort Size</span>
+                    <span style={{ fontSize: '11px', background: T.greenBg, color: T.green, padding: '2px 6px', borderRadius: '4px', fontWeight: '600' }}>True</span>
                   </div>
-                  <p style={{ fontSize: '12.5px', color: T.textMuted, lineHeight: 1.5, margin: 0, fontWeight: 300 }}>
-                    92% recovery in control environments, but general trials observed 67% efficacy.
+                  <p style={{ fontSize: '12px', color: T.textMuted, lineHeight: 1.4, margin: 0, fontWeight: 300 }}>
+                    Tested on 36 patients. Source logs state: "Cohort size: 36."
                   </p>
                 </div>
 
-                {/* Finding 2 */}
-                <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderLeft: `3px solid ${T.red}`, padding: '16px 20px', borderRadius: '8px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: '600', color: T.red }}>[2] Side-Effects Reported</span>
-                    <span style={{ fontSize: '10px', color: T.textDim }}>clinical_trial_v12.pdf (p. 9)</span>
+                {/* Finding 2: Partially True */}
+                <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderLeft: `3px solid ${T.amber}`, padding: '12px 18px', borderRadius: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '600', color: T.amber }}>[2] Recovery Parameters</span>
+                    <span style={{ fontSize: '11px', background: T.amberBg, color: T.amber, padding: '2px 6px', borderRadius: '4px', fontWeight: '600' }}>Partially True</span>
                   </div>
-                  <p style={{ fontSize: '12.5px', color: T.textMuted, lineHeight: 1.5, margin: 0, fontWeight: 300 }}>
-                    Mild side-effects (nausea, fatigue) were reported in 12% of patients.
+                  <p style={{ fontSize: '12px', color: T.textMuted, lineHeight: 1.4, margin: 0, fontWeight: 300 }}>
+                    92% recovery in controls, but general trials observed 67% efficacy.
+                  </p>
+                </div>
+
+                {/* Finding 3: False */}
+                <div style={{ background: T.cardBg, border: `1px solid ${T.border}`, borderLeft: `3px solid ${T.red}`, padding: '12px 18px', borderRadius: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '600', color: T.red }}>[3] Safety Assertions</span>
+                    <span style={{ fontSize: '11px', background: T.redBg, color: T.red, padding: '2px 6px', borderRadius: '4px', fontWeight: '600' }}>False</span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: T.textMuted, lineHeight: 1.4, margin: 0, fontWeight: 300 }}>
+                    Mild side-effects (nausea, fatigue) were documented in 12% of patients.
                   </p>
                 </div>
 
@@ -156,79 +167,15 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Core Pillars (Simplified) */}
-      <section id="features" style={{ padding: '60px 24px 100px', background: T.bg2, borderTop: `1px solid ${T.border}`, borderBottom: `1px solid ${T.border}` }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-            {[
-              { 
-                title: 'Contradiction Detection', 
-                desc: 'Cross-references claim parameters across files to automatically locate and alert you of data conflicts and anomalies.' 
-              },
-              { 
-                title: 'Verbatim Grounding', 
-                desc: 'Guarantees every assertion is paired with clickable direct quotes. No speculation, no synthetic hallucinations.' 
-              },
-              { 
-                title: 'Forensic Benchmarks', 
-                desc: 'Computes document-level precision and semantic consistency scores, giving you full trust transparency.' 
-              }
-            ].map((pillar, idx) => (
-              <div 
-                key={idx} 
-                className="pillar-card" 
-                style={{ 
-                  padding: '32px', 
-                  borderRadius: '12px', 
-                  background: T.cardBg, 
-                  border: `1px solid ${T.border}`,
-                  transition: 'border-color 0.3s'
-                }}
-              >
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: T.accentDim, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.accent, marginBottom: '20px' }}>
-                  <ShieldCheck size={18} />
-                </div>
-                <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '24px', fontWeight: 300, marginBottom: '12px' }}>{pillar.title}</h3>
-                <p style={{ fontSize: '14px', color: T.textMuted, lineHeight: 1.6, fontWeight: 300, margin: 0 }}>{pillar.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Final Call to Action */}
-      <section style={{ padding: '120px 24px', textAlign: 'center', position: 'relative' }}>
-        <div style={{ maxWidth: '600px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 300, marginBottom: '24px' }}>
-            Ready for Forensic <br />
-            <span style={{ color: T.accent, fontStyle: 'italic' }}>Intelligence?</span>
-          </h2>
-          <p style={{ fontSize: '16px', color: T.textMuted, marginBottom: '40px', fontWeight: 300, lineHeight: 1.6 }}>
-            Start auditing statements for discrepancies and contradictions with absolute precision.
-          </p>
-          <Link to="/verify">
-            <button className="shimmer-btn" style={{ padding: '18px 48px', borderRadius: '10px', fontSize: '16px', fontWeight: '600', background: T.accent, border: 'none', color: '#000', cursor: 'pointer', boxShadow: `0 4px 20px ${T.accent}20` }}>
-              Start Verification
-            </button>
-          </Link>
-        </div>
-      </section>
-
       <Footer darkMode={darkMode} toggleTheme={toggleTheme} />
 
       {/* Responsive styles override */}
       <style>{`
-        .pillar-card:hover {
-          border-color: ${T.accent}40 !important;
-        }
         @media (max-width: 900px) {
           .mock-grid {
             grid-template-columns: 1fr !important;
             height: auto !important;
-          }
-          .mock-panel-left {
-            border-right: none !important;
-            border-bottom: 1px solid ${T.border} !important;
+            padding: 20px !important;
           }
         }
       `}</style>
