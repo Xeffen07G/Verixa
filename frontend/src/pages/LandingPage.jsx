@@ -198,28 +198,28 @@ export default function LandingPage() {
     bg: '#000000', bg2: '#09090e', text: '#ffffff',
     text2: 'rgba(255,255,255,0.75)', text3: 'rgba(255,255,255,0.45)',
     border: 'rgba(255,255,255,0.08)', cardBg: '#09090e',
-    heroBg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.06) 0%, transparent 70%)',
-    statBg: '#000000', featureHover: 'rgba(255,255,255,0.05)',
+    heroBg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201, 169, 110, 0.08) 0%, transparent 70%)',
+    statBg: '#000000', featureHover: 'rgba(201, 169, 110, 0.06)',
     stepBg: '#09090e', testimonialBg: '#09090e', pricingBg: '#09090e',
-    ctaBg: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 70%)',
-    sectionBg: '#09090e', badgeText: '#ffffff',
+    ctaBg: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(201, 169, 110, 0.06) 0%, transparent 70%)',
+    sectionBg: '#09090e', badgeText: '#c9a96e',
     demoBg: '#09090e', demoCardBg: '#000000',
     glassCard: 'rgba(255,255,255,0.03)', glassBorder: 'rgba(255,255,255,0.06)',
-    accent: '#ffffff', accentMuted: 'rgba(255,255,255,0.12)',
+    accent: '#c9a96e', accentMuted: 'rgba(201, 169, 110, 0.15)',
   };
 
   const T_LIGHT = {
     bg: '#ffffff', bg2: '#f8f9fa', text: '#0a0a0f',
     text2: 'rgba(10,10,15,0.75)', text3: 'rgba(10,10,15,0.45)',
     border: 'rgba(0,0,0,0.06)', cardBg: '#ffffff',
-    heroBg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,0,0,0.03) 0%, transparent 70%)',
-    statBg: '#ffffff', featureHover: 'rgba(0,0,0,0.03)',
+    heroBg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201, 169, 110, 0.08) 0%, transparent 70%)',
+    statBg: '#ffffff', featureHover: 'rgba(201, 169, 110, 0.06)',
     stepBg: '#f8f9fa', testimonialBg: '#ffffff', pricingBg: '#ffffff',
-    ctaBg: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0,0,0,0.03) 0%, transparent 70%)',
-    sectionBg: '#f8f9fa', badgeText: '#000000',
+    ctaBg: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(201, 169, 110, 0.06) 0%, transparent 70%)',
+    sectionBg: '#f8f9fa', badgeText: '#c9a96e',
     demoBg: '#f8f9fa', demoCardBg: '#ffffff',
     glassCard: '#ffffff', glassBorder: 'rgba(0,0,0,0.06)',
-    accent: '#000000', accentMuted: 'rgba(0,0,0,0.08)',
+    accent: '#c9a96e', accentMuted: 'rgba(201, 169, 110, 0.15)',
   };
 
   const T = darkMode ? T_DARK : T_LIGHT;
@@ -312,8 +312,8 @@ export default function LandingPage() {
                 whileTap={{ scale: 0.97 }}
                 style={{
                   padding: '15px 38px', borderRadius: 10, fontSize: 14, fontWeight: 600,
-                  background: '#ffffff', border: 'none',
-                  color: '#000000', letterSpacing: 0.5, cursor: 'pointer',
+                  background: `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none',
+                  color: darkMode ? '#0a0a0f' : '#fff', letterSpacing: 0.5, cursor: 'pointer',
                 }}
               >{t('landingStartFree', lang)}</motion.button>
             </Link>
@@ -966,7 +966,7 @@ export default function LandingPage() {
               whileTap={{ scale: 0.97 }}
               style={{
                 padding: '16px 44px', borderRadius: 12, fontSize: 15, fontWeight: 600,
-                background: '#ffffff', border: 'none',
+                background: `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none',
                 color: darkMode ? '#0a0a0f' : '#fff', letterSpacing: 0.5, cursor: 'pointer',
               }}
             >Launch VeriXa Free</motion.button>

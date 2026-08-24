@@ -3,9 +3,9 @@
 :root {
   --di-bg: #06060a;
   --di-sidebar-bg: #09090e;
-  --di-accent: #ffffff;
-  --di-accent-dim: rgba(255, 255, 255, 0.04);
-  --di-accent-hover: rgba(255, 255, 255, 0.08);
+  --di-accent: #c9a96e;
+  --di-accent-dim: rgba(201, 169, 110, 0.04);
+  --di-accent-hover: rgba(201, 169, 110, 0.08);
   --di-border-subtle: rgba(255, 255, 255, 0.03);
   --di-text-primary: #f5f3ef;
   --di-text-secondary: rgba(245, 243, 239, 0.6);
