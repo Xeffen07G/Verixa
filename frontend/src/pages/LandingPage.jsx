@@ -226,7 +226,7 @@ export default function LandingPage() {
 
   const sectionHeadingStyle = {
     fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
-    fontSize: 'clamp(28px, 5vw, 54px)', lineHeight: 1.1, color: T.text, letterSpacing: -0.5,
+    fontSize: 'clamp(28px, 5vw, 54px)', lineHeight: 1.1, color: '#ffffff', letterSpacing: -0.5,
   };
   const sectionLabelStyle = {
     fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
@@ -237,13 +237,27 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="page-wrapper" style={{ background: T.bg, minHeight: '100vh', transition: 'background 0.3s' }}>
+    <div className="page-wrapper" style={{ background: '#000000', minHeight: '100vh', transition: 'background 0.3s' }}>
 
       <Navbar darkMode={darkMode} onToggleTheme={toggleTheme} />
 
 
       {/* ══════════ HERO SECTION ══════════ */}
-      <Section style={{ padding: '30px 0 100px', textAlign: 'center', position: 'relative' }}>
+      {(() => {
+        const T = T_DARK;
+        const sectionHeadingStyle = {
+          fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
+          fontSize: 'clamp(28px, 5vw, 54px)', lineHeight: 1.1, color: T.text, letterSpacing: -0.5,
+        };
+        const sectionLabelStyle = {
+          fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
+          color: T.accent, marginBottom: 14, fontWeight: 500,
+        };
+        const dividerStyle = {
+          width: 48, height: 1, background: `linear-gradient(to right, ${T.accent}, transparent)`, margin: '20px 0',
+        };
+        return (
+          <Section style={{ background: '#000000', color: '${T.text}' }} style={{ padding: '30px 0 100px', textAlign: 'center', position: 'relative' }}>
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
           background: `radial-gradient(circle at 50% 30%, ${T.accent}0a 0%, transparent 70%)`,
@@ -298,8 +312,8 @@ export default function LandingPage() {
                 whileTap={{ scale: 0.97 }}
                 style={{
                   padding: '15px 38px', borderRadius: 10, fontSize: 14, fontWeight: 600,
-                  background: `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none',
-                  color: darkMode ? '#0a0a0f' : '#fff', letterSpacing: 0.5, cursor: 'pointer',
+                  background: '#ffffff', border: 'none',
+                  color: '#000000', letterSpacing: 0.5, cursor: 'pointer',
                 }}
               >{t('landingStartFree', lang)}</motion.button>
             </Link>
@@ -309,7 +323,7 @@ export default function LandingPage() {
                 whileTap={{ scale: 0.97 }}
                 style={{
                   padding: '15px 38px', borderRadius: 10, fontSize: 14, fontWeight: 500,
-                  background: 'transparent', border: `1px solid ${T.border}`,
+                  background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.25)',
                   color: T.text, letterSpacing: 0.5, cursor: 'pointer',
                 }}
               >{t('landingSeeHow', lang)}</motion.button>
@@ -329,9 +343,24 @@ export default function LandingPage() {
             <span>{t('landingScroll', lang)}</span>
           </motion.div>
       </Section>
-
+        );
+      })()}
       {/* ══════════ STATS ══════════ */}
-      <Section style={{ position: 'relative' }}>
+      {(() => {
+        const T = T_LIGHT;
+        const sectionHeadingStyle = {
+          fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
+          fontSize: 'clamp(28px, 5vw, 54px)', lineHeight: 1.1, color: T.text, letterSpacing: -0.5,
+        };
+        const sectionLabelStyle = {
+          fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
+          color: T.accent, marginBottom: 14, fontWeight: 500,
+        };
+        const dividerStyle = {
+          width: 48, height: 1, background: `linear-gradient(to right, ${T.accent}, transparent)`, margin: '20px 0',
+        };
+        return (
+          <Section style={{ background: '#ffffff', color: '${T.text}' }} style={{ position: 'relative' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 80px' }}>
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
@@ -363,9 +392,24 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </Section>
-
+        );
+      })()}
       {/* ══════════ LIVE DEMO ══════════ */}
-      <Section id="live-demo" style={{ padding: '40px 0 100px' }}>
+      {(() => {
+        const T = T_DARK;
+        const sectionHeadingStyle = {
+          fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
+          fontSize: 'clamp(28px, 5vw, 54px)', lineHeight: 1.1, color: T.text, letterSpacing: -0.5,
+        };
+        const sectionLabelStyle = {
+          fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
+          color: T.accent, marginBottom: 14, fontWeight: 500,
+        };
+        const dividerStyle = {
+          width: 48, height: 1, background: `linear-gradient(to right, ${T.accent}, transparent)`, margin: '20px 0',
+        };
+        return (
+          <Section style={{ background: '#000000', color: '${T.text}' }} id="live-demo" style={{ padding: '40px 0 100px' }}>
         <div style={{ padding: '0 24px', maxWidth: 900, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <p style={sectionLabelStyle}>{t('livePreview', lang)}</p>
@@ -440,9 +484,24 @@ export default function LandingPage() {
           </div>
         </div>
       </Section>
-
+        );
+      })()}
       {/* ══════════ POWERED BY ══════════ */}
-      <Section style={{ padding: '40px 0 60px', overflow: 'hidden' }}>
+      {(() => {
+        const T = T_LIGHT;
+        const sectionHeadingStyle = {
+          fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
+          fontSize: 'clamp(28px, 5vw, 54px)', lineHeight: 1.1, color: T.text, letterSpacing: -0.5,
+        };
+        const sectionLabelStyle = {
+          fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
+          color: T.accent, marginBottom: 14, fontWeight: 500,
+        };
+        const dividerStyle = {
+          width: 48, height: 1, background: `linear-gradient(to right, ${T.accent}, transparent)`, margin: '20px 0',
+        };
+        return (
+          <Section style={{ background: '#ffffff', color: '${T.text}' }} style={{ padding: '40px 0 60px', overflow: 'hidden' }}>
         <p style={{ textAlign: 'center', fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: T.text3, marginBottom: 24, fontWeight: 500 }}>
           {t('poweredByLabel', lang)}
         </p>
@@ -456,9 +515,24 @@ export default function LandingPage() {
           ))}
         </div>
       </Section>
-
+        );
+      })()}
       {/* ══════════ CAPABILITIES (RE-ENGINEERED) ══════════ */}
-      <Section id="features" style={{ padding: '120px 0', position: 'relative', overflow: 'hidden' }}>
+      {(() => {
+        const T = T_LIGHT;
+        const sectionHeadingStyle = {
+          fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
+          fontSize: 'clamp(28px, 5vw, 54px)', lineHeight: 1.1, color: T.text, letterSpacing: -0.5,
+        };
+        const sectionLabelStyle = {
+          fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
+          color: T.accent, marginBottom: 14, fontWeight: 500,
+        };
+        const dividerStyle = {
+          width: 48, height: 1, background: `linear-gradient(to right, ${T.accent}, transparent)`, margin: '20px 0',
+        };
+        return (
+          <Section style={{ background: '#ffffff', color: '${T.text}' }} id="features" style={{ padding: '120px 0', position: 'relative', overflow: 'hidden' }}>
         <div style={{ padding: '0 24px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           <div className="capabilities-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 60, alignItems: 'center' }}>
             
@@ -574,9 +648,24 @@ export default function LandingPage() {
           </div>
         </div>
       </Section>
-
+        );
+      })()}
       {/* ══════════ PROCESS (SINE-WAVE JOURNEY) ══════════ */}
-      <Section id="how-it-works" style={{ padding: '120px 0', background: T.sectionBg, position: 'relative', overflow: 'hidden' }}>
+      {(() => {
+        const T = T_DARK;
+        const sectionHeadingStyle = {
+          fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
+          fontSize: 'clamp(28px, 5vw, 54px)', lineHeight: 1.1, color: T.text, letterSpacing: -0.5,
+        };
+        const sectionLabelStyle = {
+          fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
+          color: T.accent, marginBottom: 14, fontWeight: 500,
+        };
+        const dividerStyle = {
+          width: 48, height: 1, background: `linear-gradient(to right, ${T.accent}, transparent)`, margin: '20px 0',
+        };
+        return (
+          <Section style={{ background: '#000000', color: '${T.text}' }} id="how-it-works" style={{ padding: '120px 0', background: T.sectionBg, position: 'relative', overflow: 'hidden' }}>
         <div style={{ padding: '0 24px', maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           <div style={{ textAlign: 'center', marginBottom: 80 }}>
             <p style={sectionLabelStyle}>{t('howItWorksLabel', lang)}</p>
@@ -652,10 +741,24 @@ export default function LandingPage() {
           }
         `}</style>
       </Section>
-
-
+        );
+      })()}
       {/* ══════════ TESTIMONIALS ══════════ */}
-      <Section id="testimonials" style={{ padding: '100px 0' }}>
+      {(() => {
+        const T = T_LIGHT;
+        const sectionHeadingStyle = {
+          fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
+          fontSize: 'clamp(28px, 5vw, 54px)', lineHeight: 1.1, color: T.text, letterSpacing: -0.5,
+        };
+        const sectionLabelStyle = {
+          fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
+          color: T.accent, marginBottom: 14, fontWeight: 500,
+        };
+        const dividerStyle = {
+          width: 48, height: 1, background: `linear-gradient(to right, ${T.accent}, transparent)`, margin: '20px 0',
+        };
+        return (
+          <Section style={{ background: '#ffffff', color: '${T.text}' }} id="testimonials" style={{ padding: '100px 0' }}>
         <div style={{ padding: '0 24px', maxWidth: 800, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
             <p style={sectionLabelStyle}>{t('testimonialsLabel', lang)}</p>
@@ -743,9 +846,24 @@ export default function LandingPage() {
           </div>
         </div>
       </Section>
-
+        );
+      })()}
       {/* ══════════ PRICING ══════════ */}
-      <Section id="pricing" style={{ padding: '140px 0', background: T.sectionBg }}>
+      {(() => {
+        const T = T_LIGHT;
+        const sectionHeadingStyle = {
+          fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
+          fontSize: 'clamp(28px, 5vw, 54px)', lineHeight: 1.1, color: T.text, letterSpacing: -0.5,
+        };
+        const sectionLabelStyle = {
+          fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
+          color: T.accent, marginBottom: 14, fontWeight: 500,
+        };
+        const dividerStyle = {
+          width: 48, height: 1, background: `linear-gradient(to right, ${T.accent}, transparent)`, margin: '20px 0',
+        };
+        return (
+          <Section style={{ background: '#ffffff', color: '${T.text}' }} id="pricing" style={{ padding: '140px 0', background: T.sectionBg }}>
         <div style={{ padding: '0 24px', maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 80 }}>
             <p style={sectionLabelStyle}>{t('pricingLabel', lang)}</p>
@@ -815,9 +933,24 @@ export default function LandingPage() {
           </div>
         </div>
       </Section>
-
+        );
+      })()}
       {/* ══════════ CTA ══════════ */}
-      <Section style={{ padding: '120px 24px', textAlign: 'center' }}>
+      {(() => {
+        const T = T_DARK;
+        const sectionHeadingStyle = {
+          fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
+          fontSize: 'clamp(28px, 5vw, 54px)', lineHeight: 1.1, color: T.text, letterSpacing: -0.5,
+        };
+        const sectionLabelStyle = {
+          fontSize: 11, letterSpacing: 3, textTransform: 'uppercase',
+          color: T.accent, marginBottom: 14, fontWeight: 500,
+        };
+        const dividerStyle = {
+          width: 48, height: 1, background: `linear-gradient(to right, ${T.accent}, transparent)`, margin: '20px 0',
+        };
+        return (
+          <Section style={{ background: '#000000', color: '${T.text}' }} style={{ padding: '120px 24px', textAlign: 'center' }}>
         <div style={{ position: 'relative', zIndex: 1 }}>
           <h2 style={{
             fontFamily: 'Cormorant Garamond, serif', fontWeight: 300,
@@ -833,15 +966,16 @@ export default function LandingPage() {
               whileTap={{ scale: 0.97 }}
               style={{
                 padding: '16px 44px', borderRadius: 12, fontSize: 15, fontWeight: 600,
-                background: `linear-gradient(135deg, ${T.accent}, #a07b42)`, border: 'none',
+                background: '#ffffff', border: 'none',
                 color: darkMode ? '#0a0a0f' : '#fff', letterSpacing: 0.5, cursor: 'pointer',
               }}
             >Launch VeriXa Free</motion.button>
           </Link>
         </div>
       </Section>
-
-      <Footer darkMode={darkMode} toggleTheme={toggleTheme} />
+        );
+      })()}
+            <Footer darkMode={true} toggleTheme={toggleTheme} />
 
       <style>{`
         .feature-card:hover .hover-desc { height: auto !important; opacity: 1 !important; margin-top: 8px !important; }
