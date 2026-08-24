@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
-  Upload, FileText, Send, RefreshCw, Copy, Plus, File, CheckCircle2
+  Upload, FileText, Send, RefreshCw, Copy, Plus, File, CheckCircle2, ChevronLeft
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useAuth } from '../context/AuthContext';
@@ -329,7 +329,28 @@ export default function DocumentIntelligence() {
     <div className="di-layout">
       {/* LEFT SIDEBAR: Library (~20%) */}
       <div className="di-sidebar-left">
-        <div className="di-sidebar-header">
+        <div className="di-sidebar-header" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button 
+            onClick={() => navigate('/')} 
+            title="Back to Landing Page" 
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: '#c9a96e', 
+              cursor: 'pointer', 
+              padding: '6px', 
+              borderRadius: '6px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              backgroundColor: 'rgba(201, 169, 110, 0.05)',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(201, 169, 110, 0.12)'}
+            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(201, 169, 110, 0.05)'}
+          >
+            <ChevronLeft size={16} />
+          </button>
           <div className="di-sidebar-title">Library</div>
         </div>
 
